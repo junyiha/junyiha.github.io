@@ -1,0 +1,128 @@
+{% assign current_page = page.url | split: "/" | last %}
+{% if current_page contains 'page' %}
+  {% assign current_page = current_page | remove: "page" | abs %}
+{% else %}
+  {% assign current_page = 1 %}
+{% endif %}
+
+{% assign total_pages = paginator.total_pages %}
+{% assign pager_count = 5 %}
+{% assign half_pager_count = pager_count | minus: 1 | divided_by: 2 | abs %}
+{% assign pagers = "" | split: "" %}
+
+{% assign show_prev_more = false %}
+{% assign new_prev_page = 1 %}
+{% assign show_next_more = false %}
+{% assign new_next_page = total_pages %}
+
+{% if total_pages > pager_count %}
+  {% assign res = pager_count | minus: half_pager_count %}
+  {% if current_page > res %}
+    {% assign show_prev_more = true %}
+    {% assign new_prev_page = current_page | minus: pager_count | plus: 2 %}
+    {% if new_prev_page < 1 %}
+      {% assign new_prev_page = 1 %}
+    {% endif %}
+  {% endif %}
+
+  {% assign res = total_pages | minus: half_pager_count %}
+  {% if current_page < res %}
+    {% assign show_next_more = true %}
+    {% assign new_next_page = current_page | plus: pager_count | minus: 2 %}
+    {% if new_next_page > total_pages %}
+      {% assign new_next_page = total_pages %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if show_prev_more == true and show_next_more == false %}
+  {% assign start = total_pages | minus: pager_count | plus: 2 %}
+  {% assign end = total_pages | minus: 1 %}
+  {% for n in (start..end) %}
+    {% assign pagers = pagers | push: n %}
+  {% endfor %}
+{% elsif show_prev_more == false and show_next_more == true %}
+  {% assign end = pager_count | minus: 1 %}
+  {% for n in (2..end) %}
+    {% assign pagers = pagers | push: n %}
+  {% endfor %}
+{% elsif show_prev_more == true and show_next_more == true %}
+  {% assign offset = pager_count | minus: 3 | divided_by: 2 %}
+  {% assign start = current_page | minus: offset %}
+  {% assign end = current_page | plus: offset %}
+  {% for n in (start..end) %}
+    {% assign pagers = pagers | push: n %}
+  {% endfor %}
+{% else %}
+  {% assign end = total_pages | minus: 1 %}
+  {% for n in (2..end) %}
+    {% assign pagers = pagers | push: n %}
+  {% endfor %}
+{% endif %}
+
+<div id="pagination" style="text-align: center;">
+  <span class="total text-tip">{{ site.posts | size }} Posts</span>
+
+  <span class="pagination-box">
+    {% if paginator.previous_page %}
+      {% if paginator.previous_page == 1 %}
+      <a href="{{ site.baseurl }}/home" class="previous">
+        <i class="icon-chevron-left"></i>
+      </a>
+      {% else %}
+      <a href="{{ site.baseurl }}/home/page{{ paginator.previous_page }}" class="previous">
+        <i class="icon-chevron-left"></i>
+      </a>
+      {% endif %}
+    {% else %}
+      <span class="previous btn-not-allowed cursor-not-allowed">
+        <i class="icon-chevron-left"></i>
+      </span>
+    {% endif %}
+
+    <a href="{{ site.baseurl }}/home" class="number {% unless paginator.previous_page %}is-active{% endunless %}">1</a>
+
+    {% if show_prev_more == true %}
+      {% if new_prev_page == 1 %}
+      <a href="{{ site.baseurl }}/home" class="number prev-page">
+        <span>...</span>
+        <i class="icon-chevrons-left"></i>
+      </a>
+      {% else %}
+      <a href="{{ site.baseurl }}/home/page{{ new_prev_page }}" class="number prev-page">
+        <span>...</span>
+        <i class="icon-chevrons-left"></i>
+      </a>
+      {% endif %}
+    {% endif %}
+
+    {% for n in pagers %}
+    <a href="{{ site.baseurl }}/home/page{{ n }}" class="number {% if page.url contains n %}is-active{% endif %}">{{ n }}</a>
+    {% endfor %}
+
+    {% if show_next_more == true %}
+    <a href="{{ site.baseurl }}/home/page{{ new_next_page }}" class="number next-page">
+      <span>...</span>
+      <i class="icon-chevrons-right"></i>
+    </a>
+    {% endif %}
+
+    <span class="mobile-page-number text-tip only-sm">{{ paginator.page }} / {{ paginator.total_pages }}</span>
+
+    {% unless total_pages == 1 %}
+    <a href="{{ site.baseurl }}/home/page{{ total_pages }}" class="number {% unless paginator.next_page %}is-active{% endunless %}">{{ total_pages }}</a>
+    {% endunless %}
+
+    {% if paginator.next_page %}
+    <a href="{{ site.baseurl }}/home/page{{ paginator.next_page }}" class="next">
+      <i class="icon-chevron-right"></i>
+    </a>
+    {% else %}
+    <span class="next btn-not-allowed cursor-not-allowed">
+      <i class="icon-chevron-right"></i>
+    </span>
+    {% endif %}
+  </span>
+
+  <span class="page-number text-tip">{{ paginator.page }} / {{ paginator.total_pages }}</span>
+</div>
