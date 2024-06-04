@@ -281,9 +281,9 @@ if (document.querySelector('#gitalk-container')) {
   const gitalk = new Gitalk({
     clientID: 'a5e3f95d928717350bc8',
     clientSecret: 'fbc3903178fb535b50ddab5aca939b61a82e7070',
-    repo: 'zyuandong.github.io',
-    owner: 'zyuandong',
-    admin: ['zyuandong'],
+    repo: 'junyiha.github.io',
+    owner: 'junyiha',
+    admin: ['junyiha'],
     id: location.pathname, // Ensure uniqueness and length less than 50
     distractionFreeMode: false, // Facebook-like distraction free mode
   });
