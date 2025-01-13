@@ -191,6 +191,361 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/DeepLearning/2024-05-22-onnx/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/DeepLearning/2024-05-22-onnx/" class="post-title-link" itemprop="url">onnx</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-31 09:12:08" itemprop="dateModified" datetime="2024-12-31T09:12:08+08:00">2024-12-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>onnx相关笔记</li>
+</ul>
+<h2 id="TensorRT-OpenVino-ONNXRuntime-OpenCV-dnn"><a href="#TensorRT-OpenVino-ONNXRuntime-OpenCV-dnn" class="headerlink" title="TensorRT, OpenVino, ONNXRuntime, OpenCV dnn"></a>TensorRT, OpenVino, ONNXRuntime, OpenCV dnn</h2><ul>
+<li>无论用什么框架训练的模型，推荐转为onnx格式，方便部署</li>
+<li>支持onnx模型的框架如下<ul>
+<li>TensorRT： 英伟达的，用于 GPU 推理加速。注意需要英伟达 GPU 硬件的支持</li>
+<li>OpenVino： 英特尔的，用于 CPU 推理加速。注意需要英特尔 CPU 硬件的支持</li>
+<li>ONNXRuntime： 微软，亚马逊，Facebook和IBM等公司共同开发的，可用于CPU，GPU</li>
+<li>OpenCV dnn： OpenCV的调用模型的模块</li>
+</ul>
+</li>
+<li>pt格式的模型，可以用Pytorch框架部署</li>
+<li>推理效率上：TensorRT &gt; OpenVino &gt; ONNXRuntime &gt; OpenCV dnn &gt; Pytorch</li>
+</ul>
+<h2 id="onnx推理"><a href="#onnx推理" class="headerlink" title="onnx推理"></a>onnx推理</h2><ul>
+<li>ONNX的推理分别需要装两种框架<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install onnxruntime       <span class="comment"># CPU 版本</span></span><br><span class="line">pip install onnxruntime-gpu   <span class="comment"># GPU 版本</span></span><br></pre></td></tr></table></figure></li>
+<li>而且需要在保存pytorch模型的时候也需要指定cpu和gpu。</li>
+<li>这里推理就不需要pytorch框架来支持了，尤其是在容器部署的时候pytorch框架安装包非常大这会导致部署的镜像也很大，如果推理去掉pytorch框架的情况下镜像大小也会减少很多，大大减少部署难度。</li>
+</ul>
+<h2 id="onnx概述"><a href="#onnx概述" class="headerlink" title="onnx概述"></a>onnx概述</h2><ul>
+<li><p>深度学习算法大多通过计算数据流图来完成神经网络的深度学习过程。 一些框架（例如CNTK，Caffe2，Theano和TensorFlow）使用静态图形，而其他框架（例如 PyTorch 和 Chainer）使用动态图形。</p>
+</li>
+<li><p>但是这些框架都提供了接口，使开发人员可以轻松构建计算图和运行时，以优化的方式处理图。 这些图用作中间表示（IR），捕获开发人员源代码的特定意图，有助于优化和转换在特定设备（CPU，GPU，FPGA等）上运行</p>
+</li>
+<li><p>ONNX 的本质只是一套开放的 ML 模型标准，模型文件存储的只是网络的拓扑结构和权重（其实每个深度学习框架最后保存的模型都是类似的），脱离开框架是没办法对模型直接进行 inference 的</p>
+</li>
+<li><p>为什么使用通用IR</p>
+<ul>
+<li>现在很多的深度学习框架提供的功能都是类似的，但是在 API、计算图和 runtime 方面却是独立的，这就给 AI 开发者在不同平台部署不同模型带来了很多困难和挑战，ONNX 的目的在于提供一个跨框架的模型中间表达框架，用于模型转换和部署。ONNX 提供的计算图是通用的，格式也是开源的。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/DeepLearning/2024-05-22-pytorch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/DeepLearning/2024-05-22-pytorch/" class="post-title-link" itemprop="url">pytorch</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>pytorch相关笔记</li>
+</ul>
+<h2 id="pytorch生态部署方案"><a href="#pytorch生态部署方案" class="headerlink" title="pytorch生态部署方案"></a>pytorch生态部署方案</h2><ul>
+<li>Pytorch虽然社区生态好，各种功能模块都是非常好用，但是部署生态一直饱受诟病。</li>
+<li>ONNX的规范及代码主要由微软，亚马逊，Facebook和IBM等公司共同开发，也主要是为了来对抗谷歌的Tensorflow框架的部署生态。</li>
+</ul>
+<h2 id="Pytorch保存模型转化为ONNX模型"><a href="#Pytorch保存模型转化为ONNX模型" class="headerlink" title="Pytorch保存模型转化为ONNX模型"></a>Pytorch保存模型转化为ONNX模型</h2><ul>
+<li>通过Pytorch保存下来的模型pth，因为pth部署无法跨平台移植，我们必须将模型转化成通用格式</li>
+<li>优化由于推理（或模型评分）的机器学习模型非常困难，因为需要调整模型和推理库，充分利用硬件功能。如果想要在不同类型的平台（云&#x2F;Edge、CPU&#x2F;GPU 等）上获得最佳性能，实现起来会异常困难，因为每个平台都有不同的功能和特性。 如果模型来自需要在各种平台上运行的多种框架，会极大增加复杂性。 优化框架和硬件的所有不同组合非常耗时。此时ONNX的作用就显现出来的，专注于模型推理。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/DeepLearning/2024-05-22-tensorflow_serving/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/DeepLearning/2024-05-22-tensorflow_serving/" class="post-title-link" itemprop="url">tensorflow_serving</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>tensorflow serving库相关笔记</li>
+</ul>
+<h2 id="TensorFlow-Serving是什么"><a href="#TensorFlow-Serving是什么" class="headerlink" title="TensorFlow Serving是什么"></a>TensorFlow Serving是什么</h2><ul>
+<li>TensorFlow Serving 是一个适用于机器学习模型的灵活、高性能应用系统，专为生产环境而设计。借助 TensorFlow Serving，您可以轻松部署新算法和实验，同时保留相同的服务器架构和 API。TensorFlow Serving 提供与 TensorFlow 模型的开箱即用型集成，但也可以轻松扩展以应用其他类型的模型和数据。</li>
+</ul>
+<h2 id="C-tensorflow-serving库-详解"><a href="#C-tensorflow-serving库-详解" class="headerlink" title="C++ tensorflow serving库 详解"></a>C++ tensorflow serving库 详解</h2><p>TensorFlow Serving 是一个用于部署机器学习模型的开源库，它提供了一个高性能、灵活的方式来将训练好的 TensorFlow 模型部署到生产环境中，以便进行实时预测。虽然 TensorFlow Serving 主要是用 C++ 实现的，但它也提供了 Python API 以方便用户使用。</p>
+<p>下面是对 TensorFlow Serving C++ 库的详细介绍：</p>
+<ol>
+<li><p><strong>核心功能</strong>：</p>
+<ul>
+<li>加载和管理模型：TensorFlow Serving 能够加载和管理训练好的 TensorFlow 模型，包括 SavedModel 格式。</li>
+<li>提供预测服务：一旦模型被加载，TensorFlow Serving 可以为客户端提供实时的预测服务，支持单个或批量请求。</li>
+<li>高性能和可扩展性：TensorFlow Serving 在设计上注重性能和可扩展性，能够处理高并发的请求并保持低延迟。</li>
+</ul>
+</li>
+<li><p><strong>架构</strong>：</p>
+<ul>
+<li>TensorFlow Serving 的架构主要由三个组件组成：Servable、Loader 和 Servable Manager。</li>
+<li>Servable 是指 TensorFlow 模型的一种抽象，它代表了一个可部署的模型或模型的版本。</li>
+<li>Loader 负责加载 Servable，并在需要时将其初始化或卸载。</li>
+<li>Servable Manager 负责管理 Servable 的生命周期，包括加载、卸载和路由请求等。</li>
+</ul>
+</li>
+<li><p><strong>部署流程</strong>：</p>
+<ul>
+<li>准备模型：首先需要使用 TensorFlow 训练模型，并将其保存为 SavedModel 格式。</li>
+<li>配置 TensorFlow Serving：创建一个模型配置文件，指定模型的路径、输入和输出等信息。</li>
+<li>启动 TensorFlow Serving：运行 TensorFlow Serving 服务器，并指定模型配置文件。</li>
+<li>发送请求：客户端向 TensorFlow Serving 发送预测请求，服务器返回预测结果。</li>
+</ul>
+</li>
+<li><p><strong>使用示例</strong>：<br>下面是一个简单的 TensorFlow Serving C++ 应用示例，假设我们已经有一个名为 <code>my_model</code> 的 SavedModel：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;grpcpp/grpcpp.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tensorflow_serving/apis/prediction_service.grpc.pb.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> grpc::Channel;</span><br><span class="line"><span class="keyword">using</span> grpc::ClientContext;</span><br><span class="line"><span class="keyword">using</span> grpc::Status;</span><br><span class="line"><span class="keyword">using</span> tensorflow::serving::PredictRequest;</span><br><span class="line"><span class="keyword">using</span> tensorflow::serving::PredictResponse;</span><br><span class="line"><span class="keyword">using</span> tensorflow::serving::PredictionService;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TensorFlowServingClient</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TensorFlowServingClient</span>(std::shared_ptr&lt;Channel&gt; channel)</span><br><span class="line">        : <span class="built_in">stub_</span>(PredictionService::<span class="built_in">NewStub</span>(channel)) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送预测请求</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Predict</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        PredictRequest request;</span><br><span class="line">        PredictResponse response;</span><br><span class="line">        ClientContext context;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置输入数据</span></span><br><span class="line">        <span class="comment">// request.mutable_model_spec()-&gt;set_name(&quot;my_model&quot;);</span></span><br><span class="line">        <span class="comment">// 添加输入数据</span></span><br><span class="line">        <span class="comment">// request.mutable_inputs()-&gt;...;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 发送预测请求</span></span><br><span class="line">        Status status = stub_-&gt;<span class="built_in">Predict</span>(&amp;context, request, &amp;response);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 处理预测结果</span></span><br><span class="line">        <span class="keyword">if</span> (status.<span class="built_in">ok</span>()) &#123;</span><br><span class="line">            <span class="comment">// 处理 response 中的输出结果</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">&quot;RPC failed: &quot;</span> &lt;&lt; status.<span class="built_in">error_message</span>() &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::unique_ptr&lt;PredictionService::Stub&gt; stub_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建 TensorFlow Serving 客户端</span></span><br><span class="line">    <span class="function">TensorFlowServingClient <span class="title">client</span><span class="params">(grpc::CreateChannel(<span class="string">&quot;localhost:8500&quot;</span>, grpc::InsecureChannelCredentials()))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送预测请求</span></span><br><span class="line">    client.<span class="built_in">Predict</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该示例演示了如何创建一个 TensorFlow Serving 客户端，并发送预测请求。需要注意的是，你需要根据实际情况修改模型的名称、输入数据等信息。</p>
+</li>
+</ol>
+<p>总的来说，TensorFlow Serving 提供了一个功能强大的 C++ 库，用于部署 TensorFlow 模型并提供实时预测服务。通过了解其核心功能、架构和部署流程，你可以更好地使用 TensorFlow Serving 来满足你的部署需求。</p>
+<h2 id="SavedModel格式是什么"><a href="#SavedModel格式是什么" class="headerlink" title="SavedModel格式是什么"></a>SavedModel格式是什么</h2><p>SavedModel 是 TensorFlow 中用于保存和加载模型的标准格式。它是一种可移植、可恢复的模型表示形式，可以轻松地在不同的平台上进行部署和共享。SavedModel 以文件夹的形式存储，其中包含了模型的结构、权重参数、计算图以及其他相关的元数据。</p>
+<p>SavedModel 主要由两个部分组成：</p>
+<ol>
+<li><p><strong>模型图（GraphDef）</strong>：模型的计算图以 Protocol Buffers 格式保存在名为 <code>saved_model.pb</code> 的文件中。计算图定义了模型的结构，包括输入、输出、各种操作（如张量运算、变量等）以及操作之间的连接关系。</p>
+</li>
+<li><p><strong>变量和资源</strong>：模型的权重参数、变量和其他资源以二进制格式保存在名为 <code>variables/</code> 的文件夹中。这些文件包含了模型的具体参数值，用于在加载模型时恢复模型的状态。</p>
+</li>
+</ol>
+<p>除了这两个基本部分之外，SavedModel 还可以包含其他的元数据信息，例如模型的签名信息（用于描述模型的输入和输出）、运行配置、版本信息等。</p>
+<p>SavedModel 的优点在于它具有跨平台和版本控制的能力，可以在不同的 TensorFlow 版本和不同的硬件平台上进行部署和加载。这使得 SavedModel 成为了 TensorFlow 模型部署和共享的标准格式，被广泛应用于生产环境中。</p>
+<h2 id="C-tensorflow-serving加载onnx模型"><a href="#C-tensorflow-serving加载onnx模型" class="headerlink" title="C++ tensorflow serving加载onnx模型"></a>C++ tensorflow serving加载onnx模型</h2><p>TensorFlow Serving 最初设计用于加载和提供 TensorFlow 模型的预测服务，但它也支持加载其他格式的模型，包括 ONNX（Open Neural Network Exchange）格式的模型。ONNX 是一种开放的标准，用于表示深度学习模型，它允许用户在不同的深度学习框架之间交换模型，并在不同的硬件平台上运行这些模型。</p>
+<p>要在 TensorFlow Serving 中加载 ONNX 模型，你需要先将 ONNX 模型转换为 TensorFlow 的 SavedModel 格式，然后再使用 TensorFlow Serving 加载 SavedModel。以下是一个大致的步骤：</p>
+<ol>
+<li><p><strong>将 ONNX 模型转换为 TensorFlow SavedModel</strong>：</p>
+<ul>
+<li>使用 ONNX-TensorFlow 或 onnx-tf 工具将 ONNX 模型转换为 TensorFlow 的 SavedModel 格式。这些工具可以帮助你将 ONNX 模型导入到 TensorFlow 中，并将其保存为 SavedModel 格式。</li>
+</ul>
+</li>
+<li><p><strong>使用 TensorFlow Serving 加载 SavedModel</strong>：</p>
+<ul>
+<li>使用 TensorFlow Serving 的配置文件（通常是 TensorFlow Serving 的 Docker 镜像中的配置文件），将转换后的 SavedModel 添加到配置中。</li>
+<li>启动 TensorFlow Serving 服务器，并指定模型配置文件。</li>
+</ul>
+</li>
+</ol>
+<p>下面是一个大致的示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 将 ONNX 模型转换为 TensorFlow SavedModel</span></span><br><span class="line">onnx-tf convert -i model.onnx -o saved_model/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 配置 TensorFlow Serving</span></span><br><span class="line"><span class="comment"># 创建一个模型配置文件，例如 model_config.json，指定模型的路径和类型</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;model_version_policy&quot;</span>: &#123; <span class="string">&quot;specific&quot;</span>: &#123; <span class="string">&quot;versions&quot;</span>: &#123; <span class="string">&quot;1&quot;</span>: &#123;&#125; &#125; &#125; &#125;,</span><br><span class="line">  <span class="string">&quot;model_platform&quot;</span>: <span class="string">&quot;tensorflow&quot;</span>,</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;onnx_model&quot;</span>,</span><br><span class="line">  <span class="string">&quot;base_path&quot;</span>: <span class="string">&quot;/path/to/saved_model&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 启动 TensorFlow Serving</span></span><br><span class="line">docker run -p 8500:8500 -p 8501:8501 --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/path/to/model_config.json,target=/models/onnx_model/config.json -t tensorflow/serving</span><br></pre></td></tr></table></figure>
+
+<p>这里的关键步骤是将 ONNX 模型转换为 TensorFlow 的 SavedModel 格式，并通过 TensorFlow Serving 的配置文件将 SavedModel 添加到 TensorFlow Serving 中。这样就可以在 TensorFlow Serving 中加载和提供 ONNX 模型的预测服务了。</p>
+<h2 id="docker方式部署-官方示例"><a href="#docker方式部署-官方示例" class="headerlink" title="docker方式部署(官方示例)"></a>docker方式部署(官方示例)</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Download the TensorFlow Serving Docker image and repo</span></span><br><span class="line">docker pull tensorflow/serving</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/tensorflow/serving</span><br><span class="line"><span class="comment"># Location of demo models</span></span><br><span class="line">TESTDATA=<span class="string">&quot;<span class="subst">$(pwd)</span>/serving/tensorflow_serving/servables/tensorflow/testdata&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Start TensorFlow Serving container and open the REST API port</span></span><br><span class="line">docker run -t --<span class="built_in">rm</span> -p 8501:8501 \</span><br><span class="line">    -v <span class="string">&quot;<span class="variable">$TESTDATA</span>/saved_model_half_plus_two_cpu:/models/half_plus_two&quot;</span> \</span><br><span class="line">    -e MODEL_NAME=half_plus_two \</span><br><span class="line">    tensorflow/serving &amp;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Query the model using the predict API</span></span><br><span class="line">curl -d <span class="string">&#x27;&#123;&quot;instances&quot;: [1.0, 2.0, 5.0]&#125;&#x27;</span> \</span><br><span class="line">    -X POST http://localhost:8501/v1/models/half_plus_two:predict</span><br><span class="line"></span><br><span class="line"><span class="comment"># Returns =&gt; &#123; &quot;predictions&quot;: [2.5, 3.0, 4.5] &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="拉取serving-docker-image"><a href="#拉取serving-docker-image" class="headerlink" title="拉取serving docker image"></a>拉取serving docker image</h2><ul>
+<li><p>运行命令</p>
+<ul>
+<li>docker pull tensorflow&#x2F;serving</li>
+</ul>
+</li>
+<li><p>tensorflow serving docker历史镜像</p>
+<ul>
+<li>地址: <a target="_blank" rel="noopener" href="https://hub.docker.com/r/tensorflow/serving/tags/">https://hub.docker.com/r/tensorflow/serving/tags/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="从serving-docker-image-启动一个容器"><a href="#从serving-docker-image-启动一个容器" class="headerlink" title="从serving docker image 启动一个容器"></a>从serving docker image 启动一个容器</h2><ul>
+<li>serving images有以下属性<ul>
+<li>8500 端口服务于gRPC</li>
+<li>8501 端口服务于 REST API</li>
+<li>可选的环境变量 MODEL_NAME(默认为 model)</li>
+<li>可选的环境变量 MODEL_BASE_PATH(默认为 &#x2F;models)</li>
+</ul>
+</li>
+<li>当 serving image运行一个容器时，其内部实际运行的命令是<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tensorflow_model_server --port=8500 --rest_api_port=8501 \</span><br><span class="line">  --model_name=<span class="variable">$&#123;MODEL_NAME&#125;</span> --model_base_path=<span class="variable">$&#123;MODEL_BASE_PATH&#125;</span>/<span class="variable">$&#123;MODEL_NAME&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/DeepLearning/2024-05-22-%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -353,6 +708,178 @@
 </li>
 </ul>
 </li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Docker/2024-05-22-docker_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Docker/2024-05-22-docker_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">docker_3_常用技巧</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>docker常用技巧</li>
+</ul>
+<h2 id="docker-启动容器并分离到后台"><a href="#docker-启动容器并分离到后台" class="headerlink" title="docker 启动容器并分离到后台"></a>docker 启动容器并分离到后台</h2><figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="keyword">run</span><span class="language-bash"> -<span class="built_in">id</span> -p 4000:4000 jekyll/ubuntu:v1 /bin/bash</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="docker-镜像存储位置"><a href="#docker-镜像存储位置" class="headerlink" title="docker 镜像存储位置"></a>docker 镜像存储位置</h2><ul>
+<li><p>Docker 镜像存储位置取决于你在安装 Docker 时所选择的存储驱动程序。Docker 默认使用“overlay2”存储驱动程序，它会将镜像存储在 &#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2 目录下。但是，如果你使用的是其他存储驱动程序，那么镜像存储位置可能会有所不同。</p>
+</li>
+<li><p>你可以通过以下命令查看 Docker 镜像存储位置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker info | grep -i <span class="string">&#x27;docker root dir&#x27;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>在输出结果中，你将看到存储路径的具体位置。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Docker Root Dir: /var/lib/docker</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果你想将 Docker 镜像存储到不同的位置，可以通过以下步骤进行设置：</p>
+</li>
+<li><p>停止 Docker 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl stop docker</span><br></pre></td></tr></table></figure></li>
+<li><p>移动 &#x2F;var&#x2F;lib&#x2F;docker 目录到新的位置，例如 &#x2F;new&#x2F;docker&#x2F;path：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mv</span> /var/lib/docker /new/docker/path</span><br></pre></td></tr></table></figure></li>
+<li><p>创建一个指向新目录的符号链接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">ln</span> -s /new/docker/path /var/lib/docker</span><br></pre></td></tr></table></figure></li>
+<li><p>启动 Docker 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl start docker</span><br></pre></td></tr></table></figure></li>
+<li><p>现在，Docker 镜像将被存储在新的位置 &#x2F;new&#x2F;docker&#x2F;path 中。请注意，这种更改可能会导致现有的 Docker 容器无法正常运行，因此请谨慎操作。</p>
+</li>
+</ul>
+<h2 id="网络模式设置"><a href="#网络模式设置" class="headerlink" title="网络模式设置"></a>网络模式设置</h2><p>在 Docker 中，<code>-net=host</code> 是一种网络模式选项，用于指定容器的网络命名空间。当你使用该选项时，容器将与宿主机共享网络命名空间，这意味着容器将使用宿主机的网络栈，与宿主机具有相同的网络接口和IP地址。</p>
+<p>具体来说，使用<code>-net=host</code>选项，容器内的网络配置与宿主机完全一致，容器可以直接访问宿主机上的网络接口和端口。这样的配置有一些优势和限制：</p>
+<p>优势：</p>
+<ol>
+<li>简化网络配置：使用该选项，不需要再单独设置容器的网络配置，容器直接继承宿主机的网络配置。</li>
+<li>容器与宿主机共享IP地址：可以让容器直接使用宿主机的IP地址，方便某些网络应用场景。</li>
+</ol>
+<p>限制：</p>
+<ol>
+<li>安全性：容器与宿主机共享网络命名空间，容器内的进程可以直接访问宿主机的网络，这可能会增加潜在的安全风险，因此需要格外小心。</li>
+<li>端口冲突：由于容器与宿主机共享网络，如果宿主机上已经在使用的端口被容器尝试使用，可能会导致端口冲突。</li>
+<li>主机网络的限制：由于容器使用宿主机网络栈，容器将受到宿主机网络设置和限制的影响。</li>
+</ol>
+<p>在大多数情况下，推荐使用默认的网络模式，Docker会为容器分配独立的网络命名空间，从而保持隔离和安全性。只有在特定的使用场景下，才应该考虑使用<code>-net=host</code>选项。</p>
+<p>请注意，Docker在不同版本中可能会有一些变化，因此建议查阅最新的Docker文档以获得最准确的信息。</p>
+<h2 id="保存镜像"><a href="#保存镜像" class="headerlink" title="保存镜像"></a>保存镜像</h2><ul>
+<li>使用命令：<code>tar cvf image.tar --exclude=/proc --exclude=/image.tar /</code>， 在容器里打包系统所需要的文件，<ul>
+<li>记录以下：<code>tar cvf image.tar --exclude=/system --exclude=/sys --exclude=/proc --exclude=/image.tar /</code></li>
+</ul>
+</li>
+<li><code>sudo docker cp containerID:/image.tar ./</code> , 将容器中打包的文件拷贝到主机中</li>
+<li><code>cat image.tar | sudo docker import - image:v1</code>, 导入镜像</li>
+</ul>
+<h2 id="linux下重启-启动-关闭docker服务"><a href="#linux下重启-启动-关闭docker服务" class="headerlink" title="linux下重启,启动,关闭docker服务"></a>linux下重启,启动,关闭docker服务</h2><ul>
+<li><code>sudo systemctl start docker</code> : 启动</li>
+<li><code>sudo systemctl daemon-reload</code>: 守护进程重启</li>
+<li><code>sudo systemctl restart docker</code> or <code>sudo service docker restart</code> : 重启docker服务</li>
+<li><code>sudo service docker stop</code> or <code>sudo systemctl stop docker</code> : 关闭docker</li>
+</ul>
+<h2 id="以非root用户身份管理"><a href="#以非root用户身份管理" class="headerlink" title="以非root用户身份管理"></a>以非root用户身份管理</h2><ul>
+<li>Docker守护程序绑定到Unix套接字而不是TCP端口，默认情况下，Unix套接字的用户有root，其它用户只能使用sudo来访问。 Docker守护程序始终以root用户身份运行</li>
+<li>不想使用sudo，创建docker的Unix组，将用户添加到改组<ul>
+<li><code>sudo groupadd docker</code></li>
+<li><code>sudo usermod -aG docker $USER</code></li>
+<li><code>newgrp docker</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="镜像的上传和拉取"><a href="#镜像的上传和拉取" class="headerlink" title="镜像的上传和拉取"></a>镜像的上传和拉取</h2><ul>
+<li><p>登录docker </p>
+<ul>
+<li><code>docker login</code></li>
+</ul>
+</li>
+<li><p>修改镜像命名</p>
+<ul>
+<li>修改镜像的repository，使之与Docker Hub账号匹配</li>
+<li>Docker Hub为了区分不同用户的同名镜像，镜像的<code>registry</code>中要包含用户名，完整的格式为:<code>[username]/xxx:tag</code></li>
+<li>Docker官方自己维护的镜像没有用户名</li>
+</ul>
+</li>
+<li><p>镜像上传</p>
+<ul>
+<li>通过<code>docker push</code>将镜像上传到<code>Docker Hub</code></li>
+</ul>
+</li>
+<li><p>镜像的拉取</p>
+<ul>
+<li>上传的是公共镜像仓库，任何人都可以下载使用</li>
+</ul>
+</li>
+</ul>
+<h2 id="根据这些md5目录名检查是哪个容器"><a href="#根据这些md5目录名检查是哪个容器" class="headerlink" title="根据这些md5目录名检查是哪个容器"></a>根据这些md5目录名检查是哪个容器</h2><ul>
+<li><code>docker inspect xxx | grep merge</code></li>
+</ul>
+<h2 id="查看容器日志"><a href="#查看容器日志" class="headerlink" title="查看容器日志"></a>查看容器日志</h2><ul>
+<li><code>docker logs &lt;container-id&gt;</code>，查看日志</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">user@computer:test-docker$ docker logs 172</span><br><span class="line">root@1722c360945f:/# ls</span><br><span class="line">bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  src  srv  sys  tmp  usr  var</span><br><span class="line">root@1722c360945f:/# cd src</span><br><span class="line">root@1722c360945f:/src# ks</span><br><span class="line">bash: ks: command not found</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">one.txt</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">one.txt  two.txt</span><br><span class="line">root@1722c360945f:/src# cat two.txt</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">two.txt</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">two.txt</span><br><span class="line">root@1722c360945f:/src# pwd</span><br><span class="line">/src</span><br><span class="line">user@computer:test-docker$ </span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mount"><a href="#mount" class="headerlink" title="mount"></a>mount</h2><ul>
+<li><code>docker run -it --mount type=bind,src=&quot;$(pwd)&quot;，target=/src ubuntu:18.04 bash</code></li>
 </ul>
 
       
@@ -662,7 +1189,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Docker/2024-05-22-docker_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Git/2024-05-22-git_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -676,7 +1203,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Docker/2024-05-22-docker_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">docker_3_常用技巧</a>
+            <a href="/2024/05/22/notes/Git/2024-05-22-git_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">git_1_理论基础</a>
         </h2>
 
         <div class="post-meta">
@@ -701,7 +1228,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a>
+                  <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
                 </span>
             </span>
 
@@ -717,104 +1244,64 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>docker常用技巧</li>
+<li>Git的理论基础知识</li>
 </ul>
-<h2 id="docker-启动容器并分离到后台"><a href="#docker-启动容器并分离到后台" class="headerlink" title="docker 启动容器并分离到后台"></a>docker 启动容器并分离到后台</h2><figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="keyword">run</span><span class="language-bash"> -<span class="built_in">id</span> -p 4000:4000 jekyll/ubuntu:v1 /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="docker-镜像存储位置"><a href="#docker-镜像存储位置" class="headerlink" title="docker 镜像存储位置"></a>docker 镜像存储位置</h2><ul>
-<li><p>Docker 镜像存储位置取决于你在安装 Docker 时所选择的存储驱动程序。Docker 默认使用“overlay2”存储驱动程序，它会将镜像存储在 &#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2 目录下。但是，如果你使用的是其他存储驱动程序，那么镜像存储位置可能会有所不同。</p>
-</li>
-<li><p>你可以通过以下命令查看 Docker 镜像存储位置：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker info | grep -i <span class="string">&#x27;docker root dir&#x27;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>在输出结果中，你将看到存储路径的具体位置。例如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Docker Root Dir: /var/lib/docker</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果你想将 Docker 镜像存储到不同的位置，可以通过以下步骤进行设置：</p>
-</li>
-<li><p>停止 Docker 服务：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl stop docker</span><br></pre></td></tr></table></figure></li>
-<li><p>移动 &#x2F;var&#x2F;lib&#x2F;docker 目录到新的位置，例如 &#x2F;new&#x2F;docker&#x2F;path：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mv</span> /var/lib/docker /new/docker/path</span><br></pre></td></tr></table></figure></li>
-<li><p>创建一个指向新目录的符号链接：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">ln</span> -s /new/docker/path /var/lib/docker</span><br></pre></td></tr></table></figure></li>
-<li><p>启动 Docker 服务：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl start docker</span><br></pre></td></tr></table></figure></li>
-<li><p>现在，Docker 镜像将被存储在新的位置 &#x2F;new&#x2F;docker&#x2F;path 中。请注意，这种更改可能会导致现有的 Docker 容器无法正常运行，因此请谨慎操作。</p>
-</li>
-</ul>
-<h2 id="网络模式设置"><a href="#网络模式设置" class="headerlink" title="网络模式设置"></a>网络模式设置</h2><p>在 Docker 中，<code>-net=host</code> 是一种网络模式选项，用于指定容器的网络命名空间。当你使用该选项时，容器将与宿主机共享网络命名空间，这意味着容器将使用宿主机的网络栈，与宿主机具有相同的网络接口和IP地址。</p>
-<p>具体来说，使用<code>-net=host</code>选项，容器内的网络配置与宿主机完全一致，容器可以直接访问宿主机上的网络接口和端口。这样的配置有一些优势和限制：</p>
-<p>优势：</p>
-<ol>
-<li>简化网络配置：使用该选项，不需要再单独设置容器的网络配置，容器直接继承宿主机的网络配置。</li>
-<li>容器与宿主机共享IP地址：可以让容器直接使用宿主机的IP地址，方便某些网络应用场景。</li>
+<h2 id="Git工作流程"><a href="#Git工作流程" class="headerlink" title="Git工作流程"></a>Git工作流程</h2><ol>
+<li>克隆Git资源作为工作目录</li>
+<li>在克隆的资源上添加或者修改文件</li>
+<li>如果其他人修改了,你可以更新资源</li>
+<li>在提交前查看修改</li>
+<li>提交修改</li>
+<li>在修改完成后,如果发现错误,可以撤回提交并再次修改并提交</li>
 </ol>
-<p>限制：</p>
+<h2 id="基本概念-工作区-暂存区和版本库"><a href="#基本概念-工作区-暂存区和版本库" class="headerlink" title="基本概念:工作区,暂存区和版本库"></a>基本概念:工作区,暂存区和版本库</h2><ul>
+<li>工作区:就是在电脑里能够看到的目录</li>
+<li>暂存区:英文叫stage或index,一般放在.git目录下的index文件中,所以把暂存区有时也叫做索引(index)</li>
+<li>版本库:工作区有一个隐藏目录.git,这个不算工作区,而是git的版本库</li>
+</ul>
 <ol>
-<li>安全性：容器与宿主机共享网络命名空间，容器内的进程可以直接访问宿主机的网络，这可能会增加潜在的安全风险，因此需要格外小心。</li>
-<li>端口冲突：由于容器与宿主机共享网络，如果宿主机上已经在使用的端口被容器尝试使用，可能会导致端口冲突。</li>
-<li>主机网络的限制：由于容器使用宿主机网络栈，容器将受到宿主机网络设置和限制的影响。</li>
+<li>当对工作区修改(或新增)的文件执行 <code>git add</code> 命令时,暂存区的目录树被更新,同时工作区修改(或新增)的文件内容被写入到对象库中的一个新的对象中,而该对象的ID被记录在暂存区的文件索引中</li>
+<li>当执行提交操作时 <code>git commit</code> 时,暂存区的目录树写到版本库(对象库)中,master分支会做相应的更新,即<strong>master只想的目录树就是提交时暂存区的目录树.</strong></li>
 </ol>
-<p>在大多数情况下，推荐使用默认的网络模式，Docker会为容器分配独立的网络命名空间，从而保持隔离和安全性。只有在特定的使用场景下，才应该考虑使用<code>-net=host</code>选项。</p>
-<p>请注意，Docker在不同版本中可能会有一些变化，因此建议查阅最新的Docker文档以获得最准确的信息。</p>
-<h2 id="保存镜像"><a href="#保存镜像" class="headerlink" title="保存镜像"></a>保存镜像</h2><ul>
-<li>使用命令：<code>tar cvf image.tar --exclude=/proc --exclude=/image.tar /</code>， 在容器里打包系统所需要的文件，<ul>
-<li>记录以下：<code>tar cvf image.tar --exclude=/system --exclude=/sys --exclude=/proc --exclude=/image.tar /</code></li>
+<h2 id="Git官方手册"><a href="#Git官方手册" class="headerlink" title="Git官方手册"></a>Git官方手册</h2><h3 id="Git的三种状态-已提交-committed-已修改-modified-和已暂存-staged"><a href="#Git的三种状态-已提交-committed-已修改-modified-和已暂存-staged" class="headerlink" title="Git的三种状态:已提交(committed), 已修改(modified)和已暂存(staged)"></a>Git的三种状态:已提交(committed), 已修改(modified)和已暂存(staged)</h3><ul>
+<li>已修改:表示修改了文件,但还没有保存到数据库中</li>
+<li>已暂存:表示对一个已修改文件的当前版本做了标记,使之包含在下次提交的快照中</li>
+<li>已提交:表示数据已经安全地保存在本地数据库中</li>
 </ul>
-</li>
-<li><code>sudo docker cp containerID:/image.tar ./</code> , 将容器中打包的文件拷贝到主机中</li>
-<li><code>cat image.tar | sudo docker import - image:v1</code>, 导入镜像</li>
+<h3 id="这会让Git项目拥有三个三阶段-工作区-暂存区和Git目录"><a href="#这会让Git项目拥有三个三阶段-工作区-暂存区和Git目录" class="headerlink" title="这会让Git项目拥有三个三阶段:工作区, 暂存区和Git目录"></a>这会让Git项目拥有三个三阶段:工作区, 暂存区和Git目录</h3><ul>
+<li>工作区:是对项目的某个版本独立提取出来的内容,这些从Git仓库的压缩数据中提取出来的文件,放在磁盘上进行使用或修改</li>
+<li>暂存区:是一个文件,保存了下次将要提交的文件列表信息,一般在Git仓库目录中.按照Git的术语叫做”索引”,不过一般说法还是叫”暂存区”</li>
+<li>Git仓库目录:是Git用来保存项目的元数据和对象数据库的地方.这是Git中最重要的部分,<strong>从其他计算机克隆仓库时,复制的就是这里的数据.</strong></li>
 </ul>
-<h2 id="linux下重启-启动-关闭docker服务"><a href="#linux下重启-启动-关闭docker服务" class="headerlink" title="linux下重启,启动,关闭docker服务"></a>linux下重启,启动,关闭docker服务</h2><ul>
-<li><code>sudo systemctl start docker</code> : 启动</li>
-<li><code>sudo systemctl daemon-reload</code>: 守护进程重启</li>
-<li><code>sudo systemctl restart docker</code> or <code>sudo service docker restart</code> : 重启docker服务</li>
-<li><code>sudo service docker stop</code> or <code>sudo systemctl stop docker</code> : 关闭docker</li>
-</ul>
-<h2 id="以非root用户身份管理"><a href="#以非root用户身份管理" class="headerlink" title="以非root用户身份管理"></a>以非root用户身份管理</h2><ul>
-<li>Docker守护程序绑定到Unix套接字而不是TCP端口，默认情况下，Unix套接字的用户有root，其它用户只能使用sudo来访问。 Docker守护程序始终以root用户身份运行</li>
-<li>不想使用sudo，创建docker的Unix组，将用户添加到改组<ul>
-<li><code>sudo groupadd docker</code></li>
-<li><code>sudo usermod -aG docker $USER</code></li>
-<li><code>newgrp docker</code></li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="镜像的上传和拉取"><a href="#镜像的上传和拉取" class="headerlink" title="镜像的上传和拉取"></a>镜像的上传和拉取</h2><ul>
-<li><p>登录docker </p>
-<ul>
-<li><code>docker login</code></li>
-</ul>
-</li>
-<li><p>修改镜像命名</p>
-<ul>
-<li>修改镜像的repository，使之与Docker Hub账号匹配</li>
-<li>Docker Hub为了区分不同用户的同名镜像，镜像的<code>registry</code>中要包含用户名，完整的格式为:<code>[username]/xxx:tag</code></li>
-<li>Docker官方自己维护的镜像没有用户名</li>
-</ul>
-</li>
-<li><p>镜像上传</p>
-<ul>
-<li>通过<code>docker push</code>将镜像上传到<code>Docker Hub</code></li>
-</ul>
-</li>
-<li><p>镜像的拉取</p>
-<ul>
-<li>上传的是公共镜像仓库，任何人都可以下载使用</li>
+<h3 id="基本的Git工作流程"><a href="#基本的Git工作流程" class="headerlink" title="基本的Git工作流程"></a>基本的Git工作流程</h3><ol>
+<li>在工作区中修改文件</li>
+<li>将想要下次提交的更改 选择性地暂存,这样只会将更改的部分添加到暂存区</li>
+<li>提交更新,找到暂存区的文件,将快照永久性存储到Git目录</li>
+</ol>
+<h2 id="gitignore-文件"><a href="#gitignore-文件" class="headerlink" title=".gitignore 文件"></a><code>.gitignore</code> 文件</h2><ul>
+<li>In the project, it does not need to save all of the files. And the <code>.gitignore</code> file is used to save the folders which do not need to save.</li>
+<li>在工程中，并不是所有文件都需要保存到版本库中。在Git工作区的根目录下创建一个特殊的<code>.gitignore</code>文件，把要忽略的文件名填进去，Git就会自动忽略这些文件或目录</li>
+<li>匹配规则<ul>
+<li>空格不匹配任意文件，可作为分隔符，可用反斜杠转义</li>
+<li>开头的文件标识注释，可以使用反斜杠进行转义</li>
+<li><code>/</code> 结束的模式只匹配文件夹以及在该文件夹路径下的内容，但是不匹配该文件</li>
+<li><code>/</code> 开始的模式匹配项目和目录</li>
+<li><code>?</code> 通用匹配单个字符</li>
+<li><code>*</code> 通用匹配零个或多个字符</li>
+<li><code>[]</code> 通用匹配单个字符列表</li>
 </ul>
 </li>
 </ul>
-<h2 id="根据这些md5目录名检查是哪个容器"><a href="#根据这些md5目录名检查是哪个容器" class="headerlink" title="根据这些md5目录名检查是哪个容器"></a>根据这些md5目录名检查是哪个容器</h2><ul>
-<li><code>docker inspect xxx | grep merge</code></li>
-</ul>
-<h2 id="查看容器日志"><a href="#查看容器日志" class="headerlink" title="查看容器日志"></a>查看容器日志</h2><ul>
-<li><code>docker logs &lt;container-id&gt;</code>，查看日志</li>
-<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">user@computer:test-docker$ docker logs 172</span><br><span class="line">root@1722c360945f:/# ls</span><br><span class="line">bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  src  srv  sys  tmp  usr  var</span><br><span class="line">root@1722c360945f:/# cd src</span><br><span class="line">root@1722c360945f:/src# ks</span><br><span class="line">bash: ks: command not found</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">one.txt</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">one.txt  two.txt</span><br><span class="line">root@1722c360945f:/src# cat two.txt</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">two.txt</span><br><span class="line">root@1722c360945f:/src# ls</span><br><span class="line">two.txt</span><br><span class="line">root@1722c360945f:/src# pwd</span><br><span class="line">/src</span><br><span class="line">user@computer:test-docker$ </span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="mount"><a href="#mount" class="headerlink" title="mount"></a>mount</h2><ul>
-<li><code>docker run -it --mount type=bind,src=&quot;$(pwd)&quot;，target=/src ubuntu:18.04 bash</code></li>
-</ul>
+<h2 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h2><ol>
+<li>working directory:持有实际文件</li>
+<li>Index:类似于一个缓冲区与,临时保存文件的改动</li>
+<li>HEAD:指向最后一次提交的结果</li>
+</ol>
+<h2 id="添加与提交"><a href="#添加与提交" class="headerlink" title="添加与提交"></a>添加与提交</h2><ol>
+<li>把文件添加到暂存区: <code>git add &lt;filename&gt;</code></li>
+<li>提交改动信息: <code>git commit -m &quot;代码提交信息&quot;</code>. (至此,改动已经提交到了HEAD,但是还没有到远端仓库)</li>
+<li>推送改动: <code>git push origin master(master 换成想要推送的分支)</code></li>
+</ol>
 
       
     </div>
@@ -1964,7 +2451,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Git/2024-05-22-git_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1978,7 +2465,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Git/2024-05-22-git_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">git_1_理论基础</a>
+            <a href="/2024/05/22/notes/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">git_3_常用技巧</a>
         </h2>
 
         <div class="post-meta">
@@ -2019,185 +2506,512 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>Git的理论基础知识</li>
+<li>Git常见的使用技巧</li>
 </ul>
-<h2 id="Git工作流程"><a href="#Git工作流程" class="headerlink" title="Git工作流程"></a>Git工作流程</h2><ol>
-<li>克隆Git资源作为工作目录</li>
-<li>在克隆的资源上添加或者修改文件</li>
-<li>如果其他人修改了,你可以更新资源</li>
-<li>在提交前查看修改</li>
-<li>提交修改</li>
-<li>在修改完成后,如果发现错误,可以撤回提交并再次修改并提交</li>
-</ol>
-<h2 id="基本概念-工作区-暂存区和版本库"><a href="#基本概念-工作区-暂存区和版本库" class="headerlink" title="基本概念:工作区,暂存区和版本库"></a>基本概念:工作区,暂存区和版本库</h2><ul>
-<li>工作区:就是在电脑里能够看到的目录</li>
-<li>暂存区:英文叫stage或index,一般放在.git目录下的index文件中,所以把暂存区有时也叫做索引(index)</li>
-<li>版本库:工作区有一个隐藏目录.git,这个不算工作区,而是git的版本库</li>
-</ul>
-<ol>
-<li>当对工作区修改(或新增)的文件执行 <code>git add</code> 命令时,暂存区的目录树被更新,同时工作区修改(或新增)的文件内容被写入到对象库中的一个新的对象中,而该对象的ID被记录在暂存区的文件索引中</li>
-<li>当执行提交操作时 <code>git commit</code> 时,暂存区的目录树写到版本库(对象库)中,master分支会做相应的更新,即<strong>master只想的目录树就是提交时暂存区的目录树.</strong></li>
-</ol>
-<h2 id="Git官方手册"><a href="#Git官方手册" class="headerlink" title="Git官方手册"></a>Git官方手册</h2><h3 id="Git的三种状态-已提交-committed-已修改-modified-和已暂存-staged"><a href="#Git的三种状态-已提交-committed-已修改-modified-和已暂存-staged" class="headerlink" title="Git的三种状态:已提交(committed), 已修改(modified)和已暂存(staged)"></a>Git的三种状态:已提交(committed), 已修改(modified)和已暂存(staged)</h3><ul>
-<li>已修改:表示修改了文件,但还没有保存到数据库中</li>
-<li>已暂存:表示对一个已修改文件的当前版本做了标记,使之包含在下次提交的快照中</li>
-<li>已提交:表示数据已经安全地保存在本地数据库中</li>
-</ul>
-<h3 id="这会让Git项目拥有三个三阶段-工作区-暂存区和Git目录"><a href="#这会让Git项目拥有三个三阶段-工作区-暂存区和Git目录" class="headerlink" title="这会让Git项目拥有三个三阶段:工作区, 暂存区和Git目录"></a>这会让Git项目拥有三个三阶段:工作区, 暂存区和Git目录</h3><ul>
-<li>工作区:是对项目的某个版本独立提取出来的内容,这些从Git仓库的压缩数据中提取出来的文件,放在磁盘上进行使用或修改</li>
-<li>暂存区:是一个文件,保存了下次将要提交的文件列表信息,一般在Git仓库目录中.按照Git的术语叫做”索引”,不过一般说法还是叫”暂存区”</li>
-<li>Git仓库目录:是Git用来保存项目的元数据和对象数据库的地方.这是Git中最重要的部分,<strong>从其他计算机克隆仓库时,复制的就是这里的数据.</strong></li>
-</ul>
-<h3 id="基本的Git工作流程"><a href="#基本的Git工作流程" class="headerlink" title="基本的Git工作流程"></a>基本的Git工作流程</h3><ol>
-<li>在工作区中修改文件</li>
-<li>将想要下次提交的更改 选择性地暂存,这样只会将更改的部分添加到暂存区</li>
-<li>提交更新,找到暂存区的文件,将快照永久性存储到Git目录</li>
-</ol>
-<h2 id="gitignore-文件"><a href="#gitignore-文件" class="headerlink" title=".gitignore 文件"></a><code>.gitignore</code> 文件</h2><ul>
-<li>In the project, it does not need to save all of the files. And the <code>.gitignore</code> file is used to save the folders which do not need to save.</li>
-<li>在工程中，并不是所有文件都需要保存到版本库中。在Git工作区的根目录下创建一个特殊的<code>.gitignore</code>文件，把要忽略的文件名填进去，Git就会自动忽略这些文件或目录</li>
-<li>匹配规则<ul>
-<li>空格不匹配任意文件，可作为分隔符，可用反斜杠转义</li>
-<li>开头的文件标识注释，可以使用反斜杠进行转义</li>
-<li><code>/</code> 结束的模式只匹配文件夹以及在该文件夹路径下的内容，但是不匹配该文件</li>
-<li><code>/</code> 开始的模式匹配项目和目录</li>
-<li><code>?</code> 通用匹配单个字符</li>
-<li><code>*</code> 通用匹配零个或多个字符</li>
-<li><code>[]</code> 通用匹配单个字符列表</li>
-</ul>
-</li>
-</ul>
-<h2 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h2><ol>
-<li>working directory:持有实际文件</li>
-<li>Index:类似于一个缓冲区与,临时保存文件的改动</li>
-<li>HEAD:指向最后一次提交的结果</li>
-</ol>
-<h2 id="添加与提交"><a href="#添加与提交" class="headerlink" title="添加与提交"></a>添加与提交</h2><ol>
-<li>把文件添加到暂存区: <code>git add &lt;filename&gt;</code></li>
-<li>提交改动信息: <code>git commit -m &quot;代码提交信息&quot;</code>. (至此,改动已经提交到了HEAD,但是还没有到远端仓库)</li>
-<li>推送改动: <code>git push origin master(master 换成想要推送的分支)</code></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/JSON/2024-05-22-json_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/JSON/2024-05-22-json_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">json_1_理论基础</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JSON/" itemprop="url" rel="index"><span itemprop="name">JSON</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>JSON，指的是JavaScript对象表示法(JavaScript Object Notation)</li>
-<li>JSON是轻量级的文本数据交换格式</li>
-<li>JSON独立于语言，JSON使用Javascript语法来描述数据对象，但是JSON仍然独立于语言和平台。JSON解析器和JSON库支持许多种不同的编程语言。目前非常多的动态编程语言都支持JSON</li>
-<li>JSON具有自我描述性，更容易理解</li>
-</ul>
-<h2 id="与XML相同之处"><a href="#与XML相同之处" class="headerlink" title="与XML相同之处"></a>与XML相同之处</h2><ul>
-<li>JSON和XML都用于接收Web服务端的数据</li>
-<li>JSON是纯文本</li>
-<li>JSON具有自我描述性（人类可读）</li>
-<li>JSON具有层级结构（值中存在值）</li>
-<li>JSON可通过JavaScript进行解析</li>
-<li>JSON数据可使用AJAX进行传输</li>
-</ul>
-<h2 id="JSON语法规则"><a href="#JSON语法规则" class="headerlink" title="JSON语法规则"></a>JSON语法规则</h2><ul>
-<li><p>JSON语法是JavaScript对象表示语法的子集</p>
-</li>
-<li><p>数据在名称&#x2F;值对中</p>
-</li>
-<li><p>数据由逗号<code>,</code>分隔</p>
-</li>
-<li><p>使用斜杠<code>\</code>来转义字符</p>
-</li>
-<li><p>大括号<code>&#123;&#125;</code>保存对象</p>
-</li>
-<li><p>中括号<code>[]</code>保存数组，数组可以包含多个对象</p>
-</li>
-<li><p>JSON的两种结构</p>
+<h2 id="写了很多代码，发现写错了分支怎么办"><a href="#写了很多代码，发现写错了分支怎么办" class="headerlink" title="写了很多代码，发现写错了分支怎么办"></a>写了很多代码，发现写错了分支怎么办</h2><ul>
+<li><p>未提交的情况下</p>
 <ul>
-<li>对象：大括号<code>&#123;&#125;</code>保存的对象是一个无序的名称&#x2F;值对集合。一个对象以左括号<code>&#123;</code>开始，右括号<code>&#125;</code>结束。每个键后跟一个冒号<code>:</code>，名称&#x2F;值对使用逗号<code>,</code>分隔。</li>
-<li>数组：中括号<code>[]</code>保存的数组是值(value)的有序集合。一个数组以左中括号<code>[</code>开始，右中括号<code>]</code>结束，值之间使用逗号<code>,</code>分隔。值(value)可以是双引号括起来的字符串，数值，true, false, null, 对象或者数组，它们是可以嵌套的</li>
+<li>git add . (把所有改动暂存)</li>
+<li>git stash (把暂存的文件提交到git的暂存栈)</li>
+<li>git checkout 本该提交代码的分支</li>
+<li>git stash pop (将暂存栈中的代码放出来)</li>
 </ul>
 </li>
+<li><p>至于是继续改还是提交就随你了</p>
+</li>
+<li><p>已提交的情况下</p>
+<ul>
+<li>git checkout 不该提交代码提交了代码的分支</li>
+<li>git reset HEAD~1 （最近一次提交放回暂存区, 并取消此次提交）</li>
+<li>git stash (把暂存的文件提交到git的暂存栈)</li>
+<li>git checkout 该提交代码的分支</li>
+<li>git stash pop</li>
 </ul>
-<h2 id="JSON名称-值对"><a href="#JSON名称-值对" class="headerlink" title="JSON名称&#x2F;值对"></a>JSON名称&#x2F;值对</h2><ul>
-<li>JSON数据的书写格式是:<code>key:value</code></li>
-<li>名称&#x2F;值对包括字段名称（在双引号中），后面写一个冒号，然后值：<code>&quot;name&quot;:&quot;abc&quot;</code>，等价于JavaScript语句：<code>name = &quot;abc&quot;</code></li>
+</li>
+<li><p>下面一顿操作随你猛了，等你把代码提交到了正确的分支后，再次切到刚刚错的分支</p>
+</li>
 </ul>
-<h2 id="C-处理JSON的开源库"><a href="#C-处理JSON的开源库" class="headerlink" title="C++处理JSON的开源库"></a>C++处理JSON的开源库</h2><p>在C++中，有多个流行的库可以用于处理JSON数据。以下是一些常用的C++ JSON处理库：</p>
+<h2 id="git-迭代拉取子项目"><a href="#git-迭代拉取子项目" class="headerlink" title="git 迭代拉取子项目"></a>git 迭代拉取子项目</h2><p>在 Git 中，如果你有一个父项目，而该项目包含了子项目，你可能希望在父项目中拉取或更新这些子项目。这种情况下，通常会使用 Git 的子模块（submodule）功能。子模块允许你在一个 Git 仓库中引用另一个仓库。</p>
+<p>要拉取或更新子项目，可以按照以下步骤进行：</p>
 <ol>
-<li><p><strong>RapidJSON</strong>: RapidJSON是一个高性能的JSON解析和生成库，提供了灵活的API和丰富的功能。它具有快速的解析速度和低内存占用，并支持DOM和SAX风格的API。</p>
+<li><p><strong>添加子模块</strong>：如果尚未添加子模块，可以使用以下命令将子模块添加到父项目中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add &lt;URL-of-submodule-repository&gt; &lt;path-to-store-submodule&gt;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add https://github.com/example/submodule.git path/to/submodule</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>jsoncpp</strong>: jsoncpp是一个简单易用的C++ JSON库，提供了方便的API用于解析和生成JSON数据。它支持将JSON数据与C++对象进行相互转换，并提供了灵活的配置选项。</p>
+<li><p><strong>初始化子模块</strong>：在克隆父项目后，子模块目录中可能还没有子模块的文件。要初始化子模块，可以运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule init</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>nlohmann&#x2F;json</strong>: nlohmann&#x2F;json是一个现代化的C++ JSON库，具有简单易用的API和高性能。它支持以类似于JavaScript的方式访问和操作JSON数据，并提供了方便的函数和操作符用于序列化和反序列化。</p>
+<li><p><strong>更新子模块</strong>：一旦子模块被添加并初始化，你可以使用以下命令更新子模块到父项目所引用的特定版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule update --remote</span><br></pre></td></tr></table></figure>
+<p>这会将每个子模块更新到它们在父项目中所引用的最新提交。</p>
 </li>
 </ol>
-<p>这些库都是开源库，可以从它们的官方网站或代码托管平台获取源代码和使用文档。你可以选择适合你项目需求和编程风格的库来处理JSON数据。</p>
+<p>记住，当你拉取父项目时，子模块不会自动更新。你需要显式运行 <code>git submodule update --remote</code> 来更新子模块。</p>
+<p>这些是用于在 Git 中迭代拉取子项目的基本步骤。</p>
+<h2 id="git-仅检查指定项目-忽略子项目"><a href="#git-仅检查指定项目-忽略子项目" class="headerlink" title="git 仅检查指定项目 忽略子项目"></a>git 仅检查指定项目 忽略子项目</h2><p>在Git中，如果你想仅检查指定项目而忽略子项目，你可以使用<code>.gitignore</code>文件来指定哪些文件或目录应该被忽略。在<code>.gitignore</code>中，你可以列出你希望忽略的文件或目录的模式。</p>
+<p>以下是一些建议：</p>
+<ol>
+<li><p><strong>创建.gitignore文件：</strong> 在你的项目根目录下创建一个名为<code>.gitignore</code>的文件。</p>
+</li>
+<li><p><strong>编辑.gitignore文件：</strong> 打开<code>.gitignore</code>文件并添加你希望忽略的文件或目录的模式。如果你想忽略所有子项目，你可以使用通配符（如<code>/*</code>）来匹配所有直接子目录。例如：</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">!/指定项目/</span><br></pre></td></tr></table></figure>
+
+<p> 这将忽略根目录下的所有内容，但允许<code>指定项目</code>目录被追踪。</p>
+</li>
+<li><p><strong>将.gitignore文件添加到版本控制：</strong> 确保将<code>.gitignore</code>文件添加到Git版本控制中，这样其他人克隆你的仓库时也会遵循这些规则。</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add .gitignore</span><br><span class="line">git commit -m &quot;Add .gitignore to ignore subprojects&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>更新.gitignore：</strong> 如果在项目的后续开发中需要调整忽略规则，只需更新<code>.gitignore</code>文件并提交更改即可。</p>
+</li>
+</ol>
+<p>请记住，<code>.gitignore</code>文件中的模式是相对于<code>.gitignore</code>所在目录的相对路径的。确保你的规则符合你的项目结构。</p>
+<h2 id="git-config-查看默认编辑器"><a href="#git-config-查看默认编辑器" class="headerlink" title="git config 查看默认编辑器"></a>git config 查看默认编辑器</h2><p>要查看 Git 的默认文本编辑器，可以使用以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.editor</span><br></pre></td></tr></table></figure>
+
+<p>上述命令将显示全局配置中设置的默认编辑器。如果没有设置默认编辑器，它将不会返回任何输出。</p>
+<p>如果你在命令行中看到了输出，它将是你当前配置的默认编辑器的名称或路径。常见的编辑器包括 Vim、Emacs、Nano、Sublime Text、Visual Studio Code 等。</p>
+<h2 id="撤回本地修改"><a href="#撤回本地修改" class="headerlink" title="撤回本地修改"></a>撤回本地修改</h2><ul>
+<li>放弃对本地已经修改，但是尚未提交的文件的修改，还原到其未修改前的状态</li>
+<li>命令<ul>
+<li>撤回对所有已经修改，但是未提交的文件的修改，但不包括新增的文件<ul>
+<li><code>git checkout .</code></li>
+</ul>
+</li>
+<li>撤回对指定文件的修改，<code>[filename]</code>为文件名<ul>
+<li><code>git checkout [filename]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="git-reset-回退项目版本"><a href="#git-reset-回退项目版本" class="headerlink" title="git reset 回退项目版本"></a>git reset 回退项目版本</h2><ul>
+<li>可以回退到任意已经提交过的版本，已经add, commit但是没有push的文件也适用</li>
+<li>命令<ul>
+<li><code>git reset --hard [commit-hashcode]</code></li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>commit-hashcode</code> 是某个commit的哈希值，可以适用git log查看</li>
+<li>因此，一般用法是先用git log 查看具体commit的哈希值，然后reset到那个版本</li>
+</ul>
+</li>
+</ul>
+<h2 id="对于新增文件"><a href="#对于新增文件" class="headerlink" title="对于新增文件"></a>对于新增文件</h2><ul>
+<li>撤回本地修改和回退项目版本都不会对新增文件起作用。因为新增的文件是还未加到git的记录里面的，即属于未被<code>tracked</code>的状态，所以撤销修改和回退均对其不受影响。</li>
+<li>解决方法：<ul>
+<li>直接手动删除文件即可</li>
+</ul>
+</li>
+</ul>
+<h2 id="上游分支-upstream"><a href="#上游分支-upstream" class="headerlink" title="上游分支 upstream"></a>上游分支 upstream</h2><ul>
+<li><p>upstream意为上游，即本地分支所对应的远程分支。</p>
+</li>
+<li><p>一般，本地分支如果是从clone或者fetch得到的，都在远程库有一个upstream分支。</p>
+</li>
+<li><p>设置upstream的方法有两种：</p>
+<ul>
+<li>在push的时候指定：<code>git push --set-upstream origin my_remote_branch_name</code></li>
+<li>在新建分支的时候指定：<code>git branch --set-upstream my_local_branch_name origin/my_remote_branch_name</code>(错误)</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>在运行<code>git branch --set-upstream</code>命令时，出现错误(git –version: 2.17.1)</li>
+<li><code>fatal: the &#39;--set-upstream&#39; option is no longer supported. Please use &#39;--track&#39; or &#39;--set-upstream-to&#39; instead.</code></li>
+<li>设置方法：<code>git branch --set-upstream-to=origin/&lt;远程分支&gt; &lt;本地分支&gt;</code></li>
+</ul>
+</li>
+<li><p>实际上，上述命令，就是在修改本地的.git&#x2F;config文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[branch &quot;my_local_branch_name&quot;]</span><br><span class="line">	remote = origin</span><br><span class="line">	merge = refs/heads/my_remote_branch_name</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>取消分支上游</p>
+<ul>
+<li><code>git branch --inset-upstream</code></li>
+</ul>
+</li>
+<li><p>查看分支上游</p>
+<ul>
+<li><code>git status</code></li>
+<li><code>git checkout &lt;分支&gt;</code></li>
+<li><code>git branch -vv</code></li>
+</ul>
+</li>
+<li><p>设置完upstream后，就可以直接用 <code>git push/pull</code> 来拉取或推送相应的分支了。</p>
+</li>
+</ul>
+<h2 id="直接拉取远程分支"><a href="#直接拉取远程分支" class="headerlink" title="直接拉取远程分支"></a>直接拉取远程分支</h2><ul>
+<li>新建分支分支并切换到指定分支<ul>
+<li><code>git checkout -b dev origin/dev</code></li>
+<li><code>git checkout -b 本地分支名 origin/远程分支名</code></li>
+</ul>
+</li>
+<li>该命令可以将远程Git仓库里的指定分支拉取到本地，这样就在本地新建了一个dev分支，并和指定的远程分支<code>origin/dev</code>关联起来了。</li>
+<li>示例：<ul>
+<li><code>git checkout -b dev notes/dev</code> : 切换指定远程分支</li>
+</ul>
+</li>
+</ul>
+<h2 id="在本地使用指定提交id创建分支"><a href="#在本地使用指定提交id创建分支" class="headerlink" title="在本地使用指定提交id创建分支"></a>在本地使用指定提交id创建分支</h2><ul>
+<li><p>查看远程分支最新的commitSHA，例如：<code>aa4339fbe90f68bc82901d976a7c11fe92179ef3</code></p>
+</li>
+<li><p>使用命令直接从指定的commit新建分支：</p>
+<ul>
+<li><code>git branch [branch-name] [commit-id]</code></li>
+<li><code>git branch v1.x aa4339fbe90f68bc82901d976a7c11fe92179ef3</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="使用标签的方式"><a href="#使用标签的方式" class="headerlink" title="使用标签的方式"></a>使用标签的方式</h2><ul>
+<li><code>git clone [--branch tag-name/branch-name] &lt;git-url&gt; [dir]</code> 下载并绑定指定分支或下载指定标签</li>
+</ul>
+<h2 id="使用流程"><a href="#使用流程" class="headerlink" title="使用流程"></a>使用流程</h2><ul>
+<li><p>在本地仓库创建标签，并推送到远程：</p>
+<ul>
+<li><code>git tag -a v1.0 -m &quot;create tag&quot;</code></li>
+<li><code>git push origin v1.0</code></li>
+</ul>
+</li>
+<li><p>下载指定标签到本地：</p>
+<ul>
+<li><code>git clone --branch v1.0 http://192.169.4.28/zjy/clean_code.git</code></li>
+</ul>
+</li>
+<li><p>下载标签之后，出现的提示：</p>
+<ul>
+<li>你处于分离的HEAD状态。您可以环顾四周，进行实验性更改并提交它们，您可以放弃在此状态下所做的任何提交，而不会通过执行另一次签出影响任何分支。</li>
+<li>如果您想创建一个新的分支来保留您创建的提交，您可以(现在或以后)再次使用-b和chckout命令。</li>
+</ul>
+</li>
+</ul>
+<h2 id="git同步项目进度方法"><a href="#git同步项目进度方法" class="headerlink" title="git同步项目进度方法"></a>git同步项目进度方法</h2><ul>
+<li><p>创建三个分支：</p>
+<ul>
+<li>master </li>
+<li>dev</li>
+<li>local</li>
+</ul>
+</li>
+<li><p>master分支：</p>
+<ul>
+<li>存放稳定版本的代码，在这个分支上的项目，所有的功能都是经过测试，不再改动的</li>
+<li>这个是对外发行的分支</li>
+</ul>
+</li>
+<li><p>dev分支</p>
+<ul>
+<li>存放正在开发的代码，在这个分支上的项目，可能正在新加功能，需要经过反复修改的，或者是同步的</li>
+<li>这个是面向所有开发者的</li>
+<li>所有开发者通过拉取这个分支的代码来同步项目开发的进程</li>
+</ul>
+</li>
+<li><p>local分支</p>
+<ul>
+<li>存放本地的项目的代码，在这个分支上的项目，随时都有可能修改</li>
+<li>这个是存放在本地，面向的是自己</li>
+<li>其作用是，自己开发的时候，都在这个本地分支上修改，需要推送到远程git上或者拉取远程git上最新的代码时，需要进行如下几步<ul>
+<li>首先，将local分支的修改全部添加，并在本地提交</li>
+<li>其次，切换到本地的dev分支，然后拉取远程git上最新的dev分支</li>
+<li>最后，切换回local分支，将本地拉取到的最新的分支合并到local分支</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="git删除远程分支文件"><a href="#git删除远程分支文件" class="headerlink" title="git删除远程分支文件"></a>git删除远程分支文件</h2><ul>
+<li>git删除远程分支文件包括两种情况：<ul>
+<li>（1）仅仅删除远程分支文件，不删除本地的文件；</li>
+<li>（2）删除远程分支文件的同时，删除本地的文件。</li>
+</ul>
+</li>
+</ul>
+<h2 id="仅仅删除远程分支文件，不删除本地文件"><a href="#仅仅删除远程分支文件，不删除本地文件" class="headerlink" title="仅仅删除远程分支文件，不删除本地文件"></a>仅仅删除远程分支文件，不删除本地文件</h2><ul>
+<li><p>删除远程文件filename</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm --cached filename</span><br><span class="line">git commit -m &quot;delete remote file filename &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除远程文件夹directoryname</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r --cached directoryname</span><br><span class="line">git commit -m &quot;delete remote directory directoryname &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="删除本地文件与远程分支文件"><a href="#删除本地文件与远程分支文件" class="headerlink" title="删除本地文件与远程分支文件"></a>删除本地文件与远程分支文件</h2><ul>
+<li><p>删除文件filename</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm filename</span><br><span class="line">git commit -m &quot;delete file filename &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除文件夹directoryname</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r directoryname</span><br><span class="line">git commit -m &quot;delete directory directoryname &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="git常见错误"><a href="#git常见错误" class="headerlink" title="git常见错误"></a>git常见错误</h2><h2 id="fatal-refusing-to-merge-unrelated-histories"><a href="#fatal-refusing-to-merge-unrelated-histories" class="headerlink" title="fatal:refusing to merge unrelated histories"></a><code>fatal:refusing to merge unrelated histories</code></h2><ul>
+<li>在使用<code>git pull</code>命令拉取代码时出现这个错误</li>
+<li>原因：本地仓库和远程仓库实际上时独立的两个仓库</li>
+<li>解决方法：添加选项<code>--allow-unrelated-histories</code>解决问题<ul>
+<li><code>git pull zhuoer dev --allow-unrelated-histories</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h2><ul>
+<li><code>git clone &lt;url&gt;</code> : 克隆远程版本库</li>
+<li><code>git init</code> : 初始化本地版本库</li>
+</ul>
+<h2 id="修改和提交"><a href="#修改和提交" class="headerlink" title="修改和提交"></a>修改和提交</h2><ul>
+<li><code>git status</code> : 查看状态</li>
+<li><code>git diff</code> : 查看变更内容</li>
+<li><code>git add .</code> : 跟踪所有改动过的文件</li>
+<li><code>git add &lt;file&gt;</code> : 跟踪指定的文件</li>
+<li><code>git mv &lt;old&gt; &lt;new&gt;</code> : 文件改名</li>
+<li><code>git rm &lt;file&gt;</code> : 删除文件</li>
+<li><code>git commit -m &quot;commit message&quot;</code> : 提交所有更新过的文件</li>
+<li><code>git commit --amend</code> : 修改最后一次提交</li>
+</ul>
+<h2 id="查看提交历史"><a href="#查看提交历史" class="headerlink" title="查看提交历史"></a>查看提交历史</h2><ul>
+<li><code>git log</code> : 查看提交历史</li>
+<li><code>git log -p &lt;file&gt;</code> : 查看指定文件的提交历史</li>
+<li><code>git blame &lt;file&gt;</code> : 以列表方式查看指定文件的提交历史</li>
+</ul>
+<h2 id="撤销"><a href="#撤销" class="headerlink" title="撤销"></a>撤销</h2><ul>
+<li><code>git reset --     0  1.9G   0% /sys/fs/cgroup /dev/mmcblk0p7   16G   12G  3.1G  79% /data  HEAD</code> : 撤销工作目录中所有未提交文件的修改内容</li>
+<li><code>git checkout HEAD &lt;file&gt;</code> : 撤销指定的未提交的修改内容</li>
+<li><code>git revert &lt;commit&gt;</code> : 取消指定的提交</li>
+</ul>
+<h2 id="分支与标签"><a href="#分支与标签" class="headerlink" title="分支与标签"></a>分支与标签</h2><ul>
+<li><code>git branch</code> : 显示所有本地分支</li>
+<li><code>git checkout &lt;branch/tag&gt;</code> : 切换到指定分支或标签</li>
+<li><code>git branch &lt;new-branch&gt;</code> : 创建新分支</li>
+<li><code>git branch -d &lt;branch&gt;</code> : 删除本地分支</li>
+<li><code>git tag</code> : 列出所有本地标签</li>
+<li><code>git tag &lt;tagname&gt;</code> : 基于最新提交的创建标签</li>
+<li><code>git tag -d &lt;tagname&gt;</code> : 删除标签</li>
+<li><code>git checkout -b dev notes/dev</code> : 切换指定远程分支</li>
+</ul>
+<h2 id="合并和衍合"><a href="#合并和衍合" class="headerlink" title="合并和衍合"></a>合并和衍合</h2><ul>
+<li><code>git merge &lt;branch&gt;</code> : 合并指定分支到当前分支</li>
+<li><code>git rebase &lt;branch&gt;</code> : 衍合指定分支到当前分支</li>
+</ul>
+<h2 id="远程操作"><a href="#远程操作" class="headerlink" title="远程操作"></a>远程操作</h2><ul>
+<li><code>git remote -v</code> : 查看远程版本库信息</li>
+<li><code>git remote show &lt;remote&gt;</code> : 查看指定远程版本库信息</li>
+<li><code>git remote add &lt;remote&gt; &lt;url&gt;</code> : 添加远程版本库</li>
+<li><code>git fetch &lt;remote&gt;</code> : 从远程库获取代码</li>
+<li><code>git pull &lt;remote&gt; &lt;branch&gt;</code> : 下载代码及快速合并</li>
+<li><code>git push &lt;remote&gt; &lt;branch&gt;</code> : 上传代码及快速合并</li>
+<li><code>git push &lt;remote&gt; :&lt;branch/tag-name&gt;</code> : 删除远程分支或标签</li>
+<li><code>git push --tags</code> : 上传所有标签</li>
+</ul>
+<h2 id="拉取"><a href="#拉取" class="headerlink" title="拉取"></a>拉取</h2><ul>
+<li><code>git pull origin master</code><ul>
+<li><code>push</code> : 将本地仓库与远程仓库合并</li>
+<li><code>-u</code> : 将本地仓库分支与远程仓库分支一起合并，就是说将master的分支也提交上去，这样就可以在远程仓库上看到在本地仓库的master中创建了多少分支。不加这个参数，只将当前的master与远程的合并，没有分支的历史纪录，也不能切换分支</li>
+<li><code>origin</code> : 远程仓库的意思，如果这个仓库是远程的，那么必须使用这个选项</li>
+<li><code>master</code> : 提交本地master分支仓库</li>
+</ul>
+</li>
+</ul>
+<h2 id="递归克隆"><a href="#递归克隆" class="headerlink" title="递归克隆"></a>递归克隆</h2><ul>
+<li><code>git clone --recursive http://192.167.10.28/dagger/manager_node.git</code></li>
+<li><code>recursive</code>选项会递归克隆项目下的所有git项目</li>
+</ul>
+<h2 id="撤销-git-add-并保留修改的方法"><a href="#撤销-git-add-并保留修改的方法" class="headerlink" title="撤销 git add 并保留修改的方法"></a>撤销 <code>git add</code> 并保留修改的方法</h2><ul>
+<li><strong><code>git reset --mixed</code> – 撤销所有的已经<code>add</code>的文件</strong></li>
+<li><code>git reset HEAD .</code> – 复制撤销某个文件或文件夹</li>
+<li><code>git reset HEAD -filename</code> – 另外，可以使用<code>git status</code> ，git会告诉可以通过哪一个命令来执行操作</li>
+</ul>
+<h2 id="git从历史上的某一次提交处建立分支"><a href="#git从历史上的某一次提交处建立分支" class="headerlink" title="git从历史上的某一次提交处建立分支"></a>git从历史上的某一次提交处建立分支</h2><ul>
+<li><code>git log --oneline --all --graph --decorate</code></li>
+<li><code>git branch dev 3be5879</code></li>
+</ul>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><ul>
+<li><p><code>git remote add &lt;shortname&gt; &lt;url&gt;</code> ： 添加一个新的远程Git仓库，同时指定一个方便使用的简写.</p>
+<ul>
+<li><code>git remote add zhuoer http://192.167.10.28/dagger/zhuoer</code> ： 现在可以在命令行中使用字符串<code>zhuoer</code>来代替整个URL</li>
+</ul>
+</li>
+<li><p><code>git fetch &lt;remote&gt;</code> : 从远程仓库中获得数据。这个命令会访问远程仓库，从中拉取所有还没有的数据。执行完成后，将会拥有那个远程仓库中所有分支的引用，可以随时合并或者查看。</p>
+</li>
+<li><p><strong>如果使用<code>clone</code>命令克隆了一个仓库，命令会自动将其添加为远程仓库并且默认以<code>origin</code>为简写</strong>。所以，<code>git fetch origin</code>会抓取克隆（或上一次抓取）后新推送的所有工作。</p>
+<ul>
+<li>注意：<code>git fetch</code>命令只会将数据下在到本地仓库，它并不会自动合并或者修改当前的工作，当准备好时，必须要手动将其合并入你的工作。</li>
+</ul>
+</li>
+<li><p>如果当前分支设置了跟踪远程分支，那么可以使用<code>git pull</code>命令自动抓取后合并该远程分支到当前分支。</p>
+</li>
+<li><p>默认情况下，<code>git clone</code>命令会自动设置本地<code>master</code>分支跟踪克隆的远程仓库的<code>master</code>分支（或其他名字的默认分支）。运行<code>git pull</code>通常会从最初克隆的服务器上抓取数据并自动尝试合并到当前所在的分支。）</p>
+</li>
+</ul>
+<h2 id="推送到远程仓库"><a href="#推送到远程仓库" class="headerlink" title="推送到远程仓库"></a>推送到远程仓库</h2><ul>
+<li><code>git push &lt;remote&gt; &lt;branch&gt;</code><ul>
+<li>当你想要将<code>master</code>分支推送到<code>origin</code>服务器时（再次说明，克隆时通常会自动帮你设置好那两个名字），那么运行这个命令就可以将你所做的备份到服务器。</li>
+</ul>
+</li>
+</ul>
+<h2 id="查看某个远程仓库"><a href="#查看某个远程仓库" class="headerlink" title="查看某个远程仓库"></a>查看某个远程仓库</h2><ul>
+<li><code>git remote show &lt;remote&gt;</code><ul>
+<li>查看某一个远程仓库的更多信息</li>
+<li>它同样会列出远程仓库的URL与跟踪分支的信息。它告诉你正在处于<code>master</code>分支，并且如果运行<code>git pull</code>，就会抓取所有的远程引用，然后将远程<code>master</code>分支合并到本地<code>master</code>分支，</li>
+<li>它也会列出拉取到的所有远程引用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="远程仓库的重命名与移除"><a href="#远程仓库的重命名与移除" class="headerlink" title="远程仓库的重命名与移除"></a>远程仓库的重命名与移除</h2><ul>
+<li><p><code>git remote rename</code></p>
+<ul>
+<li>修改一个远程仓库的简写名</li>
+<li>这个操作也会修改所有远程跟踪的分支名字</li>
+</ul>
+</li>
+<li><p><code>git remote remove</code>或者<code>git remote rm</code></p>
+<ul>
+<li>移除一个远程仓库</li>
+<li>一旦使用这种方式删除了一个远程仓库，那么所有和这个远程仓库相关的远程跟踪分支以及配置信息也会一起被删除。</li>
+</ul>
+</li>
+</ul>
+<h2 id="打标签"><a href="#打标签" class="headerlink" title="打标签"></a>打标签</h2><ul>
+<li><p><code>git tag</code></p>
+<ul>
+<li>在Git中列出已有的标签</li>
+<li>按照通配符列出标签需要<code>-l</code>或者<code>--list</code>选项</li>
+<li>如果只想要完整的标签列表，那么运行<code>git tag</code>就会默认假定你想要一个列表，它会直接列出来</li>
+</ul>
+</li>
+<li><p>创建标签，Git支持两种标签：轻量标签(<code>lightweight</code>)与附注标签(<code>annotated</code>)</p>
+<ul>
+<li>轻量标签很像一个不会改变的分支–它只是某个特定提交的引用</li>
+<li>附注标签是存储在Git数据库中的一个完整对象，它们是可以被校验的，其中包括打标签者的名字，电子邮件，地址，日期时间，此外还有一个标签信息，并且可以使用GNU Privacy Guard（GTG）签名并验证。</li>
+</ul>
+</li>
+<li><p>通常会建议创建附注标签，这样可以拥有以上所有信息，但是如果只是想用一个临时的标签，或者因为某些原因不想要保存信息，那么也可以用轻量标签</p>
+</li>
+<li><p>附注标签的创建: <code>git tag -a v1.4 -m &quot;my version 1.4&quot;</code></p>
+<ul>
+<li><code>-m</code> : 指定了一条将会存储在标签中的信息。如果没有为附注标签指定一条信息，Git会启动编辑其要求你输入信息</li>
+</ul>
+</li>
+<li><p>推送标签</p>
+<ul>
+<li>git push origin v1.4</li>
+</ul>
+</li>
+<li><p>轻量标签，本质上是将提交校验和存储到一个文件中–没有保存任何其他信息。</p>
+</li>
+<li><p>创建轻量标签，不需要使用<code>-a</code>, <code>-s</code>, <code>-m</code>选项，只需要提供标签名字：<code>git tag v1.4-lw</code></p>
+</li>
+<li><p>后期打标签</p>
+<ul>
+<li>要在提交上打标签，需要在命令的末尾指定提交的校验和（或部分校验和）</li>
+<li><code>git tag -a v1.2 9fcaw1</code></li>
+</ul>
+</li>
+<li><p>删除标签</p>
+<ul>
+<li>删除本地仓库上的标签，可以使用命令<code>git tag -d &lt;tagname&gt;</code><ul>
+<li>注意：该命令并不会从任何远程仓库中移除这个标签，必须使用<code>git push &lt;remote&gt;:refs/tags/&lt;tagname&gt;</code>来更新远程仓库</li>
+<li>第一种变体是：<code>git push &lt;remote&gt; :refs/tags/&lt;tagname&gt;</code>，这种操作的含义是：将冒号前面的空值推送到远程标签名，从而高效地删除它</li>
+<li>第二种更加直观的删除远程标签的方式是：<code>git push &lt;remote&gt; --delete &lt;tagname&gt;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>通过使用<code>git show</code>可以看到标签信息和与之对应的提交信息</p>
+</li>
+</ul>
+<h2 id="Git别名"><a href="#Git别名" class="headerlink" title="Git别名"></a>Git别名</h2><ul>
+<li>Git并不会在输入部分命令时自动推断出想要的命令。如果不想每次都输入完整的Git命令，可以通过<code>git config</code>文件来轻松地为每一个命令设置一个别名。</li>
+<li>例如：<ul>
+<li><code>git config --global alias.co checkout</code></li>
+<li><code>git config --global alias.br branch</code></li>
+<li><code>git config --global alias.ci commit</code></li>
+<li><code>git config --global alias.st status</code></li>
+<li>这意味着，当要输入<code>git commit</code>时，只需要输入<code>git ci</code></li>
+</ul>
+</li>
+<li>在创建认为应该存在的命令时，这个技术会很有用。<ul>
+<li>例如：为了解决取消暂存文件的易用性问题，可以向Git中添加取消暂存别名,<code>git config --global alias.unstage &#39;reset HEAD --</code></li>
+<li>通常也会添加一个<code>last</code>命令：<code>git config --global alias.last &#39;log -l HEAD</code>。这样，可以很轻松地看到最后一次提交</li>
+</ul>
+</li>
+<li>Git只是简单地将别名替换为对应的命令。</li>
+</ul>
+<h2 id="Git分支"><a href="#Git分支" class="headerlink" title="Git分支"></a>Git分支</h2><ul>
+<li><p>几乎所有的版本控制系统都以某种形式支持分支。使用分支意味着可以把工作从开发主线上分离开来，以免影响开发主线。</p>
+</li>
+<li><p><strong>Git保存的不是文件的变化或者差异，而是一系列不同时刻的快照。</strong></p>
+</li>
+<li><p>Git的分支，其实质上仅仅是指向提交对象的可变指针。Git的默认分支名字是<code>master</code>，在多次提交操作之后，其实已经有一个指向最后哪个提交对象的<code>master</code>分支。<code>master</code>分支会在每次提交时自动向前移动。</p>
+<ul>
+<li>Git的<code>master</code>分支并不是一个特殊分支。它跟其他分支完全没有区别。之所以几乎每一个仓库都有<code>master</code>分支，是因为<code>git init</code>命令默认创建它，并且大多数人都懒得去改动它</li>
+</ul>
+</li>
+<li><p><code>git branch testing</code> : 创建分支<code>testing</code>，这会在当前所在的提交对象上创建一个指针。那么，Git又是怎么知道当前在哪一个分支上呢？</p>
+<ul>
+<li>也很简单，它有一个名为<code>HEAD</code>的特殊指针。它是一个指针，指向当前所在的本地分支（可以把<code>HEAD</code>想象为当前分支的别名）</li>
+<li>在本示例中，仍然在<code>master</code>分支上，因为<code>git branch</code>命令仅仅创建一个新分支，并不会自动切换到新分支中去</li>
+</ul>
+</li>
+<li><p><code>git log --decorate</code> ： 查看各个分支当前所指的对象</p>
+</li>
+<li><p>分支切换:<code>git checkout testing</code>。如此以来，<code>HEAD</code>就指向<code>testing</code>分支了。</p>
+</li>
+<li><p>由于Git的分支实质上仅是包含所指对象校验和（长度为40的SHA-1值字符串）的文件，所以它的创建和销毁都异常高效</p>
+</li>
+</ul>
+<h2 id="远程分支"><a href="#远程分支" class="headerlink" title="远程分支"></a>远程分支</h2><ul>
+<li><p>远程引用是对远程仓库的引用（指针），包括分支，标签等。</p>
+</li>
+<li><p>可以通过 <code>git ls-remote &lt;remote&gt;</code>来显示地获得远程引用的完整列表</p>
+</li>
+<li><p>或者通过<code>git remote show &lt;remote&gt;</code>获得远程分支的更多信息</p>
+</li>
+<li><p>更常见的做法是利用<strong>远程跟踪分支</strong>，远程跟踪分支是远程分支状态的引用，它们以<code>&lt;remote&gt;/&lt;branch&gt;</code>的形式命名</p>
+<ul>
+<li>例如：假设网络里由一个在<code>git.ourcompany.com</code>的Git服务器。如果从这里克隆，Git的<code>clone</code>命令会自动将其命名为<code>origin</code>，拉取它的所有数据，创建一个指向它的<code>master</code>分支的指针，并且在本地将其命名为<code>origin/master</code>。Git也会给你一个与<code>origin</code>的<code>master</code>分支在指向同一个地方的本地<code>master</code>分支，这样你就有工作的基础。</li>
+<li><code>origin</code>并无特殊含义。远程仓库名字<code>origin</code>与分支名字<code>master</code>一样，在Git中并没有任何特别的含义一样。同时,<code>master</code>是当你运行<code>git init</code>时默认的起始分支名字。如果你运行<code>git clone -o booyah</code>，那么默认的远程分支名字将会是<code>booyah/master</code></li>
+</ul>
+</li>
+<li><p><code>git push &lt;remote&gt; &lt;branch&gt;</code> ： 推送到某个分支</p>
+</li>
+<li><p>与给定的远程仓库同步数据，运行<code>git fetch &lt;remote&gt;</code>命令。</p>
+<ul>
+<li>示例：<code>git fetch a311d</code></li>
+<li>这个命令查找<code>a311d</code>是哪一个服务器，从中抓取本地没有的数据，并且更新本地数据库，移动<code>a311d/master</code>指针到更新之后的位置。</li>
+</ul>
+</li>
+<li><p><code>git pull</code> : 拉取</p>
+<ul>
+<li>当<code>git fetch</code>命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容，它只会获取数据然后让你自己合并</li>
+<li><code>git pull</code>命令在大多数情况下它的含义是一个<code>git fetch</code>紧接着一个<code>git merge</code>命令</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何避免每次输入密码"><a href="#如何避免每次输入密码" class="headerlink" title="如何避免每次输入密码"></a>如何避免每次输入密码</h2><ul>
+<li>如果正在使用<code>HTTPS URL</code>来推送，Git服务器会询问用户名与密码。默认情况下它会在终端中提示服务器是否允许你进行推送</li>
+<li>如果不想在每一个推送时都输入用户名与密码，可以设置一个<code>credential cache</code>。最简单的方式就是将其保存在内存中几分钟，可以简单地运行<code>git config --global credential.helper cache</code>来设置</li>
+</ul>
+<h2 id="跟踪分支"><a href="#跟踪分支" class="headerlink" title="跟踪分支"></a>跟踪分支</h2><ul>
+<li>从一个远程跟踪分支检出一个本地分支会自动创建所谓的“跟踪分支”（它跟踪的分支叫做“上游分支”）。</li>
+<li>跟踪分支是与远程分支有直接关系的本地分支。如果在一个跟踪分支上输入<code>git pull</code>，Git能够自动地识别去那个服务器上抓取，合并到哪个分支。</li>
+<li>当克隆一个仓库时，它通常会自动地创建一个跟踪<code>origin/master</code>的<code>master</code>分支。</li>
+<li>如果想设置其他的跟踪分支，或者是一个在其他远程仓库上的跟踪分支，简单的示例：<code>git checkout -b &lt;branch&gt; &lt;remote&gt;/&lt;branch&gt;</code>。这是一个十分常用的操作，所以Git提供了<code>--track</code>快捷方式</li>
+<li>如果想要将本地分支与远程分支设置为不同的名字，可以使用命令<code>git checkout -b sf origin/serverfix</code></li>
+</ul>
+<h2 id="删除远程分支"><a href="#删除远程分支" class="headerlink" title="删除远程分支"></a>删除远程分支</h2><ul>
+<li>运行带有<code>--delete</code>选项的<code>git push</code>命令，用来删除一个远程分支，例如:<code>git push zhuoer --delete docker-mqtt</code></li>
+<li>基本上这个命令做的只是从服务器上移除这个指针。Git服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。</li>
+</ul>
+<h2 id="Git-子模块"><a href="#Git-子模块" class="headerlink" title="Git 子模块"></a>Git 子模块</h2><ul>
+<li><p>使用场景：某个工作中的项目需要包含并使用另一个项目。也许是第三方库，或者独立开发的，用于多个父项目的库。现在问题是：把它们当作两个独立的项目，同时又想在一个项目中使用另一个</p>
+</li>
+<li><p>Git通过<strong>子模块</strong>来解决这个问题：子模块允许将一个Git仓库作为另一个Git仓库的子目录。它能够将另一个仓库克隆到自己的项目中，同时还可以保持提交的独立。</p>
+</li>
+<li><p>将一个已存在的Git仓库添加为正在工作的仓库的自模块：<code>git submodule add</code>命令后加上想要跟踪的项目的相对或者绝对URL来添加新的子模块。</p>
+<ul>
+<li>默认情况下，子模块会将子项目放到一个与仓库同名的目录中，如果想放到其他地方，可以在命令结尾添加一个不同的路径。</li>
+</ul>
+</li>
+<li><p><code>.gitmodules</code>配置文件，保存了项目URL与已经拉取的本地目录之间的映射</p>
+</li>
+<li><p>我们首先将一个已存在的 Git 仓库添加为正在工作的仓库的子模块。 你可以通过在 git submodule add 命令后面加上想要跟踪的项目的相对或绝对 URL 来添加新的子模块。 在本例中，我们将会添加一个名为 “DbConnector” 的库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git submodule add https://github.com/chaconinc/DbConnector</span><br><span class="line">Cloning into <span class="string">&#x27;DbConnector&#x27;</span>...</span><br><span class="line">remote: Counting objects: 11, <span class="keyword">done</span>.</span><br><span class="line">remote: Compressing objects: 100% (10/10), <span class="keyword">done</span>.</span><br><span class="line">remote: Total 11 (delta 0), reused 11 (delta 0)</span><br><span class="line">Unpacking objects: 100% (11/11), <span class="keyword">done</span>.</span><br><span class="line">Checking connectivity... <span class="keyword">done</span>.</span><br></pre></td></tr></table></figure></li>
+<li><p>默认情况下，子模块会将子项目放到一个与仓库同名的目录中，本例中是 “DbConnector”。 如果你想要放到其他地方，那么可以在命令结尾添加一个不同的路径。</p>
+</li>
+</ul>
 
       
     </div>
@@ -3189,7 +4003,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/JSON/2024-05-22-json_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -3203,7 +4017,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">git_3_常用技巧</a>
+            <a href="/2024/05/22/notes/JSON/2024-05-22-json_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">json_1_理论基础</a>
         </h2>
 
         <div class="post-meta">
@@ -3228,7 +4042,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+                  <a href="/categories/JSON/" itemprop="url" rel="index"><span itemprop="name">JSON</span></a>
                 </span>
             </span>
 
@@ -3244,658 +4058,53 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>Git常见的使用技巧</li>
+<li>JSON，指的是JavaScript对象表示法(JavaScript Object Notation)</li>
+<li>JSON是轻量级的文本数据交换格式</li>
+<li>JSON独立于语言，JSON使用Javascript语法来描述数据对象，但是JSON仍然独立于语言和平台。JSON解析器和JSON库支持许多种不同的编程语言。目前非常多的动态编程语言都支持JSON</li>
+<li>JSON具有自我描述性，更容易理解</li>
 </ul>
-<h2 id="写了很多代码，发现写错了分支怎么办"><a href="#写了很多代码，发现写错了分支怎么办" class="headerlink" title="写了很多代码，发现写错了分支怎么办"></a>写了很多代码，发现写错了分支怎么办</h2><ul>
-<li><p>未提交的情况下</p>
+<h2 id="与XML相同之处"><a href="#与XML相同之处" class="headerlink" title="与XML相同之处"></a>与XML相同之处</h2><ul>
+<li>JSON和XML都用于接收Web服务端的数据</li>
+<li>JSON是纯文本</li>
+<li>JSON具有自我描述性（人类可读）</li>
+<li>JSON具有层级结构（值中存在值）</li>
+<li>JSON可通过JavaScript进行解析</li>
+<li>JSON数据可使用AJAX进行传输</li>
+</ul>
+<h2 id="JSON语法规则"><a href="#JSON语法规则" class="headerlink" title="JSON语法规则"></a>JSON语法规则</h2><ul>
+<li><p>JSON语法是JavaScript对象表示语法的子集</p>
+</li>
+<li><p>数据在名称&#x2F;值对中</p>
+</li>
+<li><p>数据由逗号<code>,</code>分隔</p>
+</li>
+<li><p>使用斜杠<code>\</code>来转义字符</p>
+</li>
+<li><p>大括号<code>&#123;&#125;</code>保存对象</p>
+</li>
+<li><p>中括号<code>[]</code>保存数组，数组可以包含多个对象</p>
+</li>
+<li><p>JSON的两种结构</p>
 <ul>
-<li>git add . (把所有改动暂存)</li>
-<li>git stash (把暂存的文件提交到git的暂存栈)</li>
-<li>git checkout 本该提交代码的分支</li>
-<li>git stash pop (将暂存栈中的代码放出来)</li>
+<li>对象：大括号<code>&#123;&#125;</code>保存的对象是一个无序的名称&#x2F;值对集合。一个对象以左括号<code>&#123;</code>开始，右括号<code>&#125;</code>结束。每个键后跟一个冒号<code>:</code>，名称&#x2F;值对使用逗号<code>,</code>分隔。</li>
+<li>数组：中括号<code>[]</code>保存的数组是值(value)的有序集合。一个数组以左中括号<code>[</code>开始，右中括号<code>]</code>结束，值之间使用逗号<code>,</code>分隔。值(value)可以是双引号括起来的字符串，数值，true, false, null, 对象或者数组，它们是可以嵌套的</li>
 </ul>
 </li>
-<li><p>至于是继续改还是提交就随你了</p>
-</li>
-<li><p>已提交的情况下</p>
-<ul>
-<li>git checkout 不该提交代码提交了代码的分支</li>
-<li>git reset HEAD~1 （最近一次提交放回暂存区, 并取消此次提交）</li>
-<li>git stash (把暂存的文件提交到git的暂存栈)</li>
-<li>git checkout 该提交代码的分支</li>
-<li>git stash pop</li>
 </ul>
-</li>
-<li><p>下面一顿操作随你猛了，等你把代码提交到了正确的分支后，再次切到刚刚错的分支</p>
-</li>
+<h2 id="JSON名称-值对"><a href="#JSON名称-值对" class="headerlink" title="JSON名称&#x2F;值对"></a>JSON名称&#x2F;值对</h2><ul>
+<li>JSON数据的书写格式是:<code>key:value</code></li>
+<li>名称&#x2F;值对包括字段名称（在双引号中），后面写一个冒号，然后值：<code>&quot;name&quot;:&quot;abc&quot;</code>，等价于JavaScript语句：<code>name = &quot;abc&quot;</code></li>
 </ul>
-<h2 id="git-迭代拉取子项目"><a href="#git-迭代拉取子项目" class="headerlink" title="git 迭代拉取子项目"></a>git 迭代拉取子项目</h2><p>在 Git 中，如果你有一个父项目，而该项目包含了子项目，你可能希望在父项目中拉取或更新这些子项目。这种情况下，通常会使用 Git 的子模块（submodule）功能。子模块允许你在一个 Git 仓库中引用另一个仓库。</p>
-<p>要拉取或更新子项目，可以按照以下步骤进行：</p>
+<h2 id="C-处理JSON的开源库"><a href="#C-处理JSON的开源库" class="headerlink" title="C++处理JSON的开源库"></a>C++处理JSON的开源库</h2><p>在C++中，有多个流行的库可以用于处理JSON数据。以下是一些常用的C++ JSON处理库：</p>
 <ol>
-<li><p><strong>添加子模块</strong>：如果尚未添加子模块，可以使用以下命令将子模块添加到父项目中：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add &lt;URL-of-submodule-repository&gt; &lt;path-to-store-submodule&gt;</span><br></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add https://github.com/example/submodule.git path/to/submodule</span><br></pre></td></tr></table></figure>
+<li><p><strong>RapidJSON</strong>: RapidJSON是一个高性能的JSON解析和生成库，提供了灵活的API和丰富的功能。它具有快速的解析速度和低内存占用，并支持DOM和SAX风格的API。</p>
 </li>
-<li><p><strong>初始化子模块</strong>：在克隆父项目后，子模块目录中可能还没有子模块的文件。要初始化子模块，可以运行：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule init</span><br></pre></td></tr></table></figure>
+<li><p><strong>jsoncpp</strong>: jsoncpp是一个简单易用的C++ JSON库，提供了方便的API用于解析和生成JSON数据。它支持将JSON数据与C++对象进行相互转换，并提供了灵活的配置选项。</p>
 </li>
-<li><p><strong>更新子模块</strong>：一旦子模块被添加并初始化，你可以使用以下命令更新子模块到父项目所引用的特定版本：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule update --remote</span><br></pre></td></tr></table></figure>
-<p>这会将每个子模块更新到它们在父项目中所引用的最新提交。</p>
+<li><p><strong>nlohmann&#x2F;json</strong>: nlohmann&#x2F;json是一个现代化的C++ JSON库，具有简单易用的API和高性能。它支持以类似于JavaScript的方式访问和操作JSON数据，并提供了方便的函数和操作符用于序列化和反序列化。</p>
 </li>
 </ol>
-<p>记住，当你拉取父项目时，子模块不会自动更新。你需要显式运行 <code>git submodule update --remote</code> 来更新子模块。</p>
-<p>这些是用于在 Git 中迭代拉取子项目的基本步骤。</p>
-<h2 id="git-仅检查指定项目-忽略子项目"><a href="#git-仅检查指定项目-忽略子项目" class="headerlink" title="git 仅检查指定项目 忽略子项目"></a>git 仅检查指定项目 忽略子项目</h2><p>在Git中，如果你想仅检查指定项目而忽略子项目，你可以使用<code>.gitignore</code>文件来指定哪些文件或目录应该被忽略。在<code>.gitignore</code>中，你可以列出你希望忽略的文件或目录的模式。</p>
-<p>以下是一些建议：</p>
-<ol>
-<li><p><strong>创建.gitignore文件：</strong> 在你的项目根目录下创建一个名为<code>.gitignore</code>的文件。</p>
-</li>
-<li><p><strong>编辑.gitignore文件：</strong> 打开<code>.gitignore</code>文件并添加你希望忽略的文件或目录的模式。如果你想忽略所有子项目，你可以使用通配符（如<code>/*</code>）来匹配所有直接子目录。例如：</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">!/指定项目/</span><br></pre></td></tr></table></figure>
-
-<p> 这将忽略根目录下的所有内容，但允许<code>指定项目</code>目录被追踪。</p>
-</li>
-<li><p><strong>将.gitignore文件添加到版本控制：</strong> 确保将<code>.gitignore</code>文件添加到Git版本控制中，这样其他人克隆你的仓库时也会遵循这些规则。</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add .gitignore</span><br><span class="line">git commit -m &quot;Add .gitignore to ignore subprojects&quot;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>更新.gitignore：</strong> 如果在项目的后续开发中需要调整忽略规则，只需更新<code>.gitignore</code>文件并提交更改即可。</p>
-</li>
-</ol>
-<p>请记住，<code>.gitignore</code>文件中的模式是相对于<code>.gitignore</code>所在目录的相对路径的。确保你的规则符合你的项目结构。</p>
-<h2 id="git-config-查看默认编辑器"><a href="#git-config-查看默认编辑器" class="headerlink" title="git config 查看默认编辑器"></a>git config 查看默认编辑器</h2><p>要查看 Git 的默认文本编辑器，可以使用以下命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.editor</span><br></pre></td></tr></table></figure>
-
-<p>上述命令将显示全局配置中设置的默认编辑器。如果没有设置默认编辑器，它将不会返回任何输出。</p>
-<p>如果你在命令行中看到了输出，它将是你当前配置的默认编辑器的名称或路径。常见的编辑器包括 Vim、Emacs、Nano、Sublime Text、Visual Studio Code 等。</p>
-<h2 id="撤回本地修改"><a href="#撤回本地修改" class="headerlink" title="撤回本地修改"></a>撤回本地修改</h2><ul>
-<li>放弃对本地已经修改，但是尚未提交的文件的修改，还原到其未修改前的状态</li>
-<li>命令<ul>
-<li>撤回对所有已经修改，但是未提交的文件的修改，但不包括新增的文件<ul>
-<li><code>git checkout .</code></li>
-</ul>
-</li>
-<li>撤回对指定文件的修改，<code>[filename]</code>为文件名<ul>
-<li><code>git checkout [filename]</code></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="git-reset-回退项目版本"><a href="#git-reset-回退项目版本" class="headerlink" title="git reset 回退项目版本"></a>git reset 回退项目版本</h2><ul>
-<li>可以回退到任意已经提交过的版本，已经add, commit但是没有push的文件也适用</li>
-<li>命令<ul>
-<li><code>git reset --hard [commit-hashcode]</code></li>
-</ul>
-</li>
-<li>参数：<ul>
-<li><code>commit-hashcode</code> 是某个commit的哈希值，可以适用git log查看</li>
-<li>因此，一般用法是先用git log 查看具体commit的哈希值，然后reset到那个版本</li>
-</ul>
-</li>
-</ul>
-<h2 id="对于新增文件"><a href="#对于新增文件" class="headerlink" title="对于新增文件"></a>对于新增文件</h2><ul>
-<li>撤回本地修改和回退项目版本都不会对新增文件起作用。因为新增的文件是还未加到git的记录里面的，即属于未被<code>tracked</code>的状态，所以撤销修改和回退均对其不受影响。</li>
-<li>解决方法：<ul>
-<li>直接手动删除文件即可</li>
-</ul>
-</li>
-</ul>
-<h2 id="上游分支-upstream"><a href="#上游分支-upstream" class="headerlink" title="上游分支 upstream"></a>上游分支 upstream</h2><ul>
-<li><p>upstream意为上游，即本地分支所对应的远程分支。</p>
-</li>
-<li><p>一般，本地分支如果是从clone或者fetch得到的，都在远程库有一个upstream分支。</p>
-</li>
-<li><p>设置upstream的方法有两种：</p>
-<ul>
-<li>在push的时候指定：<code>git push --set-upstream origin my_remote_branch_name</code></li>
-<li>在新建分支的时候指定：<code>git branch --set-upstream my_local_branch_name origin/my_remote_branch_name</code>(错误)</li>
-</ul>
-</li>
-<li><p>注：</p>
-<ul>
-<li>在运行<code>git branch --set-upstream</code>命令时，出现错误(git –version: 2.17.1)</li>
-<li><code>fatal: the &#39;--set-upstream&#39; option is no longer supported. Please use &#39;--track&#39; or &#39;--set-upstream-to&#39; instead.</code></li>
-<li>设置方法：<code>git branch --set-upstream-to=origin/&lt;远程分支&gt; &lt;本地分支&gt;</code></li>
-</ul>
-</li>
-<li><p>实际上，上述命令，就是在修改本地的.git&#x2F;config文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[branch &quot;my_local_branch_name&quot;]</span><br><span class="line">	remote = origin</span><br><span class="line">	merge = refs/heads/my_remote_branch_name</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>取消分支上游</p>
-<ul>
-<li><code>git branch --inset-upstream</code></li>
-</ul>
-</li>
-<li><p>查看分支上游</p>
-<ul>
-<li><code>git status</code></li>
-<li><code>git checkout &lt;分支&gt;</code></li>
-<li><code>git branch -vv</code></li>
-</ul>
-</li>
-<li><p>设置完upstream后，就可以直接用 <code>git push/pull</code> 来拉取或推送相应的分支了。</p>
-</li>
-</ul>
-<h2 id="直接拉取远程分支"><a href="#直接拉取远程分支" class="headerlink" title="直接拉取远程分支"></a>直接拉取远程分支</h2><ul>
-<li>新建分支分支并切换到指定分支<ul>
-<li><code>git checkout -b dev origin/dev</code></li>
-<li><code>git checkout -b 本地分支名 origin/远程分支名</code></li>
-</ul>
-</li>
-<li>该命令可以将远程Git仓库里的指定分支拉取到本地，这样就在本地新建了一个dev分支，并和指定的远程分支<code>origin/dev</code>关联起来了。</li>
-<li>示例：<ul>
-<li><code>git checkout -b dev notes/dev</code> : 切换指定远程分支</li>
-</ul>
-</li>
-</ul>
-<h2 id="在本地使用指定提交id创建分支"><a href="#在本地使用指定提交id创建分支" class="headerlink" title="在本地使用指定提交id创建分支"></a>在本地使用指定提交id创建分支</h2><ul>
-<li><p>查看远程分支最新的commitSHA，例如：<code>aa4339fbe90f68bc82901d976a7c11fe92179ef3</code></p>
-</li>
-<li><p>使用命令直接从指定的commit新建分支：</p>
-<ul>
-<li><code>git branch [branch-name] [commit-id]</code></li>
-<li><code>git branch v1.x aa4339fbe90f68bc82901d976a7c11fe92179ef3</code></li>
-</ul>
-</li>
-</ul>
-<h2 id="使用标签的方式"><a href="#使用标签的方式" class="headerlink" title="使用标签的方式"></a>使用标签的方式</h2><ul>
-<li><code>git clone [--branch tag-name/branch-name] &lt;git-url&gt; [dir]</code> 下载并绑定指定分支或下载指定标签</li>
-</ul>
-<h2 id="使用流程"><a href="#使用流程" class="headerlink" title="使用流程"></a>使用流程</h2><ul>
-<li><p>在本地仓库创建标签，并推送到远程：</p>
-<ul>
-<li><code>git tag -a v1.0 -m &quot;create tag&quot;</code></li>
-<li><code>git push origin v1.0</code></li>
-</ul>
-</li>
-<li><p>下载指定标签到本地：</p>
-<ul>
-<li><code>git clone --branch v1.0 http://192.169.4.28/zjy/clean_code.git</code></li>
-</ul>
-</li>
-<li><p>下载标签之后，出现的提示：</p>
-<ul>
-<li>你处于分离的HEAD状态。您可以环顾四周，进行实验性更改并提交它们，您可以放弃在此状态下所做的任何提交，而不会通过执行另一次签出影响任何分支。</li>
-<li>如果您想创建一个新的分支来保留您创建的提交，您可以(现在或以后)再次使用-b和chckout命令。</li>
-</ul>
-</li>
-</ul>
-<h2 id="git同步项目进度方法"><a href="#git同步项目进度方法" class="headerlink" title="git同步项目进度方法"></a>git同步项目进度方法</h2><ul>
-<li><p>创建三个分支：</p>
-<ul>
-<li>master </li>
-<li>dev</li>
-<li>local</li>
-</ul>
-</li>
-<li><p>master分支：</p>
-<ul>
-<li>存放稳定版本的代码，在这个分支上的项目，所有的功能都是经过测试，不再改动的</li>
-<li>这个是对外发行的分支</li>
-</ul>
-</li>
-<li><p>dev分支</p>
-<ul>
-<li>存放正在开发的代码，在这个分支上的项目，可能正在新加功能，需要经过反复修改的，或者是同步的</li>
-<li>这个是面向所有开发者的</li>
-<li>所有开发者通过拉取这个分支的代码来同步项目开发的进程</li>
-</ul>
-</li>
-<li><p>local分支</p>
-<ul>
-<li>存放本地的项目的代码，在这个分支上的项目，随时都有可能修改</li>
-<li>这个是存放在本地，面向的是自己</li>
-<li>其作用是，自己开发的时候，都在这个本地分支上修改，需要推送到远程git上或者拉取远程git上最新的代码时，需要进行如下几步<ul>
-<li>首先，将local分支的修改全部添加，并在本地提交</li>
-<li>其次，切换到本地的dev分支，然后拉取远程git上最新的dev分支</li>
-<li>最后，切换回local分支，将本地拉取到的最新的分支合并到local分支</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="git删除远程分支文件"><a href="#git删除远程分支文件" class="headerlink" title="git删除远程分支文件"></a>git删除远程分支文件</h2><ul>
-<li>git删除远程分支文件包括两种情况：<ul>
-<li>（1）仅仅删除远程分支文件，不删除本地的文件；</li>
-<li>（2）删除远程分支文件的同时，删除本地的文件。</li>
-</ul>
-</li>
-</ul>
-<h2 id="仅仅删除远程分支文件，不删除本地文件"><a href="#仅仅删除远程分支文件，不删除本地文件" class="headerlink" title="仅仅删除远程分支文件，不删除本地文件"></a>仅仅删除远程分支文件，不删除本地文件</h2><ul>
-<li><p>删除远程文件filename</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm --cached filename</span><br><span class="line">git commit -m &quot;delete remote file filename &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除远程文件夹directoryname</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r --cached directoryname</span><br><span class="line">git commit -m &quot;delete remote directory directoryname &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="删除本地文件与远程分支文件"><a href="#删除本地文件与远程分支文件" class="headerlink" title="删除本地文件与远程分支文件"></a>删除本地文件与远程分支文件</h2><ul>
-<li><p>删除文件filename</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm filename</span><br><span class="line">git commit -m &quot;delete file filename &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除文件夹directoryname</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r directoryname</span><br><span class="line">git commit -m &quot;delete directory directoryname &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="git常见错误"><a href="#git常见错误" class="headerlink" title="git常见错误"></a>git常见错误</h2><h2 id="fatal-refusing-to-merge-unrelated-histories"><a href="#fatal-refusing-to-merge-unrelated-histories" class="headerlink" title="fatal:refusing to merge unrelated histories"></a><code>fatal:refusing to merge unrelated histories</code></h2><ul>
-<li>在使用<code>git pull</code>命令拉取代码时出现这个错误</li>
-<li>原因：本地仓库和远程仓库实际上时独立的两个仓库</li>
-<li>解决方法：添加选项<code>--allow-unrelated-histories</code>解决问题<ul>
-<li><code>git pull zhuoer dev --allow-unrelated-histories</code></li>
-</ul>
-</li>
-</ul>
-<h2 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h2><ul>
-<li><code>git clone &lt;url&gt;</code> : 克隆远程版本库</li>
-<li><code>git init</code> : 初始化本地版本库</li>
-</ul>
-<h2 id="修改和提交"><a href="#修改和提交" class="headerlink" title="修改和提交"></a>修改和提交</h2><ul>
-<li><code>git status</code> : 查看状态</li>
-<li><code>git diff</code> : 查看变更内容</li>
-<li><code>git add .</code> : 跟踪所有改动过的文件</li>
-<li><code>git add &lt;file&gt;</code> : 跟踪指定的文件</li>
-<li><code>git mv &lt;old&gt; &lt;new&gt;</code> : 文件改名</li>
-<li><code>git rm &lt;file&gt;</code> : 删除文件</li>
-<li><code>git commit -m &quot;commit message&quot;</code> : 提交所有更新过的文件</li>
-<li><code>git commit --amend</code> : 修改最后一次提交</li>
-</ul>
-<h2 id="查看提交历史"><a href="#查看提交历史" class="headerlink" title="查看提交历史"></a>查看提交历史</h2><ul>
-<li><code>git log</code> : 查看提交历史</li>
-<li><code>git log -p &lt;file&gt;</code> : 查看指定文件的提交历史</li>
-<li><code>git blame &lt;file&gt;</code> : 以列表方式查看指定文件的提交历史</li>
-</ul>
-<h2 id="撤销"><a href="#撤销" class="headerlink" title="撤销"></a>撤销</h2><ul>
-<li><code>git reset --     0  1.9G   0% /sys/fs/cgroup /dev/mmcblk0p7   16G   12G  3.1G  79% /data  HEAD</code> : 撤销工作目录中所有未提交文件的修改内容</li>
-<li><code>git checkout HEAD &lt;file&gt;</code> : 撤销指定的未提交的修改内容</li>
-<li><code>git revert &lt;commit&gt;</code> : 取消指定的提交</li>
-</ul>
-<h2 id="分支与标签"><a href="#分支与标签" class="headerlink" title="分支与标签"></a>分支与标签</h2><ul>
-<li><code>git branch</code> : 显示所有本地分支</li>
-<li><code>git checkout &lt;branch/tag&gt;</code> : 切换到指定分支或标签</li>
-<li><code>git branch &lt;new-branch&gt;</code> : 创建新分支</li>
-<li><code>git branch -d &lt;branch&gt;</code> : 删除本地分支</li>
-<li><code>git tag</code> : 列出所有本地标签</li>
-<li><code>git tag &lt;tagname&gt;</code> : 基于最新提交的创建标签</li>
-<li><code>git tag -d &lt;tagname&gt;</code> : 删除标签</li>
-<li><code>git checkout -b dev notes/dev</code> : 切换指定远程分支</li>
-</ul>
-<h2 id="合并和衍合"><a href="#合并和衍合" class="headerlink" title="合并和衍合"></a>合并和衍合</h2><ul>
-<li><code>git merge &lt;branch&gt;</code> : 合并指定分支到当前分支</li>
-<li><code>git rebase &lt;branch&gt;</code> : 衍合指定分支到当前分支</li>
-</ul>
-<h2 id="远程操作"><a href="#远程操作" class="headerlink" title="远程操作"></a>远程操作</h2><ul>
-<li><code>git remote -v</code> : 查看远程版本库信息</li>
-<li><code>git remote show &lt;remote&gt;</code> : 查看指定远程版本库信息</li>
-<li><code>git remote add &lt;remote&gt; &lt;url&gt;</code> : 添加远程版本库</li>
-<li><code>git fetch &lt;remote&gt;</code> : 从远程库获取代码</li>
-<li><code>git pull &lt;remote&gt; &lt;branch&gt;</code> : 下载代码及快速合并</li>
-<li><code>git push &lt;remote&gt; &lt;branch&gt;</code> : 上传代码及快速合并</li>
-<li><code>git push &lt;remote&gt; :&lt;branch/tag-name&gt;</code> : 删除远程分支或标签</li>
-<li><code>git push --tags</code> : 上传所有标签</li>
-</ul>
-<h2 id="拉取"><a href="#拉取" class="headerlink" title="拉取"></a>拉取</h2><ul>
-<li><code>git pull origin master</code><ul>
-<li><code>push</code> : 将本地仓库与远程仓库合并</li>
-<li><code>-u</code> : 将本地仓库分支与远程仓库分支一起合并，就是说将master的分支也提交上去，这样就可以在远程仓库上看到在本地仓库的master中创建了多少分支。不加这个参数，只将当前的master与远程的合并，没有分支的历史纪录，也不能切换分支</li>
-<li><code>origin</code> : 远程仓库的意思，如果这个仓库是远程的，那么必须使用这个选项</li>
-<li><code>master</code> : 提交本地master分支仓库</li>
-</ul>
-</li>
-</ul>
-<h2 id="递归克隆"><a href="#递归克隆" class="headerlink" title="递归克隆"></a>递归克隆</h2><ul>
-<li><code>git clone --recursive http://192.167.10.28/dagger/manager_node.git</code></li>
-<li><code>recursive</code>选项会递归克隆项目下的所有git项目</li>
-</ul>
-<h2 id="撤销-git-add-并保留修改的方法"><a href="#撤销-git-add-并保留修改的方法" class="headerlink" title="撤销 git add 并保留修改的方法"></a>撤销 <code>git add</code> 并保留修改的方法</h2><ul>
-<li><strong><code>git reset --mixed</code> – 撤销所有的已经<code>add</code>的文件</strong></li>
-<li><code>git reset HEAD .</code> – 复制撤销某个文件或文件夹</li>
-<li><code>git reset HEAD -filename</code> – 另外，可以使用<code>git status</code> ，git会告诉可以通过哪一个命令来执行操作</li>
-</ul>
-<h2 id="git从历史上的某一次提交处建立分支"><a href="#git从历史上的某一次提交处建立分支" class="headerlink" title="git从历史上的某一次提交处建立分支"></a>git从历史上的某一次提交处建立分支</h2><ul>
-<li><code>git log --oneline --all --graph --decorate</code></li>
-<li><code>git branch dev 3be5879</code></li>
-</ul>
-<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><ul>
-<li><p><code>git remote add &lt;shortname&gt; &lt;url&gt;</code> ： 添加一个新的远程Git仓库，同时指定一个方便使用的简写.</p>
-<ul>
-<li><code>git remote add zhuoer http://192.167.10.28/dagger/zhuoer</code> ： 现在可以在命令行中使用字符串<code>zhuoer</code>来代替整个URL</li>
-</ul>
-</li>
-<li><p><code>git fetch &lt;remote&gt;</code> : 从远程仓库中获得数据。这个命令会访问远程仓库，从中拉取所有还没有的数据。执行完成后，将会拥有那个远程仓库中所有分支的引用，可以随时合并或者查看。</p>
-</li>
-<li><p><strong>如果使用<code>clone</code>命令克隆了一个仓库，命令会自动将其添加为远程仓库并且默认以<code>origin</code>为简写</strong>。所以，<code>git fetch origin</code>会抓取克隆（或上一次抓取）后新推送的所有工作。</p>
-<ul>
-<li>注意：<code>git fetch</code>命令只会将数据下在到本地仓库，它并不会自动合并或者修改当前的工作，当准备好时，必须要手动将其合并入你的工作。</li>
-</ul>
-</li>
-<li><p>如果当前分支设置了跟踪远程分支，那么可以使用<code>git pull</code>命令自动抓取后合并该远程分支到当前分支。</p>
-</li>
-<li><p>默认情况下，<code>git clone</code>命令会自动设置本地<code>master</code>分支跟踪克隆的远程仓库的<code>master</code>分支（或其他名字的默认分支）。运行<code>git pull</code>通常会从最初克隆的服务器上抓取数据并自动尝试合并到当前所在的分支。）</p>
-</li>
-</ul>
-<h2 id="推送到远程仓库"><a href="#推送到远程仓库" class="headerlink" title="推送到远程仓库"></a>推送到远程仓库</h2><ul>
-<li><code>git push &lt;remote&gt; &lt;branch&gt;</code><ul>
-<li>当你想要将<code>master</code>分支推送到<code>origin</code>服务器时（再次说明，克隆时通常会自动帮你设置好那两个名字），那么运行这个命令就可以将你所做的备份到服务器。</li>
-</ul>
-</li>
-</ul>
-<h2 id="查看某个远程仓库"><a href="#查看某个远程仓库" class="headerlink" title="查看某个远程仓库"></a>查看某个远程仓库</h2><ul>
-<li><code>git remote show &lt;remote&gt;</code><ul>
-<li>查看某一个远程仓库的更多信息</li>
-<li>它同样会列出远程仓库的URL与跟踪分支的信息。它告诉你正在处于<code>master</code>分支，并且如果运行<code>git pull</code>，就会抓取所有的远程引用，然后将远程<code>master</code>分支合并到本地<code>master</code>分支，</li>
-<li>它也会列出拉取到的所有远程引用。</li>
-</ul>
-</li>
-</ul>
-<h2 id="远程仓库的重命名与移除"><a href="#远程仓库的重命名与移除" class="headerlink" title="远程仓库的重命名与移除"></a>远程仓库的重命名与移除</h2><ul>
-<li><p><code>git remote rename</code></p>
-<ul>
-<li>修改一个远程仓库的简写名</li>
-<li>这个操作也会修改所有远程跟踪的分支名字</li>
-</ul>
-</li>
-<li><p><code>git remote remove</code>或者<code>git remote rm</code></p>
-<ul>
-<li>移除一个远程仓库</li>
-<li>一旦使用这种方式删除了一个远程仓库，那么所有和这个远程仓库相关的远程跟踪分支以及配置信息也会一起被删除。</li>
-</ul>
-</li>
-</ul>
-<h2 id="打标签"><a href="#打标签" class="headerlink" title="打标签"></a>打标签</h2><ul>
-<li><p><code>git tag</code></p>
-<ul>
-<li>在Git中列出已有的标签</li>
-<li>按照通配符列出标签需要<code>-l</code>或者<code>--list</code>选项</li>
-<li>如果只想要完整的标签列表，那么运行<code>git tag</code>就会默认假定你想要一个列表，它会直接列出来</li>
-</ul>
-</li>
-<li><p>创建标签，Git支持两种标签：轻量标签(<code>lightweight</code>)与附注标签(<code>annotated</code>)</p>
-<ul>
-<li>轻量标签很像一个不会改变的分支–它只是某个特定提交的引用</li>
-<li>附注标签是存储在Git数据库中的一个完整对象，它们是可以被校验的，其中包括打标签者的名字，电子邮件，地址，日期时间，此外还有一个标签信息，并且可以使用GNU Privacy Guard（GTG）签名并验证。</li>
-</ul>
-</li>
-<li><p>通常会建议创建附注标签，这样可以拥有以上所有信息，但是如果只是想用一个临时的标签，或者因为某些原因不想要保存信息，那么也可以用轻量标签</p>
-</li>
-<li><p>附注标签的创建: <code>git tag -a v1.4 -m &quot;my version 1.4&quot;</code></p>
-<ul>
-<li><code>-m</code> : 指定了一条将会存储在标签中的信息。如果没有为附注标签指定一条信息，Git会启动编辑其要求你输入信息</li>
-</ul>
-</li>
-<li><p>推送标签</p>
-<ul>
-<li>git push origin v1.4</li>
-</ul>
-</li>
-<li><p>轻量标签，本质上是将提交校验和存储到一个文件中–没有保存任何其他信息。</p>
-</li>
-<li><p>创建轻量标签，不需要使用<code>-a</code>, <code>-s</code>, <code>-m</code>选项，只需要提供标签名字：<code>git tag v1.4-lw</code></p>
-</li>
-<li><p>后期打标签</p>
-<ul>
-<li>要在提交上打标签，需要在命令的末尾指定提交的校验和（或部分校验和）</li>
-<li><code>git tag -a v1.2 9fcaw1</code></li>
-</ul>
-</li>
-<li><p>删除标签</p>
-<ul>
-<li>删除本地仓库上的标签，可以使用命令<code>git tag -d &lt;tagname&gt;</code><ul>
-<li>注意：该命令并不会从任何远程仓库中移除这个标签，必须使用<code>git push &lt;remote&gt;:refs/tags/&lt;tagname&gt;</code>来更新远程仓库</li>
-<li>第一种变体是：<code>git push &lt;remote&gt; :refs/tags/&lt;tagname&gt;</code>，这种操作的含义是：将冒号前面的空值推送到远程标签名，从而高效地删除它</li>
-<li>第二种更加直观的删除远程标签的方式是：<code>git push &lt;remote&gt; --delete &lt;tagname&gt;</code></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>通过使用<code>git show</code>可以看到标签信息和与之对应的提交信息</p>
-</li>
-</ul>
-<h2 id="Git别名"><a href="#Git别名" class="headerlink" title="Git别名"></a>Git别名</h2><ul>
-<li>Git并不会在输入部分命令时自动推断出想要的命令。如果不想每次都输入完整的Git命令，可以通过<code>git config</code>文件来轻松地为每一个命令设置一个别名。</li>
-<li>例如：<ul>
-<li><code>git config --global alias.co checkout</code></li>
-<li><code>git config --global alias.br branch</code></li>
-<li><code>git config --global alias.ci commit</code></li>
-<li><code>git config --global alias.st status</code></li>
-<li>这意味着，当要输入<code>git commit</code>时，只需要输入<code>git ci</code></li>
-</ul>
-</li>
-<li>在创建认为应该存在的命令时，这个技术会很有用。<ul>
-<li>例如：为了解决取消暂存文件的易用性问题，可以向Git中添加取消暂存别名,<code>git config --global alias.unstage &#39;reset HEAD --</code></li>
-<li>通常也会添加一个<code>last</code>命令：<code>git config --global alias.last &#39;log -l HEAD</code>。这样，可以很轻松地看到最后一次提交</li>
-</ul>
-</li>
-<li>Git只是简单地将别名替换为对应的命令。</li>
-</ul>
-<h2 id="Git分支"><a href="#Git分支" class="headerlink" title="Git分支"></a>Git分支</h2><ul>
-<li><p>几乎所有的版本控制系统都以某种形式支持分支。使用分支意味着可以把工作从开发主线上分离开来，以免影响开发主线。</p>
-</li>
-<li><p><strong>Git保存的不是文件的变化或者差异，而是一系列不同时刻的快照。</strong></p>
-</li>
-<li><p>Git的分支，其实质上仅仅是指向提交对象的可变指针。Git的默认分支名字是<code>master</code>，在多次提交操作之后，其实已经有一个指向最后哪个提交对象的<code>master</code>分支。<code>master</code>分支会在每次提交时自动向前移动。</p>
-<ul>
-<li>Git的<code>master</code>分支并不是一个特殊分支。它跟其他分支完全没有区别。之所以几乎每一个仓库都有<code>master</code>分支，是因为<code>git init</code>命令默认创建它，并且大多数人都懒得去改动它</li>
-</ul>
-</li>
-<li><p><code>git branch testing</code> : 创建分支<code>testing</code>，这会在当前所在的提交对象上创建一个指针。那么，Git又是怎么知道当前在哪一个分支上呢？</p>
-<ul>
-<li>也很简单，它有一个名为<code>HEAD</code>的特殊指针。它是一个指针，指向当前所在的本地分支（可以把<code>HEAD</code>想象为当前分支的别名）</li>
-<li>在本示例中，仍然在<code>master</code>分支上，因为<code>git branch</code>命令仅仅创建一个新分支，并不会自动切换到新分支中去</li>
-</ul>
-</li>
-<li><p><code>git log --decorate</code> ： 查看各个分支当前所指的对象</p>
-</li>
-<li><p>分支切换:<code>git checkout testing</code>。如此以来，<code>HEAD</code>就指向<code>testing</code>分支了。</p>
-</li>
-<li><p>由于Git的分支实质上仅是包含所指对象校验和（长度为40的SHA-1值字符串）的文件，所以它的创建和销毁都异常高效</p>
-</li>
-</ul>
-<h2 id="远程分支"><a href="#远程分支" class="headerlink" title="远程分支"></a>远程分支</h2><ul>
-<li><p>远程引用是对远程仓库的引用（指针），包括分支，标签等。</p>
-</li>
-<li><p>可以通过 <code>git ls-remote &lt;remote&gt;</code>来显示地获得远程引用的完整列表</p>
-</li>
-<li><p>或者通过<code>git remote show &lt;remote&gt;</code>获得远程分支的更多信息</p>
-</li>
-<li><p>更常见的做法是利用<strong>远程跟踪分支</strong>，远程跟踪分支是远程分支状态的引用，它们以<code>&lt;remote&gt;/&lt;branch&gt;</code>的形式命名</p>
-<ul>
-<li>例如：假设网络里由一个在<code>git.ourcompany.com</code>的Git服务器。如果从这里克隆，Git的<code>clone</code>命令会自动将其命名为<code>origin</code>，拉取它的所有数据，创建一个指向它的<code>master</code>分支的指针，并且在本地将其命名为<code>origin/master</code>。Git也会给你一个与<code>origin</code>的<code>master</code>分支在指向同一个地方的本地<code>master</code>分支，这样你就有工作的基础。</li>
-<li><code>origin</code>并无特殊含义。远程仓库名字<code>origin</code>与分支名字<code>master</code>一样，在Git中并没有任何特别的含义一样。同时,<code>master</code>是当你运行<code>git init</code>时默认的起始分支名字。如果你运行<code>git clone -o booyah</code>，那么默认的远程分支名字将会是<code>booyah/master</code></li>
-</ul>
-</li>
-<li><p><code>git push &lt;remote&gt; &lt;branch&gt;</code> ： 推送到某个分支</p>
-</li>
-<li><p>与给定的远程仓库同步数据，运行<code>git fetch &lt;remote&gt;</code>命令。</p>
-<ul>
-<li>示例：<code>git fetch a311d</code></li>
-<li>这个命令查找<code>a311d</code>是哪一个服务器，从中抓取本地没有的数据，并且更新本地数据库，移动<code>a311d/master</code>指针到更新之后的位置。</li>
-</ul>
-</li>
-<li><p><code>git pull</code> : 拉取</p>
-<ul>
-<li>当<code>git fetch</code>命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容，它只会获取数据然后让你自己合并</li>
-<li><code>git pull</code>命令在大多数情况下它的含义是一个<code>git fetch</code>紧接着一个<code>git merge</code>命令</li>
-</ul>
-</li>
-</ul>
-<h2 id="如何避免每次输入密码"><a href="#如何避免每次输入密码" class="headerlink" title="如何避免每次输入密码"></a>如何避免每次输入密码</h2><ul>
-<li>如果正在使用<code>HTTPS URL</code>来推送，Git服务器会询问用户名与密码。默认情况下它会在终端中提示服务器是否允许你进行推送</li>
-<li>如果不想在每一个推送时都输入用户名与密码，可以设置一个<code>credential cache</code>。最简单的方式就是将其保存在内存中几分钟，可以简单地运行<code>git config --global credential.helper cache</code>来设置</li>
-</ul>
-<h2 id="跟踪分支"><a href="#跟踪分支" class="headerlink" title="跟踪分支"></a>跟踪分支</h2><ul>
-<li>从一个远程跟踪分支检出一个本地分支会自动创建所谓的“跟踪分支”（它跟踪的分支叫做“上游分支”）。</li>
-<li>跟踪分支是与远程分支有直接关系的本地分支。如果在一个跟踪分支上输入<code>git pull</code>，Git能够自动地识别去那个服务器上抓取，合并到哪个分支。</li>
-<li>当克隆一个仓库时，它通常会自动地创建一个跟踪<code>origin/master</code>的<code>master</code>分支。</li>
-<li>如果想设置其他的跟踪分支，或者是一个在其他远程仓库上的跟踪分支，简单的示例：<code>git checkout -b &lt;branch&gt; &lt;remote&gt;/&lt;branch&gt;</code>。这是一个十分常用的操作，所以Git提供了<code>--track</code>快捷方式</li>
-<li>如果想要将本地分支与远程分支设置为不同的名字，可以使用命令<code>git checkout -b sf origin/serverfix</code></li>
-</ul>
-<h2 id="删除远程分支"><a href="#删除远程分支" class="headerlink" title="删除远程分支"></a>删除远程分支</h2><ul>
-<li>运行带有<code>--delete</code>选项的<code>git push</code>命令，用来删除一个远程分支，例如:<code>git push zhuoer --delete docker-mqtt</code></li>
-<li>基本上这个命令做的只是从服务器上移除这个指针。Git服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。</li>
-</ul>
-<h2 id="Git-子模块"><a href="#Git-子模块" class="headerlink" title="Git 子模块"></a>Git 子模块</h2><ul>
-<li><p>使用场景：某个工作中的项目需要包含并使用另一个项目。也许是第三方库，或者独立开发的，用于多个父项目的库。现在问题是：把它们当作两个独立的项目，同时又想在一个项目中使用另一个</p>
-</li>
-<li><p>Git通过<strong>子模块</strong>来解决这个问题：子模块允许将一个Git仓库作为另一个Git仓库的子目录。它能够将另一个仓库克隆到自己的项目中，同时还可以保持提交的独立。</p>
-</li>
-<li><p>将一个已存在的Git仓库添加为正在工作的仓库的自模块：<code>git submodule add</code>命令后加上想要跟踪的项目的相对或者绝对URL来添加新的子模块。</p>
-<ul>
-<li>默认情况下，子模块会将子项目放到一个与仓库同名的目录中，如果想放到其他地方，可以在命令结尾添加一个不同的路径。</li>
-</ul>
-</li>
-<li><p><code>.gitmodules</code>配置文件，保存了项目URL与已经拉取的本地目录之间的映射</p>
-</li>
-<li><p>我们首先将一个已存在的 Git 仓库添加为正在工作的仓库的子模块。 你可以通过在 git submodule add 命令后面加上想要跟踪的项目的相对或绝对 URL 来添加新的子模块。 在本例中，我们将会添加一个名为 “DbConnector” 的库。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git submodule add https://github.com/chaconinc/DbConnector</span><br><span class="line">Cloning into <span class="string">&#x27;DbConnector&#x27;</span>...</span><br><span class="line">remote: Counting objects: 11, <span class="keyword">done</span>.</span><br><span class="line">remote: Compressing objects: 100% (10/10), <span class="keyword">done</span>.</span><br><span class="line">remote: Total 11 (delta 0), reused 11 (delta 0)</span><br><span class="line">Unpacking objects: 100% (11/11), <span class="keyword">done</span>.</span><br><span class="line">Checking connectivity... <span class="keyword">done</span>.</span><br></pre></td></tr></table></figure></li>
-<li><p>默认情况下，子模块会将子项目放到一个与仓库同名的目录中，本例中是 “DbConnector”。 如果你想要放到其他地方，那么可以在命令结尾添加一个不同的路径。</p>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Logger/2024-05-22-glog_log4cpluc_spdlog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Logger/2024-05-22-glog_log4cpluc_spdlog/" class="post-title-link" itemprop="url">glog_log4cpluc_spdlog</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Logger/" itemprop="url" rel="index"><span itemprop="name">Logger</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>深入探讨三个流行的C++日志库： glog, log4cplug, spdlog</li>
-<li>glog、log4cplus 和 spdlog，这三个日志库各有千秋，它们在性能、功能和易用性方面都有各自的优势</li>
-<li>探讨它们如何处理日志滚动、如何配置日志清理策略，以及如何实现自定义的日志管理策略</li>
-</ul>
-<h2 id="glog-日志库"><a href="#glog-日志库" class="headerlink" title="glog 日志库"></a>glog 日志库</h2><ul>
-<li><p>glog，即Google Logging Library，是由Google开发的一款高效的日志库，广泛应用于C++项目中。它提供了丰富的日志记录功能，包括日志级别、条件日志、日志滚动等。</p>
-</li>
-<li><p>glog 是一个为了满足高性能需求而设计的日志库，它支持多线程环境，能够在不同的日志级别上打印信息，并且支持日志滚动。日志滚动是一种常见的日志管理策略，用于防止日志文件无限制地增长，占用过多的磁盘空间</p>
-</li>
-<li><p>glog 支持基于文件大小的日志滚动。当日志文件达到预设的大小限制时，glog 会自动将当前日志文件重命名为备份文件，并创建一个新的日志文件继续写入。这个过程是自动的，对程序运行无影响。</p>
-</li>
-<li><p>虽然 glog 支持日志滚动，但它并不直接提供日志清理的功能。这意味着随着时间的推移，日志文件会不断累积，可能会占用大量的磁盘空间。为了解决这个问题，你可能需要依赖外部工具或者自己编写脚本来定期清理旧的日志文件。</p>
-</li>
-<li><p>虽然 glog 本身不提供日志清理的功能，但你可以通过实现自定义的清理策略来管理日志文件。这通常涉及到文件系统操作，如检查文件的创建时间、大小等属性，然后根据你的清理策略删除旧的日志文件</p>
-</li>
-</ul>
-<h2 id="log4cplus"><a href="#log4cplus" class="headerlink" title="log4cplus"></a>log4cplus</h2><ul>
-<li><p>log4cplus 是一个灵活且易于使用的日志库，它提供了丰富的日志记录功能，包括日志级别、日志格式化、日志滚动和日志清理等。它的设计哲学是使日志记录尽可能地简单而不失灵活性</p>
-</li>
-<li><p>log4cplus 提供了多种日志滚动策略，包括基于文件大小的滚动 (RollingFileAppender) 和基于时间的滚动 (DailyRollingFileAppender 和 TimeBasedRollingFileAppender)</p>
-</li>
-<li><p>RollingFileAppender 允许日志文件在达到指定大小时滚动。你可以配置 MaxFileSize 和 MaxBackupIndex 来控制日志文件的最大大小和备份文件的数量。</p>
-</li>
-<li><p>DailyRollingFileAppender 和 TimeBasedRollingFileAppender 提供了基于时间的日志滚动策略，允许你按照每天或者更精细的时间间隔来滚动日志文件。</p>
-</li>
-<li><p>log4cplus 的日志清理策略通常与日志滚动策略结合使用。通过配置 MaxBackupIndex，你可以限制保留的备份文件数量，从而实现基于文件个数的日志清理</p>
-</li>
-<li><p>然而，log4cplus 不直接提供基于时间的日志清理策略。如果你需要根据日志文件的创建时间或最后修改时间来清理日志，你可能需要实现自定义的 Appender 或者使用外部工具</p>
-</li>
-<li><p>log4cplus 支持通过 XML 或 properties 文件来配置日志管理策略，这使得你可以在不修改代码的情况下调整日志行为</p>
-</li>
-<li><p>如果 log4cplus 提供的日志管理策略不能满足你的需求，你可以通过继承 Appender 类来实现自定义的日志清理策略。</p>
-</li>
-<li><p>你需要重写 append() 方法，在这里实现你的日志清理逻辑。例如，你可以检查日志文件的创建时间或大小，并在达到一定条件时删除旧的日志文件</p>
-</li>
-</ul>
-<h2 id="spdlog"><a href="#spdlog" class="headerlink" title="spdlog"></a>spdlog</h2><ul>
-<li>spdlog 是一个快速、轻量级的日志库，它支持多线程、异步日志记录。它的设计哲学是“快速和简单”，旨在提供一个直观而强大的日志记录工具</li>
-<li>spdlog 提供了多种日志滚动策略，包括按大小滚动和按时间滚动。</li>
-<li>这种滚动策略会在日志文件达到一定大小时滚动日志。你可以配置 max_size 和 max_files 来控制日志文件的最大总大小和保留的日志文件的最大数量。</li>
-<li>这种滚动策略会在每天的某个特定时间滚动日志。你可以配置 rotation_hour 和 rotation_minute 来决定每天滚动日志的时间。</li>
-<li>spdlog 的配置通常是通过代码进行的，你需要在代码中创建和配置 Logger 和 Sink。</li>
-<li>虽然 spdlog 提供了一些内置的滚动策略，但你也可以实现自己的 Sink 来实现自定义的清理策略</li>
-</ul>
-<h2 id="比较和总结-Comparison-and-Conclusion"><a href="#比较和总结-Comparison-and-Conclusion" class="headerlink" title="比较和总结 (Comparison and Conclusion)"></a>比较和总结 (Comparison and Conclusion)</h2><h3 id="性能比较-Performance-Comparison"><a href="#性能比较-Performance-Comparison" class="headerlink" title="性能比较 (Performance Comparison)"></a>性能比较 (Performance Comparison)</h3><ul>
-<li><p>在性能方面，spdlog 通常被认为是最快的，因为它是为高性能而设计的，支持异步日志记录。glog 和 log4cplus 的性能也不错，但通常略低于 spdlog</p>
-</li>
-<li><p>glog：虽然 glog 提供了丰富的功能和灵活的配置，但这也使得它在性能上有所牺牲。特别是在高并发的环境下，glog 的性能可能会受到影响。</p>
-</li>
-<li><p>log4cplus：log4cplus 提供了更丰富的功能，包括多种 Appender 和 Layout，但这也意味着更多的性能开销。尽管如此，对于大多数应用来说，这种性能差异是可以接受的。</p>
-</li>
-<li><p>spdlog：spdlog 是专为高性能设计的，支持异步日志记录，能够在高并发环境下提供极高的日志记录性能。</p>
-</li>
-</ul>
-<h3 id="功能比较-Feature-Comparison"><a href="#功能比较-Feature-Comparison" class="headerlink" title="功能比较 (Feature Comparison)"></a>功能比较 (Feature Comparison)</h3><ul>
-<li><p>在功能方面，log4cplus 提供了最丰富的特性，包括多种 Appender、Layout 和日志滚动策略。glog 和 spdlog 在功能上略有不足，但仍然能满足大多数日志记录需求。</p>
-</li>
-<li><p>glog：提供基本的日志记录功能，支持按大小滚动日志，但在日志清理和滚动策略方面略显不足。</p>
-</li>
-<li><p>log4cplus：提供最丰富的功能和配置选项，支持多种日志滚动和清理策略，是功能最全面的选择。</p>
-</li>
-<li><p>spdlog：虽然在功能上不如 log4cplus 丰富，但 spdlog 提供了高性能的异步日志记录功能，非常适合性能敏感的应用。</p>
-</li>
-</ul>
-<h3 id="使用场景建议-Usage-Scenario-Recommendations"><a href="#使用场景建议-Usage-Scenario-Recommendations" class="headerlink" title="使用场景建议 (Usage Scenario Recommendations)"></a>使用场景建议 (Usage Scenario Recommendations)</h3><ul>
-<li>glog：适用于需要简单、高效日志记录的场景，特别是在 Google 的生态系统中。</li>
-<li>log4cplus：适用于需要丰富功能和灵活配置的企业级应用，尤其是在需要复杂日志管理策略的场景。</li>
-<li>spdlog：适用于性能敏感、需要高速日志记录的应用，如游戏、高频交易等。</li>
-</ul>
-<h3 id="总结-Conclusion"><a href="#总结-Conclusion" class="headerlink" title="总结 (Conclusion)"></a>总结 (Conclusion)</h3><ul>
-<li>选择合适的日志库对于确保应用程序的稳定性和性能至关重要。glog、log4cplus 和 spdlog 都是优秀的 C++ 日志库，各有其优势和应用场景。通过本文的比较和分析，希望读者能够根据自己的具体需求，做出明智的选择。</li>
-</ul>
+<p>这些库都是开源库，可以从它们的官方网站或代码托管平台获取源代码和使用文档。你可以选择适合你项目需求和编程风格的库来处理JSON数据。</p>
 
       
     </div>
@@ -5392,218 +5601,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Math/2024-05-22-%E6%8E%A7%E5%88%B6%E7%90%86%E8%AE%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Math/2024-05-22-%E6%8E%A7%E5%88%B6%E7%90%86%E8%AE%BA/" class="post-title-link" itemprop="url">控制理论</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Math/" itemprop="url" rel="index"><span itemprop="name">Math</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>控制理论相关笔记</li>
-</ul>
-<h2 id="控制理论是什么"><a href="#控制理论是什么" class="headerlink" title="控制理论是什么"></a>控制理论是什么</h2><p>控制理论是研究如何设计并分析动态系统的一门工程和数学学科。它涉及系统的建模、分析、设计和优化，以便系统能够实现预期的性能和行为。控制理论广泛应用于自动化、机械工程、电气工程、航空航天、化工等领域。</p>
-<p>以下是控制理论的一些关键概念：</p>
-<ol>
-<li><p><strong>系统（System）：</strong> 一个可以被观测和操控的实体，可以是物理系统、电气系统、生物系统等。系统通常由一组相互关联的元件组成。</p>
-</li>
-<li><p><strong>控制器（Controller）：</strong> 控制器是一个用于调节系统行为的设备或算法。它通过对系统的输入进行调整，使系统输出达到期望的目标。</p>
-</li>
-<li><p><strong>过程或系统的建模（System Modeling）：</strong> 将实际系统抽象为数学模型，以便进行分析和设计。模型可以是线性或非线性的，时变或时不变的，连续或离散的，等等。</p>
-</li>
-<li><p><strong>反馈控制（Feedback Control）：</strong> 反馈控制是指通过测量系统输出并将这些信息反馈到控制器，从而调整系统输入，使系统保持在期望的状态。</p>
-</li>
-<li><p><strong>开环和闭环控制（Open-Loop and Closed-Loop Control）：</strong> 在开环控制中，系统的输出不直接影响控制器的输入；而在闭环控制中，系统的输出被用于调整控制器的输入。</p>
-</li>
-<li><p><strong>稳定性分析（Stability Analysis）：</strong> 研究系统是否在长时间内保持有限的响应。稳定性分析是控制系统设计中的一个重要步骤。</p>
-</li>
-<li><p><strong>控制性能评估（Control Performance Evaluation）：</strong> 衡量控制系统在不同操作条件下的性能，包括稳定性、灵敏度、鲁棒性等。</p>
-</li>
-<li><p><strong>状态空间表示（State-Space Representation）：</strong> 将系统的动态行为表示为一组状态变量和它们的导数的方程，通常采用矩阵形式。</p>
-</li>
-<li><p><strong>PID控制（Proportional-Integral-Derivative Control）：</strong> 一种常见的控制策略，通过调整比例、积分和微分参数来实现系统的稳定性和性能。</p>
-</li>
-<li><p><strong>鲁棒控制（Robust Control）：</strong> 考虑系统参数变化和外部扰动时仍能保持良好性能的控制设计方法。</p>
-</li>
-</ol>
-<p>控制理论的目标是设计稳定、高性能、鲁棒的控制系统，以满足特定应用领域的需求。控制理论在自动化系统、飞行器、机器人、工业过程控制等方面有广泛的应用。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Math/2024-05-22-%E6%95%B0%E5%AD%A6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Math/2024-05-22-%E6%95%B0%E5%AD%A6/" class="post-title-link" itemprop="url">数学</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Math/" itemprop="url" rel="index"><span itemprop="name">Math</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>数学相关笔记</li>
-</ul>
-<h2 id="数学有哪些分支"><a href="#数学有哪些分支" class="headerlink" title="数学有哪些分支"></a>数学有哪些分支</h2><p>数学是一门广泛而深刻的学科，涵盖了多个分支和领域。以下是一些主要的数学分支：</p>
-<ol>
-<li><p><strong>代数学（Algebra）：</strong> 研究代数结构、方程、多项式、群论、环论等。它包括基本代数、抽象代数等方向。</p>
-</li>
-<li><p><strong>分析学（Analysis）：</strong> 研究极限、微积分、积分学、级数、实变函数、复变函数等。分析学分为实分析和复分析。</p>
-</li>
-<li><p><strong>几何学（Geometry）：</strong> 研究空间和图形的形状、大小、性质以及它们之间的关系。平面几何和空间几何是几何学的两个主要方向。</p>
-</li>
-<li><p><strong>概率论与数理统计（Probability and Statistics）：</strong> 研究随机事件、概率、统计推断、回归分析等，应用于数据分析、科学实验、风险管理等领域。</p>
-</li>
-<li><p><strong>数论（Number Theory）：</strong> 研究整数的性质，涉及素数、同余、数的分布等问题。</p>
-</li>
-<li><p><strong>拓扑学（Topology）：</strong> 研究空间的连通性、紧性、维度等概念，不关注度量和角度，而更注重形状和空间的变换。</p>
-</li>
-<li><p><strong>微分方程学（Differential Equations）：</strong> 研究方程中的导数和微分的关系，以及解这些方程的方法。包括常微分方程和偏微分方程。</p>
-</li>
-<li><p><strong>离散数学（Discrete Mathematics）：</strong> 研究离散结构，如集合、图论、逻辑、代数系统等。在计算机科学中有广泛应用。</p>
-</li>
-<li><p><strong>数学逻辑（Mathematical Logic）：</strong> 研究数学推理和证明的形式系统，包括命题逻辑、谓词逻辑等。</p>
-</li>
-<li><p><strong>运筹学（Operations Research）：</strong> 利用数学方法解决决策问题，包括线性规划、整数规划、动态规划等。</p>
-</li>
-<li><p><strong>应用数学（Applied Mathematics）：</strong> 将数学方法和技术应用于其他学科和实际问题，包括物理学、工程学、经济学等。</p>
-</li>
-</ol>
-<p>这些数学分支之间有许多交叉和相互关联，数学的发展也在不断拓展和丰富这些领域。</p>
-<h2 id="几何学是什么"><a href="#几何学是什么" class="headerlink" title="几何学是什么"></a>几何学是什么</h2><p>几何学是数学的一个分支，研究空间和图形的性质、形状、大小以及它们之间的相互关系。几何学关注的主要对象包括点、直线、平面、多边形、圆等几何图形，以及这些图形之间的相对位置和性质。</p>
-<p>几何学可以分为平面几何和空间几何两个主要方向：</p>
-<ol>
-<li><p><strong>平面几何：</strong> 主要研究在一个平面上的几何关系和性质，包括点、直线、多边形、圆等在平面上的性质和相互关系。欧几里德几何是平面几何的一个经典分支，其中包含了许多基本的几何定理和公理。</p>
-</li>
-<li><p><strong>空间几何：</strong> 主要研究在三维空间中的几何关系和性质，涉及点、直线、平面、曲线、曲面等在空间中的相互关系。空间几何通常涉及更复杂的数学工具，如向量、矩阵等，用于描述和计算三维空间中的几何对象。</p>
-</li>
-</ol>
-<p>几何学在数学中有着深远的影响，并且在许多其他学科中也有广泛的应用，如物理学、工程学、计算机图形学、地理学、建筑学等。它不仅关注于理论性质和证明，还在实际问题的建模、分析和解决方案中发挥着重要的作用。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -5673,7 +5670,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">583</span>
+          <span class="site-state-item-count">586</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -5686,7 +5683,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">79</span>
+        <span class="site-state-item-count">81</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
