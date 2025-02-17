@@ -191,6 +191,134 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-07-QThread/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-07-QThread/" class="post-title-link" itemprop="url">QThread</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-11-18 09:00:00" itemprop="dateCreated datePublished" datetime="2024-11-18T09:00:00+08:00">2024-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="QThread-类-详解"><a href="#QThread-类-详解" class="headerlink" title="QThread 类 详解"></a>QThread 类 详解</h2><p><code>QThread</code> 是 Qt 中用于实现多线程的类。它提供了一个平台无关的、面向对象的线程接口，使得在 GUI 应用程序中处理耗时操作时可以保持界面的响应性。在 Qt 中，<code>QThread</code> 是线程管理的基础类，但 Qt 推荐的使用方式与传统的 C++ 线程管理（如 <code>std::thread</code>）有所不同。</p>
+<h3 id="1-QThread-的基本概念"><a href="#1-QThread-的基本概念" class="headerlink" title="1. QThread 的基本概念"></a>1. <strong><code>QThread</code> 的基本概念</strong></h3><ul>
+<li><p><strong>线程与事件循环</strong>：<code>QThread</code> 继承自 <code>QObject</code>，因此它具有信号和槽机制，并且可以在子线程中运行一个事件循环。事件循环允许子线程接收信号并执行槽函数，这在 GUI 编程中非常有用。</p>
+</li>
+<li><p><strong>工作者线程模型</strong>：在 Qt 中，推荐的多线程编程方式是将一个对象的工作移到另一个线程中，而不是直接继承 <code>QThread</code>。这种方法更符合 Qt 的对象模型，也更易于管理信号与槽的连接。</p>
+</li>
+</ul>
+<h3 id="2-QThread-的使用方式"><a href="#2-QThread-的使用方式" class="headerlink" title="2. QThread 的使用方式"></a>2. <strong><code>QThread</code> 的使用方式</strong></h3><p><code>QThread</code> 可以通过多种方式使用，主要包括以下两种：</p>
+<ol>
+<li><strong>直接继承 <code>QThread</code> 类（传统方式）</strong></li>
+<li><strong>工作者线程模型（推荐方式）</strong></li>
+</ol>
+<h4 id="2-1-直接继承-QThread-类"><a href="#2-1-直接继承-QThread-类" class="headerlink" title="2.1 直接继承 QThread 类"></a>2.1 直接继承 <code>QThread</code> 类</h4><p>在这种方式中，你需要继承 <code>QThread</code> 并重写其 <code>run()</code> 方法，<code>run()</code> 方法是线程开始执行的入口点。你可以在这里编写需要在线程中运行的任务。</p>
+<p>示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QThread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyThread</span> : <span class="keyword">public</span> QThread &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">            <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Running in thread:&quot;</span> &lt;&lt; QThread::<span class="built_in">currentThread</span>();</span><br><span class="line">            QThread::<span class="built_in">sleep</span>(<span class="number">1</span>); <span class="comment">// 模拟耗时操作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyThread thread;</span><br><span class="line">    thread.<span class="built_in">start</span>(); <span class="comment">// 开始线程</span></span><br><span class="line">    thread.<span class="built_in">wait</span>();  <span class="comment">// 等待线程结束</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>缺点</strong>：这种方法虽然直观，但不推荐使用，因为它与 Qt 的信号槽机制不太兼容，容易导致线程中的对象生命周期管理问题。</p>
+<h4 id="2-2-工作者线程模型（推荐方式）"><a href="#2-2-工作者线程模型（推荐方式）" class="headerlink" title="2.2 工作者线程模型（推荐方式）"></a>2.2 工作者线程模型（推荐方式）</h4><p>工作者线程模型是将一个 <code>QObject</code> 派生类（工作对象）移动到一个新线程中，然后在新线程中执行它的任务。这种方式更安全且与 Qt 的事件系统无缝集成。</p>
+<p>步骤如下：</p>
+<ol>
+<li>创建一个工作对象，继承自 <code>QObject</code>，并定义需要在线程中运行的任务。</li>
+<li>创建一个 <code>QThread</code> 对象。</li>
+<li>使用 <code>moveToThread()</code> 将工作对象移动到新线程。</li>
+<li>通过信号槽机制启动任务。</li>
+</ol>
+<p>示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QCoreApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QThread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Worker</span> : <span class="keyword">public</span> QObject &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">doWork</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">            <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Working in thread:&quot;</span> &lt;&lt; QThread::<span class="built_in">currentThread</span>();</span><br><span class="line">            QThread::<span class="built_in">sleep</span>(<span class="number">1</span>); <span class="comment">// 模拟耗时操作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QCoreApplication <span class="title">a</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    Worker worker;</span><br><span class="line">    QThread thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将工作对象移动到子线程</span></span><br><span class="line">    worker.<span class="built_in">moveToThread</span>(&amp;thread);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在子线程中启动工作</span></span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;thread, &amp;QThread::started, &amp;worker, &amp;Worker::doWork);</span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;thread, &amp;QThread::finished, &amp;worker, &amp;QObject::deleteLater);</span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;thread, &amp;QThread::finished, &amp;thread, &amp;QObject::deleteLater);</span><br><span class="line"></span><br><span class="line">    thread.<span class="built_in">start</span>();  <span class="comment">// 启动线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> a.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：这种方式使得工作对象可以与信号槽机制结合得更好，<code>QThread</code> 仅负责线程管理，实际的任务执行由工作对象处理。</p>
+<h3 id="3-信号与槽的线程安全性"><a href="#3-信号与槽的线程安全性" class="headerlink" title="3. 信号与槽的线程安全性"></a>3. <strong>信号与槽的线程安全性</strong></h3><ul>
+<li><p>在 Qt 中，不同线程中的信号与槽可以跨线程连接。当信号和槽位于不同线程时，Qt 会自动将信号的发送和槽的调用封装为异步事件，通过事件循环来处理。这意味着跨线程的信号槽连接是线程安全的。</p>
+</li>
+<li><p>线程间的信号槽连接默认是异步的（<code>Qt::QueuedConnection</code>），即信号被发送时不会立即调用槽函数，而是将其加入事件队列，等待事件循环调度。你也可以显式指定连接类型，如 <code>Qt::DirectConnection</code>，来使得信号和槽在同一线程中同步执行。</p>
+</li>
+</ul>
+<h3 id="4-线程中的事件循环"><a href="#4-线程中的事件循环" class="headerlink" title="4. 线程中的事件循环"></a>4. <strong>线程中的事件循环</strong></h3><p><code>QThread</code> 中的事件循环使得线程可以处理信号、定时器等事件。默认情况下，<code>QThread::run()</code> 方法启动的线程没有事件循环，必须手动调用 <code>exec()</code> 以启动事件循环。</p>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyThread</span> : <span class="keyword">public</span> QThread &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="built_in">exec</span>();  <span class="comment">// 启动事件循环</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-线程生命周期管理"><a href="#5-线程生命周期管理" class="headerlink" title="5. 线程生命周期管理"></a>5. <strong>线程生命周期管理</strong></h3><ul>
+<li><strong>启动线程</strong>：使用 <code>start()</code> 启动线程。</li>
+<li><strong>停止线程</strong>：调用 <code>quit()</code> 退出事件循环，然后使用 <code>wait()</code> 等待线程结束。</li>
+<li><strong>线程结束后自动清理</strong>：可以通过连接 <code>QThread::finished</code> 信号到 <code>QObject::deleteLater</code> 来自动清理线程对象。</li>
+</ul>
+<h3 id="6-常见问题与注意事项"><a href="#6-常见问题与注意事项" class="headerlink" title="6. 常见问题与注意事项"></a>6. <strong>常见问题与注意事项</strong></h3><ul>
+<li><strong>UI 操作必须在主线程</strong>：Qt 的 GUI 元素必须在主线程中操作，如果在子线程中直接访问 GUI 会导致崩溃。</li>
+<li><strong>对象的生命周期管理</strong>：在使用 <code>moveToThread()</code> 时，要确保对象在其所属线程中被创建和销毁，以避免线程间的对象访问问题。</li>
+<li><strong>避免阻塞主线程</strong>：长时间的计算或 IO 操作应放到子线程中，以保持主线程（UI 线程）的响应性。</li>
+</ul>
+<h3 id="7-常见用例"><a href="#7-常见用例" class="headerlink" title="7. 常见用例"></a>7. <strong>常见用例</strong></h3><ul>
+<li>在后台执行耗时任务，如文件读写、网络请求、数据处理等。</li>
+<li>使用定时器在子线程中定期执行任务。</li>
+<li>在子线程中处理异步操作并通过信号槽通知主线程结果。</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>QThread</code> 是 Qt 中实现多线程编程的重要工具。尽管可以通过继承 <code>QThread</code> 来实现自定义线程，但推荐的方式是使用工作者线程模型，将任务放到一个独立的 <code>QObject</code> 中并移动到线程执行。这种方式更符合 Qt 的设计理念，并且更易于管理复杂的信号槽连接与对象生命周期。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/10/28/notes/Tools/2024-10-28-CSV/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -6649,236 +6777,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/08/27/notes/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-08-27-spdlog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/08/27/notes/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-08-27-spdlog/" class="post-title-link" itemprop="url">spdlog</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-08-27 09:00:00" itemprop="dateCreated datePublished" datetime="2024-08-27T09:00:00+08:00">2024-08-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h2 id="输出文件名和行号"><a href="#输出文件名和行号" class="headerlink" title="输出文件名和行号"></a>输出文件名和行号</h2><ul>
-<li>使用宏，例如SPDLOG_INFO</li>
-</ul>
-<h2 id="使用宏函数输出的日志也写入到文件"><a href="#使用宏函数输出的日志也写入到文件" class="headerlink" title="使用宏函数输出的日志也写入到文件"></a>使用宏函数输出的日志也写入到文件</h2><ul>
-<li>使用函数 spdlog::set_default_logger();</li>
-<li>示例如下<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">InitLogger</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//创建控制台日志记录器</span></span><br><span class="line">    <span class="keyword">auto</span> console_sink = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::stdout_color_sink_mt&gt;();</span><br><span class="line">    console_sink-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br><span class="line"></span><br><span class="line">    console_sink-&gt;<span class="built_in">set_pattern</span>(<span class="string">&quot;[%Y-%m-%d %H:%M:%S.%e][thread %t][%s:%#][%l]: %v&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件日志记录器: 滚动记录，最大文件5M，文件数量100个</span></span><br><span class="line">    std::string log_path = ROOT_PATH;</span><br><span class="line">    log_path += <span class="string">&quot;logs/rotating.txt&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span> rotating_sink = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(log_path, <span class="number">1048576</span> * <span class="number">5</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//同步记录器，</span></span><br><span class="line">    std::vector&lt;spdlog::sink_ptr&gt; sinks&#123; console_sink, rotating_sink &#125;;</span><br><span class="line">    <span class="keyword">auto</span> logger = std::<span class="built_in">make_shared</span>&lt;spdlog::logger&gt;(<span class="string">&quot;logger&quot;</span>, sinks.<span class="built_in">begin</span>(), sinks.<span class="built_in">end</span>());</span><br><span class="line">    spdlog::<span class="built_in">register_logger</span>(logger); <span class="comment">//注册为全局日志，通过log_write访问;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 宏相关配置</span></span><br><span class="line">    spdlog::<span class="built_in">set_default_logger</span>(logger);</span><br><span class="line">    spdlog::<span class="built_in">set_pattern</span>(<span class="string">&quot;[%Y-%m-%d %H:%M:%S.%e][thread %t][%s:%#][%l]: %v&quot;</span>);</span><br><span class="line">    spdlog::<span class="built_in">set_level</span>(spdlog::level::warn);</span><br><span class="line">    spdlog::<span class="built_in">flush_every</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">3</span>)); <span class="comment">//每3s刷新一次</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><ul>
-<li><p>logger: 日志对象，每个日志内包含一个sink组成的vector，每个sink可以分别设置优先级，logger本身也可设置优先级。</p>
-</li>
-<li><p>sink: 直译是水槽，实际上是引流的对象或者可以认为是输出目标，spdlog库内置了多种不同类型的logger可供选择</p>
-</li>
-<li><p>formatter: 格式化对象，绝大部分情况下spdlog默认的格式就足够用了，但是如果有个性化需求，可以进行自定义格式</p>
-</li>
-<li><p>level: 日志级别，不同的日志库可能会有不同的设置，但是基本情况下都会有debug,info,warn,error等级别划分来处理不同的情况，具体各个级别的情况可以根据自己的实际情况选取</p>
-</li>
-<li><p>逻辑关系</p>
-<ul>
-<li>每个logger包含一个vector,该vector由一个或者多个 std::shared_ptr<sink> 组成，logger的每条日志都会调用sink对象，由sink对象按照formatter的格式输出到指定的地方(有可能是控制台，文件等)</li>
-</ul>
-</li>
-</ul>
-<h2 id="formatter"><a href="#formatter" class="headerlink" title="formatter"></a>formatter</h2><ul>
-<li>formatter也即是格式化对象，用于控制日志的输出格式，spdlog自带了默认的formatter，一般情况下，我们无需任何修改，直接使用即可。需要注意的是，每个sink会有一个formatter</li>
-<li>默认formatter的格式为: [日期时间][logger名][log级别]log内容<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2022-10-13 17:00:55.795] [service] [debug] found env XXXXXXX : true</span><br><span class="line">[2022-10-13 17:00:55.795] [func_config] [debug] kafka_brokers : localhost:9092</span><br><span class="line">[2022-10-13 17:00:55.795] [func_config] [debug] kafka_main_topic : kafka_test</span><br><span class="line">[2022-10-13 17:00:55.795] [func_config] [debug] kafka_partition_value : -1</span><br><span class="line">[2022-10-13 17:00:55.795] [service] [info] initialized</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="sink"><a href="#sink" class="headerlink" title="sink"></a>sink</h2><ul>
-<li><p>每个sink对应着一个输出目标和输出格式，它内部包含一个formatter，输出目标可以是控制台，文件等地方。</p>
-</li>
-<li><p>所有的sink都在命名空间spdlog::sinks下，可以自行探索</p>
-</li>
-<li><p>spdlog中创建控制台sink非常简单，该方式创建的sink会输出到命令行终端，且是彩色的。后缀的 _mt 代表多线程， _st 代表单线程</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> sink1 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::stdout_color_sink_mt&gt;();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>文件sink的类型有很多，这里展示几种经典类型</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> sink1 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::basic_file_sink_mt&gt;(log_file_name);<span class="comment">//最简单的文件sink，只需要指定文件名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink2 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::daily_file_sink_mt&gt;(log_file_name, path, <span class="number">14</span>, <span class="number">22</span>);<span class="comment">//每天的14点22分在path下创建新的文件</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink3 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(log_file_name, <span class="number">1024</span> * <span class="number">1024</span> * <span class="number">10</span>, <span class="number">100</span>, <span class="literal">false</span>);<span class="comment">//轮转文件，一个文件满了会写到下一个文件，第二个参数是单文件大小上限，第三个参数是文件数量最大值</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>其他sink</p>
-<ul>
-<li>ostream_sink</li>
-<li>syslog_sink</li>
-</ul>
-</li>
-<li><p>sink的flush问题</p>
-<ul>
-<li>创建好sink后建议设置flush方式，否则可能无法立刻在文件中看到logger的内容</li>
-<li>以下为两种重要的flush方式设置(直接设置全局)<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">spdlog::<span class="built_in">flush_every</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">1</span>));</span><br><span class="line">spdlog::<span class="built_in">flush_on</span>(spdlog::level::debug);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="logger"><a href="#logger" class="headerlink" title="logger"></a>logger</h2><ul>
-<li><p>日志对象，每个logger内容包含了一个vector用于存放sink，每个sink都是互相独立</p>
-</li>
-<li><p>因此一个日志对象在输出日志时可以同时输出到控制台和文件等位置</p>
-</li>
-<li><p>如果整个项目中只需要一个logger，spdlog提供了最为便捷的logger，注意，该logger在全局公用，输出到控制台，多线程，彩色。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Use the default logger (stdout, multi-threaded, colored)</span></span><br><span class="line">spdlog::<span class="built_in">info</span>(<span class="string">&quot;Hello, &#123;&#125;!&quot;</span>, <span class="string">&quot;World&quot;</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>创建特定的logger</p>
-<ul>
-<li>大部分情况下默认logger是不够用的，因为我们可能需要做不同模块各自的logger，可能需要logger输出到文件进行持久化，所以创建logger是很很重要的一件事。</li>
-</ul>
-</li>
-<li><p>直接创建</p>
-<ul>
-<li>与创建sink类似，我们可以非常便捷的创建logger。</li>
-<li>由于大部分时候一个logger只会有一个sink，所以spdlog提供了创建logger的接口并封装了创建sink的过程<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> console = spdlog::<span class="built_in">stdout_color_mt</span>(<span class="string">&quot;some_unique_name&quot;</span>);<span class="comment">//一个输出到控制台的彩色多线程logger，可以指定名字</span></span><br><span class="line"><span class="keyword">auto</span> file_logger = spdlog::<span class="built_in">rotating_logger_mt</span>(<span class="string">&quot;file_logger&quot;</span>, <span class="string">&quot;logs/mylogfile&quot;</span>, <span class="number">1048576</span> * <span class="number">5</span>, <span class="number">3</span>);<span class="comment">//一个输出到指定文件的轮转文件logger，后面的参数指定了文件的信息</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>组合sinks方式创建</p>
-<ul>
-<li>有时候，单sink的logger不够用，那么可以先创建sink的vector，然后使用sinks_vector创建vector</li>
-<li>以下示例中，首先创建了sink的vector，然后创建了两个sink并放入vector，最后使用该vector创建了logger，其中 set_level 的过程不是必须的， register_logger 一般是必须的，否则只能在创建logger的地方使用该logger<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;spdlog::sink_ptr&gt; sinks;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink1 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::stdout_color_sink_mt&gt;();</span><br><span class="line">sink1-&gt;<span class="built_in">set_level</span>(MyLoggers::<span class="built_in">getGlobalLevel</span>());</span><br><span class="line">sinks.<span class="built_in">push_back</span>(sink1);</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink2 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(log_file_name, <span class="number">1024</span> * <span class="number">1024</span> * <span class="number">10</span>, <span class="number">100</span>, <span class="literal">false</span>);</span><br><span class="line">sink2-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br><span class="line">sinks.<span class="built_in">push_back</span>(sink2);</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> logger = std::<span class="built_in">make_shared</span>&lt;spdlog::logger&gt;(<span class="string">&quot;logger_name&quot;</span>, <span class="built_in">begin</span>(sinks), <span class="built_in">end</span>(sinks));</span><br><span class="line">logger-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br><span class="line">spdlog::<span class="built_in">register_logger</span>(logger);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>logger的注册与获取</p>
-<ul>
-<li>在一个地方创建了logger却智能在该处使用肯定是不好的，所以spdlog提供了全局注册和获取logger，我们只需要在某处先创建logger并注册，那么后面再其他地方使用时直接获取就可以了</li>
-<li>注册: spdlog::register_logger()</li>
-<li>获取: spdlog::get()<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//上面的代码中我们注册了一个logger，名字是logger_name，接下来尝试获取</span></span><br><span class="line"><span class="keyword">auto</span> logger = MyLoggers::<span class="built_in">getLogger</span>(<span class="string">&quot;logger_name&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="logger的使用"><a href="#logger的使用" class="headerlink" title="logger的使用"></a>logger的使用</h2><ul>
-<li><p>logger的默认level是info，如果处于开发换进给或者生产环境，绘制需要debug级别以上，可以设置logger的级别</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>可以设置全局logger级别</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spdlog::<span class="built_in">set_level</span>(spdlog::level::warn);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>可以设置sink级别的logger</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sink1-&gt;<span class="built_in">set_level</span>(spdlog::level::info);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>注意: 一个logger假如有多个sink，那么这些sink分别设置level是可以不同的，但是由于logger本身也有level，所以真正使用时，logger的level如果高于某个sink，会覆盖该sink的level，所以建议此时把logger的level手动设置为debug(默认为info)</p>
-</li>
-</ul>
-<h3 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h3><ul>
-<li><p>使用方法一：</p>
-<ul>
-<li>下载好项目源代码，使用cmake编译，命令:<code>cmake -S . -B build</code>，然后进入build进行make，会获取到一个静态库 <code>libspdlog.a</code></li>
-<li>之后通过包含include下的头文件和链接生成的静态库，使用spdlog</li>
-</ul>
-</li>
-<li><p>使用方法二：</p>
-<ul>
-<li>将头文件和源文件分别添加到相应工程中的头文件和源文件</li>
-<li>然后再CMakeLists.txt中添加头文件目录和源文件目录，并且添加一条命令用来编译指定文件：<code>target_compile_definitions($&#123;PROJECT_NAME&#125; PUBLIC SPDLOG_COMPILED_LIB)</code></li>
-</ul>
-</li>
-</ul>
-<h3 id="1-2-基本用法"><a href="#1-2-基本用法" class="headerlink" title="1.2 基本用法"></a>1.2 基本用法</h3><ul>
-<li><p>输出日志信息到标准输出</p>
-<ul>
-<li><code>spdlog::info(&quot;This is a log message.&#123;0&#125; &#123;1&#125;&quot;, &quot;hello&quot;, &quot;world&quot;)</code></li>
-<li><code>spdlog::warn(&quot;This is a warn message&quot;);</code></li>
-<li><code>spdlog::debug(&quot;This message should not be displayed&quot;);</code></li>
-<li><code>spdlog::set_level(spdlog::level::trace);  // set specifice logger&#39;s log level</code></li>
-<li><code>spdlog::debug(&quot;This message should be displayed, because the level is setted trace&quot;);</code></li>
-</ul>
-</li>
-<li><p>日志信息输出到文件</p>
-<ul>
-<li>创建基础日志文件：<ul>
-<li><code>#include &quot;spdlog/sinks/basic_file_sink.h&quot;</code></li>
-<li><code>auto my_logger = spdlog::basic_logger_mt(&quot;file_logger&quot;, &quot;logs/basic-log.txt&quot;, true);</code></li>
-<li>创建一个文件为<code>logs/basic-log.txt</code>，并设置输出的消息标识为<code>file_logger</code>的日志文件，通过使用<code>my_logger</code>来操作该日志文件</li>
-</ul>
-</li>
-<li>将日志输出到日志文件中：<ul>
-<li><code>my_logger-&gt;info(&quot;Helo Info&quot;);</code></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>输出行号：</p>
-<ul>
-<li><code>SPDLOG_DEBUG(&quot;some debug message about program: &#123;&#125;&quot;, &quot;robot&quot;);</code></li>
-</ul>
-</li>
-</ul>
-<h2 id="spdlog-spdlog-get-函数-详解"><a href="#spdlog-spdlog-get-函数-详解" class="headerlink" title="spdlog spdlog::get()函数 详解"></a>spdlog spdlog::get()函数 详解</h2><p><code>spdlog</code> 是一个快速的 C++ 日志库，广泛用于高效日志记录。<code>spdlog::get()</code> 函数用于获取已经创建的日志记录器（logger）的共享指针。如果指定名称的日志记录器不存在，它会返回 <code>nullptr</code>。</p>
-<h3 id="1-函数定义"><a href="#1-函数定义" class="headerlink" title="1. 函数定义"></a>1. 函数定义</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::shared_ptr&lt;spdlog::logger&gt; <span class="title">spdlog::get</span><span class="params">(<span class="type">const</span> std::string &amp;name)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-参数说明"><a href="#2-参数说明" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h3><ul>
-<li><strong>name</strong>: 一个 <code>std::string</code> 类型的参数，表示需要获取的日志记录器的名称。</li>
-</ul>
-<h3 id="3-返回值"><a href="#3-返回值" class="headerlink" title="3. 返回值"></a>3. 返回值</h3><ul>
-<li><strong><code>std::shared_ptr&lt;spdlog::logger&gt;</code></strong>: 返回一个指向指定名称的日志记录器的共享指针。如果指定名称的日志记录器未找到，则返回 <code>nullptr</code>。</li>
-</ul>
-<h3 id="4-使用场景"><a href="#4-使用场景" class="headerlink" title="4. 使用场景"></a>4. 使用场景</h3><p><code>spdlog::get()</code> 通常用于在应用程序的不同模块中共享同一个日志记录器。比如，你在主模块中创建了一个名为 “my_logger” 的日志记录器，之后可以在其他模块中通过 <code>spdlog::get(&quot;my_logger&quot;)</code> 获取同一个记录器，而无需重新创建。</p>
-<h3 id="5-示例代码"><a href="#5-示例代码" class="headerlink" title="5. 示例代码"></a>5. 示例代码</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/spdlog.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/sinks/basic_file_sink.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个名为 &quot;file_logger&quot; 的日志记录器</span></span><br><span class="line">    <span class="keyword">auto</span> logger = spdlog::<span class="built_in">basic_logger_mt</span>(<span class="string">&quot;file_logger&quot;</span>, <span class="string">&quot;logs.txt&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用记录器进行日志记录</span></span><br><span class="line">    logger-&gt;<span class="built_in">info</span>(<span class="string">&quot;This is an info message&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在其他地方获取并使用相同的记录器</span></span><br><span class="line">    <span class="keyword">auto</span> same_logger = spdlog::<span class="built_in">get</span>(<span class="string">&quot;file_logger&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (same_logger) &#123;</span><br><span class="line">        same_logger-&gt;<span class="built_in">warn</span>(<span class="string">&quot;This is a warning message from the same logger&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        spdlog::<span class="built_in">error</span>(<span class="string">&quot;Logger not found&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="6-注意事项"><a href="#6-注意事项" class="headerlink" title="6. 注意事项"></a>6. 注意事项</h3><ul>
-<li><code>spdlog::get()</code> 只返回已经通过 <code>spdlog::register_logger()</code> 或者 <code>spdlog::basic_logger_mt()</code> 等方法注册过的日志记录器。如果未注册过，返回的会是 <code>nullptr</code>。</li>
-<li><code>spdlog::get()</code> 函数是线程安全的，因此可以在多线程环境中安全使用。</li>
-</ul>
-<p>通过 <code>spdlog::get()</code>，你可以在不同模块中灵活地获取和使用日志记录器，确保日志管理的一致性。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -6948,7 +6846,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">628</span>
+          <span class="site-state-item-count">629</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

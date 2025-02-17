@@ -191,6 +191,287 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/19/notes/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-12-19-C++_10_43_system_error/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/19/notes/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-12-19-C++_10_43_system_error/" class="post-title-link" itemprop="url">C++_10_43_system_error</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-19 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-19T09:00:00+08:00">2024-12-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><system_error>标准库相关学习笔记</li>
+</ul>
+<h2 id="C-标准库-是什么"><a href="#C-标准库-是什么" class="headerlink" title="C++ 标准库 是什么"></a>C++ <system_error>标准库 是什么</h2><p>C++ <code>&lt;system_error&gt;</code> 标准库是用于处理和表示系统错误的头文件，它提供了 <strong>跨平台的错误处理机制</strong>。这个库引入了与操作系统和运行时环境相关的错误信息的抽象，使得开发者可以在不同的平台上统一管理错误。它在 C++11 中引入，是现代 C++ 标准库的一部分。</p>
+<hr>
+<h3 id="的核心组成"><a href="#的核心组成" class="headerlink" title="&lt;system_error&gt; 的核心组成"></a><strong><code>&lt;system_error&gt;</code> 的核心组成</strong></h3><h4 id="1-std-error-code"><a href="#1-std-error-code" class="headerlink" title="1. std::error_code"></a>1. <strong><code>std::error_code</code></strong></h4><ul>
+<li>表示具体的错误码，通常包含一个整数值和一个错误分类。</li>
+<li>提供轻量级的错误表示，适合在不抛出异常的情况下传递错误信息。</li>
+<li>示例：<br>错误码值 <code>2</code> 和分类 <code>std::generic_category()</code> 可以描述 “No such file or directory”。</li>
+</ul>
+<h4 id="2-std-error-condition"><a href="#2-std-error-condition" class="headerlink" title="2. std::error_condition"></a>2. <strong><code>std::error_condition</code></strong></h4><ul>
+<li>表示一个通用的错误条件，与平台无关。</li>
+<li>常用于将平台特定的 <code>std::error_code</code> 映射到更通用的错误。</li>
+<li>例如，Linux 和 Windows 文件系统的错误码可能不同，但都可以映射到 <code>std::errc</code> 枚举中的值。</li>
+</ul>
+<h4 id="3-std-error-category"><a href="#3-std-error-category" class="headerlink" title="3. std::error_category"></a>3. <strong><code>std::error_category</code></strong></h4><ul>
+<li>描述错误码的分类，类似于错误码的上下文。</li>
+<li>标准库提供了一些预定义的分类：<ul>
+<li><code>std::generic_category()</code>：表示通用错误（跨平台）。</li>
+<li><code>std::system_category()</code>：表示平台特定的错误（如操作系统错误）。</li>
+</ul>
+</li>
+<li>可以通过继承 <code>std::error_category</code> 创建自定义错误分类。</li>
+</ul>
+<h4 id="4-std-system-error"><a href="#4-std-system-error" class="headerlink" title="4. std::system_error"></a>4. <strong><code>std::system_error</code></strong></h4><ul>
+<li>一个异常类，用于封装 <code>std::error_code</code>，支持通过异常机制报告错误。</li>
+<li>常与函数操作失败时一起使用，例如文件或网络操作。</li>
+</ul>
+<h4 id="5-std-errc-枚举"><a href="#5-std-errc-枚举" class="headerlink" title="5. std::errc 枚举"></a>5. <strong><code>std::errc</code> 枚举</strong></h4><ul>
+<li>定义了一组通用的错误条件，用于描述常见错误。</li>
+<li>例如：<ul>
+<li><code>std::errc::permission_denied</code> 表示权限被拒绝。</li>
+<li><code>std::errc::no_such_file_or_directory</code> 表示文件或目录不存在。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="主要的类和函数"><a href="#主要的类和函数" class="headerlink" title="主要的类和函数"></a><strong>主要的类和函数</strong></h3><h4 id="1-std-error-code-1"><a href="#1-std-error-code-1" class="headerlink" title="1. std::error_code"></a>1. <strong><code>std::error_code</code></strong></h4><p>表示具体的错误码和错误分类。</p>
+<p>常见操作：</p>
+<ul>
+<li>获取错误值：<code>value()</code></li>
+<li>获取错误分类：<code>category()</code></li>
+<li>获取错误描述：<code>message()</code></li>
+<li>示例：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::error_code <span class="title">ec</span><span class="params">(<span class="number">2</span>, std::generic_category())</span></span>;</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-std-error-condition-1"><a href="#2-std-error-condition-1" class="headerlink" title="2. std::error_condition"></a>2. <strong><code>std::error_condition</code></strong></h4><p>用于表示通用错误条件。</p>
+<ul>
+<li>示例：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::error_condition cond = std::errc::no_such_file_or_directory;</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Error condition: &quot;</span> &lt;&lt; cond.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-std-error-category-1"><a href="#3-std-error-category-1" class="headerlink" title="3. std::error_category"></a>3. <strong><code>std::error_category</code></strong></h4><p>定义错误的上下文或来源。</p>
+<ul>
+<li>预定义的分类：<ul>
+<li><code>std::generic_category()</code></li>
+<li><code>std::system_category()</code></li>
+</ul>
+</li>
+<li>示例：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> std::error_category&amp; cat = std::<span class="built_in">generic_category</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Category name: &quot;</span> &lt;&lt; cat.<span class="built_in">name</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="4-std-system-error-1"><a href="#4-std-system-error-1" class="headerlink" title="4. std::system_error"></a>4. <strong><code>std::system_error</code></strong></h4><p>用于抛出异常，包含错误码和错误描述。</p>
+<ul>
+<li>示例：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> std::<span class="built_in">system_error</span>(std::<span class="built_in">make_error_code</span>(std::errc::permission_denied));</span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::system_error&amp; e) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Caught system error: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="常用场景和示例"><a href="#常用场景和示例" class="headerlink" title="常用场景和示例"></a><strong>常用场景和示例</strong></h3><h4 id="1-处理系统错误"><a href="#1-处理系统错误" class="headerlink" title="1. 处理系统错误"></a>1. <strong>处理系统错误</strong></h4><p>例如，文件打开失败时，可以返回一个错误码来描述问题：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::ifstream <span class="title">file</span><span class="params">(<span class="string">&quot;nonexistent_file.txt&quot;</span>)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!file.<span class="built_in">is_open</span>()) &#123;</span><br><span class="line">        std::error_code ec = std::<span class="built_in">make_error_code</span>(std::errc::no_such_file_or_directory);</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-结合异常"><a href="#2-结合异常" class="headerlink" title="2. 结合异常"></a>2. <strong>结合异常</strong></h4><p>当发生严重错误时，可以抛出 <code>std::system_error</code>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> std::<span class="built_in">system_error</span>(std::<span class="built_in">make_error_code</span>(std::errc::permission_denied), <span class="string">&quot;Operation failed&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="built_in">doSomething</span>();</span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> std::system_error&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-自定义错误分类"><a href="#3-自定义错误分类" class="headerlink" title="3. 自定义错误分类"></a>3. <strong>自定义错误分类</strong></h4><p>开发者可以通过继承 <code>std::error_category</code> 来创建自定义错误。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomCategory</span> : <span class="keyword">public</span> std::error_category &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">name</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;CustomCategory&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">message</span><span class="params">(<span class="type">int</span> ev)</span> <span class="type">const</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (ev) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> <span class="string">&quot;Custom error 1&quot;</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> <span class="string">&quot;Custom error 2&quot;</span>;</span><br><span class="line">            <span class="keyword">default</span>: <span class="keyword">return</span> <span class="string">&quot;Unknown error&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> CustomCategory&amp; <span class="title">custom_category</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">static</span> CustomCategory instance;</span><br><span class="line">    <span class="keyword">return</span> instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::error_code <span class="title">ec</span><span class="params">(<span class="number">1</span>, custom_category())</span></span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a><strong>优点</strong></h3><ol>
+<li><strong>跨平台支持</strong>：错误码可以表示跨平台的错误。</li>
+<li><strong>灵活性</strong>：支持自定义错误分类，适应不同的业务场景。</li>
+<li><strong>统一接口</strong>：提供了统一的错误报告机制，减少了依赖平台特定的错误处理代码。</li>
+<li><strong>异常兼容</strong>：支持通过异常报告和处理错误。</li>
+</ol>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p><code>&lt;system_error&gt;</code> 是一个强大的标准库模块，它简化了跨平台错误处理的复杂性，并提供了灵活的接口和功能。无论是在异常控制流还是在返回错误码的场景下，它都能很好地满足需求，是现代 C++ 项目中不可或缺的工具。</p>
+<h2 id="C-std-error-code-是什么"><a href="#C-std-error-code-是什么" class="headerlink" title="C++ std::error_code 是什么"></a>C++ std::error_code 是什么</h2><p><code>std::error_code</code> 是 C++ 标准库中定义的一个类，用于描述和管理错误信息。它是 <code>&lt;system_error&gt;</code> 头文件的一部分，设计的目的是为跨平台的错误处理提供统一的接口。它常与 <code>std::error_condition</code> 和 <code>std::system_error</code> 一起使用。</p>
+<h3 id="std-error-code-的关键点"><a href="#std-error-code-的关键点" class="headerlink" title="std::error_code 的关键点"></a><strong><code>std::error_code</code> 的关键点</strong></h3><ol>
+<li><p><strong>组成部分</strong><br><code>std::error_code</code> 包含两个主要的成员：</p>
+<ul>
+<li><strong>错误值</strong> (<code>int</code> 类型)：表示特定错误码。</li>
+<li><strong>错误分类</strong> (<code>std::error_category</code> 类型的引用)：定义错误的类别，例如系统错误、网络错误、自定义错误等。</li>
+</ul>
+</li>
+<li><p><strong>错误信息描述</strong><br>它可以通过 <code>message()</code> 函数返回与错误值和错误分类相关联的字符串描述。</p>
+</li>
+<li><p><strong>轻量级</strong><br><code>std::error_code</code> 是轻量级的，因为它不存储实际的错误消息，而是依赖 <code>std::error_category</code> 来提供错误的描述。</p>
+</li>
+</ol>
+<hr>
+<h3 id="主要的成员函数"><a href="#主要的成员函数" class="headerlink" title="主要的成员函数"></a><strong>主要的成员函数</strong></h3><h4 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h4><ul>
+<li>默认构造：<code>std::error_code()</code> 创建一个无错误的 <code>std::error_code</code>，即 <code>value()</code> 返回 0 且 <code>category()</code> 返回一个空的错误分类。</li>
+<li>参数构造：<code>std::error_code(int val, const std::error_category &amp;cat)</code> 初始化一个特定值和类别的错误码。</li>
+</ul>
+<h4 id="成员函数"><a href="#成员函数" class="headerlink" title="成员函数"></a>成员函数</h4><ul>
+<li><p><code>int value() const;</code><br>返回错误码的值。</p>
+</li>
+<li><p><code>const std::error_category&amp; category() const;</code><br>返回错误码所属的错误分类。</p>
+</li>
+<li><p><code>std::string message() const;</code><br>返回错误码的描述信息。</p>
+</li>
+<li><p><code>explicit operator bool() const;</code><br>返回错误码是否代表错误状态。如果 <code>value() != 0</code>，则返回 <code>true</code>。</p>
+</li>
+</ul>
+<h4 id="比较操作符"><a href="#比较操作符" class="headerlink" title="比较操作符"></a>比较操作符</h4><ul>
+<li><code>bool operator==(const std::error_code&amp; lhs, const std::error_code&amp; rhs);</code>  </li>
+<li><code>bool operator!=(const std::error_code&amp; lhs, const std::error_code&amp; rhs);</code></li>
+</ul>
+<hr>
+<h3 id="常用场景"><a href="#常用场景" class="headerlink" title="常用场景"></a><strong>常用场景</strong></h3><h4 id="1-与标准库函数搭配使用"><a href="#1-与标准库函数搭配使用" class="headerlink" title="1. 与标准库函数搭配使用"></a>1. <strong>与标准库函数搭配使用</strong></h4><p>许多标准库函数（如文件操作、网络操作）会返回一个 <code>std::error_code</code> 参数，用于指示操作结果。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec;</span><br><span class="line">    <span class="function">std::ifstream <span class="title">file</span><span class="params">(<span class="string">&quot;non_existent_file.txt&quot;</span>)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!file.<span class="built_in">is_open</span>()) &#123;</span><br><span class="line">        ec = std::<span class="built_in">make_error_code</span>(std::errc::no_such_file_or_directory);</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-与异常结合"><a href="#2-与异常结合" class="headerlink" title="2. 与异常结合"></a>2. <strong>与异常结合</strong></h4><p><code>std::system_error</code> 异常类可以封装 <code>std::error_code</code>，并通过抛出异常进行错误处理。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> std::<span class="built_in">system_error</span>(std::<span class="built_in">make_error_code</span>(std::errc::permission_denied));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="built_in">doSomething</span>();</span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> std::system_error&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Caught a system error: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-自定义错误代码"><a href="#3-自定义错误代码" class="headerlink" title="3. 自定义错误代码"></a>3. <strong>自定义错误代码</strong></h4><p>可以通过继承 <code>std::error_category</code> 来创建自定义错误分类，并结合 <code>std::error_code</code> 使用。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomCategory</span> : <span class="keyword">public</span> std::error_category &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">name</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;CustomCategory&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">message</span><span class="params">(<span class="type">int</span> ev)</span> <span class="type">const</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (ev) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> <span class="string">&quot;Custom error 1&quot;</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> <span class="string">&quot;Custom error 2&quot;</span>;</span><br><span class="line">            <span class="keyword">default</span>: <span class="keyword">return</span> <span class="string">&quot;Unknown custom error&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> CustomCategory&amp; <span class="title">custom_category</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">static</span> CustomCategory instance;</span><br><span class="line">    <span class="keyword">return</span> instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::error_code <span class="title">ec</span><span class="params">(<span class="number">1</span>, custom_category())</span></span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Error message: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a><strong>优点</strong></h3><ol>
+<li><strong>统一的错误表示</strong>：可以跨平台地统一管理不同来源的错误。</li>
+<li><strong>不依赖异常</strong>：适合那些禁用异常的代码。</li>
+<li><strong>灵活性</strong>：通过自定义错误分类和错误值，开发者可以扩展错误机制。</li>
+</ol>
+<hr>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><p><code>std::error_code</code> 是 C++ 标准库中用于处理错误信息的重要工具，提供了高效且灵活的错误处理方式。在现代 C++ 编程中，它常被用作替代异常的另一种错误报告机制，非常适合需要更精细控制的场景。</p>
+<h2 id="C-std-error-code-常用技巧"><a href="#C-std-error-code-常用技巧" class="headerlink" title="C++ std::error_code 常用技巧"></a>C++ std::error_code 常用技巧</h2><p>使用 C++ 的 <code>std::error_code</code> 处理错误时，有许多技巧可以提高代码的可读性、灵活性和健壮性。以下是一些常用技巧和最佳实践：</p>
+<hr>
+<h3 id="1-使用预定义的-std-errc-枚举"><a href="#1-使用预定义的-std-errc-枚举" class="headerlink" title="1. 使用预定义的 std::errc 枚举"></a><strong>1. 使用预定义的 <code>std::errc</code> 枚举</strong></h3><p><code>std::errc</code> 提供了通用的错误条件枚举值，可以直接创建 <code>std::error_code</code> 实例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec = std::<span class="built_in">make_error_code</span>(std::errc::permission_denied);</span><br><span class="line">    <span class="keyword">if</span> (ec) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; <span class="string">&quot; (value: &quot;</span> &lt;&lt; ec.<span class="built_in">value</span>() &lt;&lt; <span class="string">&quot;)&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：</p>
+<ul>
+<li>跨平台。</li>
+<li>可读性高。</li>
+</ul>
+<hr>
+<h3 id="2-检查错误状态"><a href="#2-检查错误状态" class="headerlink" title="2. 检查错误状态"></a><strong>2. 检查错误状态</strong></h3><p><code>std::error_code</code> 提供了隐式布尔转换操作符，可以方便地检查是否存在错误：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">std::error_code ec;</span><br><span class="line"><span class="comment">// ... 某些操作可能设置 ec ...</span></span><br><span class="line"><span class="keyword">if</span> (ec) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Error occurred: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-使用-std-system-category-和-std-generic-category"><a href="#3-使用-std-system-category-和-std-generic-category" class="headerlink" title="3. 使用 std::system_category 和 std::generic_category"></a><strong>3. 使用 <code>std::system_category</code> 和 <code>std::generic_category</code></strong></h3><ul>
+<li>**<code>std::system_category</code>**：用于表示平台特定的错误（如系统调用的错误码）。</li>
+<li>**<code>std::generic_category</code>**：用于表示跨平台的错误条件。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::error_code <span class="title">systemError</span><span class="params">(<span class="number">5</span>, std::system_category())</span></span>;</span><br><span class="line">    <span class="function">std::error_code <span class="title">genericError</span><span class="params">(<span class="number">5</span>, std::generic_category())</span></span>;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;System error: &quot;</span> &lt;&lt; systemError.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Generic error: &quot;</span> &lt;&lt; genericError.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>用法场景</strong>：</p>
+<ul>
+<li>使用 <code>std::generic_category</code> 适配跨平台代码。</li>
+<li>使用 <code>std::system_category</code> 处理平台特定错误。</li>
+</ul>
+<hr>
+<h3 id="4-自定义错误分类"><a href="#4-自定义错误分类" class="headerlink" title="4. 自定义错误分类"></a><strong>4. 自定义错误分类</strong></h3><p>如果预定义的错误分类无法满足需求，可以通过继承 <code>std::error_category</code> 创建自定义错误分类：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyErrorCategory</span> : <span class="keyword">public</span> std::error_category &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">name</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;MyErrorCategory&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">message</span><span class="params">(<span class="type">int</span> ev)</span> <span class="type">const</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (ev) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> <span class="string">&quot;Custom error 1&quot;</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> <span class="string">&quot;Custom error 2&quot;</span>;</span><br><span class="line">            <span class="keyword">default</span>: <span class="keyword">return</span> <span class="string">&quot;Unknown error&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> MyErrorCategory&amp; <span class="title">my_error_category</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">static</span> MyErrorCategory instance;</span><br><span class="line">    <span class="keyword">return</span> instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::error_code <span class="title">ec</span><span class="params">(<span class="number">1</span>, my_error_category())</span></span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5-错误码与错误条件的比较"><a href="#5-错误码与错误条件的比较" class="headerlink" title="5. 错误码与错误条件的比较"></a><strong>5. 错误码与错误条件的比较</strong></h3><p><code>std::error_code</code> 和 <code>std::error_condition</code> 支持直接比较，允许检查错误是否符合特定条件：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec = std::<span class="built_in">make_error_code</span>(std::errc::no_such_file_or_directory);</span><br><span class="line">    <span class="keyword">if</span> (ec == std::errc::no_such_file_or_directory) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Error condition matches: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>用途</strong>：</p>
+<ul>
+<li>用于将平台特定错误映射到通用错误条件。</li>
+</ul>
+<hr>
+<h3 id="6-异常与错误码结合"><a href="#6-异常与错误码结合" class="headerlink" title="6. 异常与错误码结合"></a><strong>6. 异常与错误码结合</strong></h3><p><code>std::system_error</code> 异常类封装了 <code>std::error_code</code>，用于更强大的错误处理：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">riskyOperation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> std::<span class="built_in">system_error</span>(std::<span class="built_in">make_error_code</span>(std::errc::permission_denied), <span class="string">&quot;Operation failed&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="built_in">riskyOperation</span>();</span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> std::system_error&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Caught exception: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>技巧</strong>：</p>
+<ul>
+<li>使用 <code>what()</code> 提供详细的错误信息。</li>
+<li>推荐在严重错误场景中抛出 <code>std::system_error</code>。</li>
+</ul>
+<hr>
+<h3 id="7-灵活处理错误返回"><a href="#7-灵活处理错误返回" class="headerlink" title="7. 灵活处理错误返回"></a><strong>7. 灵活处理错误返回</strong></h3><p>在需要禁用异常的代码中，<code>std::error_code</code> 可以用作返回值：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">std::error_code <span class="title">openFile</span><span class="params">(<span class="type">const</span> std::string&amp; filename)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 模拟错误</span></span><br><span class="line">    <span class="keyword">if</span> (filename.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        <span class="keyword">return</span> std::<span class="built_in">make_error_code</span>(std::errc::invalid_argument);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 模拟成功</span></span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">error_code</span>(); <span class="comment">// 表示没有错误</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec = <span class="built_in">openFile</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (ec) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open file: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;File opened successfully!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong>：</p>
+<ul>
+<li>明确返回错误信息。</li>
+<li>不依赖异常机制。</li>
+</ul>
+<hr>
+<h3 id="8-使用-std-error-code-捕获系统错误"><a href="#8-使用-std-error-code-捕获系统错误" class="headerlink" title="8. 使用 std::error_code 捕获系统错误"></a><strong>8. 使用 <code>std::error_code</code> 捕获系统错误</strong></h3><p>在调用系统 API 或库函数时，使用 <code>std::error_code</code> 捕获错误，避免直接依赖平台特定的错误码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">readFile</span><span class="params">(<span class="type">const</span> std::string&amp; filename, std::error_code&amp; ec)</span> </span>&#123;</span><br><span class="line">    <span class="function">std::ifstream <span class="title">file</span><span class="params">(filename)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!file) &#123;</span><br><span class="line">        ec = std::<span class="built_in">make_error_code</span>(std::errc::no_such_file_or_directory);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec;</span><br><span class="line">    <span class="built_in">readFile</span>(<span class="string">&quot;nonexistent_file.txt&quot;</span>, ec);</span><br><span class="line">    <span class="keyword">if</span> (ec) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error reading file: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="9-使用标准错误信息"><a href="#9-使用标准错误信息" class="headerlink" title="9. 使用标准错误信息"></a><strong>9. 使用标准错误信息</strong></h3><p>结合标准库预定义的错误信息，提高代码的可读性和用户体验：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec = std::<span class="built_in">make_error_code</span>(std::errc::not_enough_memory);</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Error description: &quot;</span> &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="10-优化日志和调试信息"><a href="#10-优化日志和调试信息" class="headerlink" title="10. 优化日志和调试信息"></a><strong>10. 优化日志和调试信息</strong></h3><p>结合错误码的值、类别和描述，生成详细的日志：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;system_error&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">logError</span><span class="params">(<span class="type">const</span> std::error_code&amp; ec)</span> </span>&#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Error: [&quot;</span> &lt;&lt; ec.<span class="built_in">value</span>() &lt;&lt; <span class="string">&quot;] &quot;</span></span><br><span class="line">              &lt;&lt; ec.<span class="built_in">category</span>().<span class="built_in">name</span>() &lt;&lt; <span class="string">&quot;: &quot;</span></span><br><span class="line">              &lt;&lt; ec.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::error_code ec = std::<span class="built_in">make_error_code</span>(std::errc::permission_denied);</span><br><span class="line">    <span class="built_in">logError</span>(ec);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a><strong>总结</strong></h3><p><code>std::error_code</code> 提供了灵活且统一的错误处理机制，结合标准库和自定义实现，可以显著提高代码的可维护性和跨平台能力。以下是主要技巧的总结：</p>
+<ul>
+<li>优先使用 <code>std::errc</code> 枚举和 <code>std::make_error_code</code>。</li>
+<li>使用 <code>std::system_category</code> 和 <code>std::generic_category</code> 区分错误上下文。</li>
+<li>根据需要选择返回 <code>std::error_code</code> 或抛出 <code>std::system_error</code>。</li>
+<li>日志中提供详细错误信息以便调试和问题定位。</li>
+</ul>
+<p>通过熟练应用这些技巧，可以更高效地管理错误并增强代码的健壮性。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/11/notes/Tools/2024-12-11-Node/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3298,250 +3579,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-04-QByteArray/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-04-QByteArray/" class="post-title-link" itemprop="url">QByteArray</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-11-18 09:00:00" itemprop="dateCreated datePublished" datetime="2024-11-18T09:00:00+08:00">2024-11-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Qt-QByteArray-类-详解"><a href="#Qt-QByteArray-类-详解" class="headerlink" title="Qt QByteArray 类 详解"></a>Qt QByteArray 类 详解</h2><p><code>QByteArray</code> 是 Qt 框架中用于处理字节数据的类。它类似于 C++ 标准库中的 <code>std::string</code>，但专门设计用来处理原始字节数据。<code>QByteArray</code> 提供了许多功能，包括存储和操作字节数据、支持多种编码、以及对比和查找等操作。以下是对 <code>QByteArray</code> 类的详细解解：</p>
-<h3 id="1-基本功能"><a href="#1-基本功能" class="headerlink" title="1. 基本功能"></a>1. <strong>基本功能</strong></h3><ul>
-<li><p><strong>定义和初始化</strong>：<br><code>QByteArray</code> 可以用多种方式初始化，包括从 C 风格字符串、Qt 字符串（<code>QString</code>）、或者通过构造函数。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QByteArray byteArray1; <span class="comment">// 空的字节数组</span></span><br><span class="line"><span class="function">QByteArray <span class="title">byteArray2</span><span class="params">(<span class="string">&quot;Hello, world!&quot;</span>)</span></span>; <span class="comment">// 从 C 风格字符串初始化</span></span><br><span class="line"><span class="function">QByteArray <span class="title">byteArray3</span><span class="params">(QString(<span class="string">&quot;Hello, world!&quot;</span>).toUtf8())</span></span>; <span class="comment">// 从 QString 初始化</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>存储字节数据</strong>：<br><code>QByteArray</code> 用于存储字节数据，可以方便地进行操作。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QByteArray <span class="title">byteArray</span><span class="params">(<span class="string">&quot;Data&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="2-基本操作"><a href="#2-基本操作" class="headerlink" title="2. 基本操作"></a>2. <strong>基本操作</strong></h3><ul>
-<li><p><strong>追加和插入</strong>：<br>可以使用 <code>append()</code> 和 <code>insert()</code> 方法将数据追加到字节数组的末尾或在指定位置插入。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byteArray.<span class="built_in">append</span>(<span class="string">&quot; more data&quot;</span>);</span><br><span class="line">byteArray.<span class="built_in">insert</span>(<span class="number">4</span>, <span class="string">&quot; insert&quot;</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>移除和替换</strong>：<br><code>remove()</code> 方法用于删除字节数据，而 <code>replace()</code> 用于替换指定范围的字节数据。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byteArray.<span class="built_in">remove</span>(<span class="number">4</span>, <span class="number">6</span>); <span class="comment">// 从位置4开始，删除6个字节</span></span><br><span class="line">byteArray.<span class="built_in">replace</span>(<span class="string">&quot;insert&quot;</span>, <span class="string">&quot;replace&quot;</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>清空和检查</strong>：<br><code>clear()</code> 方法可以清空字节数组，<code>isEmpty()</code> 方法用于检查字节数组是否为空。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byteArray.<span class="built_in">clear</span>();</span><br><span class="line"><span class="type">bool</span> isEmpty = byteArray.<span class="built_in">isEmpty</span>();</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="3-编码和解码"><a href="#3-编码和解码" class="headerlink" title="3. 编码和解码"></a>3. <strong>编码和解码</strong></h3><ul>
-<li><p><strong>与 QString 互转</strong>：<br><code>QByteArray</code> 可以方便地与 <code>QString</code> 转换，使用 <code>toStdString()</code> 可以转换为 <code>std::string</code>。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QString str = <span class="string">&quot;Hello, world!&quot;</span>;</span><br><span class="line">QByteArray byteArray = str.<span class="built_in">toUtf8</span>();</span><br><span class="line">QString backToStr = QString::<span class="built_in">fromUtf8</span>(byteArray);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>编码和解码</strong>：<br><code>QByteArray</code> 支持多种编码格式，如 UTF-8、Latin1 等。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QByteArray utf8Array = <span class="string">&quot;UTF-8 data&quot;</span>;</span><br><span class="line">QByteArray latin1Array = utf8Array.<span class="built_in">toLatin1</span>();</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="4-查找和比较"><a href="#4-查找和比较" class="headerlink" title="4. 查找和比较"></a>4. <strong>查找和比较</strong></h3><ul>
-<li><p><strong>查找子串</strong>：<br>使用 <code>indexOf()</code> 方法查找子字节串的位置，<code>contains()</code> 方法检查是否包含某个子字节串。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> pos = byteArray.<span class="built_in">indexOf</span>(<span class="string">&quot;data&quot;</span>);</span><br><span class="line"><span class="type">bool</span> contains = byteArray.<span class="built_in">contains</span>(<span class="string">&quot;data&quot;</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>比较字节数组</strong>：<br>使用 <code>compare()</code> 方法比较两个字节数组。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QByteArray <span class="title">byteArray1</span><span class="params">(<span class="string">&quot;abc&quot;</span>)</span></span>;</span><br><span class="line"><span class="function">QByteArray <span class="title">byteArray2</span><span class="params">(<span class="string">&quot;abc&quot;</span>)</span></span>;</span><br><span class="line"><span class="type">int</span> result = QByteArray::<span class="built_in">compare</span>(byteArray1, byteArray2); <span class="comment">// 0 表示相等</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="5-转换和操作"><a href="#5-转换和操作" class="headerlink" title="5. 转换和操作"></a>5. <strong>转换和操作</strong></h3><ul>
-<li><p>**转换为 <code>std::string</code>**：<br>可以通过 <code>toStdString()</code> 方法将 <code>QByteArray</code> 转换为标准 C++ 字符串。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string stdString = byteArray.<span class="built_in">toStdString</span>();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>操作字节数据</strong>：<br><code>QByteArray</code> 提供了类似于 C++ 数组的操作，例如直接访问字节。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> firstByte = byteArray[<span class="number">0</span>];</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="6-文件操作"><a href="#6-文件操作" class="headerlink" title="6. 文件操作"></a>6. <strong>文件操作</strong></h3><ul>
-<li><p><strong>读写文件</strong>：<br><code>QByteArray</code> 可用于处理文件内容，可以与 <code>QFile</code> 类一起使用来读取和写入字节数据。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QFile <span class="title">file</span><span class="params">(<span class="string">&quot;example.dat&quot;</span>)</span></span>;</span><br><span class="line"><span class="keyword">if</span> (file.<span class="built_in">open</span>(QIODevice::ReadWrite)) &#123;</span><br><span class="line">    QByteArray data = file.<span class="built_in">readAll</span>();</span><br><span class="line">    file.<span class="built_in">write</span>(<span class="string">&quot;New data&quot;</span>);</span><br><span class="line">    file.<span class="built_in">close</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QByteArray&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QString&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">QByteArray <span class="title">byteArray</span><span class="params">(<span class="string">&quot;Hello, world!&quot;</span>)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Append data</span></span><br><span class="line">    byteArray.<span class="built_in">append</span>(<span class="string">&quot; Welcome to Qt.&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Replace part of the string</span></span><br><span class="line">    byteArray.<span class="built_in">replace</span>(<span class="string">&quot;world&quot;</span>, <span class="string">&quot;Qt&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Convert to QString</span></span><br><span class="line">    QString str = QString::<span class="built_in">fromUtf8</span>(byteArray);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Print the result</span></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; str;  <span class="comment">// Output: Hello, Qt! Welcome to Qt.</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>QByteArray</code> 是处理字节数据时非常有用的类，特别是在涉及到编码转换、数据传输和文件操作时。它提供了灵活且高效的字节数据处理功能。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-06-QTimer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-06-QTimer/" class="post-title-link" itemprop="url">QTimer</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-11-18 09:00:00" itemprop="dateCreated datePublished" datetime="2024-11-18T09:00:00+08:00">2024-11-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Qt-QTimer-类-详解"><a href="#Qt-QTimer-类-详解" class="headerlink" title="Qt QTimer 类 详解"></a>Qt QTimer 类 详解</h2><p><code>QTimer</code> 是 Qt 框架中的一个用于定时和计时的类。它提供了一种非常方便的方式来设置定时器，并在定时器超时时执行指定的操作。<code>QTimer</code> 在 Qt 的事件驱动模型中非常重要，尤其适合在需要周期性或延迟执行操作的场景中使用，例如动画、定时任务、用户界面刷新等。</p>
-<h3 id="1-QTimer-的基本功能"><a href="#1-QTimer-的基本功能" class="headerlink" title="1. QTimer 的基本功能"></a>1. <strong><code>QTimer</code> 的基本功能</strong></h3><ul>
-<li><p><strong>定时器类型</strong>：</p>
-<ul>
-<li><strong>单次定时器</strong>：定时器触发一次后就自动停止。</li>
-<li><strong>循环定时器</strong>：定时器以固定的时间间隔循环触发，直到手动停止。</li>
-</ul>
-</li>
-<li><p><strong>信号与槽机制</strong>：<br><code>QTimer</code> 依赖于信号和槽机制，定时器超时时会发出 <code>timeout()</code> 信号，应用程序可以连接到这个信号并执行特定的槽函数。</p>
-</li>
-</ul>
-<h3 id="2-QTimer-的常用方法"><a href="#2-QTimer-的常用方法" class="headerlink" title="2. QTimer 的常用方法"></a>2. <strong><code>QTimer</code> 的常用方法</strong></h3><ul>
-<li>**<code>start(int msec)</code>**：启动定时器，参数 <code>msec</code> 是以毫秒为单位的间隔时间。</li>
-<li>**<code>stop()</code>**：停止定时器。如果定时器正在运行，它会被停止，且不会再触发。</li>
-<li>**<code>setInterval(int msec)</code>**：设置定时器的间隔时间（单位：毫秒）。</li>
-<li>**<code>setSingleShot(bool singleShot)</code>**：设置定时器是否为单次触发。如果设置为 <code>true</code>，定时器在超时后会自动停止。</li>
-<li>**<code>isActive()</code>**：检查定时器是否正在运行。</li>
-<li>**<code>remainingTime()</code>**：返回定时器剩余的时间（单位：毫秒）。如果定时器已超时或停止，则返回 -1。</li>
-</ul>
-<h3 id="3-QTimer-的使用方式"><a href="#3-QTimer-的使用方式" class="headerlink" title="3. QTimer 的使用方式"></a>3. <strong><code>QTimer</code> 的使用方式</strong></h3><p><code>QTimer</code> 可以有两种常见的使用方式：</p>
-<ol>
-<li><strong>直接使用 <code>QTimer</code> 静态方法</strong>。</li>
-<li><strong>创建 <code>QTimer</code> 对象，并将其与槽函数连接</strong>。</li>
-</ol>
-<h4 id="3-1-直接使用静态方法"><a href="#3-1-直接使用静态方法" class="headerlink" title="3.1 直接使用静态方法"></a>3.1 直接使用静态方法</h4><ul>
-<li><p>**<code>QTimer::singleShot(int msec, const QObject *receiver, const char *member)</code>**：<br>这是一个静态方法，适合用于只需要延迟执行一次的操作。它会在指定时间后发出信号并调用连接的槽函数。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QTimer::<span class="built_in">singleShot</span>(<span class="number">2000</span>, <span class="keyword">this</span>, <span class="built_in">SLOT</span>(<span class="built_in">doSomething</span>())); <span class="comment">// 2秒后调用槽函数 doSomething()</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<h4 id="3-2-创建-QTimer-对象"><a href="#3-2-创建-QTimer-对象" class="headerlink" title="3.2 创建 QTimer 对象"></a>3.2 创建 <code>QTimer</code> 对象</h4><p>你可以创建一个 <code>QTimer</code> 对象并手动控制它的启动、停止和触发。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTimer&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyObject</span> : <span class="keyword">public</span> QObject &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyObject</span>() &#123;</span><br><span class="line">        <span class="comment">// 创建定时器</span></span><br><span class="line">        timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(<span class="keyword">this</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 连接定时器的超时信号到槽函数</span></span><br><span class="line">        <span class="built_in">connect</span>(timer, &amp;QTimer::timeout, <span class="keyword">this</span>, &amp;MyObject::onTimeout);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置定时器为循环模式，每隔1秒触发一次</span></span><br><span class="line">        timer-&gt;<span class="built_in">start</span>(<span class="number">1000</span>); <span class="comment">// 1000毫秒 = 1秒</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onTimeout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Timer triggered!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    QTimer *timer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-单次定时器与循环定时器"><a href="#4-单次定时器与循环定时器" class="headerlink" title="4. 单次定时器与循环定时器"></a>4. <strong>单次定时器与循环定时器</strong></h3><ul>
-<li><p><strong>单次定时器</strong>：在 <code>QTimer</code> 中可以通过设置 <code>setSingleShot(true)</code> 或使用 <code>QTimer::singleShot()</code> 来实现单次定时器。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QTimer *timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(<span class="keyword">this</span>);</span><br><span class="line">timer-&gt;<span class="built_in">setSingleShot</span>(<span class="literal">true</span>);  <span class="comment">// 设置为单次定时器</span></span><br><span class="line">timer-&gt;<span class="built_in">start</span>(<span class="number">2000</span>);  <span class="comment">// 2秒后触发</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>循环定时器</strong>：默认情况下，<code>QTimer</code> 是循环定时器，即每隔指定的时间间隔触发一次。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QTimer *timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(<span class="keyword">this</span>);</span><br><span class="line">timer-&gt;<span class="built_in">start</span>(<span class="number">1000</span>);  <span class="comment">// 每隔1秒触发</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="5-定时器的精度"><a href="#5-定时器的精度" class="headerlink" title="5. 定时器的精度"></a>5. <strong>定时器的精度</strong></h3><ul>
-<li><code>QTimer</code> 是基于 Qt 事件循环的，因此它的精度受限于系统的事件调度机制。在处理复杂的 UI 或繁重任务时，定时器的精度可能受到影响。通常情况下，<code>QTimer</code> 可以提供毫秒级的精度，但并不适用于需要严格实时性的场景。</li>
-</ul>
-<h3 id="6-定时器的线程安全性"><a href="#6-定时器的线程安全性" class="headerlink" title="6. 定时器的线程安全性"></a>6. <strong>定时器的线程安全性</strong></h3><ul>
-<li><code>QTimer</code> 必须在其所属的线程中使用。如果你在多线程环境中使用定时器，确保定时器与其所在的线程一致。可以使用 <code>QTimer</code> 和 <code>QThread</code> 的组合来在子线程中处理定时任务。</li>
-</ul>
-<h3 id="7-常见用例"><a href="#7-常见用例" class="headerlink" title="7. 常见用例"></a>7. <strong>常见用例</strong></h3><ul>
-<li><strong>动画刷新</strong>：通过定时器定期更新 UI 元素的状态。</li>
-<li><strong>定时任务</strong>：在应用程序中定时执行某些任务，例如自动保存、定时更新数据等。</li>
-<li><strong>延迟操作</strong>：在特定时间后执行某一操作，如提示信息延迟消失。</li>
-</ul>
-<h3 id="8-QTimer-示例"><a href="#8-QTimer-示例" class="headerlink" title="8. QTimer 示例"></a>8. <strong>QTimer 示例</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QMainWindow&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTimer&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QLabel&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">a</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QMainWindow mainWindow;</span><br><span class="line">    QLabel *label = <span class="keyword">new</span> <span class="built_in">QLabel</span>(<span class="string">&quot;Hello, Qt!&quot;</span>, &amp;mainWindow);</span><br><span class="line">    mainWindow.<span class="built_in">setCentralWidget</span>(label);</span><br><span class="line"></span><br><span class="line">    QTimer *timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(&amp;mainWindow);</span><br><span class="line">    QObject::<span class="built_in">connect</span>(timer, &amp;QTimer::timeout, [&amp;]() &#123;</span><br><span class="line">        label-&gt;<span class="built_in">setText</span>(<span class="string">&quot;Timer triggered!&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    timer-&gt;<span class="built_in">start</span>(<span class="number">2000</span>); <span class="comment">// 2秒后触发</span></span><br><span class="line"></span><br><span class="line">    mainWindow.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> a.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>QTimer</code> 是一个强大且灵活的定时工具，在 Qt 开发中广泛用于管理定时任务。它与 Qt 的信号和槽机制紧密集成，使得处理异步操作和事件驱动编程变得更加容易。无论是周期性操作还是一次性延迟操作，<code>QTimer</code> 都能够提供理想的解决方案。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-03-QMainWindow/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3804,7 +3841,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-07-QThread/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-04-QByteArray/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -3818,7 +3855,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-07-QThread/" class="post-title-link" itemprop="url">QThread</a>
+            <a href="/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-04-QByteArray/" class="post-title-link" itemprop="url">QByteArray</a>
         </h2>
 
         <div class="post-meta">
@@ -3858,61 +3895,177 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="QThread-类-详解"><a href="#QThread-类-详解" class="headerlink" title="QThread 类 详解"></a>QThread 类 详解</h2><p><code>QThread</code> 是 Qt 中用于实现多线程的类。它提供了一个平台无关的、面向对象的线程接口，使得在 GUI 应用程序中处理耗时操作时可以保持界面的响应性。在 Qt 中，<code>QThread</code> 是线程管理的基础类，但 Qt 推荐的使用方式与传统的 C++ 线程管理（如 <code>std::thread</code>）有所不同。</p>
-<h3 id="1-QThread-的基本概念"><a href="#1-QThread-的基本概念" class="headerlink" title="1. QThread 的基本概念"></a>1. <strong><code>QThread</code> 的基本概念</strong></h3><ul>
-<li><p><strong>线程与事件循环</strong>：<code>QThread</code> 继承自 <code>QObject</code>，因此它具有信号和槽机制，并且可以在子线程中运行一个事件循环。事件循环允许子线程接收信号并执行槽函数，这在 GUI 编程中非常有用。</p>
+          <h2 id="Qt-QByteArray-类-详解"><a href="#Qt-QByteArray-类-详解" class="headerlink" title="Qt QByteArray 类 详解"></a>Qt QByteArray 类 详解</h2><p><code>QByteArray</code> 是 Qt 框架中用于处理字节数据的类。它类似于 C++ 标准库中的 <code>std::string</code>，但专门设计用来处理原始字节数据。<code>QByteArray</code> 提供了许多功能，包括存储和操作字节数据、支持多种编码、以及对比和查找等操作。以下是对 <code>QByteArray</code> 类的详细解解：</p>
+<h3 id="1-基本功能"><a href="#1-基本功能" class="headerlink" title="1. 基本功能"></a>1. <strong>基本功能</strong></h3><ul>
+<li><p><strong>定义和初始化</strong>：<br><code>QByteArray</code> 可以用多种方式初始化，包括从 C 风格字符串、Qt 字符串（<code>QString</code>）、或者通过构造函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QByteArray byteArray1; <span class="comment">// 空的字节数组</span></span><br><span class="line"><span class="function">QByteArray <span class="title">byteArray2</span><span class="params">(<span class="string">&quot;Hello, world!&quot;</span>)</span></span>; <span class="comment">// 从 C 风格字符串初始化</span></span><br><span class="line"><span class="function">QByteArray <span class="title">byteArray3</span><span class="params">(QString(<span class="string">&quot;Hello, world!&quot;</span>).toUtf8())</span></span>; <span class="comment">// 从 QString 初始化</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>工作者线程模型</strong>：在 Qt 中，推荐的多线程编程方式是将一个对象的工作移到另一个线程中，而不是直接继承 <code>QThread</code>。这种方法更符合 Qt 的对象模型，也更易于管理信号与槽的连接。</p>
+<li><p><strong>存储字节数据</strong>：<br><code>QByteArray</code> 用于存储字节数据，可以方便地进行操作。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QByteArray <span class="title">byteArray</span><span class="params">(<span class="string">&quot;Data&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="2-基本操作"><a href="#2-基本操作" class="headerlink" title="2. 基本操作"></a>2. <strong>基本操作</strong></h3><ul>
+<li><p><strong>追加和插入</strong>：<br>可以使用 <code>append()</code> 和 <code>insert()</code> 方法将数据追加到字节数组的末尾或在指定位置插入。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byteArray.<span class="built_in">append</span>(<span class="string">&quot; more data&quot;</span>);</span><br><span class="line">byteArray.<span class="built_in">insert</span>(<span class="number">4</span>, <span class="string">&quot; insert&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>移除和替换</strong>：<br><code>remove()</code> 方法用于删除字节数据，而 <code>replace()</code> 用于替换指定范围的字节数据。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byteArray.<span class="built_in">remove</span>(<span class="number">4</span>, <span class="number">6</span>); <span class="comment">// 从位置4开始，删除6个字节</span></span><br><span class="line">byteArray.<span class="built_in">replace</span>(<span class="string">&quot;insert&quot;</span>, <span class="string">&quot;replace&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>清空和检查</strong>：<br><code>clear()</code> 方法可以清空字节数组，<code>isEmpty()</code> 方法用于检查字节数组是否为空。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byteArray.<span class="built_in">clear</span>();</span><br><span class="line"><span class="type">bool</span> isEmpty = byteArray.<span class="built_in">isEmpty</span>();</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="3-编码和解码"><a href="#3-编码和解码" class="headerlink" title="3. 编码和解码"></a>3. <strong>编码和解码</strong></h3><ul>
+<li><p><strong>与 QString 互转</strong>：<br><code>QByteArray</code> 可以方便地与 <code>QString</code> 转换，使用 <code>toStdString()</code> 可以转换为 <code>std::string</code>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QString str = <span class="string">&quot;Hello, world!&quot;</span>;</span><br><span class="line">QByteArray byteArray = str.<span class="built_in">toUtf8</span>();</span><br><span class="line">QString backToStr = QString::<span class="built_in">fromUtf8</span>(byteArray);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>编码和解码</strong>：<br><code>QByteArray</code> 支持多种编码格式，如 UTF-8、Latin1 等。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QByteArray utf8Array = <span class="string">&quot;UTF-8 data&quot;</span>;</span><br><span class="line">QByteArray latin1Array = utf8Array.<span class="built_in">toLatin1</span>();</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="4-查找和比较"><a href="#4-查找和比较" class="headerlink" title="4. 查找和比较"></a>4. <strong>查找和比较</strong></h3><ul>
+<li><p><strong>查找子串</strong>：<br>使用 <code>indexOf()</code> 方法查找子字节串的位置，<code>contains()</code> 方法检查是否包含某个子字节串。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> pos = byteArray.<span class="built_in">indexOf</span>(<span class="string">&quot;data&quot;</span>);</span><br><span class="line"><span class="type">bool</span> contains = byteArray.<span class="built_in">contains</span>(<span class="string">&quot;data&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>比较字节数组</strong>：<br>使用 <code>compare()</code> 方法比较两个字节数组。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QByteArray <span class="title">byteArray1</span><span class="params">(<span class="string">&quot;abc&quot;</span>)</span></span>;</span><br><span class="line"><span class="function">QByteArray <span class="title">byteArray2</span><span class="params">(<span class="string">&quot;abc&quot;</span>)</span></span>;</span><br><span class="line"><span class="type">int</span> result = QByteArray::<span class="built_in">compare</span>(byteArray1, byteArray2); <span class="comment">// 0 表示相等</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="5-转换和操作"><a href="#5-转换和操作" class="headerlink" title="5. 转换和操作"></a>5. <strong>转换和操作</strong></h3><ul>
+<li><p>**转换为 <code>std::string</code>**：<br>可以通过 <code>toStdString()</code> 方法将 <code>QByteArray</code> 转换为标准 C++ 字符串。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string stdString = byteArray.<span class="built_in">toStdString</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>操作字节数据</strong>：<br><code>QByteArray</code> 提供了类似于 C++ 数组的操作，例如直接访问字节。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> firstByte = byteArray[<span class="number">0</span>];</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="6-文件操作"><a href="#6-文件操作" class="headerlink" title="6. 文件操作"></a>6. <strong>文件操作</strong></h3><ul>
+<li><p><strong>读写文件</strong>：<br><code>QByteArray</code> 可用于处理文件内容，可以与 <code>QFile</code> 类一起使用来读取和写入字节数据。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QFile <span class="title">file</span><span class="params">(<span class="string">&quot;example.dat&quot;</span>)</span></span>;</span><br><span class="line"><span class="keyword">if</span> (file.<span class="built_in">open</span>(QIODevice::ReadWrite)) &#123;</span><br><span class="line">    QByteArray data = file.<span class="built_in">readAll</span>();</span><br><span class="line">    file.<span class="built_in">write</span>(<span class="string">&quot;New data&quot;</span>);</span><br><span class="line">    file.<span class="built_in">close</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QByteArray&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QString&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">QByteArray <span class="title">byteArray</span><span class="params">(<span class="string">&quot;Hello, world!&quot;</span>)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Append data</span></span><br><span class="line">    byteArray.<span class="built_in">append</span>(<span class="string">&quot; Welcome to Qt.&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Replace part of the string</span></span><br><span class="line">    byteArray.<span class="built_in">replace</span>(<span class="string">&quot;world&quot;</span>, <span class="string">&quot;Qt&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Convert to QString</span></span><br><span class="line">    QString str = QString::<span class="built_in">fromUtf8</span>(byteArray);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Print the result</span></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; str;  <span class="comment">// Output: Hello, Qt! Welcome to Qt.</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>QByteArray</code> 是处理字节数据时非常有用的类，特别是在涉及到编码转换、数据传输和文件操作时。它提供了灵活且高效的字节数据处理功能。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-06-QTimer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/11/18/notes/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2024-11-18-06-QTimer/" class="post-title-link" itemprop="url">QTimer</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-11-18 09:00:00" itemprop="dateCreated datePublished" datetime="2024-11-18T09:00:00+08:00">2024-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Qt-QTimer-类-详解"><a href="#Qt-QTimer-类-详解" class="headerlink" title="Qt QTimer 类 详解"></a>Qt QTimer 类 详解</h2><p><code>QTimer</code> 是 Qt 框架中的一个用于定时和计时的类。它提供了一种非常方便的方式来设置定时器，并在定时器超时时执行指定的操作。<code>QTimer</code> 在 Qt 的事件驱动模型中非常重要，尤其适合在需要周期性或延迟执行操作的场景中使用，例如动画、定时任务、用户界面刷新等。</p>
+<h3 id="1-QTimer-的基本功能"><a href="#1-QTimer-的基本功能" class="headerlink" title="1. QTimer 的基本功能"></a>1. <strong><code>QTimer</code> 的基本功能</strong></h3><ul>
+<li><p><strong>定时器类型</strong>：</p>
+<ul>
+<li><strong>单次定时器</strong>：定时器触发一次后就自动停止。</li>
+<li><strong>循环定时器</strong>：定时器以固定的时间间隔循环触发，直到手动停止。</li>
+</ul>
+</li>
+<li><p><strong>信号与槽机制</strong>：<br><code>QTimer</code> 依赖于信号和槽机制，定时器超时时会发出 <code>timeout()</code> 信号，应用程序可以连接到这个信号并执行特定的槽函数。</p>
 </li>
 </ul>
-<h3 id="2-QThread-的使用方式"><a href="#2-QThread-的使用方式" class="headerlink" title="2. QThread 的使用方式"></a>2. <strong><code>QThread</code> 的使用方式</strong></h3><p><code>QThread</code> 可以通过多种方式使用，主要包括以下两种：</p>
+<h3 id="2-QTimer-的常用方法"><a href="#2-QTimer-的常用方法" class="headerlink" title="2. QTimer 的常用方法"></a>2. <strong><code>QTimer</code> 的常用方法</strong></h3><ul>
+<li>**<code>start(int msec)</code>**：启动定时器，参数 <code>msec</code> 是以毫秒为单位的间隔时间。</li>
+<li>**<code>stop()</code>**：停止定时器。如果定时器正在运行，它会被停止，且不会再触发。</li>
+<li>**<code>setInterval(int msec)</code>**：设置定时器的间隔时间（单位：毫秒）。</li>
+<li>**<code>setSingleShot(bool singleShot)</code>**：设置定时器是否为单次触发。如果设置为 <code>true</code>，定时器在超时后会自动停止。</li>
+<li>**<code>isActive()</code>**：检查定时器是否正在运行。</li>
+<li>**<code>remainingTime()</code>**：返回定时器剩余的时间（单位：毫秒）。如果定时器已超时或停止，则返回 -1。</li>
+</ul>
+<h3 id="3-QTimer-的使用方式"><a href="#3-QTimer-的使用方式" class="headerlink" title="3. QTimer 的使用方式"></a>3. <strong><code>QTimer</code> 的使用方式</strong></h3><p><code>QTimer</code> 可以有两种常见的使用方式：</p>
 <ol>
-<li><strong>直接继承 <code>QThread</code> 类（传统方式）</strong></li>
-<li><strong>工作者线程模型（推荐方式）</strong></li>
+<li><strong>直接使用 <code>QTimer</code> 静态方法</strong>。</li>
+<li><strong>创建 <code>QTimer</code> 对象，并将其与槽函数连接</strong>。</li>
 </ol>
-<h4 id="2-1-直接继承-QThread-类"><a href="#2-1-直接继承-QThread-类" class="headerlink" title="2.1 直接继承 QThread 类"></a>2.1 直接继承 <code>QThread</code> 类</h4><p>在这种方式中，你需要继承 <code>QThread</code> 并重写其 <code>run()</code> 方法，<code>run()</code> 方法是线程开始执行的入口点。你可以在这里编写需要在线程中运行的任务。</p>
-<p>示例代码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QThread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyThread</span> : <span class="keyword">public</span> QThread &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">            <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Running in thread:&quot;</span> &lt;&lt; QThread::<span class="built_in">currentThread</span>();</span><br><span class="line">            QThread::<span class="built_in">sleep</span>(<span class="number">1</span>); <span class="comment">// 模拟耗时操作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyThread thread;</span><br><span class="line">    thread.<span class="built_in">start</span>(); <span class="comment">// 开始线程</span></span><br><span class="line">    thread.<span class="built_in">wait</span>();  <span class="comment">// 等待线程结束</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>缺点</strong>：这种方法虽然直观，但不推荐使用，因为它与 Qt 的信号槽机制不太兼容，容易导致线程中的对象生命周期管理问题。</p>
-<h4 id="2-2-工作者线程模型（推荐方式）"><a href="#2-2-工作者线程模型（推荐方式）" class="headerlink" title="2.2 工作者线程模型（推荐方式）"></a>2.2 工作者线程模型（推荐方式）</h4><p>工作者线程模型是将一个 <code>QObject</code> 派生类（工作对象）移动到一个新线程中，然后在新线程中执行它的任务。这种方式更安全且与 Qt 的事件系统无缝集成。</p>
-<p>步骤如下：</p>
-<ol>
-<li>创建一个工作对象，继承自 <code>QObject</code>，并定义需要在线程中运行的任务。</li>
-<li>创建一个 <code>QThread</code> 对象。</li>
-<li>使用 <code>moveToThread()</code> 将工作对象移动到新线程。</li>
-<li>通过信号槽机制启动任务。</li>
-</ol>
-<p>示例代码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QCoreApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QThread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Worker</span> : <span class="keyword">public</span> QObject &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">doWork</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">            <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Working in thread:&quot;</span> &lt;&lt; QThread::<span class="built_in">currentThread</span>();</span><br><span class="line">            QThread::<span class="built_in">sleep</span>(<span class="number">1</span>); <span class="comment">// 模拟耗时操作</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QCoreApplication <span class="title">a</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    Worker worker;</span><br><span class="line">    QThread thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将工作对象移动到子线程</span></span><br><span class="line">    worker.<span class="built_in">moveToThread</span>(&amp;thread);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在子线程中启动工作</span></span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;thread, &amp;QThread::started, &amp;worker, &amp;Worker::doWork);</span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;thread, &amp;QThread::finished, &amp;worker, &amp;QObject::deleteLater);</span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;thread, &amp;QThread::finished, &amp;thread, &amp;QObject::deleteLater);</span><br><span class="line"></span><br><span class="line">    thread.<span class="built_in">start</span>();  <span class="comment">// 启动线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> a.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>优点</strong>：这种方式使得工作对象可以与信号槽机制结合得更好，<code>QThread</code> 仅负责线程管理，实际的任务执行由工作对象处理。</p>
-<h3 id="3-信号与槽的线程安全性"><a href="#3-信号与槽的线程安全性" class="headerlink" title="3. 信号与槽的线程安全性"></a>3. <strong>信号与槽的线程安全性</strong></h3><ul>
-<li><p>在 Qt 中，不同线程中的信号与槽可以跨线程连接。当信号和槽位于不同线程时，Qt 会自动将信号的发送和槽的调用封装为异步事件，通过事件循环来处理。这意味着跨线程的信号槽连接是线程安全的。</p>
-</li>
-<li><p>线程间的信号槽连接默认是异步的（<code>Qt::QueuedConnection</code>），即信号被发送时不会立即调用槽函数，而是将其加入事件队列，等待事件循环调度。你也可以显式指定连接类型，如 <code>Qt::DirectConnection</code>，来使得信号和槽在同一线程中同步执行。</p>
-</li>
+<h4 id="3-1-直接使用静态方法"><a href="#3-1-直接使用静态方法" class="headerlink" title="3.1 直接使用静态方法"></a>3.1 直接使用静态方法</h4><ul>
+<li><p>**<code>QTimer::singleShot(int msec, const QObject *receiver, const char *member)</code>**：<br>这是一个静态方法，适合用于只需要延迟执行一次的操作。它会在指定时间后发出信号并调用连接的槽函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QTimer::<span class="built_in">singleShot</span>(<span class="number">2000</span>, <span class="keyword">this</span>, <span class="built_in">SLOT</span>(<span class="built_in">doSomething</span>())); <span class="comment">// 2秒后调用槽函数 doSomething()</span></span><br></pre></td></tr></table></figure></li>
 </ul>
-<h3 id="4-线程中的事件循环"><a href="#4-线程中的事件循环" class="headerlink" title="4. 线程中的事件循环"></a>4. <strong>线程中的事件循环</strong></h3><p><code>QThread</code> 中的事件循环使得线程可以处理信号、定时器等事件。默认情况下，<code>QThread::run()</code> 方法启动的线程没有事件循环，必须手动调用 <code>exec()</code> 以启动事件循环。</p>
-<p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyThread</span> : <span class="keyword">public</span> QThread &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="built_in">exec</span>();  <span class="comment">// 启动事件循环</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="3-2-创建-QTimer-对象"><a href="#3-2-创建-QTimer-对象" class="headerlink" title="3.2 创建 QTimer 对象"></a>3.2 创建 <code>QTimer</code> 对象</h4><p>你可以创建一个 <code>QTimer</code> 对象并手动控制它的启动、停止和触发。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTimer&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyObject</span> : <span class="keyword">public</span> QObject &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyObject</span>() &#123;</span><br><span class="line">        <span class="comment">// 创建定时器</span></span><br><span class="line">        timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(<span class="keyword">this</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 连接定时器的超时信号到槽函数</span></span><br><span class="line">        <span class="built_in">connect</span>(timer, &amp;QTimer::timeout, <span class="keyword">this</span>, &amp;MyObject::onTimeout);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置定时器为循环模式，每隔1秒触发一次</span></span><br><span class="line">        timer-&gt;<span class="built_in">start</span>(<span class="number">1000</span>); <span class="comment">// 1000毫秒 = 1秒</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onTimeout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Timer triggered!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    QTimer *timer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<h3 id="5-线程生命周期管理"><a href="#5-线程生命周期管理" class="headerlink" title="5. 线程生命周期管理"></a>5. <strong>线程生命周期管理</strong></h3><ul>
-<li><strong>启动线程</strong>：使用 <code>start()</code> 启动线程。</li>
-<li><strong>停止线程</strong>：调用 <code>quit()</code> 退出事件循环，然后使用 <code>wait()</code> 等待线程结束。</li>
-<li><strong>线程结束后自动清理</strong>：可以通过连接 <code>QThread::finished</code> 信号到 <code>QObject::deleteLater</code> 来自动清理线程对象。</li>
+<h3 id="4-单次定时器与循环定时器"><a href="#4-单次定时器与循环定时器" class="headerlink" title="4. 单次定时器与循环定时器"></a>4. <strong>单次定时器与循环定时器</strong></h3><ul>
+<li><p><strong>单次定时器</strong>：在 <code>QTimer</code> 中可以通过设置 <code>setSingleShot(true)</code> 或使用 <code>QTimer::singleShot()</code> 来实现单次定时器。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QTimer *timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(<span class="keyword">this</span>);</span><br><span class="line">timer-&gt;<span class="built_in">setSingleShot</span>(<span class="literal">true</span>);  <span class="comment">// 设置为单次定时器</span></span><br><span class="line">timer-&gt;<span class="built_in">start</span>(<span class="number">2000</span>);  <span class="comment">// 2秒后触发</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>循环定时器</strong>：默认情况下，<code>QTimer</code> 是循环定时器，即每隔指定的时间间隔触发一次。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QTimer *timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(<span class="keyword">this</span>);</span><br><span class="line">timer-&gt;<span class="built_in">start</span>(<span class="number">1000</span>);  <span class="comment">// 每隔1秒触发</span></span><br></pre></td></tr></table></figure></li>
 </ul>
-<h3 id="6-常见问题与注意事项"><a href="#6-常见问题与注意事项" class="headerlink" title="6. 常见问题与注意事项"></a>6. <strong>常见问题与注意事项</strong></h3><ul>
-<li><strong>UI 操作必须在主线程</strong>：Qt 的 GUI 元素必须在主线程中操作，如果在子线程中直接访问 GUI 会导致崩溃。</li>
-<li><strong>对象的生命周期管理</strong>：在使用 <code>moveToThread()</code> 时，要确保对象在其所属线程中被创建和销毁，以避免线程间的对象访问问题。</li>
-<li><strong>避免阻塞主线程</strong>：长时间的计算或 IO 操作应放到子线程中，以保持主线程（UI 线程）的响应性。</li>
+<h3 id="5-定时器的精度"><a href="#5-定时器的精度" class="headerlink" title="5. 定时器的精度"></a>5. <strong>定时器的精度</strong></h3><ul>
+<li><code>QTimer</code> 是基于 Qt 事件循环的，因此它的精度受限于系统的事件调度机制。在处理复杂的 UI 或繁重任务时，定时器的精度可能受到影响。通常情况下，<code>QTimer</code> 可以提供毫秒级的精度，但并不适用于需要严格实时性的场景。</li>
+</ul>
+<h3 id="6-定时器的线程安全性"><a href="#6-定时器的线程安全性" class="headerlink" title="6. 定时器的线程安全性"></a>6. <strong>定时器的线程安全性</strong></h3><ul>
+<li><code>QTimer</code> 必须在其所属的线程中使用。如果你在多线程环境中使用定时器，确保定时器与其所在的线程一致。可以使用 <code>QTimer</code> 和 <code>QThread</code> 的组合来在子线程中处理定时任务。</li>
 </ul>
 <h3 id="7-常见用例"><a href="#7-常见用例" class="headerlink" title="7. 常见用例"></a>7. <strong>常见用例</strong></h3><ul>
-<li>在后台执行耗时任务，如文件读写、网络请求、数据处理等。</li>
-<li>使用定时器在子线程中定期执行任务。</li>
-<li>在子线程中处理异步操作并通过信号槽通知主线程结果。</li>
+<li><strong>动画刷新</strong>：通过定时器定期更新 UI 元素的状态。</li>
+<li><strong>定时任务</strong>：在应用程序中定时执行某些任务，例如自动保存、定时更新数据等。</li>
+<li><strong>延迟操作</strong>：在特定时间后执行某一操作，如提示信息延迟消失。</li>
 </ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>QThread</code> 是 Qt 中实现多线程编程的重要工具。尽管可以通过继承 <code>QThread</code> 来实现自定义线程，但推荐的方式是使用工作者线程模型，将任务放到一个独立的 <code>QObject</code> 中并移动到线程执行。这种方式更符合 Qt 的设计理念，并且更易于管理复杂的信号槽连接与对象生命周期。</p>
+<h3 id="8-QTimer-示例"><a href="#8-QTimer-示例" class="headerlink" title="8. QTimer 示例"></a>8. <strong>QTimer 示例</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QMainWindow&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTimer&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QLabel&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">a</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QMainWindow mainWindow;</span><br><span class="line">    QLabel *label = <span class="keyword">new</span> <span class="built_in">QLabel</span>(<span class="string">&quot;Hello, Qt!&quot;</span>, &amp;mainWindow);</span><br><span class="line">    mainWindow.<span class="built_in">setCentralWidget</span>(label);</span><br><span class="line"></span><br><span class="line">    QTimer *timer = <span class="keyword">new</span> <span class="built_in">QTimer</span>(&amp;mainWindow);</span><br><span class="line">    QObject::<span class="built_in">connect</span>(timer, &amp;QTimer::timeout, [&amp;]() &#123;</span><br><span class="line">        label-&gt;<span class="built_in">setText</span>(<span class="string">&quot;Timer triggered!&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    timer-&gt;<span class="built_in">start</span>(<span class="number">2000</span>); <span class="comment">// 2秒后触发</span></span><br><span class="line"></span><br><span class="line">    mainWindow.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> a.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>QTimer</code> 是一个强大且灵活的定时工具，在 Qt 开发中广泛用于管理定时任务。它与 Qt 的信号和槽机制紧密集成，使得处理异步操作和事件驱动编程变得更加容易。无论是周期性操作还是一次性延迟操作，<code>QTimer</code> 都能够提供理想的解决方案。</p>
 
       
     </div>
@@ -3997,7 +4150,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">628</span>
+          <span class="site-state-item-count">629</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
