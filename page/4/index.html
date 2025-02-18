@@ -191,6 +191,307 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-Output/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-Output/" class="post-title-link" itemprop="url">ov::Output</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2025-01-05 09:00:00 / Modified: 13:18:59" itemprop="dateCreated datePublished" datetime="2025-01-05T09:00:00+08:00">2025-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ov-Output-详解"><a href="#ov-Output-详解" class="headerlink" title="ov::Output 详解"></a>ov::Output 详解</h2><p><code>ov::Output</code> 是 OpenVINO 中的一个核心类，用于表示模型图中节点的输出。它封装了一个节点的输出端口，允许用户访问输出的形状、数据类型以及与其他节点的连接信息。通过 <code>ov::Output</code>，可以在计算图中导航并操作节点间的连接。</p>
+<hr>
+<h2 id="核心功能"><a href="#核心功能" class="headerlink" title="核心功能"></a><strong>核心功能</strong></h2><ol>
+<li><p><strong>表示节点的输出端口</strong><br>每个 <code>ov::Node</code> 可能有一个或多个输出端口，<code>ov::Output</code> 表示其中一个端口。</p>
+</li>
+<li><p><strong>获取元信息</strong><br>包括输出的形状、数据类型和元素类型等。</p>
+</li>
+<li><p><strong>管理连接关系</strong><br>用于查看输出与哪些节点的输入相连接。</p>
+</li>
+<li><p><strong>支持模板化</strong><br><code>ov::Output&lt;T&gt;</code> 可以作用于不同类型的节点，例如 <code>ov::Node</code> 或 <code>ov::Function</code>。</p>
+</li>
+</ol>
+<hr>
+<h2 id="创建和使用-ov-Output"><a href="#创建和使用-ov-Output" class="headerlink" title="创建和使用 ov::Output"></a><strong>创建和使用 <code>ov::Output</code></strong></h2><p>通常，<code>ov::Output</code> 是从 <code>ov::Node</code> 的 <code>outputs()</code> 方法或 <code>output(i)</code> 方法获取的，而不是直接创建。</p>
+<h3 id="获取节点的输出"><a href="#获取节点的输出" class="headerlink" title="获取节点的输出"></a><strong>获取节点的输出</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取节点的第一个输出</span></span><br><span class="line">ov::Output&lt;ov::Node&gt; output = node-&gt;<span class="built_in">output</span>(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="主要方法和属性"><a href="#主要方法和属性" class="headerlink" title="主要方法和属性"></a><strong>主要方法和属性</strong></h2><p>以下是 <code>ov::Output</code> 的常用方法及其功能：</p>
+<h3 id="1-获取输出形状"><a href="#1-获取输出形状" class="headerlink" title="1. 获取输出形状"></a><strong>1. 获取输出形状</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ov::Shape shape = output.<span class="built_in">get_shape</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Shape: &quot;</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; dim : shape) &#123;</span><br><span class="line">    std::cout &lt;&lt; dim &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line">std::cout &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回输出的静态形状（<code>ov::Shape</code>）。</li>
+</ul>
+<h3 id="2-获取数据类型"><a href="#2-获取数据类型" class="headerlink" title="2. 获取数据类型"></a><strong>2. 获取数据类型</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ov::element::Type type = output.<span class="built_in">get_element_type</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Data type: &quot;</span> &lt;&lt; type &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回输出的数据类型（例如 <code>f32</code>、<code>i32</code> 等）。</li>
+</ul>
+<h3 id="3-检查输出是否为动态形状"><a href="#3-检查输出是否为动态形状" class="headerlink" title="3. 检查输出是否为动态形状"></a><strong>3. 检查输出是否为动态形状</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (output.<span class="built_in">get_partial_shape</span>().<span class="built_in">is_dynamic</span>()) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Output has a dynamic shape.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>get_partial_shape()</code> 检查是否为动态形状。</li>
+</ul>
+<h3 id="4-获取连接的输入"><a href="#4-获取连接的输入" class="headerlink" title="4. 获取连接的输入"></a><strong>4. 获取连接的输入</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; target_input : output.<span class="built_in">get_target_inputs</span>()) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Connected to input of node: &quot;</span> </span><br><span class="line">              &lt;&lt; target_input.<span class="built_in">get_node</span>()-&gt;<span class="built_in">get_friendly_name</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>get_target_inputs()</code> 返回所有连接到该输出的输入端口。</li>
+</ul>
+<h3 id="5-获取输出所属的节点"><a href="#5-获取输出所属的节点" class="headerlink" title="5. 获取输出所属的节点"></a><strong>5. 获取输出所属的节点</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> owner_node = output.<span class="built_in">get_node</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Output belongs to node: &quot;</span> </span><br><span class="line">          &lt;&lt; owner_node-&gt;<span class="built_in">get_friendly_name</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>get_node()</code> 返回该输出所属的节点。</li>
+</ul>
+<h3 id="6-设置输出名称"><a href="#6-设置输出名称" class="headerlink" title="6. 设置输出名称"></a><strong>6. 设置输出名称</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">output.<span class="built_in">set_names</span>(&#123;<span class="string">&quot;custom_output_name&quot;</span>&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置输出的自定义名称，便于识别和访问。</li>
+</ul>
+<hr>
+<h2 id="动态修改模型图"><a href="#动态修改模型图" class="headerlink" title="动态修改模型图"></a><strong>动态修改模型图</strong></h2><p>通过 <code>ov::Output</code>，可以修改计算图中节点的连接关系。</p>
+<h3 id="1-替换输出连接"><a href="#1-替换输出连接" class="headerlink" title="1. 替换输出连接"></a><strong>1. 替换输出连接</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ov::Output&lt;ov::Node&gt; new_output = some_other_node-&gt;<span class="built_in">output</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 替换当前输出与新输出的连接</span></span><br><span class="line">ov::<span class="built_in">replace_output</span>(output, new_output);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-添加新连接"><a href="#2-添加新连接" class="headerlink" title="2. 添加新连接"></a><strong>2. 添加新连接</strong></h3><p>可以将一个输出连接到多个输入节点：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">output.<span class="built_in">add_target_input</span>(new_node-&gt;<span class="built_in">input</span>(<span class="number">0</span>));</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="实际应用示例"><a href="#实际应用示例" class="headerlink" title="实际应用示例"></a><strong>实际应用示例</strong></h2><p>以下示例展示了如何遍历模型节点的输出，并动态修改模型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ov::Core core;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载模型</span></span><br><span class="line">    <span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历模型中的所有节点</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; node : model-&gt;<span class="built_in">get_ops</span>()) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; node-&gt;<span class="built_in">get_output_size</span>(); ++i) &#123;</span><br><span class="line">            ov::Output&lt;ov::Node&gt; output = node-&gt;<span class="built_in">output</span>(i);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 输出节点信息</span></span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;Node: &quot;</span> &lt;&lt; node-&gt;<span class="built_in">get_friendly_name</span>()</span><br><span class="line">                      &lt;&lt; <span class="string">&quot;, Output index: &quot;</span> &lt;&lt; i</span><br><span class="line">                      &lt;&lt; <span class="string">&quot;, Shape: &quot;</span> &lt;&lt; output.<span class="built_in">get_shape</span>()</span><br><span class="line">                      &lt;&lt; <span class="string">&quot;, Type: &quot;</span> &lt;&lt; output.<span class="built_in">get_element_type</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 修改连接（例如替换输出连接）</span></span><br><span class="line">            <span class="keyword">if</span> (output.<span class="built_in">get_element_type</span>() == ov::element::f32) &#123;</span><br><span class="line">                <span class="keyword">auto</span> new_node = std::<span class="built_in">make_shared</span>&lt;ov::op::v0::Relu&gt;(output);</span><br><span class="line">                ov::<span class="built_in">replace_output</span>(output, new_node-&gt;<span class="built_in">output</span>(<span class="number">0</span>));</span><br><span class="line">                std::cout &lt;&lt; <span class="string">&quot;Replaced output with a ReLU node.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 保存修改后的模型</span></span><br><span class="line">    core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>)-&gt;<span class="built_in">export_model</span>(<span class="string">&quot;modified_model.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="高级功能"><a href="#高级功能" class="headerlink" title="高级功能"></a><strong>高级功能</strong></h2><h3 id="使用动态形状的输出"><a href="#使用动态形状的输出" class="headerlink" title="使用动态形状的输出"></a><strong>使用动态形状的输出</strong></h3><p>对于动态形状的输出，可以进一步设置具体形状：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (output.<span class="built_in">get_partial_shape</span>().<span class="built_in">is_dynamic</span>()) &#123;</span><br><span class="line">    output.<span class="built_in">set_partial_shape</span>(&#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取扩展的形状信息"><a href="#获取扩展的形状信息" class="headerlink" title="获取扩展的形状信息"></a><strong>获取扩展的形状信息</strong></h3><p>获取动态形状的约束：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ov::PartialShape partial_shape = output.<span class="built_in">get_partial_shape</span>();</span><br><span class="line"><span class="keyword">if</span> (partial_shape.<span class="built_in">rank</span>().<span class="built_in">is_dynamic</span>()) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Rank is dynamic.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Rank: &quot;</span> &lt;&lt; partial_shape.<span class="built_in">rank</span>().<span class="built_in">get_length</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="性能注意事项"><a href="#性能注意事项" class="headerlink" title="性能注意事项"></a><strong>性能注意事项</strong></h2><ol>
+<li><p><strong>批量操作</strong><br>尽量减少对输出的逐个操作，使用批量方法操作多个节点或输出。</p>
+</li>
+<li><p><strong>减少拷贝</strong><br>使用引用或共享机制避免不必要的输出数据拷贝。</p>
+</li>
+<li><p><strong>动态形状处理</strong><br>在动态模型中，尽量在推理开始前明确所有动态形状。</p>
+</li>
+</ol>
+<hr>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a><strong>常见问题</strong></h2><ol>
+<li><p><strong>动态形状的操作限制</strong><br>对动态形状的输出操作时，需要先设置具体形状，否则部分操作可能失败。</p>
+</li>
+<li><p><strong>数据类型不匹配</strong><br>在连接节点时，确保输出和输入的数据类型一致。</p>
+</li>
+<li><p><strong>输出未连接</strong><br>如果某些输出未连接，可能导致模型推理失败或结果异常。</p>
+</li>
+</ol>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p><code>ov::Output</code> 是 OpenVINO 图操作中的关键类，用于表示和管理节点的输出端口。通过 <code>ov::Output</code>，开发者可以轻松获取输出的元信息，管理节点间的连接关系，并动态修改计算图。熟练掌握 <code>ov::Output</code> 的功能，可以大大提升在 OpenVINO 图操作中的开发效率。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">常见编程技巧</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2025-01-05 09:00:00 / Modified: 13:05:19" itemprop="dateCreated datePublished" datetime="2025-01-05T09:00:00+08:00">2025-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>OpenVINO 常见编程技巧</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-Tensor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-Tensor/" class="post-title-link" itemprop="url">ov::Tensor</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2025-01-05 09:00:00 / Modified: 12:50:49" itemprop="dateCreated datePublished" datetime="2025-01-05T09:00:00+08:00">2025-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>Tensor 类 相关学习笔记</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-Tensor/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-5-Core/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -268,83 +569,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-CompiledModel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-CompiledModel/" class="post-title-link" itemprop="url">ov::CompiledModel</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2025-01-05 09:00:00 / Modified: 12:40:55" itemprop="dateCreated datePublished" datetime="2025-01-05T09:00:00+08:00">2025-01-05</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
-<li>ov::CompiledModel 类 相关学习笔记</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/01/05/notes/DeepLearning/OpenVINO/2025-01-05-CompiledModel/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/01/notes/Personal/2025-01-01-2025%E5%B9%B4%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -376,7 +600,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-02-17 14:25:50" itemprop="dateModified" datetime="2025-02-17T14:25:50+08:00">2025-02-17</time>
+                <time title="Modified: 2025-02-18 14:43:58" itemprop="dateModified" datetime="2025-02-18T14:43:58+08:00">2025-02-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -405,6 +629,83 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/01/01/notes/Personal/2025-01-01-2025%E5%B9%B4%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/31/notes/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/31/notes/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/" class="post-title-link" itemprop="url">推理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-12-31 09:00:00 / Modified: 11:26:27" itemprop="dateCreated datePublished" datetime="2024-12-31T09:00:00+08:00">2024-12-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>深度学习模型部署 推理部分相关学习笔记</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/12/31/notes/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -1051,83 +1352,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/31/notes/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/31/notes/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/" class="post-title-link" itemprop="url">推理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2024-12-31 09:00:00 / Modified: 11:26:27" itemprop="dateCreated datePublished" datetime="2024-12-31T09:00:00+08:00">2024-12-31</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
-<li>深度学习模型部署 推理部分相关学习笔记</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/12/31/notes/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-30-dotnet/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1180,6 +1404,89 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2024/12/30/notes/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-30-dotnet/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/30/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/" class="post-title-link" itemprop="url">Mat</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-30 10:00:00" itemprop="dateCreated datePublished" datetime="2024-12-30T10:00:00+08:00">2024-12-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-31 09:12:08" itemprop="dateModified" datetime="2024-12-31T09:12:08+08:00">2024-12-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>cv::Mat 类相关学习笔记</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/12/30/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -1404,89 +1711,6 @@
 <li><code>cv::Rect</code> 主要用于图像处理中的区域定义、裁剪、目标检测、区域计算等任务，是 OpenCV 中不可或缺的重要类。</li>
 </ul>
 
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/30/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/" class="post-title-link" itemprop="url">Mat</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-12-30 10:00:00" itemprop="dateCreated datePublished" datetime="2024-12-30T10:00:00+08:00">2024-12-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-31 09:12:08" itemprop="dateModified" datetime="2024-12-31T09:12:08+08:00">2024-12-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
-<li>cv::Mat 类相关学习笔记</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/12/30/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
       
     </div>
 
@@ -2063,80 +2287,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/Asio/2024-12-17-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/30/notes/Asio/2024-12-17-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/" class="post-title-link" itemprop="url">官方文档学习手册</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-12-30 09:25:45" itemprop="dateCreated datePublished" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="异步操作流程"><a href="#异步操作流程" class="headerlink" title="异步操作流程"></a>异步操作流程</h2><ul>
-<li><p>初始化连接操作</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.<span class="built_in">async_connect</span>(server_endpoint, your_completion_handler);</span><br></pre></td></tr></table></figure></li>
-<li><p>这个 your_completion_handler 是一个函数或函数对象，其函数签名如下</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">your_completion_handler</span><span class="params">(<span class="type">const</span> asio::error_code&amp; ec)</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>这个IO对象将请求转发给IO执行体</p>
-</li>
-<li><p>IO执行体给操作系统发送一个信号，提示操作系统应该开始一个异步链接</p>
-</li>
-<li><p>当使用 io_context 当作IO执行体时，程序必须调用 io_context::run() 使异步任务的结果可以被接收并处理。当有未完成的异步操作时，调用 io_context::run() 将被阻塞。</p>
-</li>
-<li><p>当你开始第一个异步操作时，就应该调用 io_context::run()</p>
-</li>
-<li><p>在调用 io_context::run() 内部，IO执行体将操作的结果转换为error_code,然后将它传递给 your completion handler</p>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/Asio/2024-12-14-endpoint/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2250,6 +2400,80 @@
 
 <hr>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p><code>asio::ip::tcp::endpoint</code> 是 TCP 通信中的一个核心组件，用于描述通信双方的网络位置。它不仅简单易用，而且与其他 Asio 组件（如 <code>tcp::resolver</code>、<code>tcp::socket</code>）紧密配合，为构建高效的网络程序提供了强大支持。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/Asio/2024-12-17-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/30/notes/Asio/2024-12-17-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/" class="post-title-link" itemprop="url">官方文档学习手册</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-30 09:25:45" itemprop="dateCreated datePublished" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="异步操作流程"><a href="#异步操作流程" class="headerlink" title="异步操作流程"></a>异步操作流程</h2><ul>
+<li><p>初始化连接操作</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.<span class="built_in">async_connect</span>(server_endpoint, your_completion_handler);</span><br></pre></td></tr></table></figure></li>
+<li><p>这个 your_completion_handler 是一个函数或函数对象，其函数签名如下</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">your_completion_handler</span><span class="params">(<span class="type">const</span> asio::error_code&amp; ec)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这个IO对象将请求转发给IO执行体</p>
+</li>
+<li><p>IO执行体给操作系统发送一个信号，提示操作系统应该开始一个异步链接</p>
+</li>
+<li><p>当使用 io_context 当作IO执行体时，程序必须调用 io_context::run() 使异步任务的结果可以被接收并处理。当有未完成的异步操作时，调用 io_context::run() 将被阻塞。</p>
+</li>
+<li><p>当你开始第一个异步操作时，就应该调用 io_context::run()</p>
+</li>
+<li><p>在调用 io_context::run() 内部，IO执行体将操作的结果转换为error_code,然后将它传递给 your completion handler</p>
+</li>
+</ul>
 
       
     </div>
@@ -4221,463 +4445,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/DeepLearning/OpenVINO/2024-12-30-OpenVino/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/30/notes/DeepLearning/OpenVINO/2024-12-30-OpenVino/" class="post-title-link" itemprop="url">OpenVino</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-12-30 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-30T09:00:00+08:00">2024-12-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-01-05 11:53:03" itemprop="dateModified" datetime="2025-01-05T11:53:03+08:00">2025-01-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
-<li>OpenVino 相关学习笔记</li>
-</ul>
-<h2 id="ov-AnyMap-详解"><a href="#ov-AnyMap-详解" class="headerlink" title="ov::AnyMap 详解"></a>ov::AnyMap 详解</h2><p>在 OpenVINO 的 C++ API 中，<code>ov::AnyMap</code> 是一个通用的键值对数据结构，用于设置和传递模型编译或推理时的配置参数。它允许用户通过简单的键值映射来定义特定配置，以便调整推理过程的行为。</p>
-<hr>
-<h2 id="1-ov-AnyMap-的基本概念"><a href="#1-ov-AnyMap-的基本概念" class="headerlink" title="1. ov::AnyMap 的基本概念"></a>1. <strong><code>ov::AnyMap</code> 的基本概念</strong></h2><ul>
-<li><strong>类型</strong>: <code>std::map&lt;std::string, ov::Any&gt;</code> 的别名。</li>
-<li><strong>功能</strong>: 存储键值对，其中键为配置参数的名称，值为 <code>ov::Any</code> 类型，用于支持不同类型的参数值。</li>
-<li><strong>用途</strong>:<ul>
-<li>配置推理设备的行为（如线程数、性能模式）。</li>
-<li>设置优化参数（如批处理大小、输入精度等）。</li>
-<li>传递插件特定的自定义配置。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="2-创建和使用"><a href="#2-创建和使用" class="headerlink" title="2. 创建和使用"></a>2. <strong>创建和使用</strong></h2><p><code>ov::AnyMap</code> 是可选配置的一部分，通常在调用 <code>ov::Core::compile_model</code> 或类似方法时使用。</p>
-<h3 id="创建一个-ov-AnyMap"><a href="#创建一个-ov-AnyMap" class="headerlink" title="创建一个 ov::AnyMap"></a><strong>创建一个 <code>ov::AnyMap</code></strong></h3><p>以下是创建和设置 <code>ov::AnyMap</code> 的示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个配置参数的 AnyMap</span></span><br><span class="line">    ov::AnyMap config;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置性能模式</span></span><br><span class="line">    config[ov::hint::performance_mode.<span class="built_in">name</span>()] = ov::hint::PerformanceMode::THROUGHPUT;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置线程数</span></span><br><span class="line">    config[ov::inference_num_threads.<span class="built_in">name</span>()] = <span class="number">8</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置流数量</span></span><br><span class="line">    config[ov::num_streams.<span class="built_in">name</span>()] = <span class="string">&quot;AUTO&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用-ov-AnyMap"><a href="#使用-ov-AnyMap" class="headerlink" title="使用 ov::AnyMap"></a><strong>使用 <code>ov::AnyMap</code></strong></h3><p>通过 <code>ov::Core</code> 编译模型时传入 <code>ov::AnyMap</code>：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载模型</span></span><br><span class="line"><span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用配置编译模型</span></span><br><span class="line"><span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>, config);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="3-ov-Any-的特性"><a href="#3-ov-Any-的特性" class="headerlink" title="3. ov::Any 的特性"></a>3. <strong><code>ov::Any</code> 的特性</strong></h2><p><code>ov::Any</code> 是一个多态类型，支持存储任意类型的值。常见的值类型包括：</p>
-<ul>
-<li>整数 (<code>int</code>)</li>
-<li>浮点数 (<code>float</code>, <code>double</code>)</li>
-<li>字符串 (<code>std::string</code>)</li>
-<li>枚举类型（如 <code>ov::hint::PerformanceMode</code>）</li>
-<li>布尔值 (<code>bool</code>)</li>
-</ul>
-<p>使用 <code>ov::Any</code> 时，自动处理值类型，例如：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置不同类型的值</span></span><br><span class="line">ov::AnyMap config;</span><br><span class="line">config[<span class="string">&quot;threads&quot;</span>] = <span class="number">4</span>; <span class="comment">// int</span></span><br><span class="line">config[<span class="string">&quot;enable_profiling&quot;</span>] = <span class="literal">true</span>; <span class="comment">// bool</span></span><br><span class="line">config[<span class="string">&quot;device&quot;</span>] = std::<span class="built_in">string</span>(<span class="string">&quot;CPU&quot;</span>); <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="4-常见配置参数"><a href="#4-常见配置参数" class="headerlink" title="4. 常见配置参数"></a>4. <strong>常见配置参数</strong></h2><p>以下是 OpenVINO 支持的一些常见配置参数：</p>
-<table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>值类型</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>ov::hint::performance_mode</code></td>
-<td><code>ov::hint::PerformanceMode</code></td>
-<td>性能优化模式，如延迟或吞吐量优化。</td>
-</tr>
-<tr>
-<td><code>ov::inference_num_threads</code></td>
-<td><code>int</code></td>
-<td>推理线程数。</td>
-</tr>
-<tr>
-<td><code>ov::num_streams</code></td>
-<td><code>std::string</code></td>
-<td>流数量，如 “AUTO”、”1”、”2” 等。</td>
-</tr>
-<tr>
-<td><code>ov::enable_profiling</code></td>
-<td><code>bool</code></td>
-<td>是否启用性能分析。</td>
-</tr>
-<tr>
-<td><code>ov::hint::model_priority</code></td>
-<td><code>ov::hint::Priority</code></td>
-<td>模型优先级设置。</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="5-如何读取配置"><a href="#5-如何读取配置" class="headerlink" title="5. 如何读取配置"></a>5. <strong>如何读取配置</strong></h2><p>使用 <code>ov::AnyMap</code> 设置参数后，可以通过以下方式访问参数值：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取配置值</span></span><br><span class="line"><span class="keyword">auto</span> threads = config[<span class="string">&quot;threads&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">int</span>&gt;(); <span class="comment">// 获取 int 类型的线程数</span></span><br><span class="line"><span class="keyword">auto</span> enable_profiling = config[<span class="string">&quot;enable_profiling&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">bool</span>&gt;(); <span class="comment">// 获取 bool 类型的值</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="6-错误处理"><a href="#6-错误处理" class="headerlink" title="6. 错误处理"></a>6. <strong>错误处理</strong></h2><ul>
-<li>如果尝试访问不存在的键，会抛出异常。</li>
-<li>如果类型转换失败（如尝试将 <code>bool</code> 转换为 <code>int</code>），会引发类型错误。</li>
-</ul>
-<p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">auto</span> value = config[<span class="string">&quot;non_existing_key&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">int</span>&gt;();</span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="7-结合设备插件"><a href="#7-结合设备插件" class="headerlink" title="7. 结合设备插件"></a>7. <strong>结合设备插件</strong></h2><p><code>ov::AnyMap</code> 可以传递设备插件特定的配置。例如，针对 GPU：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ov::AnyMap gpu_config = &#123;</span><br><span class="line">    &#123;<span class="string">&quot;CACHE_DIR&quot;</span>, <span class="string">&quot;/path/to/cache&quot;</span>&#125;, <span class="comment">// GPU 缓存目录</span></span><br><span class="line">    &#123;ov::hint::performance_mode.<span class="built_in">name</span>(), ov::hint::PerformanceMode::THROUGHPUT&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;GPU&quot;</span>, gpu_config);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>ov::AnyMap</code> 是 OpenVINO 中灵活且强大的配置工具，用户可以根据需要动态设置和调整推理的行为，优化性能。结合设备特性和推理场景，灵活使用 <code>ov::AnyMap</code> 是提升模型部署效率的重要手段。如果需要针对某个配置参数的具体说明，请进一步告知！</p>
-<h2 id="C-OpenVINO-ov-hint-performance-mode-详解"><a href="#C-OpenVINO-ov-hint-performance-mode-详解" class="headerlink" title="C++ OpenVINO ov::hint::performance_mode 详解"></a>C++ OpenVINO ov::hint::performance_mode 详解</h2><p>在 OpenVINO 的 C++ API 中，<code>ov::hint::performance_mode</code> 是一个用于优化推理性能的设置选项。它允许用户为推理过程选择不同的性能模式，以平衡吞吐量、延迟和设备资源利用率等方面的需求。</p>
-<p>以下是对 <code>ov::hint::performance_mode</code> 的详解：</p>
-<hr>
-<h2 id="1-性能模式的类型"><a href="#1-性能模式的类型" class="headerlink" title="1. 性能模式的类型"></a>1. <strong>性能模式的类型</strong></h2><p><code>ov::hint::performance_mode</code> 支持以下几种模式，每种模式都有其适用场景：</p>
-<h3 id="a-LATENCY"><a href="#a-LATENCY" class="headerlink" title="a. LATENCY"></a><strong>a. <code>LATENCY</code></strong></h3><ul>
-<li><strong>描述</strong>: 优化以降低单次推理的延迟。</li>
-<li><strong>应用场景</strong>:<ul>
-<li>实时应用，如视频分析和在线推理。</li>
-<li>延迟敏感的场景。</li>
-</ul>
-</li>
-</ul>
-<h3 id="b-THROUGHPUT"><a href="#b-THROUGHPUT" class="headerlink" title="b. THROUGHPUT"></a><strong>b. <code>THROUGHPUT</code></strong></h3><ul>
-<li><strong>描述</strong>: 优化以提高设备的整体吞吐量，通常通过增加批处理大小和并行化执行。</li>
-<li><strong>应用场景</strong>:<ul>
-<li>离线批量处理。</li>
-<li>批量推理任务，如图像分类。</li>
-</ul>
-</li>
-</ul>
-<h3 id="c-CUMULATIVE-THROUGHPUT"><a href="#c-CUMULATIVE-THROUGHPUT" class="headerlink" title="c. CUMULATIVE_THROUGHPUT"></a><strong>c. <code>CUMULATIVE_THROUGHPUT</code></strong></h3><ul>
-<li><strong>描述</strong>: 专注于在多次推理任务中累积吞吐量的优化。</li>
-<li><strong>应用场景</strong>:<ul>
-<li>多模型部署。</li>
-<li>并发推理任务的优化。</li>
-</ul>
-</li>
-</ul>
-<h3 id="d-UNDEFINED"><a href="#d-UNDEFINED" class="headerlink" title="d. UNDEFINED"></a><strong>d. <code>UNDEFINED</code></strong></h3><ul>
-<li><strong>描述</strong>: 使用插件的默认性能配置，通常适用于简单场景或不确定优化需求时。</li>
-<li><strong>应用场景</strong>:<ul>
-<li>开发阶段。</li>
-<li>初始实验。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="2-设置方式"><a href="#2-设置方式" class="headerlink" title="2. 设置方式"></a>2. <strong>设置方式</strong></h2><p>通过 <code>ov::Core</code> 或 <code>ov::CompiledModel</code> 对象设置性能模式。以下是示例代码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建 OpenVINO Core 对象</span></span><br><span class="line">    ov::Core core;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载模型</span></span><br><span class="line">    <span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 配置性能模式</span></span><br><span class="line">    ov::AnyMap config = &#123;</span><br><span class="line">        &#123;ov::hint::performance_mode, ov::hint::PerformanceMode::LATENCY&#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 编译模型并应用配置</span></span><br><span class="line">    <span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>, config);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行推理</span></span><br><span class="line">    <span class="keyword">auto</span> infer_request = compiled_model.<span class="built_in">create_infer_request</span>();</span><br><span class="line">    <span class="comment">// 推理逻辑...</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="3-性能模式的影响"><a href="#3-性能模式的影响" class="headerlink" title="3. 性能模式的影响"></a>3. <strong>性能模式的影响</strong></h2><p>性能模式主要通过以下方式影响推理行为：</p>
-<ul>
-<li><strong>线程优化</strong>: 调整计算线程数、绑定策略等。</li>
-<li><strong>批量处理</strong>: 增加或减少批处理大小。</li>
-<li><strong>并行化策略</strong>: 优化并行计算的粒度和线程分配。</li>
-</ul>
-<hr>
-<h2 id="4-最佳实践"><a href="#4-最佳实践" class="headerlink" title="4. 最佳实践"></a>4. <strong>最佳实践</strong></h2><ul>
-<li>在实时系统中，优先选择 <code>LATENCY</code>。</li>
-<li>离线任务或批量处理，选择 <code>THROUGHPUT</code>。</li>
-<li>如果部署多个模型，选择 <code>CUMULATIVE_THROUGHPUT</code>。</li>
-<li>开发和测试阶段，可以先使用 <code>UNDEFINED</code>，然后根据实际需求调整。</li>
-</ul>
-<hr>
-<h2 id="5-设备支持"><a href="#5-设备支持" class="headerlink" title="5. 设备支持"></a>5. <strong>设备支持</strong></h2><p>不同的设备插件（如 CPU、GPU、VPU 等）可能对性能模式的支持有细微差异。例如：</p>
-<ul>
-<li><strong>CPU</strong>: 支持所有性能模式，并提供多线程优化。</li>
-<li><strong>GPU</strong>: 注重吞吐量优化，但延迟模式下可能受到硬件约束。</li>
-<li><strong>VPU</strong>: 通常用于低功耗场景，优化吞吐量和延迟的权衡。</li>
-</ul>
-<p>了解设备特性和任务需求，有助于更好地选择性能模式。</p>
-<hr>
-<p>如果你有具体问题或需要针对某个场景的配置示例，请告诉我！</p>
-<h2 id="OpenVINO-windows下环境配置教程"><a href="#OpenVINO-windows下环境配置教程" class="headerlink" title="OpenVINO windows下环境配置教程"></a>OpenVINO windows下环境配置教程</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://docs.openvino.ai/2024/get-started/install-openvino/install-openvino-archive-windows.html">OpenVINO 安装指南</a></li>
-</ul>
-<h2 id="OpenVino-是什么"><a href="#OpenVino-是什么" class="headerlink" title="OpenVino 是什么"></a>OpenVino 是什么</h2><p>OpenVINO（Open Visual Inference and Neural Network Optimization）是一个由 <strong>Intel</strong> 提供的开源工具包，旨在加速深度学习模型的推理和优化，特别是在 Intel 硬件（如 CPU、GPU、FPGA 和 VPU）上的性能表现。它主要用于计算机视觉应用，但也支持其他类型的 AI 工作负载。</p>
-<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><ol>
-<li><p><strong>模型优化</strong><br>OpenVINO 提供了模型优化器（Model Optimizer），可以将各种深度学习框架（如 TensorFlow、PyTorch、ONNX、Caffe 等）训练的模型转换为 OpenVINO 的中间表示格式（IR Format）。这可以帮助简化模型并提升推理效率。</p>
-</li>
-<li><p><strong>硬件加速</strong><br>支持在多种 Intel 硬件上运行，包括：  </p>
-<ul>
-<li>Intel CPU（尤其是使用了 AVX 和其他指令集优化）  </li>
-<li>Intel 集成显卡（GPU）  </li>
-<li>Intel Movidius VPU（视觉处理单元）  </li>
-<li>Intel FPGA（可编程逻辑门阵列）</li>
-</ul>
-</li>
-<li><p><strong>高效推理引擎</strong><br>OpenVINO 提供了推理引擎，可以通过异构计算同时利用多种硬件的优势，最大化推理性能。</p>
-</li>
-<li><p><strong>预训练模型和工具支持</strong><br>包括预训练的模型库（Open Model Zoo），以及一些便捷的 API 和开发工具，用于快速开发 AI 应用。</p>
-</li>
-<li><p><strong>跨平台支持</strong><br>OpenVINO 支持在各种操作系统上运行，包括 Linux、Windows 和 macOS。</p>
-</li>
-</ol>
-<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
-<li><strong>计算机视觉</strong>：如目标检测、图像分类、语义分割、人脸识别等。</li>
-<li><strong>视频分析</strong>：如实时监控、行为分析、视频内容理解等。</li>
-<li><strong>自然语言处理（NLP）</strong>：尽管主要面向视觉任务，但 OpenVINO 也支持 NLP 模型的优化和推理。</li>
-<li><strong>嵌入式 AI</strong>：在资源受限的设备（如边缘设备）上运行优化的 AI 模型。</li>
-</ul>
-<h3 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h3><ol>
-<li>提高推理速度，降低延迟。</li>
-<li>支持多种硬件，灵活适应不同的部署需求。</li>
-<li>开源且有丰富的文档和社区支持。</li>
-<li>提供易用的 API，适合快速开发。</li>
-</ol>
-<p>如果你正在开发需要部署深度学习模型的应用，并且目标硬件是 Intel 平台，OpenVINO 是一个非常合适的选择。</p>
-<h2 id="OpenVino-推理框架-详解"><a href="#OpenVino-推理框架-详解" class="headerlink" title="OpenVino 推理框架 详解"></a>OpenVino 推理框架 详解</h2><p>OpenVINO 的推理框架（Inference Framework）是 OpenVINO 工具包的核心组件之一，它负责高效地执行优化后的深度学习模型推理。以下是 OpenVINO 推理框架的详细解析：</p>
-<hr>
-<h3 id="1-核心组件"><a href="#1-核心组件" class="headerlink" title="1. 核心组件"></a><strong>1. 核心组件</strong></h3><h4 id="1-模型优化器（Model-Optimizer）"><a href="#1-模型优化器（Model-Optimizer）" class="headerlink" title="(1) 模型优化器（Model Optimizer）"></a><strong>(1) 模型优化器（Model Optimizer）</strong></h4><ul>
-<li>将训练好的深度学习模型转换为 OpenVINO 的中间表示（Intermediate Representation，IR）格式。</li>
-<li><strong>输入支持：</strong><ul>
-<li>支持多种框架的模型，包括 TensorFlow、PyTorch、ONNX、Caffe 等。</li>
-</ul>
-</li>
-<li><strong>优化方式：</strong><ul>
-<li>图形优化（删除冗余运算节点）。</li>
-<li>数据类型精简（如 FP32 转换为 FP16）。</li>
-<li>插入专为 Intel 硬件设计的高效计算指令。</li>
-</ul>
-</li>
-</ul>
-<h4 id="2-推理引擎（Inference-Engine）"><a href="#2-推理引擎（Inference-Engine）" class="headerlink" title="(2) 推理引擎（Inference Engine）"></a><strong>(2) 推理引擎（Inference Engine）</strong></h4><ul>
-<li>核心执行模块，负责加载优化后的 IR 模型并在目标硬件上高效运行。</li>
-<li><strong>功能：</strong><ul>
-<li>提供统一的 API 接口，支持多种硬件。</li>
-<li>实现同步和异步推理（适用于实时和离线场景）。</li>
-<li>自动分配推理负载到多个设备（如 CPU 和 GPU 同时工作）。</li>
-</ul>
-</li>
-<li><strong>主要模块：</strong><ul>
-<li><strong>核心对象（Core API）：</strong> 用于加载模型和配置设备。</li>
-<li><strong>插件架构：</strong> 针对不同硬件有特定插件，如 CPU 插件、GPU 插件、VPU 插件。</li>
-</ul>
-</li>
-</ul>
-<h4 id="3-硬件支持层（Hardware-Abstraction-Layer）"><a href="#3-硬件支持层（Hardware-Abstraction-Layer）" class="headerlink" title="(3) 硬件支持层（Hardware Abstraction Layer）"></a><strong>(3) 硬件支持层（Hardware Abstraction Layer）</strong></h4><ul>
-<li>提供针对 Intel 硬件优化的指令集（如 AVX、VNNI）。</li>
-<li>支持的设备包括：<ul>
-<li>CPU（使用线程优化和向量化技术）。</li>
-<li>GPU（集成 GPU 的 OpenCL 加速）。</li>
-<li>VPU（Movidius 芯片）。</li>
-<li>FPGA（灵活可编程硬件）。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="2-工作流程"><a href="#2-工作流程" class="headerlink" title="2. 工作流程"></a><strong>2. 工作流程</strong></h3><ol>
-<li><strong>模型准备</strong><ul>
-<li>从训练框架导出模型（如 <code>.pb</code>、<code>.onnx</code>、<code>.caffemodel</code>）。</li>
-<li>使用模型优化器将模型转换为 IR 格式（包括 <code>.xml</code> 和 <code>.bin</code> 文件）。</li>
-</ul>
-</li>
-<li><strong>加载模型</strong><ul>
-<li>使用推理引擎的 Core API 加载 IR 模型到指定设备。</li>
-</ul>
-</li>
-<li><strong>预处理</strong><ul>
-<li>调整输入数据的格式（如大小、数据类型、归一化等）。</li>
-</ul>
-</li>
-<li><strong>推理执行</strong><ul>
-<li>调用推理引擎执行推理操作（支持同步或异步）。</li>
-</ul>
-</li>
-<li><strong>后处理</strong><ul>
-<li>对推理结果进行解码或进一步处理（如 NMS、标签映射等）。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="3-编程接口"><a href="#3-编程接口" class="headerlink" title="3. 编程接口"></a><strong>3. 编程接口</strong></h3><h4 id="1-Python-API"><a href="#1-Python-API" class="headerlink" title="(1) Python API"></a><strong>(1) Python API</strong></h4><ul>
-<li>简单易用，适合快速开发和原型验证。</li>
-<li>样例代码：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> openvino.runtime <span class="keyword">import</span> Core</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Core</span></span><br><span class="line">core = Core()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载模型</span></span><br><span class="line">model = core.read_model(model=<span class="string">&quot;model.xml&quot;</span>)</span><br><span class="line">compiled_model = core.compile_model(model=model, device_name=<span class="string">&quot;CPU&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推理</span></span><br><span class="line">input_data = ...  <span class="comment"># 预处理后的输入数据</span></span><br><span class="line">results = compiled_model([input_data])</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h4 id="2-C-API"><a href="#2-C-API" class="headerlink" title="(2) C++ API"></a><strong>(2) C++ API</strong></h4><ul>
-<li>性能更高，适合生产级部署。</li>
-<li>样例代码：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ov::Core core;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载模型</span></span><br><span class="line">    <span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line">    <span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 推理</span></span><br><span class="line">    ov::InferRequest infer_request = compiled_model.<span class="built_in">create_infer_request</span>();</span><br><span class="line">    infer_request.<span class="built_in">set_input_tensor</span>(...);  <span class="comment">// 设置输入</span></span><br><span class="line">    infer_request.<span class="built_in">infer</span>();</span><br><span class="line">    <span class="keyword">auto</span> output = infer_request.<span class="built_in">get_output_tensor</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h3 id="4-支持的推理模式"><a href="#4-支持的推理模式" class="headerlink" title="4. 支持的推理模式"></a><strong>4. 支持的推理模式</strong></h3><h4 id="1-同步推理"><a href="#1-同步推理" class="headerlink" title="(1) 同步推理"></a><strong>(1) 同步推理</strong></h4><ul>
-<li>简单、顺序执行推理。</li>
-<li>适合离线处理场景。</li>
-</ul>
-<h4 id="2-异步推理"><a href="#2-异步推理" class="headerlink" title="(2) 异步推理"></a><strong>(2) 异步推理</strong></h4><ul>
-<li>非阻塞模式，可以在等待推理结果时并行执行其他任务。</li>
-<li>适合实时场景，如视频流分析。</li>
-</ul>
-<hr>
-<h3 id="5-优化特性"><a href="#5-优化特性" class="headerlink" title="5. 优化特性"></a><strong>5. 优化特性</strong></h3><h4 id="1-混合精度推理"><a href="#1-混合精度推理" class="headerlink" title="(1) 混合精度推理"></a><strong>(1) 混合精度推理</strong></h4><ul>
-<li>支持 FP32、FP16 和 INT8 的混合精度计算。</li>
-<li>使用 INT8 精度进一步提升性能，同时减少计算和内存开销。</li>
-</ul>
-<h4 id="2-多设备推理"><a href="#2-多设备推理" class="headerlink" title="(2) 多设备推理"></a><strong>(2) 多设备推理</strong></h4><ul>
-<li>使用 Heterogeneous Plugin 实现负载均衡。</li>
-<li>自动调度任务到最佳设备。</li>
-</ul>
-<h4 id="3-自定义层扩展"><a href="#3-自定义层扩展" class="headerlink" title="(3) 自定义层扩展"></a><strong>(3) 自定义层扩展</strong></h4><ul>
-<li>支持用户定义的自定义操作，适配特定模型需求。</li>
-</ul>
-<hr>
-<h3 id="6-应用场景"><a href="#6-应用场景" class="headerlink" title="6. 应用场景"></a><strong>6. 应用场景</strong></h3><ol>
-<li><strong>实时视频分析</strong>（如安防监控、人流统计）。</li>
-<li><strong>工业自动化</strong>（如缺陷检测、机器人视觉）。</li>
-<li><strong>医疗影像处理</strong>（如肿瘤检测）。</li>
-<li><strong>嵌入式 AI</strong>（如无人机、智能家居设备）。</li>
-</ol>
-<hr>
-<h3 id="7-常用工具"><a href="#7-常用工具" class="headerlink" title="7. 常用工具"></a><strong>7. 常用工具</strong></h3><h4 id="1-Open-Model-Zoo"><a href="#1-Open-Model-Zoo" class="headerlink" title="(1) Open Model Zoo"></a><strong>(1) Open Model Zoo</strong></h4><ul>
-<li>提供大量预训练模型，如 ResNet、YOLO、SSD。</li>
-<li>方便快速测试和验证。</li>
-</ul>
-<h4 id="2-Benchmark-Tool"><a href="#2-Benchmark-Tool" class="headerlink" title="(2) Benchmark Tool"></a><strong>(2) Benchmark Tool</strong></h4><ul>
-<li>测试模型在目标硬件上的性能。</li>
-</ul>
-<h4 id="3-Post-Training-Optimization-Toolkit-POT"><a href="#3-Post-Training-Optimization-Toolkit-POT" class="headerlink" title="(3) Post-Training Optimization Toolkit (POT)"></a><strong>(3) Post-Training Optimization Toolkit (POT)</strong></h4><ul>
-<li>支持后量化（Post-training Quantization），提升推理性能。</li>
-</ul>
-<hr>
-<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>OpenVINO 推理框架通过模型优化器和推理引擎，实现高效的深度学习模型推理。其支持多种硬件设备，并提供丰富的优化选项，适用于多种 AI 应用场景，是一个功能强大、灵活且高效的推理工具。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/29/notes/Personal/2024-12-29-AI%E9%83%A8%E7%BD%B2%E5%B7%A5%E7%A8%8B%E5%B8%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/29/notes/Personal/2024-12-29-AI%E9%83%A8%E7%BD%B2%E5%B7%A5%E7%A8%8B%E5%B8%88/" class="post-title-link" itemprop="url">AI部署工程师</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-12-29 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-29T09:00:00+08:00">2024-12-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-31 09:12:10" itemprop="dateModified" datetime="2024-12-31T09:12:10+08:00">2024-12-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Personal/" itemprop="url" rel="index"><span itemprop="name">Personal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
-<li>AI部署工程师相关岗位的信息收集</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/12/29/notes/Personal/2024-12-29-AI%E9%83%A8%E7%BD%B2%E5%B7%A5%E7%A8%8B%E5%B8%88/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -4747,7 +4514,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">629</span>
+          <span class="site-state-item-count">628</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -4760,7 +4527,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-count">94</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

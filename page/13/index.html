@@ -191,790 +191,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/NVIDIA/2024-05-22-nvidia_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/NVIDIA/2024-05-22-nvidia_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">nvidia_2_常用函数</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NVIDIA/" itemprop="url" rel="index"><span itemprop="name">NVIDIA</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="nvjpegBackend-t"><a href="#nvjpegBackend-t" class="headerlink" title="nvjpegBackend_t"></a>nvjpegBackend_t</h3><ul>
-<li>简述：<ul>
-<li><code>NVJPEG_BACKEND_DEFAULT</code>  –  默认值</li>
-<li><code>NVJPEG_BACKEND_HYBRID</code>   –  使用CPU进行霍夫曼解码</li>
-<li><code>NVJPEG_BACKEND_GPU_HYBRID</code>  –  使用GPU辅助霍夫曼解码。nvjpegDecodeBatched将使用GPU对基线JPEG比特流进行解码,当批量大小大于100时进行交错扫描</li>
-<li><code>NVJPEG_BACKEND_HARDWARE</code> –  单扫描支持基线JPEG比特流。不支持410和411个子样本</li>
-</ul>
-</li>
-<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">typedef enum </span><br><span class="line">&#123;</span><br><span class="line">    NVJPEG_BACKEND_DEFAULT = 0,</span><br><span class="line">    NVJPEG_BACKEND_HYBRID  = 1,</span><br><span class="line">    NVJPEG_BACKEND_GPU_HYBRID = 2,</span><br><span class="line">    NVJPEG_BACKEND_HARDWARE = 3</span><br><span class="line">&#125; nvjpegBackend_t;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="nvjpegDevAllocator-t"><a href="#nvjpegDevAllocator-t" class="headerlink" title="nvjpegDevAllocator_t"></a>nvjpegDevAllocator_t</h3><ul>
-<li>简述：内存分配器使用提到的原型，提供给nvjpegCreateEx<ul>
-<li>这个分配器将用于库中的所有设备内存分配</li>
-<li>无论如何，库都在进行智能分配(仅在需要时重新分配内存)</li>
-</ul>
-</li>
-<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">typedef struct </span><br><span class="line">&#123;</span><br><span class="line">    tDevMalloc dev_malloc;</span><br><span class="line">    tDevFree dev_free;</span><br><span class="line">&#125; nvjpegDevAllocator_t;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="nvjpegImage-t"><a href="#nvjpegImage-t" class="headerlink" title="nvjpegImage_t"></a>nvjpegImage_t</h3><ul>
-<li>简述：输出描述符。根据输出格式，被写入平面的数据</li>
-<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">typedef struct</span><br><span class="line">&#123;</span><br><span class="line">    unsigned char * channel[NVJPEG_MAX_COMPONENT];</span><br><span class="line">    size_t    pitch[NVJPEG_MAX_COMPONENT];</span><br><span class="line">&#125; nvjpegImage_t;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="英伟达API"><a href="#英伟达API" class="headerlink" title="英伟达API"></a>英伟达API</h2><h3 id="nvjpegCreateSimple"><a href="#nvjpegCreateSimple" class="headerlink" title="nvjpegCreateSimple()"></a>nvjpegCreateSimple()</h3><ul>
-<li>简述：使用默认后端和默认内存分配器(cudaMalloc&#x2F;cudaFree)初始化nvjpeg句柄</li>
-<li>声明：<code>nvjpegStatus_t NVJPEGAPI nvjpegCreateSimple(nvjpegHandle_t *handle);</code></li>
-<li>参数：<ul>
-<li><code>handle</code>  –  编解码器实例，用于其他调用  –  Input&#x2F;Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="nvjpegCreate"><a href="#nvjpegCreate" class="headerlink" title="nvjpegCreate()"></a>nvjpegCreate()</h3><ul>
-<li>简述：初始化nvjpeg句柄。此句柄用于所有连续调用</li>
-<li>声明：<code>nvjpegStatus_t NVJPEGAPI nvjpegCreate(nvjpegBackend_t backend, nvjpegDevAllocator_t *dev_allocator, nvjpegHandle_t *handle);</code></li>
-<li>参数：<ul>
-<li><code>backend</code>  –  要使用的后端。目前支持默认或混合(目前相同)。  –  Input</li>
-<li><code>dev_allocator</code>  –  指向nvjpegDevAllocator的指针。如果为NULL - 使用默认cuda调用(cudaMalloc&#x2F;cudaFree)  –  Input</li>
-<li><code>handle</code>   –  编解码器实例，用于其他调用  –  Input&#x2F;Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="nvjpegDestroy"><a href="#nvjpegDestroy" class="headerlink" title="nvjpegDestroy()"></a>nvjpegDestroy()</h3><ul>
-<li>简述：释放句柄和资源</li>
-<li>声明：<code>nvjpegStatus_t NVJPEGAPI nvjpegDestroy(nvjpegHandle_t handle);</code></li>
-<li>参数：<ul>
-<li><code>handle</code>  –  要释放的实例句柄  –  Input&#x2F;Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="nvjpegJpegStateCreate"><a href="#nvjpegJpegStateCreate" class="headerlink" title="nvjpegJpegStateCreate()"></a>nvjpegJpegStateCreate()</h3><ul>
-<li>简述：解码状态的初始化</li>
-<li>声明：<code>nvjpegStatus_t NVJPEGAPI nvjpegJpegStateCreate(nvjpegHandle_t handle, nvjpegJpegState_t *jpeg_handle);</code></li>
-<li>参数：<ul>
-<li><code>handle</code>  –  编解码器实例  –  Input</li>
-<li><code>jpeg_handle</code>  –  解码的jpeg图像状态句柄  –  Input&#x2F;Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="nvjpegJpegStateDestroy"><a href="#nvjpegJpegStateDestroy" class="headerlink" title="nvjpegJpegStateDestroy()"></a>nvjpegJpegStateDestroy()</h3><ul>
-<li>简述：释放jpeg图像句柄</li>
-<li>声明：<code>nvjpegStatus_t NVJPEGAPI nvjpegJpegStateDestroy(nvjpegJpegState_t jpeg_handle);</code></li>
-<li>参数：<ul>
-<li><code>jpeg_handle</code>  –  解码的jpeg图像状态句柄  –  Input&#x2F;Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="nvjpegGetImageInfo"><a href="#nvjpegGetImageInfo" class="headerlink" title="nvjpegGetImageInfo()"></a>nvjpegGetImageInfo()</h3><ul>
-<li>简述：检索图像信息，包括通道、每个图像层的宽度和高度，以及色度下采样。<ul>
-<li>如果编码的通道小于NVJPEG_MAX_COMPONENT，那么零将被设置为缺失通道信息</li>
-<li>如果图像是三通道的，则所有三组都有效</li>
-<li>This function is thread safe.</li>
-</ul>
-</li>
-<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">nvjpegStatus_t NVJPEGAPI nvjpegGetImageInfo(</span><br><span class="line">nvjpegHandle_t handle,</span><br><span class="line">const unsigned char *data, </span><br><span class="line">size_t length,</span><br><span class="line">int *nComponents, </span><br><span class="line">nvjpegChromaSubsampling_t *subsampling,</span><br><span class="line">int *widths,</span><br><span class="line">int *heights);</span><br></pre></td></tr></table></figure></li>
-<li>参数：<ul>
-<li><code>handle</code>  –  编解码器实例  –  Input</li>
-<li><code>data</code>    –  指向缓冲区的指针，其中包含要解码的jpeg流数据。  –  Input</li>
-<li><code>length</code>  –  jpeg图像缓冲区的长度。  –  Input</li>
-<li><code>nComponent</code>  –  图像的组件数(层数)，目前只支持1通道(灰度)或3通道。  –  Output</li>
-<li><code>subsampling</code> –  在这个JPEG中使用的色度下采样，参见nvjpegChromaSubsampling_t  –  Output</li>
-<li><code>widths</code>  –  指向NVJPEG_MAX_COMPONENT的指针，返回每个通道的宽度。如果信道未编码，则为0  –  Output</li>
-<li><code>heights</code> –  指向NVJPEG_MAX_COMPONENT的指针，返回每个通道的高度。如果信道未编码，则为0  –  Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="nvjpegDecode"><a href="#nvjpegDecode" class="headerlink" title="nvjpegDecode()"></a>nvjpegDecode()</h3><ul>
-<li>简述：解码单幅图像<ul>
-<li>API是后端不可知的。</li>
-<li>它将决定在内部使用哪个实现。目标缓冲区应该足够大，能够存储指定格式的输出。</li>
-<li>对于每个颜色平面，可以使用<code>nvjpegGetImageInfo()</code>检索图像大小，每个平面所需的最小内存缓冲区是<code>nPlaneHeight*nPlanePitch</code>，</li>
-<li>其中<code>nPlanePitch &gt;= nPlaneWidth</code>用于平面输出格式，</li>
-<li><code>nPlanePitch &gt;= nPlaneWidth*nOutputComponents</code>用于交错输出格式</li>
-</ul>
-</li>
-<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">nvjpegStatus_t NVJPEGAPI nvjpegDecode(</span><br><span class="line">        nvjpegHandle_t handle,</span><br><span class="line">        nvjpegJpegState_t jpeg_handle,</span><br><span class="line">        const unsigned char *data,</span><br><span class="line">        size_t length, </span><br><span class="line">        nvjpegOutputFormat_t output_format,</span><br><span class="line">        nvjpegImage_t *destination,</span><br><span class="line">        cudaStream_t stream);</span><br></pre></td></tr></table></figure></li>
-<li>参数：<ul>
-<li><code>handle</code>  –  编解码器实例  –  Input&#x2F;Output</li>
-<li><code>jpeg_handle</code>  –  解码的jpeg图像状态句柄  –  Input&#x2F;Output</li>
-<li><code>data</code>    –  指向包含要解码的jpeg图像的缓冲区的指针。  –  Input</li>
-<li><code>length</code>  –  jpeg图像缓冲区的长度。  –  Input</li>
-<li><code>output_format</code>  –  输出数据格式。有关描述，请参阅nvjpegOutputFormat_t  –  Input</li>
-<li><code>destination</code>    –  指向结构的指针，包含输出缓冲区的信息。参见nvjpegImage_t描述。  –  Input&#x2F;Output</li>
-<li><code>stream</code>  –  CUDA流在哪里提交所有GPU工作  –  Input&#x2F;Output</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  </li>
-<li>失败  –</li>
-</ul>
-</li>
-</ul>
-<h3 id="cudaStreamSynchronize"><a href="#cudaStreamSynchronize" class="headerlink" title="cudaStreamSynchronize()"></a>cudaStreamSynchronize()</h3><ul>
-<li>简述：阻塞任务流，直到流完成所有操作。如果 device 设置了<code>cudaDeviceScheduleBlockingSync</code>标识，主机线程在它完成所有的任务之前，会一直阻塞</li>
-<li>声明：<code>cudaError_t cudaStreamSynchronize(cudaStream_t stream);</code></li>
-<li>参数：<ul>
-<li><code>stream</code>  –  流标识符</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  返回<code>cudaSuccess</code></li>
-<li>失败  –  返回<code>cudaErrorInvalidResourceHandle</code></li>
-</ul>
-</li>
-</ul>
-<h3 id="cudaStreamCreateWithFlags"><a href="#cudaStreamCreateWithFlags" class="headerlink" title="cudaStreamCreateWithFlags()"></a>cudaStreamCreateWithFlags()</h3><ul>
-<li>简述：创建一个新的异步的流,通过参数<code>flags</code>来设置流的属性  <ul>
-<li><code>Create an asynchronous stream Creates a new asynchronous stream.</code></li>
-<li><code>The flags argument determines the behaviors of the stream.</code></li>
-</ul>
-</li>
-<li>声明：<code>cudaError_t cudaStreamCreateWithFlags(cudaStream_t *pStream, unsigned int flags);</code></li>
-<li>参数：<ul>
-<li><code>pStream</code>  –  指向流标识符的指针</li>
-<li><code>flags</code>    –  创建流的参数,有效的参数为：<ul>
-<li><code>cudaStreamDefault</code>  –  默认标识</li>
-<li><code>cudaStreamNonBlocking</code>  –   异步流，异步于NULL流</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  cudaSuccess</li>
-<li>失败  –  cudaErrorInvalidValue</li>
-</ul>
-</li>
-</ul>
-<h3 id="cudaGetDeviceCount"><a href="#cudaGetDeviceCount" class="headerlink" title="cudaGetDeviceCount()"></a>cudaGetDeviceCount()</h3><ul>
-<li>简述：获取可用算能设备的数量</li>
-<li>声明：<code>cudaError_t cudaGetDeviceCount(int *count);</code></li>
-<li>参数：<ul>
-<li><code>count</code>  –  具有计算能力的设备数字</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  cudaSuccess</li>
-</ul>
-</li>
-</ul>
-<h3 id="cudaGetDevice"><a href="#cudaGetDevice" class="headerlink" title="cudaGetDevice()"></a>cudaGetDevice()</h3><ul>
-<li>简述：返回当前正在使用的设备</li>
-<li>声明：<code>cudaError_t cudaGetDevice(int *device);</code></li>
-<li>参数：<ul>
-<li><code>device</code>  –  正在工作的主机线程所执行的设备代码</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  cudaSuccess</li>
-<li>失败  –  cudaErrorInvalidValue</li>
-</ul>
-</li>
-</ul>
-<h3 id="cudaSetDevice"><a href="#cudaSetDevice" class="headerlink" title="cudaSetDevice()"></a>cudaSetDevice()</h3><ul>
-<li>简述：设置GPU运行的设备</li>
-<li>声明：<code>cudaError_t cudaSetDevice(int device);</code></li>
-<li>参数：<ul>
-<li><code>device</code>  –  调用这个函数的主机线程要执行设备代码的设备</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  cudaSuccess</li>
-<li>失败  –  cudaErrorInvalidDevice  | cudaErrorDeviceAlreadyInUse</li>
-</ul>
-</li>
-<li>注意：<ul>
-<li>随后任何设备由<code>cudaMalloc(), cudaMallocPitch(), cudaMallocArray()</code>申请的设备内存都会分配到对应device的物理设备</li>
-<li>任何主机线程通过<code>cudaMallocHost(), cudaHostAlloc(), cudaHostRegister()</code>申请的主机内存都会将它们的生命周期与设备device关联起来</li>
-<li>任何通过主机线程创建的流或事件都会和设备device关联起来</li>
-<li>任何通过主机线程由<code>cudaLaunchKernel()</code>发生的内核调用都会在设备device上执行</li>
-<li>这个调用可能在任何时间，由任何主机线程在任何设备上调用。</li>
-</ul>
-</li>
-<li>返回值：<ul>
-<li>成功  –  cudaSuccess</li>
-<li>失敗  –  cudaErrorInvalidDevice | cudaErrorDeviceAlreadyInUse</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/NVIDIA/2024-05-22-tensorrt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/NVIDIA/2024-05-22-tensorrt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">tensorrt_1_理论基础</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NVIDIA/" itemprop="url" rel="index"><span itemprop="name">NVIDIA</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>tensorrt库</li>
-</ul>
-<h2 id="tensorrt-GA和EA的区别"><a href="#tensorrt-GA和EA的区别" class="headerlink" title="tensorrt GA和EA的区别"></a>tensorrt GA和EA的区别</h2><ul>
-<li>EA版本代表抢鲜体验，在正式发布之前</li>
-<li>GA代表通用性，表示稳定版，经过全面测试。</li>
-</ul>
-<h2 id="TensorRT加速"><a href="#TensorRT加速" class="headerlink" title="TensorRT加速"></a>TensorRT加速</h2><ul>
-<li>TensorRT是英伟达开发针对自身显卡来优化的推理加速框架，TensorRT主要做了两件事情，来提升模型的运行速度<ul>
-<li>TensorRT降精度推理支持INT8和FP16的计算。深度学习网络在训练时，通常使用 32 位或 16 位数据。TensorRT则在网络的推理时选用不这么高的精度，达到加速推断的目的。</li>
-<li>TensorRT对于网络结构进行了重构，把一些能够合并的运算合并在了一起，针对GPU的特性做了优化。因为显卡是英伟达出的没有谁比英伟达更懂自己的显卡，自然就推出了针对自己GPU的加速工具TensorRT。一个深度学习模型，在没有优化的情况下，比如一个卷积层、一个偏置层和一个reload层，这三层是需要调用三次cuDNN对应的API，但实际上这三层的实现完全是可以合并到一起的，TensorRT会对一些可以合并网络进行合并。</li>
-</ul>
-</li>
-</ul>
-<h2 id="C-tensorrt是什么"><a href="#C-tensorrt是什么" class="headerlink" title="C++ tensorrt是什么"></a>C++ tensorrt是什么</h2><p>TensorRT（Tensor Runtime）是由 NVIDIA 开发的用于高性能深度学习推理（inference）的库。它主要用于加速深度学习模型在 NVIDIA GPU 上的推理阶段，以提高模型的实时性能。</p>
-<p>TensorRT 提供了许多优化技术，以减少深度学习模型推理的计算和内存开销。它通过使用精确的数值计算、层融合（layer fusion）、动态 Tensor 网络（dynamic tensor network）、深度学习加速库（cuDNN）、自动混合精度（automatic mixed precision）等技术，提供高效的推理加速。</p>
-<p>TensorRT 支持多种深度学习框架，包括 TensorFlow、PyTorch、ONNX（Open Neural Network Exchange）等。你可以使用 TensorRT 将经过训练的深度学习模型转换为 TensorRT 可以高效执行的格式，以利用 GPU 进行快速推理。</p>
-<p>以下是 TensorRT 的一些主要特性：</p>
-<ol>
-<li><p><strong>快速推理：</strong> TensorRT 通过 GPU 加速深度学习推理，提供高性能的模型执行。</p>
-</li>
-<li><p><strong>精确数值计算：</strong> TensorRT 支持对模型进行精确数值计算，以在不牺牲模型精度的情况下提高推理速度。</p>
-</li>
-<li><p><strong>层融合：</strong> TensorRT 可以自动融合相邻层，减少计算和内存开销。</p>
-</li>
-<li><p><strong>支持多种框架：</strong> TensorRT 提供用于与多种深度学习框架集成的工具，包括 TensorFlow、PyTorch、ONNX 等。</p>
-</li>
-<li><p><strong>动态 Tensor 网络：</strong> TensorRT 支持构建动态的 Tensor 网络，适用于需要在推理期间动态改变形状的模型。</p>
-</li>
-</ol>
-<p>TensorRT 的使用通常涉及到以下几个步骤：</p>
-<ol>
-<li><p><strong>创建和训练模型：</strong> 使用深度学习框架创建和训练深度学习模型。</p>
-</li>
-<li><p><strong>模型转换：</strong> 使用 TensorRT 提供的工具将训练好的模型转换为 TensorRT 可以高效执行的格式。</p>
-</li>
-<li><p><strong>加载和推理：</strong> 在 C++ 或其他支持的语言中加载 TensorRT 格式的模型并进行推理。</p>
-</li>
-</ol>
-<p>TensorRT 是用于加速深度学习推理的强大工具，尤其在实时应用、嵌入式系统和边缘计算等场景中具有重要作用。</p>
-<h2 id="C-tensorrt-库-详解"><a href="#C-tensorrt-库-详解" class="headerlink" title="C++ tensorrt 库 详解"></a>C++ tensorrt 库 详解</h2><p>TensorRT 是 NVIDIA 提供的深度学习推理库，专为在 NVIDIA GPU 上进行深度学习模型的加速而设计。TensorRT 提供了一系列工具和优化技术，以在推理阶段获得高性能、低延迟的模型执行。以下是关于 TensorRT 库的一些详细信息：</p>
-<h3 id="TensorRT-的主要特性："><a href="#TensorRT-的主要特性：" class="headerlink" title="TensorRT 的主要特性："></a>TensorRT 的主要特性：</h3><ol>
-<li><p><strong>快速推理：</strong> TensorRT 通过 GPU 加速深度学习推理，提供高性能的模型执行。它针对 NVIDIA GPU 的架构进行了优化，充分利用了 GPU 的并行计算能力。</p>
-</li>
-<li><p><strong>精确数值计算：</strong> TensorRT 支持深度学习模型的精确数值计算，同时考虑到模型推理过程中的计算精度和效率。</p>
-</li>
-<li><p><strong>层融合：</strong> TensorRT 可以自动融合相邻层，减少计算和内存开销。这种层融合技术有助于减小模型的计算图，提高推理性能。</p>
-</li>
-<li><p><strong>多精度计算：</strong> TensorRT 支持多种精度计算，包括 FP32、FP16 和 INT8。可以根据模型的需求选择合适的精度，以在保持精度的同时提高计算性能。</p>
-</li>
-<li><p><strong>层和操作库：</strong> TensorRT 提供了包括卷积、归一化、激活函数等在内的一系列层和操作库，以满足不同模型结构的推理需求。</p>
-</li>
-<li><p><strong>支持多种框架：</strong> TensorRT 支持多种深度学习框架，包括 TensorFlow、PyTorch、ONNX 等。通过支持多种框架，TensorRT 提供了灵活性，使用户能够在不同框架之间无缝转换和使用模型。</p>
-</li>
-<li><p><strong>动态 Tensor 网络：</strong> TensorRT 支持构建动态的 Tensor 网络，适用于需要在推理期间动态改变形状的模型。</p>
-</li>
-</ol>
-<h3 id="TensorRT-的使用流程："><a href="#TensorRT-的使用流程：" class="headerlink" title="TensorRT 的使用流程："></a>TensorRT 的使用流程：</h3><ol>
-<li><p><strong>创建和训练模型：</strong> 使用深度学习框架（例如 TensorFlow、PyTorch）创建和训练深度学习模型。</p>
-</li>
-<li><p><strong>模型转换：</strong> 使用 TensorRT 提供的工具将训练好的模型转换为 TensorRT 可以高效执行的格式。这通常涉及到使用 TensorRT 的 Python API 进行模型转换。</p>
-</li>
-<li><p><strong>TensorRT 推理引擎构建：</strong> 使用 C++ 或其他支持的语言，在运行时加载 TensorRT 格式的模型并构建 TensorRT 推理引擎。推理引擎是 TensorRT 用于高效执行模型的核心组件。</p>
-</li>
-<li><p><strong>输入数据传递和推理：</strong> 将输入数据传递给 TensorRT 推理引擎，并执行推理操作。TensorRT 会在 GPU 上对输入数据进行并行计算，并输出模型的推理结果。</p>
-</li>
-<li><p><strong>清理资源：</strong> 在推理完成后，释放分配的 GPU 和 CPU 资源，以确保良好的系统资源管理。</p>
-</li>
-</ol>
-<h3 id="TensorRT-C-API-使用示例："><a href="#TensorRT-C-API-使用示例：" class="headerlink" title="TensorRT C++ API 使用示例："></a>TensorRT C++ API 使用示例：</h3><p>以下是一个简化的 TensorRT C++ API 使用示例，展示了加载 TensorRT 模型并进行推理的基本步骤：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;NvInfer.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 初始化 TensorRT</span></span><br><span class="line">    nvinfer1::IRuntime* runtime = nvinfer1::<span class="built_in">createInferRuntime</span>(gLogger);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从文件中加载 TensorRT 模型</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* trtModelPath = <span class="string">&quot;path/to/your/model.plan&quot;</span>;</span><br><span class="line">    <span class="function">std::ifstream <span class="title">trtModelStream</span><span class="params">(trtModelPath, std::ios::binary)</span></span>;</span><br><span class="line">    trtModelStream.<span class="built_in">seekg</span>(<span class="number">0</span>, trtModelStream.end);</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> modelSize = trtModelStream.<span class="built_in">tellg</span>();</span><br><span class="line">    trtModelStream.<span class="built_in">seekg</span>(<span class="number">0</span>, trtModelStream.beg);</span><br><span class="line">    <span class="function">std::vector&lt;<span class="type">char</span>&gt; <span class="title">modelData</span><span class="params">(modelSize)</span></span>;</span><br><span class="line">    trtModelStream.<span class="built_in">read</span>(modelData.<span class="built_in">data</span>(), modelSize);</span><br><span class="line"></span><br><span class="line">    nvinfer1::ICudaEngine* engine = runtime-&gt;<span class="built_in">deserializeCudaEngine</span>(modelData.<span class="built_in">data</span>(), modelSize, <span class="literal">nullptr</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建执行上下文</span></span><br><span class="line">    nvinfer1::IExecutionContext* context = engine-&gt;<span class="built_in">createExecutionContext</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 准备输入数据和输出缓冲区</span></span><br><span class="line">    <span class="type">float</span> inputData[INPUT_SIZE]; <span class="comment">// INPUT_SIZE 是模型期望的输入大小</span></span><br><span class="line">    <span class="type">float</span> outputData[OUTPUT_SIZE]; <span class="comment">// OUTPUT_SIZE 是模型期望的输出大小</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配 GPU 内存并将输入数据传输到 GPU</span></span><br><span class="line">    <span class="type">void</span>* gpuInputBuffer;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;gpuInputBuffer, INPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(gpuInputBuffer, inputData, INPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyHostToDevice);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配 GPU 内存用于输出</span></span><br><span class="line">    <span class="type">void</span>* gpuOutputBuffer;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;gpuOutputBuffer, OUTPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行推理</span></span><br><span class="line">    context-&gt;<span class="built_in">execute</span>(<span class="number">1</span>, &amp;gpuInputBuffer, &amp;gpuOutputBuffer, <span class="literal">nullptr</span>, <span class="literal">nullptr</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将输出数据从 GPU 复制回主机</span></span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(outputData, gpuOutputBuffer, OUTPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyDeviceToHost);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 处理输出数据...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清理资源</span></span><br><span class="line">    <span class="built_in">cudaFree</span>(gpuInputBuffer);</span><br><span class="line">    <span class="built_in">cudaFree</span>(gpuOutputBuffer);</span><br><span class="line">    context-&gt;<span class="built_in">destroy</span>();</span><br><span class="line">    engine-&gt;<span class="built_in">destroy</span>();</span><br><span class="line">    runtime-&gt;<span class="built_in">destroy</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>请注意，实际的使用场景可能会更加复杂，具体的实现可能需要更多的代码，特别是在处理不同类型和形状的输入数据时。确保查阅 TensorRT 的文档和示例，以获得详细的使用说明。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Network/2024-05-22-network_2_%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Network/2024-05-22-network_2_%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="post-title-link" itemprop="url">network_2_网络协议</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Network/" itemprop="url" rel="index"><span itemprop="name">Network</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>计算机网络协议是在计算机网络中进行通信和数据交换的规则和约定集合。它定义了计算机网络中数据的格式、传输方式、错误检测和纠正、网络设备的工作方式以及网络中各个实体之间的通信流程等。</p>
-<p>下面是一些常见的计算机网络协议：</p>
-<ol>
-<li><p><strong>TCP&#x2F;IP协议</strong>：TCP&#x2F;IP协议是互联网的核心协议，它包括TCP（传输控制协议）和IP（Internet协议）两个主要协议。TCP协议提供可靠的、面向连接的数据传输，而IP协议负责在网络中寻址和路由数据包。</p>
-</li>
-<li><p><strong>HTTP协议</strong>：HTTP（超文本传输协议）是应用层协议，用于在Web浏览器和Web服务器之间传输超文本文档。它是无状态的，通过请求-响应模型进行通信。</p>
-</li>
-<li><p><strong>HTTPS协议</strong>：HTTPS（安全超文本传输协议）是在HTTP基础上加入了安全层的协议，使用SSL&#x2F;TLS加密算法保证通信的安全性。</p>
-</li>
-<li><p><strong>FTP协议</strong>：FTP（文件传输协议）用于在客户端和服务器之间传输文件。它支持文件上传、下载、删除和重命名等操作。</p>
-</li>
-<li><p><strong>SMTP协议</strong>：SMTP（简单邮件传输协议）用于在网络中发送和传输电子邮件。它定义了电子邮件的格式和传输方式。</p>
-</li>
-<li><p><strong>POP3协议</strong>：POP3（邮局协议版本3）是用于接收电子邮件的协议，它允许用户从邮件服务器上下载邮件。</p>
-</li>
-<li><p><strong>DNS协议</strong>：DNS（域名系统）协议用于将域名解析为相应的IP地址。它提供了域名到IP地址之间的映射服务。</p>
-</li>
-<li><p><strong>ICMP协议</strong>：ICMP（Internet控制消息协议）用于在IP网络中传输错误报文和状态信息。它用于网络故障诊断和管理。</p>
-</li>
-</ol>
-<p>以上只是一小部分常见的计算机网络协议，实际上还有许多其他的协议和标准，用于不同的网络通信需求和场景。这些协议共同构成了计算机网络的基础，使得不同设备和系统能够进行有效的通信和数据交换。</p>
-<h2 id="Web服务"><a href="#Web服务" class="headerlink" title="Web服务"></a>Web服务</h2><h3 id="Web服务原理和技术"><a href="#Web服务原理和技术" class="headerlink" title="Web服务原理和技术"></a>Web服务原理和技术</h3><ul>
-<li><p>Web Service，是面向服务计算模式的一部分，用于互联网上的信息交换</p>
-</li>
-<li><p>Web Service的主题非常广泛，非常复杂，涉及许多概念，协议和技术，而且它们源自不同的学科，诸如分布式计算系统，计算机网络，计算机体系结构，中间件，软件工程，编程语言，数据库系统，安全性和知识表示等，并且它们以各种错综复杂的方式组合在一起。</p>
-</li>
-<li><p>此外，还需要一些处理业务流程与组织的新技术，这些新技术既要发现企业存在的问题，又要在实际应用中解决这些问题</p>
-</li>
-</ul>
-<h3 id="维基百科"><a href="#维基百科" class="headerlink" title="维基百科"></a>维基百科</h3><ul>
-<li><p>Web服务是一种服务导向架构的技术，通过标准的Web协议提供服务，目的是保证不同平台的应用服务可以互操作</p>
-</li>
-<li><p>根据W3C的定义，Web服务（Web service）应当是一个软件系统，用以支持网络间不同机器的互动操作</p>
-</li>
-<li><p>网络服务通常是许多应用程序接口（API）所组成的，它们透过网络，例如国际互联网（Internet）的远程服务器端，执行客户所提交服务的请求</p>
-</li>
-<li><p>尽管W3C的定义涵盖诸多相异且无法介分的系统，不过通常我们指有关于<strong>主从式架构</strong>（Client-server）之间根据SOAP协议进行传递XML格式消息</p>
-</li>
-<li><p>无论定义还是实现，Web服务过程中会由服务器提供一个机器可读的描述（通常基于WSDL）以辨识服务器所提供的WEB服务</p>
-<ul>
-<li><code>SOAP</code>, 一个基于XML的可扩展消息信封格式，需同时绑定一个网络传输协议。这个协议通常是HTTP或HTTPS，但也可能是SMTP或XMPP。</li>
-<li><code>WSDL</code>, 一个XML格式文档，用以描述服务端口访问方式和使用协议的细节。通常用来辅助生成服务器和客户端代码及配置信息。</li>
-<li><code>UDDI</code>, 一个用来发布和搜索WEB服务的协议，应用程序可借由此协议在设计或运行时找到目标WEB服务。</li>
-<li>这些标准由这些组织制订：W3C负责XML、SOAP及WSDL；OASIS负责UDDI。</li>
-</ul>
-</li>
-</ul>
-<h3 id="阮一峰网络日志"><a href="#阮一峰网络日志" class="headerlink" title="阮一峰网络日志"></a>阮一峰网络日志</h3><ul>
-<li><p>想要理解Web service，必须先理解什么是Service（服务）</p>
-</li>
-<li><p>传统上，我们把计算机后台程序（Daemon）提供的功能，称为”服务”（service）</p>
-</li>
-<li><p>比如，让一个杀毒软件在后台运行，它会自动监控系统，那么这种自动监控就是一个”服务”。</p>
-</li>
-<li><p>通俗地说，”服务”就是<strong>计算机可以提供的某一种功能</strong>。</p>
-</li>
-<li><p>根据来源的不同，”服务”又可以分成两种：</p>
-<ul>
-<li>一种是”本地服务”（使用同一台机器提供的服务，不需要网络）</li>
-<li>另一种是”网络服务”（使用另一台计算机提供的服务，必须通过网络才能完成）</li>
-</ul>
-</li>
-<li><p>举例来说</p>
-<ul>
-<li>我现在有一批图片，需要把它们的大小缩小一半。那么，我们可以把”缩放图片”看成是一种服务。</li>
-<li>你可以使用”本地服务”，在自己计算机上用软件缩小图片，也可以使用”网络服务”，将图片上传到某个网站，让服务器替你缩小图片，完成后再通过网络送回给你。</li>
-<li>这就好比，一件事你可以自己做，也可以交给另一个人去做。肚子饿了，你可以自己做饭，也可以打电话去订一份比萨，让店家替你做好送上门。</li>
-</ul>
-</li>
-<li><p>“网络服务”（Web Service）的本质，就是通过<strong>网络调用其他网站的资源</strong></p>
-</li>
-<li><p>如果一个软件的主要部分采用了”网络服务”，即它把存储或计算环节”外包”给其他网站了，那么我们就说这个软件属于Web Service架构</p>
-</li>
-<li><p>Web Service架构的基本思想，就是尽量把非核心功能交给其他人去做，自己全力开发核心功能。</p>
-</li>
-</ul>
-<h2 id="使用Web服务的方式"><a href="#使用Web服务的方式" class="headerlink" title="使用Web服务的方式"></a>使用Web服务的方式</h2><ul>
-<li><p>Web服务实际上是一组工具，并有多种不同的方法调用之。</p>
-</li>
-<li><p><strong>三种最普遍的手段是</strong>：远程过程调用（RPC），服务导向架构（SOA）以及表述性状态转移（REST）。</p>
-</li>
-<li><p>远程过程调用</p>
-<ul>
-<li>Web服务提供一个分布式函数或方法接口供用户调用，这是一种比较传统的方式。通常，在WSDL中对RPC接口进行定义（类似于早期的XML-RPC）。</li>
-<li>尽管最初的Web服务广泛采用RPC方式部署，但针对其过于紧密之耦合性的批评声也随之不断。这是因为<strong>RPC式WEB服务实质上是利用一个简单的映射</strong>，以把用户请求直接转化成为一个特定语言编写的函数或方法。</li>
-<li>如今，多数服务提供商认定此种方式在未来将难有作为，在他们的推动下，WS-I基本协议集（WS-I Basic Profile）已不再支持远程过程调用。</li>
-</ul>
-</li>
-<li><p>服务导向架构</p>
-<ul>
-<li>现在，业界比较关注的是遵从服务导向架构（Service-oriented architecture，SOA）概念来构筑WEB服务。</li>
-<li>在服务导向架构中，通讯由消息驱动，而不再是某个动作（方法调用）。这种WEB服务也被称作面向消息的服务</li>
-<li>SOA式WEB服务得到了大部分主要软件供应商以及业界专家的支持和肯定。</li>
-<li>作为与RPC方式的最大差别，SOA方式<strong>更加关注如何去连接服务而不是去特定某个实现的细节</strong>。WSDL定义了联络服务的必要内容</li>
-</ul>
-</li>
-<li><p>表述性状态转移</p>
-<ul>
-<li>表述性状态转移式（Representational state transfer，REST）Web服务类似于HTTP或其他类似协议，它们<strong>把接口限定在一组广为人知的标准动作中</strong>（比如HTTP的GET、PUT、DELETE）以供调用。</li>
-<li>此类WEB服务关注与那些稳定的资源的互动，而不是消息或动作</li>
-<li>此种服务可以通过WSDL来描述SOAP消息内容，通过HTTP限定动作接口；或者完全在SOAP中对动作进行抽象。</li>
-</ul>
-</li>
-</ul>
-<h2 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h2><h3 id="维基百科-1"><a href="#维基百科-1" class="headerlink" title="维基百科"></a>维基百科</h3><ul>
-<li><p>WebSocket是一种网络传输协议，可在单个TCP连接上进行全双工通信，位于OSI模型的应用层。</p>
-</li>
-<li><p>WebSocket协议在2011年由IETF标准化为RFC 6455，后由RFC 7936补充规范。<strong>Web IDL中的WebSocket API由W3C标准化</strong></p>
-</li>
-<li><p>WebSocket使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。</p>
-</li>
-<li><p>在WebSocket API中，浏览器和服务器只需要完成一次握手，两者之间就可以创建持久性的连接，并进行双向数据传输</p>
-</li>
-</ul>
-<h4 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h4><ul>
-<li><p>WebSocket是一种与HTTP不同的协议。两者都位于OSI模型的应用层，并且都依赖于传输层的TCP协议</p>
-</li>
-<li><p>为了实现兼容性，WebSocket握手使用HTTP Upgrade头从HTTP协议更改为WebSocket协议。</p>
-</li>
-<li><p>WebSocket协议支持Web浏览器（或其他客户端应用程序）与Web服务器之间的交互，具有较低的开销，便于实现客户端与服务器的实时数据传输</p>
-</li>
-<li><p>服务器可以通过标准化的方式来实现，而无需客户端首先请求内容，并允许消息在保持连接打开的同时来回传递。</p>
-</li>
-<li><p>通过这种方式，可以在客户端和服务器之间进行双向持续对话。 </p>
-</li>
-<li><p>通信通过TCP端口80或443完成，这在防火墙阻止非Web网络连接的环境下是有益的。</p>
-</li>
-<li><p>另外，Comet之类的技术以非标准化的方式实现了类似的双向通信</p>
-<ul>
-<li>Comet是一种用于web的推送技术，能使服务器实时地将更新的信息传送到客户端，而无须客户端发出请求，</li>
-<li>目前有两种实现方式，长轮询和iframe流。</li>
-</ul>
-</li>
-<li><p>与HTTP不同，WebSocket提供全双工通信。</p>
-</li>
-<li><p>此外，WebSocket还可以在TCP之上实现消息流。TCP单独处理字节流，没有固有的消息概念。 </p>
-</li>
-<li><p>在WebSocket之前，使用Comet可以实现全双工通信。</p>
-</li>
-<li><p>但是Comet存在TCP握手和HTTP头的开销，因此对于小消息来说效率很低。WebSocket协议旨在解决这些问题。</p>
-</li>
-<li><p>WebSocket协议规范将ws（WebSocket）和wss（WebSocket Secure）定义为两个新的统一资源标识符（URI）方案，分别对应明文和加密连接。</p>
-</li>
-<li><p>除了方案名称和片段ID（不支持#）之外，其余的URI组件都被定义为此URI的通用语法。</p>
-</li>
-</ul>
-<h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><ul>
-<li><p>早期，很多网站为了实现<strong>推送技术</strong>，所用的技术都是<strong>轮询</strong>。</p>
-</li>
-<li><p>推送技术（英语：Push technology），或者说是是一种基于Internet通信方式的服务器推送，其中要求通信的请求是由发布者或中央服务器发起。与 pull&#x2F;get 形成对比，额外消息传输的相应一般由接收者或客户端发起。</p>
-</li>
-<li><p>轮询,是指由浏览器每隔一段时间（如每秒）向服务器发出HTTP请求，然后服务器返回最新的数据给客户端。</p>
-</li>
-<li><p>这种传统的模式带来很明显的缺点，即:</p>
-<ul>
-<li>浏览器需要不断的向服务器发出请求，然而HTTP请求与回复可能会包含较长的头部，其中真正有效的数据可能只是很小的一部分，所以这样会消耗很多带宽资源</li>
-</ul>
-</li>
-<li><p><strong>比较新的轮询技术是Comet</strong>。这种技术虽然可以实现双向通信，但仍然需要反复发出请求。而且在Comet中普遍采用的HTTP长连接也会消耗服务器资源</p>
-</li>
-<li><p>在这种情况下，HTML5定义了WebSocket协议，能更好的节省服务器资源和带宽，并且能够更实时地进行通讯</p>
-</li>
-<li><p>Websocket与HTTP和HTTPS使用相同的TCP端口，可以绕过大多数防火墙的限制。默认情况下，Websocket协议使用80端口；运行在TLS之上时，默认使用443端口。</p>
-</li>
-</ul>
-<h4 id="握手协议"><a href="#握手协议" class="headerlink" title="握手协议"></a>握手协议</h4><ul>
-<li><p>WebSocket 是独立的、创建在TCP上的协议。</p>
-</li>
-<li><p>Websocket 通过 HTTP&#x2F;1.1 协议的101状态码进行握手。</p>
-</li>
-<li><p>为了创建Websocket连接，需要通过浏览器发出请求，之后服务器进行回应，这个过程通常称<strong>握手</strong>（Handshaking）。</p>
-</li>
-<li><p>典型的WebSocket握手请求</p>
-<ul>
-<li>客户端请求：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /chat HTTP/1.1</span><br><span class="line">Host: server.example.com</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==</span><br><span class="line">Origin: http://example.com</span><br><span class="line">Sec-WebSocket-Protocol: chat, superchat</span><br><span class="line">Sec-WebSocket-Version: 13</span><br></pre></td></tr></table></figure></li>
-<li>服务器回应：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 101 Switching Protocols</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=</span><br><span class="line">Sec-WebSocket-Protocol: chat</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>字段说明：</p>
-<ul>
-<li>Connection必须设置Upgrade，表示客户端希望连接升级。</li>
-<li>Upgrade字段必须设置Websocket，表示希望升级到Websocket协议。</li>
-<li>Sec-WebSocket-Key是随机的字符串，服务器端会用这些数据来构造出一个SHA-1的信息摘要。<ul>
-<li>把“Sec-WebSocket-Key”加上一个特殊字符串“258EAFA5-E914-47DA-95CA-C5AB0DC85B11”，然后计算SHA-1摘要，之后进行Base64编码，将结果做为“Sec-WebSocket-Accept”头的值，返回给客户端。</li>
-<li>如此操作，可以尽量避免普通HTTP请求被误认为Websocket协议。</li>
-</ul>
-</li>
-<li>Sec-WebSocket-Version 表示支持的Websocket版本。RFC6455要求使用的版本是13，之前草案的版本均应当弃用。</li>
-<li>Origin字段是必须的。如果缺少origin字段，WebSocket服务器需要回复HTTP 403 状态码（禁止访问）。</li>
-<li>其他一些定义在HTTP协议中的字段，如Cookie等，也可以在Websocket中使用</li>
-</ul>
-</li>
-</ul>
-<h3 id="阮一峰网络日志-1"><a href="#阮一峰网络日志-1" class="headerlink" title="阮一峰网络日志"></a>阮一峰网络日志</h3><ul>
-<li><p>已经有了 HTTP 协议，为什么还需要另一个协议？它能带来什么好处？</p>
-</li>
-<li><p>因为 HTTP 协议有一个缺陷：通信只能由客户端发起。</p>
-</li>
-<li><p>举例来说，我们想了解今天的天气，只能是客户端向服务器发出请求，服务器返回查询结果。HTTP 协议做不到服务器主动向客户端推送信息。</p>
-</li>
-<li><p>这种单向请求的特点，注定了如果服务器有连续的状态变化，客户端要获知就非常麻烦。</p>
-</li>
-<li><p>我们只能使用”<strong>轮询</strong>“：每隔一段时候，就发出一个询问，了解服务器有没有新的信息。最典型的场景就是聊天室</p>
-</li>
-<li><p>轮询的效率低，非常浪费资源（因为必须不停连接，或者 HTTP 连接始终打开）。</p>
-</li>
-<li><p>因此，工程师们一直在思考，有没有更好的方法。WebSocket 就是这样发明的</p>
-</li>
-</ul>
-<h4 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h4><ul>
-<li><p>WebSocket 协议在2008年诞生，2011年成为国际标准。所有浏览器都已经支持了</p>
-</li>
-<li><p>它的最大特点就是，服务器可以主动向客户端推送信息，客户端也可以主动向服务器发送信息，是真正的双向平等对话，属于服务器推送技术的一种</p>
-</li>
-<li><p>其他特点包括：</p>
-<ul>
-<li>建立在 TCP 协议之上，服务器端的实现比较容易。</li>
-<li>与 HTTP 协议有着良好的兼容性。默认端口也是80和443，并且握手阶段采用 HTTP 协议，因此握手时不容易屏蔽，能通过各种 HTTP 代理服务器</li>
-<li>数据格式比较轻量，性能开销小，通信高效。</li>
-<li>可以发送文本，也可以发送二进制数据。</li>
-<li>没有同源限制，客户端可以与任意服务器通信。</li>
-<li>协议标识符是ws（如果加密，则为wss），服务器网址就是 URL</li>
-</ul>
-</li>
-</ul>
-<h2 id="Web3和区块链"><a href="#Web3和区块链" class="headerlink" title="Web3和区块链"></a>Web3和区块链</h2><ul>
-<li><p>互联网迄今有两个阶段：Web 1.0 和 Web 2.0</p>
-</li>
-<li><p>下一个阶段自然就是 Web 3.0（简称 Web3）</p>
-</li>
-<li><p>Web 1.0 阶段，用户是单纯的内容消费者，内容由网站提供，网站让你看什么，你就看什么，典型例子就是新闻门户网站。</p>
-</li>
-<li><p>Web 2.0 阶段，用户是内容的生产者，网站只是一个向用户提供服务的平台，典型的 Web 2.0 平台有维基百科、抖音、微信等等</p>
-</li>
-<li><p>Web3 的很多特征还不明确，但是国外很多文章认为，它跟区块链有关。</p>
-<ul>
-<li>Web 1.0 是用户读取互联网，Web 2.0 是用户写入互联网，Web3 是用户生活在互联网</li>
-<li>娱乐、工作、学习、消费、交际，都在网上发生。网站不仅提供服务，还是一个生活空间，人们的一部分生活可以在网上完成</li>
-<li>在教育网站学习，在会议网站开会，在社交网站交友，在游戏网站玩乐。所有网站共同构成了一个无所不包的网络世界</li>
-</ul>
-</li>
-<li><p>所有网站的生活功能，如果能够连在一起，让用户无缝地从一个场景进入另一个场景，那就构成了一个虚拟世界。这大概就是最近很热门的元宇宙（metaverse）的样子</p>
-</li>
-<li><p>到了那个阶段，用户不再是访问网站，而是进入虚拟世界，过着虚拟的线上生活</p>
-</li>
-<li><p>这样的虚拟世界，显然不能被一家或几家巨头垄断，否则我们就会依赖这些巨头，不得不遵守它制定的规则。当你的生活都在虚拟世界里面，某一天巨头突然决定关闭你的账号，你的虚拟人生岂不嘎然而止了！</p>
-</li>
-<li><p>这就是很多人<strong>提出 Web3 应该是分布式的原因</strong>。这有两层含义：</p>
-<ul>
-<li>它不是集中式的，就没有单一的公司可以控制它；</li>
-<li>任何一种服务都有多家提供商，通过分布式协议连起来，用户可以极小的成本，从一个提供商转移到另一个服务商。</li>
-</ul>
-</li>
-<li><p>如果 Web3 确定是分布式的，那么区块链简直就是天然的基础设施。因为<strong>区块链是分布式数据库的一种实现</strong>，本身就是分布式的，而且信息一旦上链，就无法修改</p>
-</li>
-<li><p>这解决了 Web3 的核心问题：不同网站的数据交换。 </p>
-</li>
-<li><p>不同网站都可以自由读写同一个用户的数据，并且这些数据是可以信赖的，从而保证用户进入另一个网站，就好像进入同一个世界的不同地区</p>
-</li>
-<li><p>一旦 Web3 构建于区块链之上，按照区块链的设计，用户需要有一个数字钱包，它是你在虚拟世界的身份证和银行账户。</p>
-</li>
-<li><p>你的身份、财产、消费，都通过这个数字钱包来标识。网站通过数字钱包的 ID，来识别你是谁</p>
-</li>
-<li><p>我翻开谷歌一查,这WEB3.0就没有一个正常的解释， 歪歪斜斜的搜索结果每页上都写着 “去中心化” “分布式” “用户拥有” “区块链” “虚拟经济” “价值重塑” “Token” 几个大词，我横竖睡不着，仔细看了半夜，才从字缝里看出来，满本上都写着两个字“炒币”</p>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Network/2024-05-22-%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1702,7 +918,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-RFID_%E8%80%83%E5%8B%A4%E7%B3%BB%E7%BB%9F/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-embedded_system_intermediate/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1716,7 +932,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Personal/2024-05-22-RFID_%E8%80%83%E5%8B%A4%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">RFID_考勤系统</a>
+            <a href="/2024/05/22/notes/Personal/2024-05-22-embedded_system_intermediate/" class="post-title-link" itemprop="url">embedded_system_intermediate</a>
         </h2>
 
         <div class="post-meta">
@@ -1757,80 +973,94 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>RFID考勤系统设计</li>
+<li>五月二十七日考试</li>
 </ul>
-<h2 id="已有信息"><a href="#已有信息" class="headerlink" title="已有信息"></a>已有信息</h2><ul>
-<li><p>题目：</p>
+<h2 id="第一章计算机系统基础知识"><a href="#第一章计算机系统基础知识" class="headerlink" title="第一章计算机系统基础知识"></a>第一章计算机系统基础知识</h2><h3 id="1-1-嵌入式计算机系统概述"><a href="#1-1-嵌入式计算机系统概述" class="headerlink" title="1.1 嵌入式计算机系统概述"></a>1.1 嵌入式计算机系统概述</h3><h4 id="1-1-1-计算机硬件"><a href="#1-1-1-计算机硬件" class="headerlink" title="1.1.1 计算机硬件"></a>1.1.1 计算机硬件</h4><ul>
+<li>基本的计算机硬件系统由： 运算器，控制器，存储器，输入设备和输出设备</li>
+<li>运算器和控制器及其相关部件已被集成在一起，统称为中央处理单元(Central Processing Unit, CPU)<ul>
+<li>运算器是对数据进行加工处理的部件，它主要完成算术和逻辑运算。</li>
+<li>控制器的主要功能是从主存中取出指令并进行分析，以控制计算机的各个部件有条不紊地完成指令的功能</li>
+</ul>
+</li>
+<li>存储器是计算机系统中的记忆设备，分为内部存储器(Main Memory, MM, 简称内存，主存)和外部存储器(简称外存或辅存)<ul>
+<li>相对而言，内存速度快，容量小，一般用来临时存储计算机运行时所需要的程序，数据及运算结果</li>
+<li>外村容量大，速度慢，可用于长期保存信息。</li>
+<li>寄存器是CPU中的存储器件，用来临时存放少量的数据，运算结果和正在执行的指令。</li>
+</ul>
+</li>
+</ul>
+<h4 id="1-1-2-计算机软件"><a href="#1-1-2-计算机软件" class="headerlink" title="1.1.2 计算机软件"></a>1.1.2 计算机软件</h4><ul>
+<li><p>计算机软件，是指为管理，运行，维护及应用计算机系统所开发的程序和相关文档的集合。</p>
+</li>
+<li><p>如果计算机系统中仅有硬件系统，则只具备了计算的基础，并不能真正计算，只有将解决问题的步骤编制成机器可识别的程序并加载到计算机内存开始运行，才能完成计算</p>
+</li>
+<li><p>软件，是计算机系统中的重要组成部分，通常可将软件分为系统软件，中间件和应用软件等类型</p>
 <ul>
-<li>基于RFID的考勤管理系统设计与实现</li>
+<li>系统软件的主要功能是管理系统的硬件和软件资源</li>
+<li>应用软件则用于解决应用领域的具体问题，</li>
+<li>中间件，是一类独立的系统软件或服务程序，常用来管理计算资源和网络通信，提供通信处理，数据获取，事务处理，Web服务，安全，跨平台等服务。</li>
 </ul>
 </li>
-<li><p>物理环境要求</p>
+</ul>
+<h3 id="1-2-数据表示"><a href="#1-2-数据表示" class="headerlink" title="1.2 数据表示"></a>1.2 数据表示</h3><ul>
+<li>二进制，是计算机系统广泛采用的一种数制。在计算机内部，数值，文字，声音，图形图像等各种信息都必须经过数字化编码后才能被传送，存储和处理。</li>
+</ul>
+<h4 id="1-2-1-数值型数据的表示"><a href="#1-2-1-数值型数据的表示" class="headerlink" title="1.2.1 数值型数据的表示"></a>1.2.1 数值型数据的表示</h4><ul>
+<li><p>数据在计算机中表示的形式称为机器数，其特点是采用二进制计数制，数的符号使用0，1表示，小数点隐含表示而不占位置。</p>
+</li>
+<li><p>机器数对应的实际数值称为数的真值。</p>
+</li>
+<li><p>无符号数，是指全部二进制位均代表数值，没有符号位。</p>
+</li>
+<li><p>对于有符号数，其机器数的最高位是表示正，负的符号位，其余位则表示数值。</p>
 <ul>
-<li>硬件：<ul>
-<li>RFID阅读器</li>
-<li>RFID读写器</li>
-<li>RFID卡片</li>
+<li>若约定小数点的位置在机器数的最低数值位之后，则是纯整数；</li>
+<li>若约定小数点的位置在机器数的最高数值位之前（符号位之后），则是纯小数。</li>
 </ul>
 </li>
-<li>软件：<ul>
-<li>C 编程语言 | C++ 编程语言</li>
-<li>硬件比较少，软件多做几张表</li>
-</ul>
+<li><p>为了便于运算，带符号的机器数可采用原码，反码，补码和移码等不同的编码方法</p>
 </li>
 </ul>
+<h4 id="1-2-2-定点数和浮点数"><a href="#1-2-2-定点数和浮点数" class="headerlink" title="1.2.2 定点数和浮点数"></a>1.2.2 定点数和浮点数</h4><ul>
+<li><p>所谓定点数，就是表示数据时小数点的位置固定不变。</p>
 </li>
-<li><p>导师指导：</p>
+<li><p>小数点的位置通常有两种约定方式：</p>
 <ul>
-<li>和功能有关，只是收读卡器信息，计算机上写程序即可</li>
+<li>定点整数，纯整数，小数点在最低有效数值位之后，</li>
+<li>定点小数，纯小数，小数点在最高有效数值位之前。</li>
 </ul>
 </li>
+<li><p>所谓浮点数，是指小数点位置不固定的数，浮点表示法能表示更大范围的数</p>
+</li>
 </ul>
-<hr>
-<h2 id="系统环境设计"><a href="#系统环境设计" class="headerlink" title="系统环境设计"></a>系统环境设计</h2><ul>
-<li><p>编程语言：</p>
+<h3 id="1-2-3-其他数据的表示"><a href="#1-2-3-其他数据的表示" class="headerlink" title="1.2.3 其他数据的表示"></a>1.2.3 其他数据的表示</h3><ul>
+<li>各类数据的表示都有相应的基本字符集，任何字符在计算机中都必须转换成二进制表示形式，称为字符编码。</li>
+</ul>
+<h4 id="1-2-4-校验码"><a href="#1-2-4-校验码" class="headerlink" title="1.2.4 校验码"></a>1.2.4 校验码</h4><ul>
+<li><p>计算机系统运行时，各个部件之间要进行频繁的数据交换，为了确保数据在传送过程中准确无误，一是提高硬件电路的可靠性，二是提高代码的校验能力，以进行查错和纠错。</p>
+</li>
+<li><p>通常使用校验码的方法来检测所存储和传送的数据是否出错，即对数据可能出席那的编码分为合法编码和错误编码两类。</p>
 <ul>
-<li>C++</li>
+<li>合法编码，用于存储和传送数据</li>
+<li>错误编码，是不允许在数据中出现的编码</li>
 </ul>
 </li>
-<li><p>数据读写工具</p>
+<li><p>码距，是校验码中的一个重要概念。所谓码距，是指一个编码系统中任意两个合法编码之间至少有多少个二进制位不同。</p>
+</li>
+<li><p>例如，4位8421码的码距为1，在传输过程中，该代码的一位或多位发生错误，都将变成另外一个合法编码，因此这种代码无差错检验能力</p>
+</li>
+<li><p>常用的三种校验码：</p>
 <ul>
-<li>RFID读写器</li>
-<li>RFID卡片</li>
-</ul>
-</li>
-<li><p>系统运行环境</p>
-<ul>
-<li>Ubuntu</li>
+<li>奇偶校验码(Parity Codes)</li>
+<li>海明码(Hamming Code)</li>
+<li>循环冗余校验码(Cyclic Redundancy Check, CRC)</li>
 </ul>
 </li>
 </ul>
-<h2 id="系统流程设计"><a href="#系统流程设计" class="headerlink" title="系统流程设计"></a>系统流程设计</h2><ul>
-<li><p>注册：</p>
-<ul>
-<li>RFID卡片存储用户的唯一ID，通过RFID读写器将用户的ID写入到RFID卡片中</li>
-</ul>
-</li>
-<li><p>签到</p>
-<ul>
-<li>通过RFID读写器，读取RFID卡片存储的数据，在本地用户列表中查找，如果存在，即签到成功；否则，签到失败</li>
-</ul>
-</li>
-<li><p>签退</p>
-<ul>
-<li>通过RFID读写器，读取RFID卡片存储的数据，在本地用户已登录列表查找，如果存在，即签退成功；否则，签退失败</li>
-</ul>
-</li>
-<li><p>注销</p>
-<ul>
-<li>通过RFID读写器，读取RFID卡片存储的数据，在本地用户列表查找，如果存在，删除该数据，返回成功；否则，返回失败</li>
-</ul>
-</li>
-<li><p>其他模块</p>
-<ul>
-<li>待完善</li>
-</ul>
-</li>
+<h3 id="1-3-算术运算和逻辑运算"><a href="#1-3-算术运算和逻辑运算" class="headerlink" title="1.3 算术运算和逻辑运算"></a>1.3 算术运算和逻辑运算</h3><ul>
+<li>基本的算术运算有加法，减法，乘法和除法。</li>
+<li>逻辑数据的取值只有 真 和 假，通常以 1 表示为 真； 0 表示为 假。</li>
+<li>基本的逻辑运算有： 逻辑与， 逻辑或， 逻辑非</li>
 </ul>
 
       
@@ -2134,100 +1364,6 @@
 <li><p>在学习上，自己变得非常聚焦，解决问题为第一优先级，并且一定会想一想自己有没有过度发散学习，以至于跑偏了。一个很明显的例子：由于很多场景需要在SSH到Linux服务器上开发，自己比较深度的使用了VIM，再也没有想着整的vim多么完美，而是着重的练习vim各种快速查找编辑操作上，把实际中最常用的几个插件给好好摸索一下。</p>
 </li>
 <li><p>平时开始看一些人文社科的书籍，开始着重拓展非技术方面的知识，重视建设多元化的自己。</p>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-RFID%E8%80%83%E5%8B%A4%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Personal/2024-05-22-RFID%E8%80%83%E5%8B%A4%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">RFID考勤管理系统</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Personal/" itemprop="url" rel="index"><span itemprop="name">Personal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>RFID考勤管理系统设计</li>
-</ul>
-<h2 id="价格"><a href="#价格" class="headerlink" title="价格"></a>价格</h2><ul>
-<li>1200 – 多人</li>
-<li>1500 – 单人</li>
-</ul>
-<h2 id="初步规划"><a href="#初步规划" class="headerlink" title="初步规划"></a>初步规划</h2><ul>
-<li><p>系统从功能上分为前端和后端</p>
-<ul>
-<li>前端: 使用JS(JavaScript)编程语言，主要实现与用户交互的页面，通讯方式为网络通讯</li>
-<li>后端: 使用C编程语言，主要实现web服务器和RFID读写功能</li>
-</ul>
-</li>
-<li><p>系统从物理上分为软件和硬件。</p>
-<ul>
-<li>硬件: stm32 or ubuntu系统, RFID读写器(RC522), IC磁卡</li>
-<li>软件: 后端服务器和前端界面</li>
-</ul>
 </li>
 </ul>
 
@@ -2559,7 +1695,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-embedded_system_intermediate/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2_%E7%AE%97%E6%B3%95%E8%90%BD%E5%9C%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2573,7 +1709,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Personal/2024-05-22-embedded_system_intermediate/" class="post-title-link" itemprop="url">embedded_system_intermediate</a>
+            <a href="/2024/05/22/notes/Personal/2024-05-22-%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2_%E7%AE%97%E6%B3%95%E8%90%BD%E5%9C%B0/" class="post-title-link" itemprop="url">模型部署_算法落地</a>
         </h2>
 
         <div class="post-meta">
@@ -2614,94 +1750,115 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>五月二十七日考试</li>
+<li>与AI算法团队紧密合作，负责AI算法在CPU，GPU等处理器上的模型，并进行压缩和优化</li>
+<li>提高模型性能，降低部署成本，封装成SDK供业务端使用</li>
+<li>帮助AI算法在项目中快速落地</li>
 </ul>
-<h2 id="第一章计算机系统基础知识"><a href="#第一章计算机系统基础知识" class="headerlink" title="第一章计算机系统基础知识"></a>第一章计算机系统基础知识</h2><h3 id="1-1-嵌入式计算机系统概述"><a href="#1-1-嵌入式计算机系统概述" class="headerlink" title="1.1 嵌入式计算机系统概述"></a>1.1 嵌入式计算机系统概述</h3><h4 id="1-1-1-计算机硬件"><a href="#1-1-1-计算机硬件" class="headerlink" title="1.1.1 计算机硬件"></a>1.1.1 计算机硬件</h4><ul>
-<li>基本的计算机硬件系统由： 运算器，控制器，存储器，输入设备和输出设备</li>
-<li>运算器和控制器及其相关部件已被集成在一起，统称为中央处理单元(Central Processing Unit, CPU)<ul>
-<li>运算器是对数据进行加工处理的部件，它主要完成算术和逻辑运算。</li>
-<li>控制器的主要功能是从主存中取出指令并进行分析，以控制计算机的各个部件有条不紊地完成指令的功能</li>
+<h2 id="任职资格"><a href="#任职资格" class="headerlink" title="任职资格"></a>任职资格</h2><ul>
+<li>精通C++，Python，具备良好的代码书写规范和文档编写能力</li>
+<li>熟悉tensorflow等深度学习框架，熟悉CNN，RNN，LSTM等常用神经网络模型代码实现，精通网络剪枝，量化等算法优化方法</li>
+<li>熟悉ARM，X86，GPU架构体系，熟悉并行计算软件开发，具有丰富的汇编，CUDA编程经验</li>
+<li>良好的英语阅读能力，良好团队合作精神</li>
+</ul>
+<h2 id="经验分享-1"><a href="#经验分享-1" class="headerlink" title="经验分享 1"></a>经验分享 1</h2><h3 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h3><ul>
+<li>想要真正的将训练好的模型部署到边缘计算设备上，并能够以可接受的速度和精度来运行需要掌握很多知识。技术栈可以粗分成两个部分，即软件栈和硬件栈<ul>
+<li>软件栈主要针对算法，包括对深度学习模型的了解、对模型加速技术的了解；</li>
+<li>硬件栈需要了解自己选择的边缘计算设备的硬件架构，边缘计算设备的ISP、存储、算力等性能</li>
 </ul>
 </li>
-<li>存储器是计算机系统中的记忆设备，分为内部存储器(Main Memory, MM, 简称内存，主存)和外部存储器(简称外存或辅存)<ul>
-<li>相对而言，内存速度快，容量小，一般用来临时存储计算机运行时所需要的程序，数据及运算结果</li>
-<li>外村容量大，速度慢，可用于长期保存信息。</li>
-<li>寄存器是CPU中的存储器件，用来临时存放少量的数据，运算结果和正在执行的指令。</li>
 </ul>
+<h3 id="1-2-软件栈"><a href="#1-2-软件栈" class="headerlink" title="1.2 软件栈"></a>1.2 软件栈</h3><ul>
+<li><p>我们需要掌握三部分：模型前处理、模型推理、后处理三部分内容。</p>
 </li>
-</ul>
-<h4 id="1-1-2-计算机软件"><a href="#1-1-2-计算机软件" class="headerlink" title="1.1.2 计算机软件"></a>1.1.2 计算机软件</h4><ul>
-<li><p>计算机软件，是指为管理，运行，维护及应用计算机系统所开发的程序和相关文档的集合。</p>
-</li>
-<li><p>如果计算机系统中仅有硬件系统，则只具备了计算的基础，并不能真正计算，只有将解决问题的步骤编制成机器可识别的程序并加载到计算机内存开始运行，才能完成计算</p>
-</li>
-<li><p>软件，是计算机系统中的重要组成部分，通常可将软件分为系统软件，中间件和应用软件等类型</p>
+<li><p>前处理</p>
 <ul>
-<li>系统软件的主要功能是管理系统的硬件和软件资源</li>
-<li>应用软件则用于解决应用领域的具体问题，</li>
-<li>中间件，是一类独立的系统软件或服务程序，常用来管理计算资源和网络通信，提供通信处理，数据获取，事务处理，Web服务，安全，跨平台等服务。</li>
+<li>了解图像从获取到输入到网络需要哪些基本的操作，常见的减均值，除标准差，通道变换，RGB变换，仿射变换，透视变换等，根据业务场景不同进行组合。</li>
 </ul>
 </li>
-</ul>
-<h3 id="1-2-数据表示"><a href="#1-2-数据表示" class="headerlink" title="1.2 数据表示"></a>1.2 数据表示</h3><ul>
-<li>二进制，是计算机系统广泛采用的一种数制。在计算机内部，数值，文字，声音，图形图像等各种信息都必须经过数字化编码后才能被传送，存储和处理。</li>
-</ul>
-<h4 id="1-2-1-数值型数据的表示"><a href="#1-2-1-数值型数据的表示" class="headerlink" title="1.2.1 数值型数据的表示"></a>1.2.1 数值型数据的表示</h4><ul>
-<li><p>数据在计算机中表示的形式称为机器数，其特点是采用二进制计数制，数的符号使用0，1表示，小数点隐含表示而不占位置。</p>
-</li>
-<li><p>机器数对应的实际数值称为数的真值。</p>
-</li>
-<li><p>无符号数，是指全部二进制位均代表数值，没有符号位。</p>
-</li>
-<li><p>对于有符号数，其机器数的最高位是表示正，负的符号位，其余位则表示数值。</p>
+<li><p>模型推理</p>
 <ul>
-<li>若约定小数点的位置在机器数的最低数值位之后，则是纯整数；</li>
-<li>若约定小数点的位置在机器数的最高数值位之前（符号位之后），则是纯小数。</li>
+<li>了解网络结构模型的设计方法和各部分算子的具体意义。对于部署模型来讲，可能不需要对模型设计有创造性的能力，但需要掌握模型结构设计的基本知识，比如一个通用的目标检测模型包含骨干网络和检测头，针对不同的应用场景，需要我们灵活地调整骨干网络，搭起一个架子，是用VGG还是Resnet，用不用FPN或者Attention模块，有必要的要加进去，没必要的别瞎往里堆。实现一个高精度的深度学习模型网络结构。计算机视觉方向有很多优秀的开源工作，有监督网络里的目标检测、实例分割、关键点检测，无监督网络里的MOCO，github上有很多star作品，比自己设计要强，能白嫖谁还自己搭是吧？</li>
 </ul>
 </li>
-<li><p>为了便于运算，带符号的机器数可采用原码，反码，补码和移码等不同的编码方法</p>
-</li>
-</ul>
-<h4 id="1-2-2-定点数和浮点数"><a href="#1-2-2-定点数和浮点数" class="headerlink" title="1.2.2 定点数和浮点数"></a>1.2.2 定点数和浮点数</h4><ul>
-<li><p>所谓定点数，就是表示数据时小数点的位置固定不变。</p>
-</li>
-<li><p>小数点的位置通常有两种约定方式：</p>
+<li><p>后处理</p>
 <ul>
-<li>定点整数，纯整数，小数点在最低有效数值位之后，</li>
-<li>定点小数，纯小数，小数点在最高有效数值位之前。</li>
+<li>明白一个模型推理结束之后，如何通过后处理得到自己想要的结果，分类加sigmoid，目标检测需要nms，关键点检测需要基于heatmap映射关键点。得到基本的信息之后再拿到自己的业务场景里去做内容</li>
 </ul>
 </li>
-<li><p>所谓浮点数，是指小数点位置不固定的数，浮点表示法能表示更大范围的数</p>
-</li>
 </ul>
-<h3 id="1-2-3-其他数据的表示"><a href="#1-2-3-其他数据的表示" class="headerlink" title="1.2.3 其他数据的表示"></a>1.2.3 其他数据的表示</h3><ul>
-<li>各类数据的表示都有相应的基本字符集，任何字符在计算机中都必须转换成二进制表示形式，称为字符编码。</li>
-</ul>
-<h4 id="1-2-4-校验码"><a href="#1-2-4-校验码" class="headerlink" title="1.2.4 校验码"></a>1.2.4 校验码</h4><ul>
-<li><p>计算机系统运行时，各个部件之间要进行频繁的数据交换，为了确保数据在传送过程中准确无误，一是提高硬件电路的可靠性，二是提高代码的校验能力，以进行查错和纠错。</p>
+<h3 id="1-3-模型加速技术基础"><a href="#1-3-模型加速技术基础" class="headerlink" title="1.3 模型加速技术基础"></a>1.3 模型加速技术基础</h3><ul>
+<li><p>掌握了模型推理基础内容之后，开始模型加速技术相关工作，我们需要把一个在服务器上得到的大模型变成一个小模型，方便边缘计算设备去支持、去计算。很多人直接拿着模型就去进行加速，先剪枝、蒸馏、量化来一套再说，这样不能说错，但是真正想要兼顾速度和精度，还是要深入分析一个模型的特点，再去进行针对性的加速优化</p>
 </li>
-<li><p>通常使用校验码的方法来检测所存储和传送的数据是否出错，即对数据可能出席那的编码分为合法编码和错误编码两类。</p>
+<li><p>分析一个模型</p>
 <ul>
-<li>合法编码，用于存储和传送数据</li>
-<li>错误编码，是不允许在数据中出现的编码</li>
+<li>如何分析一个模型或者如何衡量一个模型的大小？模型的大小是否单单是由运算量体现的？好多人加速完模型已测试，卧槽咋变慢了？<br>模型大小的衡量指标包括计算量、参数量、访存量、计算密度，前三个是绝对值，最后一个是相对值，衡量一个模型大小或者加速一个模型要从这四个方面去考量。因为内存墙的原因，访存比往往成为影响模型推理速度的一个重要因素</li>
+<li>我们不需要自己去计算这些指标，不同的平台或者后端都提供了这些指标的计算API，比如ONNX，Tensorrt，PPL，根据对应的API很快就能分析出一个模型在特定计算设备的指标情况。从模型推理角度出发，各种profiler能够更直观的看到整个模型推理过程中，流水线、计算时间等是怎么分布的。有了这些基本的认识之后，就可以针对性地进行模型加速了</li>
 </ul>
 </li>
-<li><p>码距，是校验码中的一个重要概念。所谓码距，是指一个编码系统中任意两个合法编码之间至少有多少个二进制位不同。</p>
-</li>
-<li><p>例如，4位8421码的码距为1，在传输过程中，该代码的一位或多位发生错误，都将变成另外一个合法编码，因此这种代码无差错检验能力</p>
-</li>
-<li><p>常用的三种校验码：</p>
+<li><p>常用的加速技术</p>
 <ul>
-<li>奇偶校验码(Parity Codes)</li>
-<li>海明码(Hamming Code)</li>
-<li>循环冗余校验码(Cyclic Redundancy Check, CRC)</li>
+<li>加速技术很多，图优化技术，如结构重参数化技术；模型压缩技术如剪枝，蒸馏、量化；此外，不同的软件栈也针对性的做了很多其他方面的优化工作，kernel优化、动态内存，多线程优化技术等等，底层的技术都是类似的，只不过实现细节略有差异，性能也是千差万别。</li>
+</ul>
+</li>
+<li><p>剪枝：</p>
+<ul>
+<li>剪去不需要的权重，相当于减少了模型的运算量，在模型的运算量是模型瓶颈的时候益处很大，各种剪枝方法也很多，设计损失函数的核心就是某个channel的权重重不重要，比如LI norm，L2 norm, Slim pruner, FPGM pruner,这些都是结构化剪枝方法，非结构化剪枝需要特定的ASIC，否则稀疏化和没做没啥区别。但当性能瓶颈不是计算量，而是访存时，剪枝技术的优点就不那么明显了。</li>
+</ul>
+</li>
+<li><p>量化</p>
+<ul>
+<li>量化后放存量必然减少了，采用向量化的方法，计算设备单次发射的指令能够处理更多的数据，真香！</li>
+<li>主流的量化方法还是对称量化，饱不饱合的得看数据到底啥样。</li>
+</ul>
+</li>
+<li><p>结构重参数化</p>
+<ul>
+<li>减少访存的利器，把网络结构里能合并的层合并在一起，实现访存优化，常见的就是CBR融合，RepVGG融合，关键看实操</li>
+</ul>
+</li>
+<li><p>工具链</p>
+<ul>
+<li>大厂为我们提供了成熟的白嫖工具，自动完成所需要的优化工作：Tensorrt，NCNN轻松实现量化、结构重参，还附带其他内存优化、多线程工具，但如果你选择的边缘计算芯片不支持常用的工具链，优化工作就要自己做了，这才是真正检测功底的工作。</li>
 </ul>
 </li>
 </ul>
-<h3 id="1-3-算术运算和逻辑运算"><a href="#1-3-算术运算和逻辑运算" class="headerlink" title="1.3 算术运算和逻辑运算"></a>1.3 算术运算和逻辑运算</h3><ul>
-<li>基本的算术运算有加法，减法，乘法和除法。</li>
-<li>逻辑数据的取值只有 真 和 假，通常以 1 表示为 真； 0 表示为 假。</li>
-<li>基本的逻辑运算有： 逻辑与， 逻辑或， 逻辑非</li>
+<h3 id="1-4-硬件栈"><a href="#1-4-硬件栈" class="headerlink" title="1.4 硬件栈"></a>1.4 硬件栈</h3><ul>
+<li><p>通用计算芯片和专用计算芯片</p>
+<ul>
+<li>首先肯定得了解GPU，CPU，GPU代表英伟达，CPU代表intel，了解主流的GPU，CPU芯片一代代迭代，和计算相关的架构变化到底涉及了哪些内容</li>
+<li>以GPU为例，Nvidia的进化史大致是Kepler，Maxwell，Pascal，Volta，Turing, Ampere，每一代芯片都进行了那些更新，算力，显存怎么做的提升，都支持了那些操作等等</li>
+</ul>
+</li>
+<li><p>专用芯片硬件架构</p>
+<ul>
+<li>CPU、GPU架构主要在任务通用性上下了功夫，相较于专门针对计算机视觉的专用芯片性能很大差距。专用的ASIC种类很多了，架构各有特色，但都是为了一个目的：高性能+低功耗。以Google为代表的TPU问世后掀起了专用ASIC的研发热潮，这十年国产芯片也在疯狂输出，FPGA、KPU，NPU等各种PU层出不穷，性能鱼龙混杂，我们还是要擦亮眼睛去识别的</li>
+<li>涉及到模型部署还是要优选搭配软件栈的芯片，自己去实测芯片性能是最可靠的方法，别看彩页说的如何牛p，还得看模型、看实测！<br>了解视觉信号从输入芯片到输出芯片全流程参与的硬件，这些硬件是怎么参与整个模型的前处理、推理和后处理的，比如昇腾的芯片采用专用硬件实现img2col，Nvidia采用软件实现img2col，各自的特点是怎么样的；再比如Nvidia专用的硬件解码，对于模型推理有怎样的增益等等</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-5-编程语言"><a href="#1-5-编程语言" class="headerlink" title="1.5 编程语言"></a>1.5 编程语言</h3><ul>
+<li><p>Python是一门高级抽象语言，便利了深度学习模型搭建、训练，但用来部署无法和C++一较高下了，</p>
+</li>
+<li><p>简单说说针对算法部署需要掌握的C++知识有哪些？</p>
+<ul>
+<li>面向对象编程的基础：类</li>
+<li>继承：构造函数、析构函数、指针、引用、重写，模板函数</li>
+<li>STL：常用的序列容器及特性，共享内存</li>
+<li>C++多线程：掌握 threading, mutex,condition_variable,future，RAII怎么用</li>
+<li>C++动态内存管理：我也不会，google去吧</li>
+<li>编译基础，动静态库，makefile</li>
+</ul>
+</li>
+</ul>
+<h2 id="经验分享-2"><a href="#经验分享-2" class="headerlink" title="经验分享 2"></a>经验分享 2</h2><ul>
+<li>一般部署的每一个硬件平台都有自己的推理框架，需要自己做的任务基本上是调用api来对一些模型进行落地，这些其实并不是很难</li>
+<li>如果想进阶，学习一些优化的知识，例如卷积优化算法，或者更深入的汇编优化等等，可以关注知乎移动端专栏或者GiantPandaCV公众号，都会带来一些比较良心的部署优化相关的文章</li>
+</ul>
+<h2 id="经验分享-3"><a href="#经验分享-3" class="headerlink" title="经验分享 3"></a>经验分享 3</h2><ul>
+<li>这个工作是开发，对算法的熟悉是为了帮助工程实现，对算法的要求和研究员的关键区别是不太需要算法上的创新</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/411393222">https://www.zhihu.com/question/411393222</a></li>
 </ul>
 
       
@@ -2912,306 +2069,6 @@
 </li>
 </ol>
 <p>业务壁垒的类型和程度因行业而异，有些行业可能具有多种壁垒，而其他行业可能只有少数几个。成功的公司通常能够克服这些壁垒，但它们需要仔细的计划、战略和资源来应对挑战。同时，政府法规和市场变化也可能会改变业务壁垒的性质和程度。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2_%E7%AE%97%E6%B3%95%E8%90%BD%E5%9C%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Personal/2024-05-22-%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2_%E7%AE%97%E6%B3%95%E8%90%BD%E5%9C%B0/" class="post-title-link" itemprop="url">模型部署_算法落地</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Personal/" itemprop="url" rel="index"><span itemprop="name">Personal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>与AI算法团队紧密合作，负责AI算法在CPU，GPU等处理器上的模型，并进行压缩和优化</li>
-<li>提高模型性能，降低部署成本，封装成SDK供业务端使用</li>
-<li>帮助AI算法在项目中快速落地</li>
-</ul>
-<h2 id="任职资格"><a href="#任职资格" class="headerlink" title="任职资格"></a>任职资格</h2><ul>
-<li>精通C++，Python，具备良好的代码书写规范和文档编写能力</li>
-<li>熟悉tensorflow等深度学习框架，熟悉CNN，RNN，LSTM等常用神经网络模型代码实现，精通网络剪枝，量化等算法优化方法</li>
-<li>熟悉ARM，X86，GPU架构体系，熟悉并行计算软件开发，具有丰富的汇编，CUDA编程经验</li>
-<li>良好的英语阅读能力，良好团队合作精神</li>
-</ul>
-<h2 id="经验分享-1"><a href="#经验分享-1" class="headerlink" title="经验分享 1"></a>经验分享 1</h2><h3 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h3><ul>
-<li>想要真正的将训练好的模型部署到边缘计算设备上，并能够以可接受的速度和精度来运行需要掌握很多知识。技术栈可以粗分成两个部分，即软件栈和硬件栈<ul>
-<li>软件栈主要针对算法，包括对深度学习模型的了解、对模型加速技术的了解；</li>
-<li>硬件栈需要了解自己选择的边缘计算设备的硬件架构，边缘计算设备的ISP、存储、算力等性能</li>
-</ul>
-</li>
-</ul>
-<h3 id="1-2-软件栈"><a href="#1-2-软件栈" class="headerlink" title="1.2 软件栈"></a>1.2 软件栈</h3><ul>
-<li><p>我们需要掌握三部分：模型前处理、模型推理、后处理三部分内容。</p>
-</li>
-<li><p>前处理</p>
-<ul>
-<li>了解图像从获取到输入到网络需要哪些基本的操作，常见的减均值，除标准差，通道变换，RGB变换，仿射变换，透视变换等，根据业务场景不同进行组合。</li>
-</ul>
-</li>
-<li><p>模型推理</p>
-<ul>
-<li>了解网络结构模型的设计方法和各部分算子的具体意义。对于部署模型来讲，可能不需要对模型设计有创造性的能力，但需要掌握模型结构设计的基本知识，比如一个通用的目标检测模型包含骨干网络和检测头，针对不同的应用场景，需要我们灵活地调整骨干网络，搭起一个架子，是用VGG还是Resnet，用不用FPN或者Attention模块，有必要的要加进去，没必要的别瞎往里堆。实现一个高精度的深度学习模型网络结构。计算机视觉方向有很多优秀的开源工作，有监督网络里的目标检测、实例分割、关键点检测，无监督网络里的MOCO，github上有很多star作品，比自己设计要强，能白嫖谁还自己搭是吧？</li>
-</ul>
-</li>
-<li><p>后处理</p>
-<ul>
-<li>明白一个模型推理结束之后，如何通过后处理得到自己想要的结果，分类加sigmoid，目标检测需要nms，关键点检测需要基于heatmap映射关键点。得到基本的信息之后再拿到自己的业务场景里去做内容</li>
-</ul>
-</li>
-</ul>
-<h3 id="1-3-模型加速技术基础"><a href="#1-3-模型加速技术基础" class="headerlink" title="1.3 模型加速技术基础"></a>1.3 模型加速技术基础</h3><ul>
-<li><p>掌握了模型推理基础内容之后，开始模型加速技术相关工作，我们需要把一个在服务器上得到的大模型变成一个小模型，方便边缘计算设备去支持、去计算。很多人直接拿着模型就去进行加速，先剪枝、蒸馏、量化来一套再说，这样不能说错，但是真正想要兼顾速度和精度，还是要深入分析一个模型的特点，再去进行针对性的加速优化</p>
-</li>
-<li><p>分析一个模型</p>
-<ul>
-<li>如何分析一个模型或者如何衡量一个模型的大小？模型的大小是否单单是由运算量体现的？好多人加速完模型已测试，卧槽咋变慢了？<br>模型大小的衡量指标包括计算量、参数量、访存量、计算密度，前三个是绝对值，最后一个是相对值，衡量一个模型大小或者加速一个模型要从这四个方面去考量。因为内存墙的原因，访存比往往成为影响模型推理速度的一个重要因素</li>
-<li>我们不需要自己去计算这些指标，不同的平台或者后端都提供了这些指标的计算API，比如ONNX，Tensorrt，PPL，根据对应的API很快就能分析出一个模型在特定计算设备的指标情况。从模型推理角度出发，各种profiler能够更直观的看到整个模型推理过程中，流水线、计算时间等是怎么分布的。有了这些基本的认识之后，就可以针对性地进行模型加速了</li>
-</ul>
-</li>
-<li><p>常用的加速技术</p>
-<ul>
-<li>加速技术很多，图优化技术，如结构重参数化技术；模型压缩技术如剪枝，蒸馏、量化；此外，不同的软件栈也针对性的做了很多其他方面的优化工作，kernel优化、动态内存，多线程优化技术等等，底层的技术都是类似的，只不过实现细节略有差异，性能也是千差万别。</li>
-</ul>
-</li>
-<li><p>剪枝：</p>
-<ul>
-<li>剪去不需要的权重，相当于减少了模型的运算量，在模型的运算量是模型瓶颈的时候益处很大，各种剪枝方法也很多，设计损失函数的核心就是某个channel的权重重不重要，比如LI norm，L2 norm, Slim pruner, FPGM pruner,这些都是结构化剪枝方法，非结构化剪枝需要特定的ASIC，否则稀疏化和没做没啥区别。但当性能瓶颈不是计算量，而是访存时，剪枝技术的优点就不那么明显了。</li>
-</ul>
-</li>
-<li><p>量化</p>
-<ul>
-<li>量化后放存量必然减少了，采用向量化的方法，计算设备单次发射的指令能够处理更多的数据，真香！</li>
-<li>主流的量化方法还是对称量化，饱不饱合的得看数据到底啥样。</li>
-</ul>
-</li>
-<li><p>结构重参数化</p>
-<ul>
-<li>减少访存的利器，把网络结构里能合并的层合并在一起，实现访存优化，常见的就是CBR融合，RepVGG融合，关键看实操</li>
-</ul>
-</li>
-<li><p>工具链</p>
-<ul>
-<li>大厂为我们提供了成熟的白嫖工具，自动完成所需要的优化工作：Tensorrt，NCNN轻松实现量化、结构重参，还附带其他内存优化、多线程工具，但如果你选择的边缘计算芯片不支持常用的工具链，优化工作就要自己做了，这才是真正检测功底的工作。</li>
-</ul>
-</li>
-</ul>
-<h3 id="1-4-硬件栈"><a href="#1-4-硬件栈" class="headerlink" title="1.4 硬件栈"></a>1.4 硬件栈</h3><ul>
-<li><p>通用计算芯片和专用计算芯片</p>
-<ul>
-<li>首先肯定得了解GPU，CPU，GPU代表英伟达，CPU代表intel，了解主流的GPU，CPU芯片一代代迭代，和计算相关的架构变化到底涉及了哪些内容</li>
-<li>以GPU为例，Nvidia的进化史大致是Kepler，Maxwell，Pascal，Volta，Turing, Ampere，每一代芯片都进行了那些更新，算力，显存怎么做的提升，都支持了那些操作等等</li>
-</ul>
-</li>
-<li><p>专用芯片硬件架构</p>
-<ul>
-<li>CPU、GPU架构主要在任务通用性上下了功夫，相较于专门针对计算机视觉的专用芯片性能很大差距。专用的ASIC种类很多了，架构各有特色，但都是为了一个目的：高性能+低功耗。以Google为代表的TPU问世后掀起了专用ASIC的研发热潮，这十年国产芯片也在疯狂输出，FPGA、KPU，NPU等各种PU层出不穷，性能鱼龙混杂，我们还是要擦亮眼睛去识别的</li>
-<li>涉及到模型部署还是要优选搭配软件栈的芯片，自己去实测芯片性能是最可靠的方法，别看彩页说的如何牛p，还得看模型、看实测！<br>了解视觉信号从输入芯片到输出芯片全流程参与的硬件，这些硬件是怎么参与整个模型的前处理、推理和后处理的，比如昇腾的芯片采用专用硬件实现img2col，Nvidia采用软件实现img2col，各自的特点是怎么样的；再比如Nvidia专用的硬件解码，对于模型推理有怎样的增益等等</li>
-</ul>
-</li>
-</ul>
-<h3 id="1-5-编程语言"><a href="#1-5-编程语言" class="headerlink" title="1.5 编程语言"></a>1.5 编程语言</h3><ul>
-<li><p>Python是一门高级抽象语言，便利了深度学习模型搭建、训练，但用来部署无法和C++一较高下了，</p>
-</li>
-<li><p>简单说说针对算法部署需要掌握的C++知识有哪些？</p>
-<ul>
-<li>面向对象编程的基础：类</li>
-<li>继承：构造函数、析构函数、指针、引用、重写，模板函数</li>
-<li>STL：常用的序列容器及特性，共享内存</li>
-<li>C++多线程：掌握 threading, mutex,condition_variable,future，RAII怎么用</li>
-<li>C++动态内存管理：我也不会，google去吧</li>
-<li>编译基础，动静态库，makefile</li>
-</ul>
-</li>
-</ul>
-<h2 id="经验分享-2"><a href="#经验分享-2" class="headerlink" title="经验分享 2"></a>经验分享 2</h2><ul>
-<li>一般部署的每一个硬件平台都有自己的推理框架，需要自己做的任务基本上是调用api来对一些模型进行落地，这些其实并不是很难</li>
-<li>如果想进阶，学习一些优化的知识，例如卷积优化算法，或者更深入的汇编优化等等，可以关注知乎移动端专栏或者GiantPandaCV公众号，都会带来一些比较良心的部署优化相关的文章</li>
-</ul>
-<h2 id="经验分享-3"><a href="#经验分享-3" class="headerlink" title="经验分享 3"></a>经验分享 3</h2><ul>
-<li>这个工作是开发，对算法的熟悉是为了帮助工程实现，对算法的要求和研究员的关键区别是不太需要算法上的创新</li>
-</ul>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/411393222">https://www.zhihu.com/question/411393222</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-%E7%BB%A9%E6%95%88%E8%80%83%E6%A0%B8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Personal/2024-05-22-%E7%BB%A9%E6%95%88%E8%80%83%E6%A0%B8/" class="post-title-link" itemprop="url">绩效考核</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Personal/" itemprop="url" rel="index"><span itemprop="name">Personal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>绩效考核相关笔记</li>
-</ul>
-<h2 id="自我评价-模板"><a href="#自我评价-模板" class="headerlink" title="自我评价 模板"></a>自我评价 模板</h2><ul>
-<li><p>rk平台项目 ： mnc</p>
-<ul>
-<li>代码量 一万七千多行</li>
-</ul>
-</li>
-<li><p>vcr平台项目 ： vcr</p>
-<ul>
-<li>代码量 一万两千多行</li>
-</ul>
-</li>
-</ul>
-<p>给你一个横版。 </p>
-<ul>
-<li><p>所做事项：</p>
-<ul>
-<li>已完成****，</li>
-<li>未完成****，</li>
-<li>未完成原因****，</li>
-<li>计划何时完成*****</li>
-</ul>
-</li>
-<li><p>取得成绩：*****</p>
-<ul>
-<li>（尽量数据化，比如完成<strong>项，</strong>件，占比**%）</li>
-</ul>
-</li>
-<li><p>自我提升：*****</p>
-<ul>
-<li>（学到什么？长进了什么？为更好地产生绩效服务）</li>
-</ul>
-</li>
-<li><p>不足之处：*****</p>
-<ul>
-<li>（哪些不足需要改进？怎么改进？）</li>
-</ul>
-</li>
-</ul>
-<p>紧扣工作内容，力求做到不突兀、不生硬，不长篇大论，切不可肆意抒情。</p>
-<h2 id="2023年自我评价"><a href="#2023年自我评价" class="headerlink" title="2023年自我评价"></a>2023年自我评价</h2><p>我所做的主要工作有机械臂主控系统开发，rockchip平台的边缘计算产品开发，协作机器人的视觉控制系统底层服务器开发。所有项目代码约三万行，按时完成领导分配的开发任务。<br>在个人能力上，通过完成一个个开发任务，分析问题，解决问题的能力得到了很大的提升，能够独立处理问题和新的项目需求。在技术上，使用C++编程语言进行工程开发的能力得到了极大提升，同时熟悉了python编程语言，能够编写python测试程序，提高了程序测试的效率。在团队合作上，在机械臂主控系统开发阶段和前端的对接，在协作机器人的视觉控制系统开发阶段对接后端和算法等，这些经历都对我的团队合作能力和沟通交流能力有极大的提升，现在能够高效率的提出需求或者找到需求并解决。<br>我的不足之处有不够高效的代码和项目框架设计能力欠缺。针对不够高效的代码的改进方法，我将阅读和学习优秀的开源项目代码，重新翻阅自己的代码以进行优化；针对项目框架设计能力欠缺的改进方法，我将阅读相关书籍，例如设计模式等，学习相关理论知识，针对新项目多思考和实践来增强项目框架的设计能力。</p>
 
       
     </div>
@@ -3509,6 +2366,122 @@
 <li><p>基于延续性的考量，以往工作过的行业领域都需要认真对待，但不一定非要继续在之前的方向上做，换一换也可以。但有一个基本的原则：<strong>离夕阳产业和走下坡路的企业远点</strong></p>
 </li>
 </ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Personal/2024-05-22-%E7%BB%A9%E6%95%88%E8%80%83%E6%A0%B8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Personal/2024-05-22-%E7%BB%A9%E6%95%88%E8%80%83%E6%A0%B8/" class="post-title-link" itemprop="url">绩效考核</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Personal/" itemprop="url" rel="index"><span itemprop="name">Personal</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>绩效考核相关笔记</li>
+</ul>
+<h2 id="自我评价-模板"><a href="#自我评价-模板" class="headerlink" title="自我评价 模板"></a>自我评价 模板</h2><ul>
+<li><p>rk平台项目 ： mnc</p>
+<ul>
+<li>代码量 一万七千多行</li>
+</ul>
+</li>
+<li><p>vcr平台项目 ： vcr</p>
+<ul>
+<li>代码量 一万两千多行</li>
+</ul>
+</li>
+</ul>
+<p>给你一个横版。 </p>
+<ul>
+<li><p>所做事项：</p>
+<ul>
+<li>已完成****，</li>
+<li>未完成****，</li>
+<li>未完成原因****，</li>
+<li>计划何时完成*****</li>
+</ul>
+</li>
+<li><p>取得成绩：*****</p>
+<ul>
+<li>（尽量数据化，比如完成<strong>项，</strong>件，占比**%）</li>
+</ul>
+</li>
+<li><p>自我提升：*****</p>
+<ul>
+<li>（学到什么？长进了什么？为更好地产生绩效服务）</li>
+</ul>
+</li>
+<li><p>不足之处：*****</p>
+<ul>
+<li>（哪些不足需要改进？怎么改进？）</li>
+</ul>
+</li>
+</ul>
+<p>紧扣工作内容，力求做到不突兀、不生硬，不长篇大论，切不可肆意抒情。</p>
+<h2 id="2023年自我评价"><a href="#2023年自我评价" class="headerlink" title="2023年自我评价"></a>2023年自我评价</h2><p>我所做的主要工作有机械臂主控系统开发，rockchip平台的边缘计算产品开发，协作机器人的视觉控制系统底层服务器开发。所有项目代码约三万行，按时完成领导分配的开发任务。<br>在个人能力上，通过完成一个个开发任务，分析问题，解决问题的能力得到了很大的提升，能够独立处理问题和新的项目需求。在技术上，使用C++编程语言进行工程开发的能力得到了极大提升，同时熟悉了python编程语言，能够编写python测试程序，提高了程序测试的效率。在团队合作上，在机械臂主控系统开发阶段和前端的对接，在协作机器人的视觉控制系统开发阶段对接后端和算法等，这些经历都对我的团队合作能力和沟通交流能力有极大的提升，现在能够高效率的提出需求或者找到需求并解决。<br>我的不足之处有不够高效的代码和项目框架设计能力欠缺。针对不够高效的代码的改进方法，我将阅读和学习优秀的开源项目代码，重新翻阅自己的代码以进行优化；针对项目框架设计能力欠缺的改进方法，我将阅读相关书籍，例如设计模式等，学习相关理论知识，针对新项目多思考和实践来增强项目框架的设计能力。</p>
 
       
     </div>
@@ -4567,6 +3540,173 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Qt/2024-05-22-qt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Qt/2024-05-22-qt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">qt_1_理论基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>QT 应用程序开发 理论基础</li>
+</ul>
+<h2 id="QT按钮组件"><a href="#QT按钮组件" class="headerlink" title="QT按钮组件"></a>QT按钮组件</h2><ul>
+<li>QT中有六种按钮组件，分别是按压按钮QPushButton、工具按钮QToolButton、单选按钮QRadioButton、多选按钮QCheckBox、命令链接按钮QCommandLinkButton、按钮盒QButtonBox</li>
+</ul>
+<h2 id="QPushButton"><a href="#QPushButton" class="headerlink" title="QPushButton"></a>QPushButton</h2><h3 id="QPushButton组件简介"><a href="#QPushButton组件简介" class="headerlink" title="QPushButton组件简介"></a>QPushButton组件简介</h3><ul>
+<li>QPushButton组件用于接受用户点击事件，能够显示提示字符串，是功能性组件，需要父组件作为容器，能够在父组件中进行定位，用于执行命令或触发事件。</li>
+<li>QPushButton的类继承如下：<ul>
+<li>QPushButton ：public QAbstractButton ：pubic QWidget ：public QObject, public QPaintDevice</li>
+</ul>
+</li>
+</ul>
+<h3 id="QPushButton组件属性"><a href="#QPushButton组件属性" class="headerlink" title="QPushButton组件属性"></a>QPushButton组件属性</h3><ul>
+<li>QPushButton 组件属性设置选项：<ul>
+<li>A、name：组件对应源代码中的名字。</li>
+<li>B、text：组件对应图形界面中显示的名字。</li>
+<li>C、font：设置text的字体。</li>
+<li>D、enabled：组件是否可用。</li>
+</ul>
+</li>
+</ul>
+<h3 id="QPushButton组件常用成员函数"><a href="#QPushButton组件常用成员函数" class="headerlink" title="QPushButton组件常用成员函数"></a>QPushButton组件常用成员函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QPushButton：：QPushButton（<span class="type">const</span> QString &amp;text，QWidget *parent，<span class="type">const</span> <span class="type">char</span> *name = <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>构造一个名称为name，父对象为parent并且文本为text的按压按钮。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> QAbstractButton：：setText（<span class="type">const</span> QString &amp;）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置按钮上显示的文本。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QString QAbstractButton：：text（）<span class="type">const</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回按钮上显示的文本。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> QAbstractButton：：pressed（）[signal]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>当按下按钮时，发射信号。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> QAbstractButton：：clicked（）[signal]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>当单击按钮时，发射信号。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="type">void</span> QAbstractButton：：released（）[signal]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>当释放按钮时，发射信号。</li>
+</ul>
+<h2 id="Qt程序需要配置那些内容"><a href="#Qt程序需要配置那些内容" class="headerlink" title="Qt程序需要配置那些内容"></a>Qt程序需要配置那些内容</h2><ul>
+<li>Qt的几个编译工具: moc, uic, rcc.这几个工具在Qt Assistant中都可以直接搜索到介绍界面，下面简单说一下各自的功能<ul>
+<li>moc: 元对象编译器(Meta Object Compiler)，用来处理带有Q_OBJECT宏的类。我们在声明class的时候，继承QObject，再私有声明Q_OBJECT宏就可以使用Qt的信号和槽了，实际上是Qt利用moc将各个类所需要的元对象代码(meta-object code)补充好了。(moc读取一个头文件，补充其中带有Q_OBJECT宏类的元对象代码，一般生成一个moc_ClassName.cpp文件)</li>
+<li>uic: 用户界面编译器(User Interface Compiler)，用来编译ui界面文件的</li>
+<li>rcc: 资源编译器(Resource Compiler)，把qrc文件编译成对应的C++代码</li>
+</ul>
+</li>
+<li>所以在CMake工程中使用Qt首先要搞明白如何调用这些工具</li>
+</ul>
+<h3 id="moc-uic-rcc-自动调用"><a href="#moc-uic-rcc-自动调用" class="headerlink" title="moc uic rcc 自动调用"></a>moc uic rcc 自动调用</h3><ul>
+<li><p>首先对于 moc uic rcc处理的方法</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_AUTOMOC <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_AUTORCC <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_AUTOUIC <span class="keyword">ON</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>设置了这几个变量之后，会在需要时自动调用这几个编译器。</p>
+</li>
+<li><p>在添加 exe 时的语法:</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(TestQtCMake WIN32 src/main.cpp src/mainWindow.cpp src/mainwindow.h src/mainwindow.ui)</span><br></pre></td></tr></table></figure></li>
+<li><p>其中 WIN32 的参数可能需要提示一下</p>
+<ul>
+<li>如果提供了 WIN32，则将设置WIN32_EXECUTABLE变量为ON，此时将生成一个界面程序而不是控制台程序。</li>
+</ul>
+</li>
+</ul>
+<h3 id="添加Qt模块和生成执行文件"><a href="#添加Qt模块和生成执行文件" class="headerlink" title="添加Qt模块和生成执行文件"></a>添加Qt模块和生成执行文件</h3><ul>
+<li><p>添加库，使用了 find_package()函数，示例如下</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_package</span>(Qt5 COMPONENTS Widgets REQUIRED)</span><br></pre></td></tr></table></figure></li>
+<li><p>首先，要使用find_package()函数，需要提供一个.cmake文件，如何让CMake知道这个文件，可以采用两个方法</p>
+<ul>
+<li>设置环境变量CMAKE_PREFIX_PATH为Qt5安装位置，这是官方Qt-CMake教程中的推荐做法</li>
+<li>设置CMake中Qt5_DIR变量，值为QT5Config.cmake文件的位置。示例如下<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(Qt5_DIR D:\Qt514\<span class="number">5.14</span>.<span class="number">0</span>\msvc2017_64\lib\cmake\Qt5)</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>从上方目录可以看出来，这个.cmake文件是不同Qt版本和不同编译平台都有一套，所以对于官方推荐做法笔者并不是很推荐，难不成当需要换平台的时候还需要去改环境变量</p>
+</li>
+<li><p>将Qt库链接到可执行文件</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(TestQtCMake Qt5::Widgets)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="运行时依赖处理"><a href="#运行时依赖处理" class="headerlink" title="运行时依赖处理"></a>运行时依赖处理</h3><ul>
+<li>对于缺少dll文件，可以在环境变量中是设置Path，把Qt的bin目录添加进来</li>
+<li>在windows平台使用官方的 windeployqt 工具，就在上述的bin目录下，传入exe文件路径就可以将该exe依赖的Qt文件全部打包到目录下，命令示例<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">windeployqt.exe TestQtCMake.exe</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
+<li>要在CMake中使用Qt，需要以下几步<ul>
+<li>设置变量CMAKE_AUTO***为ON以启动 rcc uic moc编译器</li>
+<li>设置变量QT5_DIR变量定位.cmake文件，使用find_package()函数定位Qt的库文件，使用target_link_libraries()函数链接Qt库</li>
+<li>使用windeployqt工具打包依赖项</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/PointCloud/2024-05-22-PCL_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -4884,7 +4024,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Qt/2024-05-22-qt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/SQL/2024-05-22-Postgresql_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -4898,7 +4038,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Qt/2024-05-22-qt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">qt_1_理论基础</a>
+            <a href="/2024/05/22/notes/SQL/2024-05-22-Postgresql_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">Postgresql_1_理论基础</a>
         </h2>
 
         <div class="post-meta">
@@ -4923,7 +4063,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
                 </span>
             </span>
 
@@ -4939,99 +4079,924 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>QT 应用程序开发 理论基础</li>
+<li>PostgresQL 关系型数据库</li>
 </ul>
-<h2 id="QT按钮组件"><a href="#QT按钮组件" class="headerlink" title="QT按钮组件"></a>QT按钮组件</h2><ul>
-<li>QT中有六种按钮组件，分别是按压按钮QPushButton、工具按钮QToolButton、单选按钮QRadioButton、多选按钮QCheckBox、命令链接按钮QCommandLinkButton、按钮盒QButtonBox</li>
+<h2 id="什么是数据库？"><a href="#什么是数据库？" class="headerlink" title="什么是数据库？"></a>什么是数据库？</h2><ul>
+<li>数据库（Database）是按照数据结构来组织、存储和管理数据的仓库。</li>
+<li>每个数据库都有一个或多个不同的 API 用于创建，访问，管理，搜索和复制所保存的数据。</li>
+<li>我们也可以将数据存储在文件中，但是在文件中读写数据速度相对较慢。</li>
+<li>所以，现在我们使用关系型数据库管理系统（RDBMS）来存储和管理的大数据量。所谓的关系型数据库，是建立在关系模型基础上的数+ 据库，借助于集合代数等数学概念和方法来处理数据库中的数据。</li>
+<li>ORDBMS（对象关系数据库系统）是面向对象技术与传统的关系数据库相结合的产物，查询处理是 ORDBMS 的重要组成部分，它的性能+ 优劣将直接影响到DBMS 的性能。</li>
+<li>ORDBMS在原来关系数据库的基础上，增加了一些新的特性。</li>
+<li>RDBMS 是关系数据库管理系统，是建立实体之间的联系，最后得到的是关系表。</li>
+<li>OODBMS 面向对象数据库管理系统，将所有实体都看成对象，并将这些对象类进行封装，对象之间的通信通过消息 OODBMS 对象关系数据库在实质上还是关系数据库</li>
 </ul>
-<h2 id="QPushButton"><a href="#QPushButton" class="headerlink" title="QPushButton"></a>QPushButton</h2><h3 id="QPushButton组件简介"><a href="#QPushButton组件简介" class="headerlink" title="QPushButton组件简介"></a>QPushButton组件简介</h3><ul>
-<li>QPushButton组件用于接受用户点击事件，能够显示提示字符串，是功能性组件，需要父组件作为容器，能够在父组件中进行定位，用于执行命令或触发事件。</li>
-<li>QPushButton的类继承如下：<ul>
-<li>QPushButton ：public QAbstractButton ：pubic QWidget ：public QObject, public QPaintDevice</li>
-</ul>
-</li>
-</ul>
-<h3 id="QPushButton组件属性"><a href="#QPushButton组件属性" class="headerlink" title="QPushButton组件属性"></a>QPushButton组件属性</h3><ul>
-<li>QPushButton 组件属性设置选项：<ul>
-<li>A、name：组件对应源代码中的名字。</li>
-<li>B、text：组件对应图形界面中显示的名字。</li>
-<li>C、font：设置text的字体。</li>
-<li>D、enabled：组件是否可用。</li>
-</ul>
-</li>
-</ul>
-<h3 id="QPushButton组件常用成员函数"><a href="#QPushButton组件常用成员函数" class="headerlink" title="QPushButton组件常用成员函数"></a>QPushButton组件常用成员函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QPushButton：：QPushButton（<span class="type">const</span> QString &amp;text，QWidget *parent，<span class="type">const</span> <span class="type">char</span> *name = <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>构造一个名称为name，父对象为parent并且文本为text的按压按钮。</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> QAbstractButton：：setText（<span class="type">const</span> QString &amp;）</span><br></pre></td></tr></table></figure>
-<ul>
-<li>设置按钮上显示的文本。</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QString QAbstractButton：：text（）<span class="type">const</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>返回按钮上显示的文本。</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> QAbstractButton：：pressed（）[signal]</span><br></pre></td></tr></table></figure>
-<ul>
-<li>当按下按钮时，发射信号。</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> QAbstractButton：：clicked（）[signal]</span><br></pre></td></tr></table></figure>
-<ul>
-<li>当单击按钮时，发射信号。</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="type">void</span> QAbstractButton：：released（）[signal]</span><br></pre></td></tr></table></figure>
-<ul>
-<li>当释放按钮时，发射信号。</li>
-</ul>
-<h2 id="Qt程序需要配置那些内容"><a href="#Qt程序需要配置那些内容" class="headerlink" title="Qt程序需要配置那些内容"></a>Qt程序需要配置那些内容</h2><ul>
-<li>Qt的几个编译工具: moc, uic, rcc.这几个工具在Qt Assistant中都可以直接搜索到介绍界面，下面简单说一下各自的功能<ul>
-<li>moc: 元对象编译器(Meta Object Compiler)，用来处理带有Q_OBJECT宏的类。我们在声明class的时候，继承QObject，再私有声明Q_OBJECT宏就可以使用Qt的信号和槽了，实际上是Qt利用moc将各个类所需要的元对象代码(meta-object code)补充好了。(moc读取一个头文件，补充其中带有Q_OBJECT宏类的元对象代码，一般生成一个moc_ClassName.cpp文件)</li>
-<li>uic: 用户界面编译器(User Interface Compiler)，用来编译ui界面文件的</li>
-<li>rcc: 资源编译器(Resource Compiler)，把qrc文件编译成对应的C++代码</li>
-</ul>
-</li>
-<li>所以在CMake工程中使用Qt首先要搞明白如何调用这些工具</li>
-</ul>
-<h3 id="moc-uic-rcc-自动调用"><a href="#moc-uic-rcc-自动调用" class="headerlink" title="moc uic rcc 自动调用"></a>moc uic rcc 自动调用</h3><ul>
-<li><p>首先对于 moc uic rcc处理的方法</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_AUTOMOC <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_AUTORCC <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_AUTOUIC <span class="keyword">ON</span>)</span><br></pre></td></tr></table></figure></li>
-<li><p>设置了这几个变量之后，会在需要时自动调用这几个编译器。</p>
-</li>
-<li><p>在添加 exe 时的语法:</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(TestQtCMake WIN32 src/main.cpp src/mainWindow.cpp src/mainwindow.h src/mainwindow.ui)</span><br></pre></td></tr></table></figure></li>
-<li><p>其中 WIN32 的参数可能需要提示一下</p>
-<ul>
-<li>如果提供了 WIN32，则将设置WIN32_EXECUTABLE变量为ON，此时将生成一个界面程序而不是控制台程序。</li>
+<h2 id="ORDBMS-术语"><a href="#ORDBMS-术语" class="headerlink" title="ORDBMS 术语"></a>ORDBMS 术语</h2><ul>
+<li>在我们开始学习 PostgreSQL 数据库前，让我们先了解下 ORDBMS 的一些术语：<ul>
+<li>数据库: 数据库是一些关联表的集合。</li>
+<li>数据表: 表是数据的矩阵。在一个数据库中的表看起来像一个简单的电子表格。</li>
+<li>列: 一列(数据元素) 包含了相同的数据, 例如邮政编码的数据。</li>
+<li>行：一行（&#x3D;元组，或记录）是一组相关的数据，例如一条用户订阅的数据。</li>
+<li>冗余：存储两倍数据，冗余降低了性能，但提高了数据的安全性。</li>
+<li>主键：主键是唯一的。一个数据表中只能包含一个主键。你可以使用主键来查询数据。</li>
+<li>外键：外键用于关联两个表。</li>
+<li>复合键：复合键（组合键）将多个列作为一个索引键，一般用于复合索引。</li>
+<li>索引：使用索引可快速访问数据库表中的特定信息。索引是对数据库表中一列或多列的值进行排序的一种结构。类似于书籍的目录。</li>
+<li>参照完整性: 参照的完整性要求关系中不允许引用不存在的实体。与实体完整性是关系模型必须满足的完整性约束条件，目的是保证数+ 据的一致性。</li>
 </ul>
 </li>
 </ul>
-<h3 id="添加Qt模块和生成执行文件"><a href="#添加Qt模块和生成执行文件" class="headerlink" title="添加Qt模块和生成执行文件"></a>添加Qt模块和生成执行文件</h3><ul>
-<li><p>添加库，使用了 find_package()函数，示例如下</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_package</span>(Qt5 COMPONENTS Widgets REQUIRED)</span><br></pre></td></tr></table></figure></li>
-<li><p>首先，要使用find_package()函数，需要提供一个.cmake文件，如何让CMake知道这个文件，可以采用两个方法</p>
+<h2 id="PostgreSQL-特征"><a href="#PostgreSQL-特征" class="headerlink" title="PostgreSQL 特征"></a>PostgreSQL 特征</h2><ul>
+<li>函数：通过函数，可以在数据库服务器端执行指令程序。</li>
+<li>索引：用户可以自定义索引方法，或使用内置的 B 树，哈希表与 GiST 索引。</li>
+<li>触发器：触发器是由SQL语句查询所触发的事件。如：一个INSERT语句可能触发一个检查数据完整性的触发器。触发器通常由INSERT或UPDATE语句触发。 多版本并发控制：PostgreSQL使用多版本并发控制（MVCC，Multiversion concurrency control）系统进行并发控制，该系统向每个用户提供了一个数据库的”快照”，用户在事务内所作的每个修改，对于其他的用户都不可见，直到该事务成功提交。</li>
+<li>规则：规则（RULE）允许一个查询能被重写，通常用来实现对视图（VIEW）的操作，如插入（INSERT）、更新（UPDATE）、删除（DELETE）。</li>
+<li>数据类型：包括文本、任意精度的数值数组、JSON 数据、枚举类型、XML 数据等。</li>
+<li>全文检索：通过 Tsearch2 或 OpenFTS，8.3版本中内嵌 Tsearch2。</li>
+<li>NoSQL：JSON，JSONB，XML，HStore 原生支持，至 NoSQL 数据库的外部数据包装器。</li>
+<li>数据仓库：能平滑迁移至同属 PostgreSQL 生态的 GreenPlum，DeepGreen，HAWK 等，使用 FDW 进行 ETL。</li>
+</ul>
+<h2 id="Linux-上安装-PostgreSQL-Ubuntu-安装-PostgreSQL"><a href="#Linux-上安装-PostgreSQL-Ubuntu-安装-PostgreSQL" class="headerlink" title="Linux 上安装 PostgreSQL (Ubuntu 安装 PostgreSQL)"></a>Linux 上安装 PostgreSQL (Ubuntu 安装 PostgreSQL)</h2><ul>
+<li><p>Ubuntu 可以使用 apt-get 安装 PostgreSQL：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get update</span><br><span class="line"><span class="built_in">sudo</span> apt-get install postgresql postgresql-client</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装完毕后，系统会创建一个数据库超级用户 postgres，密码为空。</p>
 <ul>
-<li>设置环境变量CMAKE_PREFIX_PATH为Qt5安装位置，这是官方Qt-CMake教程中的推荐做法</li>
-<li>设置CMake中Qt5_DIR变量，值为QT5Config.cmake文件的位置。示例如下<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(Qt5_DIR D:\Qt514\<span class="number">5.14</span>.<span class="number">0</span>\msvc2017_64\lib\cmake\Qt5)</span><br></pre></td></tr></table></figure></li>
+<li><h1 id="sudo-i-u-postgres"><a href="#sudo-i-u-postgres" class="headerlink" title="sudo -i -u postgres"></a>sudo -i -u postgres</h1></li>
 </ul>
 </li>
-<li><p>从上方目录可以看出来，这个.cmake文件是不同Qt版本和不同编译平台都有一套，所以对于官方推荐做法笔者并不是很推荐，难不成当需要换平台的时候还需要去改环境变量</p>
-</li>
-<li><p>将Qt库链接到可执行文件</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(TestQtCMake Qt5::Widgets)</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="运行时依赖处理"><a href="#运行时依赖处理" class="headerlink" title="运行时依赖处理"></a>运行时依赖处理</h3><ul>
-<li>对于缺少dll文件，可以在环境变量中是设置Path，把Qt的bin目录添加进来</li>
-<li>在windows平台使用官方的 windeployqt 工具，就在上述的bin目录下，传入exe文件路径就可以将该exe依赖的Qt文件全部打包到目录下，命令示例<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">windeployqt.exe TestQtCMake.exe</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
-<li>要在CMake中使用Qt，需要以下几步<ul>
-<li>设置变量CMAKE_AUTO***为ON以启动 rcc uic moc编译器</li>
-<li>设置变量QT5_DIR变量定位.cmake文件，使用find_package()函数定位Qt的库文件，使用target_link_libraries()函数链接Qt库</li>
-<li>使用windeployqt工具打包依赖项</li>
+<li><p>这时使用以下命令进入 postgres，输出以下信息，说明安装成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">~$ psql</span><br><span class="line">psql (9.5.17)</span><br><span class="line">Type <span class="string">&quot;help&quot;</span> <span class="keyword">for</span> <span class="built_in">help</span>.</span><br><span class="line"></span><br><span class="line">postgres=# </span><br></pre></td></tr></table></figure></li>
+<li><p>输入以下命令退出 PostgreSQL 提示符：</p>
+<ul>
+<li>\q</li>
 </ul>
 </li>
+<li><p>PostgreSQL 安装完成后默认是已经启动的，但是也可以通过下面的方式来手动启动服务。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> /etc/init.d/postgresql start   <span class="comment"># 开启</span></span><br><span class="line"><span class="built_in">sudo</span> /etc/init.d/postgresql stop    <span class="comment"># 关闭</span></span><br><span class="line"><span class="built_in">sudo</span> /etc/init.d/postgresql restart <span class="comment"># 重启</span></span><br></pre></td></tr></table></figure></li>
 </ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Robotics/2024-05-22-robotics_2_%E4%BB%BF%E7%9C%9F%E5%B7%A5%E5%85%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Robotics/2024-05-22-robotics_2_%E4%BB%BF%E7%9C%9F%E5%B7%A5%E5%85%B7/" class="post-title-link" itemprop="url">robotics_2_仿真工具</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Robotics/" itemprop="url" rel="index"><span itemprop="name">Robotics</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>机器人学的仿真工具</li>
+</ul>
+<h2 id="机器人仿真-robodk是什么"><a href="#机器人仿真-robodk是什么" class="headerlink" title="机器人仿真 robodk是什么"></a>机器人仿真 robodk是什么</h2><p>RoboDK（Robot Development Kit）是一种用于机器人仿真和离线编程的软件平台。它允许用户在虚拟环境中模拟和测试工业机器人的运动，以及为这些机器人生成程序代码。RoboDK支持多种不同类型的工业机器人，包括ABB、Fanuc、KUKA、Universal Robots等。</p>
+<p>主要功能包括：</p>
+<ol>
+<li><p><strong>机器人仿真：</strong> 用户可以在RoboDK中创建一个虚拟环境，包括工作台、机器人和其他相关设备。通过仿真，用户可以预先测试和优化机器人的运动，避免在实际生产中出现问题。</p>
+</li>
+<li><p><strong>离线编程：</strong> RoboDK允许用户在虚拟环境中为机器人生成程序代码，然后将这些代码直接应用到实际的机器人系统中。这种离线编程的方法可以减少生产线的停机时间，提高生产效率。</p>
+</li>
+<li><p><strong>支持多种机器人品牌：</strong> RoboDK具有广泛的机器人品牌支持，使其适用于多种不同类型的工业机器人。用户可以选择并模拟其特定品牌和型号的机器人。</p>
+</li>
+<li><p><strong>路径规划和碰撞检测：</strong> RoboDK能够进行路径规划和碰撞检测，确保生成的机器人程序在实际操作中是安全和有效的。</p>
+</li>
+</ol>
+<p>总的来说，RoboDK是一个用于机器人系统仿真和离线编程的强大工具，可帮助用户优化他们的制造流程，提高生产效率。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Robotics/2024-05-22-robotics_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Robotics/2024-05-22-robotics_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">robotics_1_理论基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Robotics/" itemprop="url" rel="index"><span itemprop="name">Robotics</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>机器人学相关理论基础</li>
+</ul>
+<h2 id="机械臂行业"><a href="#机械臂行业" class="headerlink" title="机械臂行业"></a>机械臂行业</h2><ul>
+<li><p>机械手臂是一种固定或移动式的机器，其构造通常由一系列互相链接或相对滑动的零件组成，工作方式主要通过沿着X，Y，Z轴上做线性运动以到达目标位置，从而实现物体的抓取或者移动，能够实现自动控制，可重复程序设计，多自由度(轴)</p>
+</li>
+<li><p>国际企业</p>
+<ul>
+<li>ABB</li>
+<li>发那科</li>
+<li>安川电机</li>
+<li>ADEPT Technology</li>
+<li>UR</li>
+</ul>
+</li>
+<li><p>本土企业</p>
+<ul>
+<li>新松机器人</li>
+<li>埃斯顿</li>
+<li>大族激光</li>
+<li>越疆科技</li>
+<li>埃夫特</li>
+<li>汇川技术</li>
+<li>新时达</li>
+</ul>
+</li>
+<li><p>机械臂的应用领域</p>
+<ul>
+<li>工业制造</li>
+<li>医疗保健</li>
+<li>军事</li>
+<li>物流仓储</li>
+<li>农业</li>
+<li>家庭服务</li>
+</ul>
+</li>
+</ul>
+<h2 id="机器人领域-推荐著作"><a href="#机器人领域-推荐著作" class="headerlink" title="机器人领域 推荐著作"></a>机器人领域 推荐著作</h2><ul>
+<li><p>机器人学导论</p>
+<ul>
+<li>综合性入门教材，内容涉及正&#x2F;逆运动学、静力变换、操作臂动力学、轨迹规划、机械设计、控制等。</li>
+</ul>
+</li>
+<li><p>机器人学，机器视觉与控制-MATLAB算法基础</p>
+<ul>
+<li>Peter Corke编写的机器人入门教材，书中的实例很多，都使用机器人工具箱编写，配合Matlab可以边看边试！</li>
+</ul>
+</li>
+<li><p>Principles of Robot Motion：Theory, Algorithms, and Implementations</p>
+<ul>
+<li>主要讲解基于传感器的规划、概率规划、定位与映射、动态与非完整系统的运动规划。</li>
+</ul>
+</li>
+<li><p>Planning Algorithms</p>
+<ul>
+<li>这本书提出了多种不同规划算法的统一处理。运动规划、离散规划、不确定性规划、基于传感器的规划、可见性、决策理论规划、博弈论、信息空间、强化学习、非线性系统、轨迹规划、非完整规划和动态规划</li>
+</ul>
+</li>
+<li><p>Rigid Body Dynamics Algorithms</p>
+<ul>
+<li>最佳刚体动力学算法的综合集合，Github上也拥有很多不错的资源。</li>
+</ul>
+</li>
+<li><p>机器人操作的数学导论</p>
+<ul>
+<li>从数学的角度系统地介绍了机器人操作的运动学、动力学、控制及运动规划内容，主要包含旋量理论、指数积建模，机器人动力学等内容</li>
+</ul>
+</li>
+<li><p>机器人学-建模、规划与控制</p>
+<ul>
+<li>深入讲解机器人的建模、轨迹运动、运动控制等内容。基础入门强烈推荐！</li>
+</ul>
+</li>
+<li><p>机器人技术手册</p>
+<ul>
+<li>日本机器人学会出品，一本超全的百科全书类型。特别适合作为工具查漏翻查</li>
+</ul>
+</li>
+<li><p>Springer Handbook of Roboticsd</p>
+<ul>
+<li>机器人研究人员、该领域新人和相关学科学者的权威参考</li>
+</ul>
+</li>
+</ul>
+<h2 id="机械臂中的正解FK和逆解IK是什么"><a href="#机械臂中的正解FK和逆解IK是什么" class="headerlink" title="机械臂中的正解FK和逆解IK是什么"></a>机械臂中的正解FK和逆解IK是什么</h2><p>在机械臂控制中，正解（Forward Kinematics，FK）和逆解（Inverse Kinematics，IK）是两个重要的概念。</p>
+<ol>
+<li><p>正解（Forward Kinematics，FK）：<br>正解是指根据机械臂的关节角度或长度等参数，推导出末端执行器（例如机械臂末端的位置和姿态）的运动学表达式或方程式的过程。FK描述了输入到机械臂关节的位置、速度或加速度等参数，从而计算出末端执行器的位置和姿态。FK用于确定机械臂末端在给定关节参数下的运动轨迹，通常是一个从关节空间到工作空间的映射。</p>
+</li>
+<li><p>逆解（Inverse Kinematics，IK）：<br>逆解是指根据已知末端执行器的位置和姿态，确定使机械臂末端达到这个位置和姿态所需的关节角度或长度等参数的过程。IK可以被用来解决给定目标位置和姿态时，计算出机械臂关节参数的问题。在实际应用中，逆解通常是更为复杂和困难的问题，因为一个末端位置和姿态通常对应着多个可能的解。</p>
+</li>
+</ol>
+<p>FK和IK在机器人学和机械臂控制中扮演着重要的角色，FK用于描述机械臂的运动学特性，而IK则允许机械臂在空间中实现特定的末端目标。这些概念对于控制和规划机械臂的运动非常重要，特别是在自动化生产线、工业机器人和虚拟仿真等领域中。</p>
+<h2 id="机器人-目标坐标系-末端坐标系-基底坐标系"><a href="#机器人-目标坐标系-末端坐标系-基底坐标系" class="headerlink" title="机器人 目标坐标系 末端坐标系 基底坐标系"></a>机器人 目标坐标系 末端坐标系 基底坐标系</h2><p>在机器人学中，通常使用三种坐标系来描述机器人的运动和位置：目标坐标系、末端坐标系和基底坐标系。</p>
+<ol>
+<li><p><strong>目标坐标系（Target Coordinate System）：</strong> 这是机器人执行任务时所需达到的目标位置的坐标系。在目标坐标系中定义了机器人需要完成的具体任务的坐标和方向信息。机器人的动作控制通常是根据目标坐标系来规划和执行的。</p>
+</li>
+<li><p><strong>末端坐标系（End-Effector Coordinate System）：</strong> 这是机器人末端执行器（通常是机械手、夹爪等）的坐标系。末端坐标系描述了末端执行器的位置和方向，是机器人进行具体操作时的参考坐标系。机器人执行任务时，末端坐标系的变化反映了机器人末端执行器的运动和姿态。</p>
+</li>
+<li><p><strong>基底坐标系（Base Coordinate System）：</strong> 这是机器人整体结构的参考坐标系。基底坐标系通常与机器人的固定部分（例如机器人底座）相关联，用于描述机器人整体的位置和方向。基底坐标系的选择对机器人运动的规划和控制起着重要的作用。</p>
+</li>
+</ol>
+<p>这三个坐标系之间的关系和转换是机器人控制和规划中的关键问题。通过准确描述这些坐标系之间的变换关系，可以更有效地控制机器人的运动，使其在工作空间内完成任务。</p>
+<h2 id="机器人-世界坐标系-基底坐标系"><a href="#机器人-世界坐标系-基底坐标系" class="headerlink" title="机器人 世界坐标系 基底坐标系"></a>机器人 世界坐标系 基底坐标系</h2><p>在机器人学中，世界坐标系和基底坐标系是两个相关但不同的概念。</p>
+<ol>
+<li><p><strong>世界坐标系（World Coordinate System）：</strong> 世界坐标系是一个全局坐标系，通常被用作机器人工作空间中的参考坐标系。它是一个固定的坐标系，用于描述整个机器人系统在其运动范围内的位置和方向。世界坐标系的选择通常取决于特定应用的需要，以提供方便的参考点。</p>
+</li>
+<li><p><strong>基底坐标系（Base Coordinate System）：</strong> 基底坐标系是机器人本身固有的坐标系，通常与机器人底座或底部连接的结构相关联。这是机器人运动的起点和参考点。机器人的关节和执行器运动通常是相对于基底坐标系进行描述的。基底坐标系的选择对机器人的运动规划和控制非常重要。</p>
+</li>
+</ol>
+<p>在一般情况下，机器人控制和规划涉及到将基底坐标系中的运动转换到世界坐标系中，或者反之。这涉及到位姿变换，包括平移和旋转。</p>
+<p>例如，如果你想让机器人执行一个在世界坐标系中指定的任务，你可能需要将任务的坐标转换为机器人基底坐标系中的坐标，以便机器人能够正确执行任务。反之，如果你想获取机器人当前的位置和方向，你可能需要将机器人基底坐标系中的信息转换为世界坐标系中的信息，以便提供一个全局的参考框架。</p>
+<p>这种坐标系的变换在机器人学和自动化控制中是非常常见的，因为它允许机器人在不同坐标系中进行运动和交互。</p>
+<h2 id="机器人-轨迹规划是什么"><a href="#机器人-轨迹规划是什么" class="headerlink" title="机器人 轨迹规划是什么"></a>机器人 轨迹规划是什么</h2><p>在机器人学和自动化领域，轨迹规划是指通过一系列的动作，规划出机器人从一个起始点到达目标点或完成任务的路径。这个路径通常被称为轨迹，而规划这样的轨迹则需要考虑一系列的因素，如避障、动力学、工作空间限制等。</p>
+<p>轨迹规划的目标是使机器人能够在给定的环境中，以安全、有效、并且可能最优的方式达到目标。以下是轨迹规划的一些关键概念：</p>
+<ol>
+<li><p><strong>起始点和目标点：</strong> 轨迹规划通常始于机器人当前的位置（起始点）并以某个目标位置为终点。</p>
+</li>
+<li><p><strong>运动约束：</strong> 考虑到机器人的动力学、速度、加速度等方面的限制，确保规划出的轨迹是机器人能够执行的。</p>
+</li>
+<li><p><strong>避障：</strong> 考虑到环境中的障碍物，确保规划的轨迹不会碰撞到障碍物。这可能涉及到路径规划算法，例如 A*、Dijkstra、RRT（Rapidly Exploring Random Trees）等。</p>
+</li>
+<li><p><strong>工作空间：</strong> 考虑到机器人工作的空间限制，确保规划的轨迹在工作空间内。</p>
+</li>
+<li><p><strong>优化：</strong> 有时候，除了满足上述条件，还希望规划出的轨迹是最优的，例如最短路径或最短时间。</p>
+</li>
+<li><p><strong>实时性：</strong> 在某些情况下，轨迹规划需要在实时性要求下执行，以适应不断变化的环境。</p>
+</li>
+</ol>
+<p>轨迹规划可以应用于各种类型的机器人，包括工业机械臂、移动机器人、飞行器等。不同类型的机器人可能需要不同的轨迹规划方法，因为它们的动力学和环境条件可能有很大的差异。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/SQL/2024-05-22-sqlite3_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/SQL/2024-05-22-sqlite3_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">sqlite3_2_常用函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h2 id="Update-语句"><a href="#Update-语句" class="headerlink" title="Update 语句"></a>Update 语句</h2><ul>
+<li><p>简介</p>
+<ul>
+<li>SQLite 的 UPDATE 查询用于修改表中已有的记录。可以使用带有 WHERE 子句的 UPDATE 查询来更新选定行，否则所有的行都会被更新</li>
+</ul>
+</li>
+<li><p>语法：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> table_name</span><br><span class="line"><span class="keyword">SET</span> column1 <span class="operator">=</span> value1, column2 <span class="operator">=</span> value2...., columnN <span class="operator">=</span> valueN</span><br><span class="line"><span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure></li>
+<li><p>注 ：</p>
+<ul>
+<li>您可以使用 AND 或 OR 运算符来结合 N 个数量的条件。</li>
+</ul>
+</li>
+</ul>
+<h2 id="删除表"><a href="#删除表" class="headerlink" title="删除表"></a>删除表</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>SQLite 的 DROP TABLE 语句用来删除表定义及其所有相关数据、索引、触发器、约束和该表的权限规范</li>
+<li>使用此命令时要特别注意，因为一旦一个表被删除，表中所有信息也将永远丢失。</li>
+</ul>
+</li>
+<li><p>语法：</p>
+<ul>
+<li><code>DROP TABLE database_name.table_name;</code></li>
+</ul>
+</li>
+<li><p>示例：</p>
+<ul>
+<li>让我们先确认 COMPANY 表已经存在，然后我们将其从数据库中删除。</li>
+<li><code>sqlite&gt;.tables</code></li>
+<li><code>COMPANY       test.COMPANY</code></li>
+</ul>
+</li>
+<li><p>把它从数据库中删除，如下：</p>
+<ul>
+<li><code>sqlite&gt;DROP TABLE COMPANY;</code></li>
+</ul>
+</li>
+<li><p>现在，如果尝试 .TABLES 命令，那么将无法找到 COMPANY 表了：</p>
+<ul>
+<li><code>sqlite&gt;.tables</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><ul>
+<li><p><code>.help</code> : 显示各种重要的 SQLite 点命令的列表</p>
+</li>
+<li><p><code>.tables</code></p>
+</li>
+</ul>
+<p>SQLite是一种轻量级的嵌入式关系型数据库管理系统，具有简单、快速、可靠的特点。以下是一些常用的SQLite命令：</p>
+<ol>
+<li><p>打开或创建数据库：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 database_name.db</span><br></pre></td></tr></table></figure>
+
+<p>该命令将打开名为<code>database_name.db</code>的数据库。如果数据库不存在，则会创建一个新的数据库。</p>
+</li>
+<li><p>显示数据库中的所有表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.tables</span><br></pre></td></tr></table></figure>
+
+<p>该命令将列出数据库中的所有表。</p>
+</li>
+<li><p>显示表结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.schema table_name</span><br></pre></td></tr></table></figure>
+
+<p>该命令将显示名为<code>table_name</code>的表的结构，包括列名、数据类型和约束等信息。</p>
+</li>
+<li><p>执行SQL查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
+
+<p>该命令将执行一个SELECT查询，并显示<code>table_name</code>表中的所有行。</p>
+</li>
+<li><p>插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT INTO</span> table_name (column1, column2, ...) <span class="keyword">VALUES</span> (value1, value2, ...);</span><br></pre></td></tr></table></figure>
+
+<p>该命令将在<code>table_name</code>表中插入一行数据，指定列和对应的值。</p>
+</li>
+<li><p>更新数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> table_name <span class="keyword">SET</span> column1 <span class="operator">=</span> value1, column2 <span class="operator">=</span> value2, ... <span class="keyword">WHERE</span> <span class="keyword">condition</span>;</span><br></pre></td></tr></table></figure>
+
+<p>该命令将更新满足条件<code>WHERE</code>的行，设置指定列的新值。</p>
+</li>
+<li><p>删除数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> <span class="keyword">condition</span>;</span><br></pre></td></tr></table></figure>
+
+<p>该命令将从<code>table_name</code>表中删除满足条件<code>WHERE</code>的行。</p>
+</li>
+<li><p>创建表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> table_name (</span><br><span class="line">    column1 datatype <span class="keyword">constraint</span>,</span><br><span class="line">    column2 datatype <span class="keyword">constraint</span>,</span><br><span class="line">    ...</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>该命令将创建一个新的表，指定列名、数据类型和约束等信息。</p>
+</li>
+<li><p>删除表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> table_name;</span><br></pre></td></tr></table></figure>
+
+<p>该命令将删除名为<code>table_name</code>的表。</p>
+</li>
+</ol>
+<p>这只是SQLite命令的一小部分，SQLite还提供了许多其他命令和功能，如索引、事务、连接等。您可以参考SQLite官方文档或其他资源来了解更多有关SQLite的命令和功能。</p>
+<h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>SQLite 是一种嵌入式关系型数据库管理系统 (RDBMS)，它是一个轻量级、高效、自包含的数据库引擎。与传统的客户端-服务器模式的数据库不同，SQLite 是以库的形式嵌入到应用程序中，应用程序可以直接与数据库文件进行交互，而无需独立的数据库服务器。</p>
+<p>以下是 SQLite 的一些特点和用途：</p>
+<ol>
+<li><p>轻量级：SQLite 是一个轻量级的数据库引擎，它的核心库非常小巧，不依赖于外部服务器或配置。这使得 SQLite 在嵌入式系统、移动设备和资源受限的环境中非常适用。</p>
+</li>
+<li><p>自包含：SQLite 数据库以单个文件的形式存储，并且包含了完整的数据库结构和数据。这意味着应用程序可以直接操作一个 SQLite 数据库文件，而无需额外的数据库管理系统。</p>
+</li>
+<li><p>事务支持：SQLite 支持 ACID（原子性、一致性、隔离性和持久性）事务特性，它可以确保数据库的完整性和一致性。</p>
+</li>
+<li><p>SQL 兼容：SQLite 支持 SQL 查询语言，可以使用标准的 SQL 语句进行数据库操作，包括数据的查询、插入、更新和删除等。</p>
+</li>
+<li><p>广泛应用：由于其轻量级和自包含的特性，SQLite 在各种应用场景中得到广泛应用，包括嵌入式系统、移动应用程序、桌面应用程序、Web 浏览器、数据分析和开发测试等。</p>
+</li>
+</ol>
+<p>在使用 SQLite 时，你可以通过编写 SQL 语句或使用相应的 SQLite API 来创建数据库、定义表结构、插入和查询数据等操作。同时，有许多编程语言和框架提供了对 SQLite 的支持和封装，使得在不同的开发环境中使用 SQLite 更加便捷。</p>
+<p>SQLite 是C语言接口的</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>以下是在 Linux 系统上编译和安装 SQLite 的基本步骤：</p>
+<ol>
+<li><p>下载源代码：访问 SQLite 的官方网站（<a target="_blank" rel="noopener" href="https://www.sqlite.org/index.html%EF%BC%89%E5%B9%B6%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC%E7%9A%84%E6%BA%90%E4%BB%A3%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%8C%85%E3%80%82">https://www.sqlite.org/index.html）并下载最新版本的源代码压缩包。</a></p>
+</li>
+<li><p>解压源代码：使用命令行解压下载的源代码压缩包。例如，可以使用以下命令解压名为 “sqlite.tar.gz” 的压缩包：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xzf sqlite.tar.gz</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进入源代码目录：切换到解压后的源代码目录。例如，如果解压后的目录名为 “sqlite-x.x.x”，可以使用以下命令进入该目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd sqlite-x.x.x</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置编译选项：运行以下命令来配置编译选项，其中 <code>prefix</code> 是指定安装目录的路径：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/path/to/installation</span><br></pre></td></tr></table></figure>
+
+<p>你可以根据需要指定其他选项，如启用或禁用特定功能。可以运行 <code>./configure --help</code> 命令查看可用的配置选项。</p>
+</li>
+<li><p>编译源代码：运行以下命令来编译源代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装 SQLite：运行以下命令以将 SQLite 安装到指定的安装目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<p>注意确保你有足够的权限来将文件安装到指定目录。</p>
+</li>
+<li><p>完成安装：安装完成后，你可以在指定的安装目录中找到 SQLite 的可执行文件和相关库文件。</p>
+</li>
+</ol>
+<p>完成上述步骤后，你已成功编译和安装了 SQLite。你可以使用 SQLite 的命令行工具或在你的应用程序中使用 SQLite 库进行数据库操作。记得参考 SQLite 的文档和相关资源，以了解如何使用 SQLite 进行数据库管理和操作。</p>
+<h2 id="查看数据库表"><a href="#查看数据库表" class="headerlink" title="查看数据库表"></a>查看数据库表</h2><p>要查看 SQLite 数据库中的表，你可以使用 SQLite 提供的命令行工具 <code>sqlite3</code> 或编写一个简单的 C++ 程序来执行查询。</p>
+<p>使用命令行工具 <code>sqlite3</code>，按照以下步骤进行操作：</p>
+<ol>
+<li><p>打开终端或命令提示符。</p>
+</li>
+<li><p>运行以下命令来连接到 SQLite 数据库文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 your_database.db</span><br></pre></td></tr></table></figure>
+<p>将 <code>your_database.db</code> 替换为实际的数据库文件名。</p>
+</li>
+<li><p>连接成功后，你将进入 SQLite 的命令行界面。运行以下命令来查看数据库中的表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.tables</span><br></pre></td></tr></table></figure>
+<p>这将显示数据库中所有的表的列表。</p>
+</li>
+<li><p>若要查看特定表的详细结构，可以使用以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.schema table_name</span><br></pre></td></tr></table></figure>
+<p>将 <code>table_name</code> 替换为实际的表名。</p>
+</li>
+</ol>
+<p>使用 C++ 程序来查看数据库表，你可以编写类似以下的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sqlite3.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    sqlite3* db;</span><br><span class="line">    <span class="type">int</span> rc;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打开数据库连接</span></span><br><span class="line">    rc = <span class="built_in">sqlite3_open</span>(<span class="string">&quot;your_database.db&quot;</span>, &amp;db);</span><br><span class="line">    <span class="keyword">if</span> (rc) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;无法打开数据库: &quot;</span> &lt;&lt; <span class="built_in">sqlite3_errmsg</span>(db) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> rc;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查询表名</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* selectTablesSQL = <span class="string">&quot;SELECT name FROM sqlite_master WHERE type=&#x27;table&#x27;;&quot;</span>;</span><br><span class="line">    rc = <span class="built_in">sqlite3_exec</span>(db, selectTablesSQL, [](<span class="type">void</span>* data, <span class="type">int</span> argc, <span class="type">char</span>** argv, <span class="type">char</span>** <span class="comment">/*azColName*/</span>) -&gt; <span class="type">int</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">            std::cout &lt;&lt; argv[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        std::cout &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;, <span class="literal">nullptr</span>, <span class="literal">nullptr</span>);</span><br><span class="line">    <span class="keyword">if</span> (rc != SQLITE_OK) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;无法查询表: &quot;</span> &lt;&lt; <span class="built_in">sqlite3_errmsg</span>(db) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> rc;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭数据库连接</span></span><br><span class="line">    <span class="built_in">sqlite3_close</span>(db);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将代码中的 <code>&quot;your_database.db&quot;</code> 替换为实际的数据库文件名，然后编译和运行程序。它将连接到数据库文件并执行查询来获取表名列表，并将其打印到控制台。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/SQL/2024-05-22-sql_2_%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/SQL/2024-05-22-sql_2_%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95/" class="post-title-link" itemprop="url">sql_2_基本语法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>sql编程语言的基本语法</li>
+</ul>
+<h2 id="1-3-SQL-SELECT语句"><a href="#1-3-SQL-SELECT语句" class="headerlink" title="1.3 SQL SELECT语句"></a>1.3 SQL SELECT语句</h2><ul>
+<li><p>SELECT 语句用于从数据库中选取数据。结果被存储在一个结果表中，称为结果集。</p>
+</li>
+<li><p>SQL SELECT 语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1, column2, ...</span><br><span class="line"><span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>SELECT * FROM table_name;</code></li>
+</ul>
+</li>
+<li><p>参数说明：</p>
+<ul>
+<li>column1, column2, …：要选择的字段名称，可以为多个字段。如果不指定字段名称，则会选择所有字段。</li>
+<li>table_name：要查询的表名称。</li>
+</ul>
+</li>
+<li><p>大多数数据库软件系统都允许使用编程函数在结果集中进行导航，比如：Move-To-First-Record、Get-Record-Content、Move-To-Next-Record 等等。</p>
+</li>
+<li><p>类似这些编程函数不在本教程讲解之列。如需学习通过函数调用访问数据的知识，请访问我们的 ADO 教程 或者 PHP 教程。</p>
+</li>
+</ul>
+<h2 id="1-3-SQL-SELECT-DISTINCT-语句"><a href="#1-3-SQL-SELECT-DISTINCT-语句" class="headerlink" title="1.3 SQL SELECT DISTINCT 语句"></a>1.3 SQL SELECT DISTINCT 语句</h2><ul>
+<li><p>SELECT DISTINCT 语句用于返回唯一不同的值。</p>
+</li>
+<li><p>在表中，一个列可能会包含多个重复值，有时您也许希望仅仅列出不同（distinct）的值。DISTINCT 关键词用于返回唯一不同的值。</p>
+</li>
+<li><p>SQL SELECT DISTINCT 语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> column1, column2, ...</span><br><span class="line"><span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure></li>
+<li><p>参数说明：</p>
+<ul>
+<li>column1, column2, …：要选择的字段名称，可以为多个字段。如果不指定字段名称，则会选择所有字段。</li>
+<li>table_name：要查询的表名称。</li>
+</ul>
+</li>
+<li><p>SELECT DISTINCT 实例</p>
+<ul>
+<li>下面的 SQL 语句仅从 “Websites” 表的 “country” 列中选取唯一不同的值，也就是去掉 “country” 列重复值：</li>
+<li><code>SELECT DISTINCT country FROM Websites;</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-3-SQL-WHERE-子句"><a href="#1-3-SQL-WHERE-子句" class="headerlink" title="1.3 SQL WHERE 子句"></a>1.3 SQL WHERE 子句</h2><ul>
+<li><p>WHERE 子句用于过滤记录。</p>
+</li>
+<li><p>WHERE 子句用于提取那些满足指定条件的记录。</p>
+</li>
+<li><p>SQL WHERE 语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1, column2, ...</span><br><span class="line"><span class="keyword">FROM</span> table_name</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">condition</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>参数说明：</p>
+<ul>
+<li>column1, column2, …：要选择的字段名称，可以为多个字段。如果不指定字段名称，则会选择所有字段。</li>
+<li>table_name：要查询的表名称。</li>
+</ul>
+</li>
+<li><p>WHERE 子句实例</p>
+<ul>
+<li>下面的 SQL 语句从 “Websites” 表中选取国家为 “CN” 的所有网站：</li>
+<li><code>SELECT * FROM Websites WHERE country=&#39;CN&#39;;</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-4-SQL-AND-OR-运算符"><a href="#1-4-SQL-AND-OR-运算符" class="headerlink" title="1.4 SQL AND &amp; OR 运算符"></a>1.4 SQL AND &amp; OR 运算符</h2><ul>
+<li><p>AND &amp; OR 运算符用于基于一个以上的条件对记录进行过滤。</p>
+</li>
+<li><p>如果第一个条件和第二个条件都成立，则 AND 运算符显示一条记录。</p>
+</li>
+<li><p>如果第一个条件和第二个条件中只要有一个成立，则 OR 运算符显示一条记录。</p>
+</li>
+<li><p>AND 运算符实例</p>
+<ul>
+<li>下面的 SQL 语句从 “Websites” 表中选取国家为 “CN” 且alexa排名大于 “50” 的所有网站：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">WHERE</span> country<span class="operator">=</span><span class="string">&#x27;CN&#x27;</span></span><br><span class="line"><span class="keyword">AND</span> alexa <span class="operator">&gt;</span> <span class="number">50</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>OR 运算符实例</p>
+<ul>
+<li>下面的 SQL 语句从 “Websites” 表中选取国家为 “USA” 或者 “CN” 的所有客户：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">WHERE</span> country<span class="operator">=</span><span class="string">&#x27;USA&#x27;</span></span><br><span class="line"><span class="keyword">OR</span> country<span class="operator">=</span><span class="string">&#x27;CN&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>结合 AND &amp; OR</p>
+<ul>
+<li>您也可以把 AND 和 OR 结合起来（使用圆括号来组成复杂的表达式）。</li>
+<li>下面的 SQL 语句从 “Websites” 表中选取 alexa 排名大于 “15” 且国家为 “CN” 或 “USA” 的所有网站：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">WHERE</span> alexa <span class="operator">&gt;</span> <span class="number">15</span></span><br><span class="line"><span class="keyword">AND</span> (country<span class="operator">=</span><span class="string">&#x27;CN&#x27;</span> <span class="keyword">OR</span> country<span class="operator">=</span><span class="string">&#x27;USA&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-5-SQL-ORDER-BY-关键字"><a href="#1-5-SQL-ORDER-BY-关键字" class="headerlink" title="1.5 SQL ORDER BY 关键字"></a>1.5 SQL ORDER BY 关键字</h2><ul>
+<li><p>ORDER BY 关键字用于对结果集进行排序。</p>
+</li>
+<li><p>ORDER BY 关键字用于对结果集按照一个列或者多个列进行排序。</p>
+</li>
+<li><p>ORDER BY 关键字默认按照升序对记录进行排序。如果需要按照降序对记录进行排序，您可以使用 DESC 关键字。</p>
+</li>
+<li><p>SQL ORDER BY 语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1, column2, ...</span><br><span class="line"><span class="keyword">FROM</span> table_name</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> column1, column2, ... <span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>参数解析：</p>
+<ul>
+<li>column1, column2, …：要排序的字段名称，可以为多个字段。</li>
+<li>ASC：表示按升序排序。</li>
+<li>DESC：表示按降序排序。</li>
+</ul>
+</li>
+<li><p>ORDER BY 实例</p>
+<ul>
+<li>下面的 SQL 语句从 “Websites” 表中选取所有网站，并按照 “alexa” 列排序：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> alexa;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>ORDER BY DESC 实例</p>
+<ul>
+<li>下面的 SQL 语句从 “Websites” 表中选取所有网站，并按照 “alexa” 列降序排序：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> alexa <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>ORDER BY 多列</p>
+<ul>
+<li>下面的 SQL 语句从 “Websites” 表中选取所有网站，并按照 “country” 和 “alexa” 列排序：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> country,alexa;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-5-SQL-INSERT-INTO-语句"><a href="#1-5-SQL-INSERT-INTO-语句" class="headerlink" title="1.5 SQL INSERT INTO 语句"></a>1.5 SQL INSERT INTO 语句</h2><ul>
+<li><p>INSERT INTO 语句用于向表中插入新记录。</p>
+</li>
+<li><p>INSERT INTO 语句可以有两种编写形式。</p>
+<ul>
+<li>第一种形式无需指定要插入数据的列名，只需提供被插入的值即可：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT INTO</span> table_name</span><br><span class="line"><span class="keyword">VALUES</span> (value1,value2,value3,...);</span><br></pre></td></tr></table></figure></li>
+<li>第二种形式需要指定列名及被插入的值：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT INTO</span> table_name (column1,column2,column3,...)</span><br><span class="line"><span class="keyword">VALUES</span> (value1,value2,value3,...);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>参数说明：</p>
+<ul>
+<li>table_name：需要插入新记录的表名。</li>
+<li>column1, column2, …：需要插入的字段名。</li>
+<li>value1, value2, …：需要插入的字段值。</li>
+</ul>
+</li>
+<li><p>INSERT INTO 实例</p>
+<ul>
+<li>假设我们要向 “Websites” 表中插入一个新行。<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT INTO</span> Websites (name, url, alexa, country)</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;百度&#x27;</span>,<span class="string">&#x27;https://www.baidu.com/&#x27;</span>,<span class="string">&#x27;4&#x27;</span>,<span class="string">&#x27;CN&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+<li>在指定的列插入数据</li>
+<li>下面的 SQL 语句将插入一个新行，但是只在 “name”、”url” 和 “country” 列插入数据（id 字段会自动更新）：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT INTO</span> Websites (name, url, country)</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;stackoverflow&#x27;</span>, <span class="string">&#x27;http://stackoverflow.com/&#x27;</span>, <span class="string">&#x27;IND&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-6-SQL-UPDATE-语句"><a href="#1-6-SQL-UPDATE-语句" class="headerlink" title="1.6 SQL UPDATE 语句"></a>1.6 SQL UPDATE 语句</h2><ul>
+<li><p>UPDATE 语句用于更新表中的记录。</p>
+</li>
+<li><p>UPDATE 语句用于更新表中已存在的记录。</p>
+</li>
+<li><p>SQL UPDATE 语法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">UPDATE table_name</span><br><span class="line">SET column1 = value1, column2 = value2, ...</span><br><span class="line">WHERE condition;</span><br></pre></td></tr></table></figure></li>
+<li><p>参数说明：</p>
+<ul>
+<li>table_name：要修改的表名称。</li>
+<li>column1, column2, …：要修改的字段名称，可以为多个字段。</li>
+<li>value1, value2, …：要修改的值，可以为多个值。</li>
+<li>condition：修改条件，用于指定哪些数据要修改</li>
+</ul>
+</li>
+<li><p>请注意 SQL UPDATE 语句中的 WHERE 子句！</p>
+</li>
+<li><p>WHERE 子句规定哪条记录或者哪些记录需要更新。如果您省略了 WHERE 子句，所有的记录都将被更新！</p>
+</li>
+<li><p>SQL UPDATE 实例</p>
+<ul>
+<li>假设我们要把 “菜鸟教程” 的 alexa 排名更新为 5000，country 改为 USA。<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> Websites </span><br><span class="line"><span class="keyword">SET</span> alexa<span class="operator">=</span><span class="string">&#x27;5000&#x27;</span>, country<span class="operator">=</span><span class="string">&#x27;USA&#x27;</span> </span><br><span class="line"><span class="keyword">WHERE</span> name<span class="operator">=</span><span class="string">&#x27;菜鸟教程&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-7-SQL-DELETE-语句"><a href="#1-7-SQL-DELETE-语句" class="headerlink" title="1.7 SQL DELETE 语句"></a>1.7 SQL DELETE 语句</h2><ul>
+<li><p>DELETE 语句用于删除表中的记录。</p>
+</li>
+<li><p>DELETE 语句用于删除表中的行。</p>
+</li>
+<li><p>SQL DELETE 语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> table_name</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">condition</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>参数说明：</p>
+<ul>
+<li>table_name：要删除的表名称。</li>
+<li>condition：删除条件，用于指定哪些数据要删除</li>
+</ul>
+</li>
+<li><p>SQL DELETE 实例</p>
+<ul>
+<li>假设我们要从 “Websites” 表中删除网站名为 “Facebook” 且国家为 USA 的网站。<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> Websites</span><br><span class="line"><span class="keyword">WHERE</span> name<span class="operator">=</span><span class="string">&#x27;Facebook&#x27;</span> <span class="keyword">AND</span> country<span class="operator">=</span><span class="string">&#x27;USA&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>删除所有数据</p>
+<ul>
+<li>您可以在不删除表的情况下，删除表中所有的行。这意味着表结构、属性、索引将保持不变：</li>
+<li><code>DELETE FROM table_name;</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="sql-常用语句"><a href="#sql-常用语句" class="headerlink" title="sql 常用语句"></a>sql 常用语句</h2><p>SQL（Structured Query Language）是一种用于管理关系型数据库的编程语言。下面是一些SQL编程语言中常用的语句：</p>
+<ol>
+<li><p>数据库操作语句：</p>
+<ul>
+<li>创建数据库：<code>CREATE DATABASE database_name;</code></li>
+<li>删除数据库：<code>DROP DATABASE database_name;</code></li>
+<li>切换数据库：<code>USE database_name;</code></li>
+</ul>
+</li>
+<li><p>表操作语句：</p>
+<ul>
+<li>创建表：<code>CREATE TABLE table_name (column1 datatype, column2 datatype, ...);</code></li>
+<li>删除表：<code>DROP TABLE table_name;</code></li>
+<li>修改表结构：<code>ALTER TABLE table_name ADD column_name datatype;</code></li>
+</ul>
+</li>
+<li><p>数据操作语句：</p>
+<ul>
+<li>插入数据：<code>INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...);</code></li>
+<li>更新数据：<code>UPDATE table_name SET column1 = value1, column2 = value2 WHERE condition;</code></li>
+<li>删除数据：<code>DELETE FROM table_name WHERE condition;</code></li>
+<li>查询数据：<code>SELECT column1, column2, ... FROM table_name WHERE condition;</code></li>
+</ul>
+</li>
+<li><p>数据过滤语句：</p>
+<ul>
+<li>条件过滤：使用WHERE子句进行条件筛选，例如：<code>WHERE column_name = value</code>。</li>
+<li>范围过滤：使用BETWEEN和IN进行范围筛选，例如：<code>WHERE column_name BETWEEN value1 AND value2</code>。</li>
+<li>模糊搜索：使用LIKE进行模糊匹配，例如：<code>WHERE column_name LIKE &#39;%value%&#39;</code>。</li>
+</ul>
+</li>
+<li><p>数据排序和限制语句：</p>
+<ul>
+<li>排序数据：使用ORDER BY子句对结果进行排序，例如：<code>ORDER BY column_name ASC/DESC</code>。</li>
+<li>限制结果：使用LIMIT子句限制结果集的数量，例如：<code>LIMIT n</code>。</li>
+</ul>
+</li>
+<li><p>数据聚合和统计语句：</p>
+<ul>
+<li>聚合函数：使用聚合函数对数据进行计算，如COUNT、SUM、AVG、MIN、MAX等，例如：<code>SELECT COUNT(*) FROM table_name</code>。</li>
+<li>分组数据：使用GROUP BY子句对结果进行分组，例如：<code>GROUP BY column_name</code>。</li>
+<li>过滤分组：使用HAVING子句对分组结果进行过滤，例如：<code>HAVING condition</code>。</li>
+</ul>
+</li>
+</ol>
+<p>这些是SQL编程语言中常用的一些语句，可以用于创建和管理数据库、操作数据、查询数据和进行数据分析。具体的语法和用法可能会根据数据库管理系统的不同而有所差异，因此在实际使用时需要参考相应的数据库文档和语法规范。</p>
+<hr>
+<h2 id="ORDER-详解"><a href="#ORDER-详解" class="headerlink" title="ORDER 详解"></a>ORDER 详解</h2><p>在SQL中，ORDER BY子句用于对查询结果进行排序。它可以按照一个或多个列的值进行升序（ASC）或降序（DESC）排序。以下是ORDER BY子句的详细解释：</p>
+<p>基本语法：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1, column2, ...</span><br><span class="line"><span class="keyword">FROM</span> table_name</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> column1 [<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>], column2 [<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>], ...;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SELECT：用于指定要查询的列。</li>
+<li>FROM：用于指定要查询的表名。</li>
+<li>ORDER BY：用于指定排序规则。</li>
+<li>column1, column2, …：要按照其值进行排序的列名。</li>
+<li>ASC：升序排列（默认值）。</li>
+<li>DESC：降序排列。</li>
+</ul>
+<p>示例：<br>假设有一个名为”employees”的表，包含以下列：id、name和salary。我们将使用该表作为示例来说明ORDER BY的使用：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, name, salary</span><br><span class="line"><span class="keyword">FROM</span> employees</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+
+<p>上述示例将返回按照salary列的值降序排列的结果集。结果集中的记录将按照salary的值从高到低排序。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, name, salary</span><br><span class="line"><span class="keyword">FROM</span> employees</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> name <span class="keyword">ASC</span>, salary <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+
+<p>上述示例将返回首先按照name列的值升序排列，如果name相同，则按照salary列的值降序排列的结果集。</p>
+<p>需要注意的是，ORDER BY子句的位置应该位于查询语句的最后，以便在执行排序之前获取查询结果。</p>
+<p>ORDER BY子句在SQL中非常有用，它使我们能够按照特定的列或多个列对查询结果进行排序，以满足特定的排序需求。</p>
 
       
     </div>
@@ -5116,7 +5081,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">629</span>
+          <span class="site-state-item-count">628</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -5129,7 +5094,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-count">94</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
