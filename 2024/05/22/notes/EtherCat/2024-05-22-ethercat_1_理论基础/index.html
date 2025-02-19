@@ -20,18 +20,20 @@
     var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
   </script>
 
-  <meta name="description" content="简介 ethercat的理论基础知识  ethercat 是什么 详细解释EtherCAT 详解EtherCAT（以太网控制自动化技术）是一种基于以太网的高性能实时工业通信协议，专为工业自动化系统设计。它由德国Beckhoff公司于2003年开发，现已成为工业自动化领域的重要标准（IEC 61158）。  核心特点 实时性与高效性    数据帧“飞行处理”机制：主站发送的以太网帧依次经过每个从站设">
+  <meta name="description" content="简介 ethercat的理论基础知识  可能出现从站依次松闸现象的原因有哪些EtherCAT 从站依次松闸（即从站的执行机构或电机控制器按顺序解锁&#x2F;启动，而不是同时执行）可能由以下原因引起：  1. 主站状态机控制问题 EtherCAT 从站需要经过 Init → Pre-Op → Safe-Op → OP 状态转换才能正式运行。 如果主站没有同时对所有从站发送 状态切换命令，可能导致从">
 <meta property="og:type" content="article">
 <meta property="og:title" content="EtherCAT 理论基础">
 <meta property="og:url" content="https://junyiha.github.io/2024/05/22/notes/EtherCAT/2024-05-22-ethercat_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="junyi&#39;s blog">
-<meta property="og:description" content="简介 ethercat的理论基础知识  ethercat 是什么 详细解释EtherCAT 详解EtherCAT（以太网控制自动化技术）是一种基于以太网的高性能实时工业通信协议，专为工业自动化系统设计。它由德国Beckhoff公司于2003年开发，现已成为工业自动化领域的重要标准（IEC 61158）。  核心特点 实时性与高效性    数据帧“飞行处理”机制：主站发送的以太网帧依次经过每个从站设">
+<meta property="og:description" content="简介 ethercat的理论基础知识  可能出现从站依次松闸现象的原因有哪些EtherCAT 从站依次松闸（即从站的执行机构或电机控制器按顺序解锁&#x2F;启动，而不是同时执行）可能由以下原因引起：  1. 主站状态机控制问题 EtherCAT 从站需要经过 Init → Pre-Op → Safe-Op → OP 状态转换才能正式运行。 如果主站没有同时对所有从站发送 状态切换命令，可能导致从">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.ethercat.org/download/press/ethercat_state_machine.png">
 <meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
-<meta property="article:modified_time" content="2025-02-19T12:01:00.168Z">
+<meta property="article:modified_time" content="2025-02-19T15:27:13.556Z">
 <meta property="article:author" content="zhang junyi">
 <meta property="article:tag" content="EtherCAT">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.ethercat.org/download/press/ethercat_state_machine.png">
 
 <link rel="canonical" href="https://junyiha.github.io/2024/05/22/notes/EtherCAT/2024-05-22-ethercat_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
 
@@ -225,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-02-19 20:01:00" itemprop="dateModified" datetime="2025-02-19T20:01:00+08:00">2025-02-19</time>
+                <time title="Modified: 2025-02-19 23:27:13" itemprop="dateModified" datetime="2025-02-19T23:27:13+08:00">2025-02-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -251,6 +253,412 @@
         <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
 <li>ethercat的理论基础知识</li>
 </ul>
+<h2 id="可能出现从站依次松闸现象的原因有哪些"><a href="#可能出现从站依次松闸现象的原因有哪些" class="headerlink" title="可能出现从站依次松闸现象的原因有哪些"></a>可能出现从站依次松闸现象的原因有哪些</h2><p>EtherCAT 从站<strong>依次松闸</strong>（即从站的执行机构或电机控制器按顺序解锁&#x2F;启动，而不是同时执行）可能由以下原因引起：</p>
+<hr>
+<h2 id="1-主站状态机控制问题"><a href="#1-主站状态机控制问题" class="headerlink" title="1. 主站状态机控制问题"></a><strong>1. 主站状态机控制问题</strong></h2><ul>
+<li>EtherCAT 从站需要经过 <strong>Init → Pre-Op → Safe-Op → OP</strong> 状态转换才能正式运行。</li>
+<li>如果主站没有同时对所有从站发送 <strong>状态切换命令</strong>，可能导致<strong>从站依次进入 OP 状态</strong>，从而导致依次松闸。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 在主站程序中，确保所有从站在<strong>同一周期</strong>内切换到 OP 状态，而不是顺序执行。</p>
+<hr>
+<h2 id="2-同步机制（Distributed-Clocks-DC）问题"><a href="#2-同步机制（Distributed-Clocks-DC）问题" class="headerlink" title="2. 同步机制（Distributed Clocks, DC）问题"></a><strong>2. 同步机制（Distributed Clocks, DC）问题</strong></h2><ul>
+<li><strong>从站时钟不同步</strong>：如果使用 <strong>DC（分布式时钟）模式</strong>，但从站的时钟没有正确同步，不同从站可能会在不同的时间点进入 OP 状态。</li>
+<li><strong>时钟漂移</strong>：某些从站可能会<strong>比其他从站慢</strong>进入 OP 状态，导致松闸的时间差异。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 在主站配置中检查 DC 设置，确保所有从站的时钟同步。<br>✅ 通过 <code>dcOffset</code> 进行时钟补偿，使所有从站的启动时间一致。</p>
+<hr>
+<h2 id="3-PDO-映射或过程数据更新问题"><a href="#3-PDO-映射或过程数据更新问题" class="headerlink" title="3. PDO 映射或过程数据更新问题"></a><strong>3. PDO 映射或过程数据更新问题</strong></h2><ul>
+<li>EtherCAT 采用 <strong>PDO（过程数据对象）</strong> 进行输入&#x2F;输出数据交换。</li>
+<li>如果 <strong>PDO 更新不一致</strong> 或者 <strong>某些从站的数据没有及时刷新</strong>，会导致<strong>某些从站较晚接收到松闸指令</strong>。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 在主站配置中，确保所有从站的 PDO <strong>在同一周期内更新</strong>。<br>✅ 使用 <strong>周期同步模式（Cyclic Synchronous Mode）</strong> 以确保所有从站同时执行操作。</p>
+<hr>
+<h2 id="4-设备响应时间差异"><a href="#4-设备响应时间差异" class="headerlink" title="4. 设备响应时间差异"></a><strong>4. 设备响应时间差异</strong></h2><ul>
+<li>不同从站的<strong>硬件响应时间不同</strong>（如伺服驱动器、电磁阀、继电器等）。</li>
+<li>某些从站可能需要<strong>更长的初始化时间</strong>，导致它们比其他从站<strong>晚进入 OP 状态</strong>。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 在主站程序中，<strong>等待所有从站进入 OP 状态后再统一发送松闸指令</strong>。<br>✅ 使用 <strong>EtherCAT 总线诊断工具</strong> 检查从站进入 OP 状态的时间是否一致。</p>
+<hr>
+<h2 id="5-网络拓扑和通信延迟"><a href="#5-网络拓扑和通信延迟" class="headerlink" title="5. 网络拓扑和通信延迟"></a><strong>5. 网络拓扑和通信延迟</strong></h2><ul>
+<li>EtherCAT 采用<strong>菊花链结构</strong>，如果<strong>总线负载过高</strong>或<strong>链路有异常</strong>，可能导致数据包在不同从站之间传输时间不同。</li>
+<li>这种情况下，<strong>靠近主站的从站可能会比远离主站的从站更早收到指令</strong>，导致依次松闸。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 使用 EtherCAT 网络分析工具（如 Wireshark + EtherCAT 插件）检查数据包延迟。<br>✅ 在<strong>高负载场景下</strong>，优化 PDO 更新频率，避免总线数据阻塞。  </p>
+<hr>
+<h2 id="6-设备上电顺序不一致"><a href="#6-设备上电顺序不一致" class="headerlink" title="6. 设备上电顺序不一致"></a><strong>6. 设备上电顺序不一致</strong></h2><ul>
+<li>如果<strong>从站上电时间不同</strong>，即某些设备比其他设备<strong>晚启动</strong>，则可能导致它们进入 OP 状态的时间不同。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 确保所有从站<strong>同时上电</strong>，或者在主站程序中<strong>等待所有设备启动后再进入 OP 状态</strong>。</p>
+<hr>
+<h2 id="7-触发信号或启动命令不同步"><a href="#7-触发信号或启动命令不同步" class="headerlink" title="7. 触发信号或启动命令不同步"></a><strong>7. 触发信号或启动命令不同步</strong></h2><ul>
+<li>如果松闸依赖于<strong>外部触发信号</strong>（如数字输入 DI、PLC 触发），而该信号的传播或执行时间不同，也会导致从站<strong>依次解锁</strong>。</li>
+</ul>
+<p><strong>解决方案：</strong><br>✅ 检查<strong>触发信号</strong>是否<strong>同步</strong>发送到所有从站。<br>✅ 在主站逻辑中，使用 <strong>全局触发信号</strong> 或 <strong>基于 DC 的同步触发</strong> 来确保所有设备同时执行动作。</p>
+<hr>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a><strong>结论</strong></h2><p>EtherCAT 从站依次松闸的常见原因包括：</p>
+<table>
+<thead>
+<tr>
+<th><strong>原因类别</strong></th>
+<th><strong>可能问题</strong></th>
+<th><strong>解决方案</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>主站状态机</strong></td>
+<td>主站未同步切换 OP</td>
+<td>在主站程序中确保所有从站同步进入 OP</td>
+</tr>
+<tr>
+<td><strong>DC 时钟同步</strong></td>
+<td>时钟未同步、漂移</td>
+<td>确保所有从站 DC 同步</td>
+</tr>
+<tr>
+<td><strong>PDO 更新</strong></td>
+<td>数据未及时刷新</td>
+<td>确保所有从站的 PDO 在同一周期内更新</td>
+</tr>
+<tr>
+<td><strong>设备响应时间</strong></td>
+<td>设备处理速度不同</td>
+<td>统一等待所有设备进入 OP</td>
+</tr>
+<tr>
+<td><strong>网络拓扑</strong></td>
+<td>总线负载高，数据延迟</td>
+<td>优化数据更新频率，检查总线健康状态</td>
+</tr>
+<tr>
+<td><strong>上电顺序</strong></td>
+<td>设备启动时间不同</td>
+<td>确保所有从站同时上电</td>
+</tr>
+<tr>
+<td><strong>触发信号不同步</strong></td>
+<td>触发时间不同</td>
+<td>使用 DC 触发或全局信号同步</td>
+</tr>
+</tbody></table>
+<p>如果 EtherCAT 从站出现 <strong>依次松闸</strong> 现象，可以从 <strong>主站状态机、DC 时钟、PDO 更新、网络拓扑、设备响应、触发信号</strong> 等方面进行检查和优化。</p>
+<h2 id="EtherCAT-从站有几种状态"><a href="#EtherCAT-从站有几种状态" class="headerlink" title="EtherCAT 从站有几种状态"></a>EtherCAT 从站有几种状态</h2><p>在 EtherCAT（Ethernet for Control Automation Technology）协议中，<strong>从站（Slave）</strong> 具有 <strong>四种状态（State Machine）</strong>，每个状态代表不同的操作模式。  </p>
+<hr>
+<h2 id="EtherCAT-从站的-4-种状态"><a href="#EtherCAT-从站的-4-种状态" class="headerlink" title="EtherCAT 从站的 4 种状态"></a><strong>EtherCAT 从站的 4 种状态</strong></h2><p>从站状态由 <strong>AL 状态机（Application Layer State Machine）</strong> 控制，状态包括：</p>
+<ol>
+<li><strong>初始化（Init）</strong></li>
+<li><strong>预操作（Pre-Operational, Pre-Op）</strong></li>
+<li><strong>安全操作（Safe-Operational, Safe-Op）</strong></li>
+<li><strong>操作（Operational, OP）</strong></li>
+</ol>
+<p>EtherCAT <strong>主站（Master）</strong> 通过 <strong>AL 控制寄存器</strong> 控制从站的状态转换。</p>
+<hr>
+<h3 id="1-初始化（Init）"><a href="#1-初始化（Init）" class="headerlink" title="1. 初始化（Init）"></a><strong>1. 初始化（Init）</strong></h3><ul>
+<li><strong>功能</strong>：从站上电后进入 <strong>初始状态</strong>，此时只进行 <strong>基础通信配置</strong>，还不能进行过程数据（Process Data）交换。</li>
+<li><strong>特性</strong>：<ul>
+<li>只能访问 <strong>物理层和链路层</strong>（EtherCAT 层）。</li>
+<li>仅支持 <strong>CoE&#x2F;SDO</strong>（对象字典）等<strong>配置数据通信</strong>。</li>
+<li>从站必须完成 <strong>寄存器初始化</strong> 和 <strong>EEPROM 读取</strong>。</li>
+</ul>
+</li>
+<li><strong>状态转换</strong>：<ul>
+<li><strong>进入 Pre-Op</strong>：主站发送 <code>Init → Pre-Op</code> 命令。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-预操作（Pre-Operational-Pre-Op）"><a href="#2-预操作（Pre-Operational-Pre-Op）" class="headerlink" title="2. 预操作（Pre-Operational, Pre-Op）"></a><strong>2. 预操作（Pre-Operational, Pre-Op）</strong></h3><ul>
+<li><strong>功能</strong>：在该状态下，从站允许主站访问<strong>对象字典（Object Dictionary）</strong> 进行参数配置，但仍不能交换过程数据。</li>
+<li><strong>特性</strong>：<ul>
+<li>允许<strong>CoE（CANopen over EtherCAT）</strong> 进行<strong>SDO 参数传输</strong>。</li>
+<li>不能进行实时过程数据交换（PDO 无效）。</li>
+<li>适用于 <strong>参数下载、设备初始化</strong> 等任务。</li>
+</ul>
+</li>
+<li><strong>状态转换</strong>：<ul>
+<li><strong>进入 Safe-Op</strong>：主站配置完成后，发送 <code>Pre-Op → Safe-Op</code> 命令。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="3-安全操作（Safe-Operational-Safe-Op）"><a href="#3-安全操作（Safe-Operational-Safe-Op）" class="headerlink" title="3. 安全操作（Safe-Operational, Safe-Op）"></a><strong>3. 安全操作（Safe-Operational, Safe-Op）</strong></h3><ul>
+<li><strong>功能</strong>：从站可以进行<strong>输入数据的读取</strong>，但不能修改输出数据（即，不能改变执行机构的状态）。</li>
+<li><strong>特性</strong>：<ul>
+<li>允许主站<strong>读取</strong>从站的输入数据。</li>
+<li>但不允许主站<strong>写入</strong>从站的输出数据（防止设备误动作）。</li>
+<li>适用于<strong>调试过程</strong>，确保系统在操作前数据正确。</li>
+</ul>
+</li>
+<li><strong>状态转换</strong>：<ul>
+<li><strong>进入 OP（Operational）</strong>：主站确认输入数据正确后，发送 <code>Safe-Op → OP</code> 命令。</li>
+<li><strong>返回 Pre-Op</strong>：如果数据异常，主站可发送 <code>Safe-Op → Pre-Op</code>。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="4-操作（Operational-OP）"><a href="#4-操作（Operational-OP）" class="headerlink" title="4. 操作（Operational, OP）"></a><strong>4. 操作（Operational, OP）</strong></h3><ul>
+<li><strong>功能</strong>：从站进入<strong>全功能状态</strong>，主站可以<strong>读取输入数据、写入输出数据</strong>，正式运行 EtherCAT 过程数据（PDO）。</li>
+<li><strong>特性</strong>：<ul>
+<li>允许<strong>完整过程数据通信</strong>（输入&#x2F;输出）。</li>
+<li>适用于<strong>正常生产、设备运行</strong>。</li>
+</ul>
+</li>
+<li><strong>状态转换</strong>：<ul>
+<li><strong>返回 Safe-Op</strong>：如果出现紧急情况（如数据错误），主站可发送 <code>OP → Safe-Op</code> 命令。</li>
+<li><strong>返回 Pre-Op</strong>：如果主站要修改配置，主站可发送 <code>OP → Pre-Op</code> 命令。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="状态转换流程"><a href="#状态转换流程" class="headerlink" title="状态转换流程"></a><strong>状态转换流程</strong></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. Init → Pre-Op（初始化完成，进入参数配置）</span><br><span class="line">2. Pre-Op → Safe-Op（参数配置完成，输入数据可用）</span><br><span class="line">3. Safe-Op → OP（进入全功能模式，允许数据输入/输出）</span><br><span class="line">4. OP → Safe-Op/Pre-Op/Init（错误或主站请求降级）</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.ethercat.org/download/press/ethercat_state_machine.png"></p>
+<hr>
+<h2 id="异常状态处理"><a href="#异常状态处理" class="headerlink" title="异常状态处理"></a><strong>异常状态处理</strong></h2><p>如果从站发生错误，它可能：</p>
+<ul>
+<li><strong>进入 “错误状态”（Error）</strong>（通常表现为 Safe-Op 或 Init）。</li>
+<li><strong>重启后回到 Init 状态</strong>，等待重新进入 OP。</li>
+</ul>
+<p>主站可以通过：</p>
+<ul>
+<li><strong>检查 AL 状态寄存器</strong></li>
+<li><strong>读取诊断信息</strong></li>
+<li><strong>尝试重新配置</strong></li>
+</ul>
+<p>来判断从站的状态并进行恢复。</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>EtherCAT 从站有 4 种状态：</p>
+<table>
+<thead>
+<tr>
+<th><strong>状态</strong></th>
+<th><strong>能否进行 PDO 通信？</strong></th>
+<th><strong>应用场景</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Init</strong></td>
+<td>❌ 不能</td>
+<td>上电、基础通信</td>
+</tr>
+<tr>
+<td><strong>Pre-Op</strong></td>
+<td>❌ 不能</td>
+<td>参数配置</td>
+</tr>
+<tr>
+<td><strong>Safe-Op</strong></td>
+<td>✅ 只能读取输入</td>
+<td>调试、验证</td>
+</tr>
+<tr>
+<td><strong>OP（Operational）</strong></td>
+<td>✅ 允许输入&#x2F;输出</td>
+<td>正常运行</td>
+</tr>
+</tbody></table>
+<p>EtherCAT 主站通过 <strong>状态机控制</strong> 从站，确保从 <strong>初始化 → 预操作 → 安全操作 → 运行</strong> 的<strong>安全平稳过渡</strong>。</p>
+<h2 id="ethercat-主站与从站通讯协议"><a href="#ethercat-主站与从站通讯协议" class="headerlink" title="ethercat 主站与从站通讯协议"></a>ethercat 主站与从站通讯协议</h2><p>EtherCAT（<strong>Ethernet for Control Automation Technology</strong>）是一种基于<strong>以太网</strong>的实时工业网络协议，广泛用于<strong>运动控制、I&#x2F;O、传感器、机器人</strong>等领域。EtherCAT 的核心是<strong>主站（Master）</strong>和<strong>从站（Slave）</strong>之间的高速数据交换，采用<strong>主从架构</strong>。  </p>
+<hr>
+<h2 id="1-EtherCAT-通讯协议架构"><a href="#1-EtherCAT-通讯协议架构" class="headerlink" title="1. EtherCAT 通讯协议架构"></a><strong>1. EtherCAT 通讯协议架构</strong></h2><p>EtherCAT 采用<strong>以太网帧</strong>进行通信，但与标准以太网不同，EtherCAT 具有以下特点：</p>
+<ul>
+<li><strong>主站（Master）</strong> 负责发送和处理EtherCAT 数据包，不需要专用芯片，可由普通网卡或专用控制器实现。</li>
+<li><strong>从站（Slave）</strong> 设备按照帧数据处理规则响应主站请求，通常使用<strong>EtherCAT专用芯片</strong>（如<strong>ET1100</strong>）。</li>
+<li><strong>循环拓扑</strong> 方式（支持菊花链、环形、树形等），数据帧沿<strong>单向传输</strong>。</li>
+<li><strong>帧穿透</strong> 机制：数据包在传输时直接在从站设备间传递，无需存储转发。</li>
+</ul>
+<hr>
+<h2 id="2-EtherCAT-通讯流程"><a href="#2-EtherCAT-通讯流程" class="headerlink" title="2. EtherCAT 通讯流程"></a><strong>2. EtherCAT 通讯流程</strong></h2><p>EtherCAT 通讯采用主站主动轮询方式：</p>
+<ol>
+<li><p><strong>主站发送EtherCAT帧</strong></p>
+<ul>
+<li>主站生成数据帧，并包含多个<strong>过程数据对象（PDO）</strong>。</li>
+<li>帧内携带多个从站的数据请求&#x2F;指令。</li>
+</ul>
+</li>
+<li><p><strong>从站解析和处理帧</strong></p>
+<ul>
+<li>帧经过从站时，<strong>从站在数据帧上直接读写相关数据区域</strong>，而不是接收整个帧再处理。</li>
+<li>这极大提升了通信效率，避免了传统以太网的<strong>存储转发</strong>延迟。</li>
+</ul>
+</li>
+<li><p><strong>主站接收并解析返回数据</strong></p>
+<ul>
+<li>当帧经过所有从站后，数据会返回给主站，主站读取修改后的数据。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-EtherCAT-帧结构"><a href="#3-EtherCAT-帧结构" class="headerlink" title="3. EtherCAT 帧结构"></a><strong>3. EtherCAT 帧结构</strong></h2><p>EtherCAT 帧基于标准<strong>IEEE 802.3 以太网帧</strong>，但采用特殊的<strong>EtherType &#x3D; 0x88A4</strong>，表示是EtherCAT数据帧。</p>
+<p>EtherCAT 数据帧结构如下：</p>
+<table>
+<thead>
+<tr>
+<th><strong>字段</strong></th>
+<th><strong>长度（字节）</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目标MAC地址</td>
+<td>6</td>
+<td>目的设备MAC</td>
+</tr>
+<tr>
+<td>源MAC地址</td>
+<td>6</td>
+<td>发送设备MAC</td>
+</tr>
+<tr>
+<td>EtherType</td>
+<td>2</td>
+<td>固定为 0x88A4</td>
+</tr>
+<tr>
+<td>EtherCAT数据</td>
+<td>46-1500</td>
+<td>实际数据，包含多个命令</td>
+</tr>
+<tr>
+<td>CRC校验</td>
+<td>4</td>
+<td>以太网帧校验</td>
+</tr>
+</tbody></table>
+<p>EtherCAT数据部分主要包含：</p>
+<ul>
+<li><strong>命令头（CMD Header）</strong><ul>
+<li>包含<strong>命令类型（LRW、APRD、APWR、BRD等）</strong>，目标<strong>从站地址</strong>，数据长度等信息。</li>
+</ul>
+</li>
+<li><strong>过程数据（Process Data）</strong><ul>
+<li>具体的输入&#x2F;输出数据内容。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-主要EtherCAT通信命令"><a href="#4-主要EtherCAT通信命令" class="headerlink" title="4. 主要EtherCAT通信命令"></a><strong>4. 主要EtherCAT通信命令</strong></h2><p>EtherCAT 主站与从站的通讯主要基于以下<strong>命令类型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>缩写</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>逻辑读取</td>
+<td><strong>LRD</strong></td>
+<td>读取过程数据</td>
+</tr>
+<tr>
+<td>逻辑写入</td>
+<td><strong>LWR</strong></td>
+<td>写入过程数据</td>
+</tr>
+<tr>
+<td>逻辑读写</td>
+<td><strong>LRW</strong></td>
+<td>读写数据，最常用</td>
+</tr>
+<tr>
+<td>自动增量读取</td>
+<td><strong>APRD</strong></td>
+<td>按自动增量地址读取</td>
+</tr>
+<tr>
+<td>自动增量写入</td>
+<td><strong>APWR</strong></td>
+<td>按自动增量地址写入</td>
+</tr>
+<tr>
+<td>自动增量读写</td>
+<td><strong>APRW</strong></td>
+<td>读写数据，并自动增量</td>
+</tr>
+<tr>
+<td>广播读取</td>
+<td><strong>BRD</strong></td>
+<td>读取所有从站数据</td>
+</tr>
+<tr>
+<td>广播写入</td>
+<td><strong>BWR</strong></td>
+<td>写入所有从站数据</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-EtherCAT-工作模式"><a href="#5-EtherCAT-工作模式" class="headerlink" title="5. EtherCAT 工作模式"></a><strong>5. EtherCAT 工作模式</strong></h2><p>EtherCAT 主要有以下<strong>4种工作模式</strong>：</p>
+<h3 id="1）自由运行模式（Free-Run-Mode）"><a href="#1）自由运行模式（Free-Run-Mode）" class="headerlink" title="1）自由运行模式（Free Run Mode）"></a><strong>1）自由运行模式（Free Run Mode）</strong></h3><ul>
+<li>主站<strong>不停发送数据</strong>，不依赖同步时钟。</li>
+<li>适用于简单IO控制，不需要高精度同步。</li>
+</ul>
+<h3 id="2）同步管理模式（SM-Sync-Mode）"><a href="#2）同步管理模式（SM-Sync-Mode）" class="headerlink" title="2）同步管理模式（SM Sync Mode）"></a><strong>2）同步管理模式（SM Sync Mode）</strong></h3><ul>
+<li>通过<strong>同步管理器（Sync Manager）</strong>控制数据交换。</li>
+<li>适用于<strong>离散IO</strong>，但同步性较低。</li>
+</ul>
+<h3 id="3）分布式时钟模式（DC-Mode）"><a href="#3）分布式时钟模式（DC-Mode）" class="headerlink" title="3）分布式时钟模式（DC Mode）"></a><strong>3）分布式时钟模式（DC Mode）</strong></h3><ul>
+<li>采用<strong>从站时钟同步机制</strong>，主站下发时间戳，从站调整本地时钟。</li>
+<li>适用于<strong>高精度运动控制</strong>，同步精度可达<strong>纳秒级</strong>。</li>
+</ul>
+<h3 id="4）周期同步模式（Cyclic-Sync-Mode）"><a href="#4）周期同步模式（Cyclic-Sync-Mode）" class="headerlink" title="4）周期同步模式（Cyclic Sync Mode）"></a><strong>4）周期同步模式（Cyclic Sync Mode）</strong></h3><ul>
+<li>类似DC模式，但主站以<strong>固定周期</strong>发送数据。</li>
+<li>适用于<strong>实时性要求高的应用</strong>（如伺服驱动）。</li>
+</ul>
+<hr>
+<h2 id="6-EtherCAT与其他工业总线对比"><a href="#6-EtherCAT与其他工业总线对比" class="headerlink" title="6. EtherCAT与其他工业总线对比"></a><strong>6. EtherCAT与其他工业总线对比</strong></h2><table>
+<thead>
+<tr>
+<th><strong>总线类型</strong></th>
+<th><strong>通信方式</strong></th>
+<th><strong>同步精度</strong></th>
+<th><strong>通信速率</strong></th>
+<th><strong>优点</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CANopen</td>
+<td>轮询+事件触发</td>
+<td>毫秒级</td>
+<td>1Mbps</td>
+<td>成熟稳定，成本低</td>
+</tr>
+<tr>
+<td>PROFINET</td>
+<td>以太网+RT&#x2F;IRT</td>
+<td>微秒级</td>
+<td>100Mbps</td>
+<td>兼容性好，普及广</td>
+</tr>
+<tr>
+<td>EtherCAT</td>
+<td>主站轮询</td>
+<td>纳秒级</td>
+<td>100Mbps</td>
+<td>高速、低延迟</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="7-EtherCAT-应用场景"><a href="#7-EtherCAT-应用场景" class="headerlink" title="7. EtherCAT 应用场景"></a><strong>7. EtherCAT 应用场景</strong></h2><ul>
+<li><strong>运动控制</strong><ul>
+<li>伺服驱动、电机控制</li>
+<li>CNC机床、机器人控制</li>
+</ul>
+</li>
+<li><strong>工业自动化</strong><ul>
+<li>PLC与IO模块连接</li>
+<li>传感器数据采集</li>
+</ul>
+</li>
+<li><strong>半导体制造</strong><ul>
+<li>高精度同步传输</li>
+</ul>
+</li>
+<li><strong>汽车测试</strong><ul>
+<li>车辆HIL仿真测试系统</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-结论"><a href="#8-结论" class="headerlink" title="8. 结论"></a><strong>8. 结论</strong></h2><p>EtherCAT 作为高性能工业以太网协议，具有<strong>低延迟、高同步精度</strong>的特点，广泛应用于<strong>实时控制领域</strong>。主站通过<strong>轮询</strong>与从站通信，从站在<strong>数据帧穿透</strong>机制下直接修改数据，提高了通信效率，是目前<strong>工业4.0和智能制造</strong>的核心技术之一。</p>
 <h2 id="ethercat-是什么-详细解释"><a href="#ethercat-是什么-详细解释" class="headerlink" title="ethercat 是什么 详细解释"></a>ethercat 是什么 详细解释</h2><h3 id="EtherCAT-详解"><a href="#EtherCAT-详解" class="headerlink" title="EtherCAT 详解"></a>EtherCAT 详解</h3><p><strong>EtherCAT</strong>（<strong>以太网控制自动化技术</strong>）是一种基于以太网的高性能实时工业通信协议，专为工业自动化系统设计。它由德国Beckhoff公司于2003年开发，现已成为工业自动化领域的重要标准（IEC 61158）。</p>
 <hr>
 <h4 id="核心特点"><a href="#核心特点" class="headerlink" title="核心特点"></a><strong>核心特点</strong></h4><ol>
@@ -311,7 +719,7 @@
 <li><strong>硬件支持</strong>：TI、Infineon等提供ESC芯片，多家厂商推出兼容I&#x2F;O模块、驱动器。</li>
 </ul>
 <hr>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h4><p>EtherCAT凭借其实时性、灵活性和高性价比，成为工业4.0的核心通信技术之一，尤其适用于需要高速同步和复杂控制的场景。随着边缘计算和TSN（时间敏感网络）的融合，其未来在智能制造中的应用将更加广泛。</p>
+<h4 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h4><p>EtherCAT凭借其实时性、灵活性和高性价比，成为工业4.0的核心通信技术之一，尤其适用于需要高速同步和复杂控制的场景。随着边缘计算和TSN（时间敏感网络）的融合，其未来在智能制造中的应用将更加广泛。</p>
 <h2 id="ethercat-和-xenomai-分别是什么-详细解释"><a href="#ethercat-和-xenomai-分别是什么-详细解释" class="headerlink" title="ethercat 和 xenomai 分别是什么 详细解释"></a>ethercat 和 xenomai 分别是什么 详细解释</h2><p>EtherCAT 和 Xenomai 是两个在工业自动化和实时系统中广泛应用的关键技术，但它们的功能和应用领域不同。以下是详细解释：</p>
 <hr>
 <h3 id="1-EtherCAT"><a href="#1-EtherCAT" class="headerlink" title="1. EtherCAT"></a><strong>1. EtherCAT</strong></h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a><strong>定义</strong></h4><p><strong>EtherCAT</strong>（Ethernet for Control Automation Technology）是一种基于以太网的<strong>实时工业通信协议</strong>，专为工业自动化中的高速、高精度控制设计。它由德国 Beckhoff 公司开发，现已成为国际标准（IEC 61158）。</p>
@@ -411,7 +819,7 @@
 </li>
 </ol>
 <hr>
-<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><ul>
+<h3 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a><strong>总结</strong></h3><ul>
 <li><strong>EtherCAT</strong>：实时工业以太网协议，解决高速、高精度设备通信问题。  </li>
 <li><strong>Xenomai</strong>：实时操作系统框架，为 Linux 提供硬实时能力。  </li>
 <li><strong>协同价值</strong>：在复杂控制系统中，Xenomai 保障实时任务执行，EtherCAT 实现高效设备通信，共同构建高性能工业自动化平台。</li>
@@ -959,12 +1367,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2024/05/22/notes/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="prev" title="git_3_常用技巧">
-      <i class="fa fa-chevron-left"></i> git_3_常用技巧
+    <a href="/2024/05/22/notes/GitHub/2024-05-22-Github/" rel="prev" title="Github">
+      <i class="fa fa-chevron-left"></i> Github
     </a></div>
       <div class="post-nav-item">
-    <a href="/2024/05/22/notes/EtherCAT/2024-05-22-ethercat_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="next" title="ethercat_2_常用函数">
-      ethercat_2_常用函数 <i class="fa fa-chevron-right"></i>
+    <a href="/2024/05/22/notes/Docker/2024-05-22-docker_2_%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/" rel="next" title="docker_2_基础语法">
+      docker_2_基础语法 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -1024,7 +1432,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ethercat-%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">ethercat 是什么 详细解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EtherCAT-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.1.</span> <span class="nav-text">EtherCAT 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E7%82%B9"><span class="nav-number">2.1.1.</span> <span class="nav-text">核心特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="nav-number">2.1.2.</span> <span class="nav-text">技术细节</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">2.1.3.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.1.4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E5%8C%96%E4%B8%8E%E7%94%9F%E6%80%81"><span class="nav-number">2.1.5.</span> <span class="nav-text">标准化与生态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.1.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ethercat-%E5%92%8C-xenomai-%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">3.</span> <span class="nav-text">ethercat 和 xenomai 分别是什么 详细解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-EtherCAT"><span class="nav-number">3.1.</span> <span class="nav-text">1. EtherCAT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="nav-number">3.1.2.</span> <span class="nav-text">核心特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">3.1.3.</span> <span class="nav-text">工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="nav-number">3.1.4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-1"><span class="nav-number">3.1.5.</span> <span class="nav-text">优势</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Xenomai"><span class="nav-number">3.2.</span> <span class="nav-text">2. Xenomai</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">核心特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86-1"><span class="nav-number">3.2.3.</span> <span class="nav-text">工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-2"><span class="nav-number">3.2.4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-2"><span class="nav-number">3.2.5.</span> <span class="nav-text">优势</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-EtherCAT-%E4%B8%8E-Xenomai-%E7%9A%84%E7%BB%93%E5%90%88"><span class="nav-number">3.3.</span> <span class="nav-text">3. EtherCAT 与 Xenomai 的结合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.3.1.</span> <span class="nav-text">典型架构示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">3.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT"><span class="nav-number">4.</span> <span class="nav-text">EtherCAT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EtherCAT-xenomai-%E5%AE%89%E8%A3%85"><span class="nav-number">4.1.</span> <span class="nav-text">EtherCAT xenomai 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9ARxPDOs"><span class="nav-number">4.2.</span> <span class="nav-text">固定RxPDOs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9ATxPDO"><span class="nav-number">4.3.</span> <span class="nav-text">固定TxPDO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E4%B8%BB%E7%AB%99"><span class="nav-number">4.4.</span> <span class="nav-text">请求主站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E7%AB%99%E9%85%8D%E7%BD%AE"><span class="nav-number">4.5.</span> <span class="nav-text">从站配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDO"><span class="nav-number">5.</span> <span class="nav-text">PDO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAN"><span class="nav-number">6.</span> <span class="nav-text">CAN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E4%BD%BF%E7%94%A8%E4%B8%8E%E8%A7%A3%E6%9E%90%E2%80%93%E5%85%B3%E4%BA%8Eethercat%E5%BA%94%E7%94%A8%E5%B1%82%E4%BD%BF%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">EtherCAT 使用与解析–关于ethercat应用层使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ecrt-h%E5%A4%B4%E6%96%87%E4%BB%B6%E6%8E%A5%E5%8F%A3"><span class="nav-number">8.</span> <span class="nav-text">ecrt.h头文件接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8EPDO%E6%98%A0%E5%B0%84"><span class="nav-number">9.</span> <span class="nav-text">关于PDO映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E7%AB%99%E5%92%8C%E4%BB%8E%E7%AB%99"><span class="nav-number">10.</span> <span class="nav-text">主站和从站</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%8D%A1"><span class="nav-number">11.</span> <span class="nav-text">控制卡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%8D%A1%E5%88%86%E7%B1%BB"><span class="nav-number">11.1.</span> <span class="nav-text">控制卡分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF%E6%8E%A7%E5%88%B6%E5%8D%A1"><span class="nav-number">11.2.</span> <span class="nav-text">总线控制卡</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CAN%E6%80%BB%E7%BA%BF"><span class="nav-number">11.2.1.</span> <span class="nav-text">CAN总线</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EtherCAT%E6%80%BB%E7%BA%BF"><span class="nav-number">11.2.2.</span> <span class="nav-text">EtherCAT总线</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A9%B1%E5%8A%A8%E6%94%AF%E6%8C%81%E7%9A%84%E5%90%84%E7%A7%8D%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">驱动支持的各种模式详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E9%85%8D%E7%BD%AE%E6%B5%81%E7%A8%8B"><span class="nav-number">13.</span> <span class="nav-text">EtherCAT 配置流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E9%80%9A%E8%AE%AF%E6%B5%81%E7%A8%8B"><span class="nav-number">14.</span> <span class="nav-text">EtherCAT 通讯流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDO-1"><span class="nav-number">15.</span> <span class="nav-text">PDO</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E8%83%BD%E5%87%BA%E7%8E%B0%E4%BB%8E%E7%AB%99%E4%BE%9D%E6%AC%A1%E6%9D%BE%E9%97%B8%E7%8E%B0%E8%B1%A1%E7%9A%84%E5%8E%9F%E5%9B%A0%E6%9C%89%E5%93%AA%E4%BA%9B"><span class="nav-number">2.</span> <span class="nav-text">可能出现从站依次松闸现象的原因有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BB%E7%AB%99%E7%8A%B6%E6%80%81%E6%9C%BA%E6%8E%A7%E5%88%B6%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">1. 主站状态机控制问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%90%8C%E6%AD%A5%E6%9C%BA%E5%88%B6%EF%BC%88Distributed-Clocks-DC%EF%BC%89%E9%97%AE%E9%A2%98"><span class="nav-number">4.</span> <span class="nav-text">2. 同步机制（Distributed Clocks, DC）问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-PDO-%E6%98%A0%E5%B0%84%E6%88%96%E8%BF%87%E7%A8%8B%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">3. PDO 映射或过程数据更新问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%BE%E5%A4%87%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E5%B7%AE%E5%BC%82"><span class="nav-number">6.</span> <span class="nav-text">4. 设备响应时间差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%BD%91%E7%BB%9C%E6%8B%93%E6%89%91%E5%92%8C%E9%80%9A%E4%BF%A1%E5%BB%B6%E8%BF%9F"><span class="nav-number">7.</span> <span class="nav-text">5. 网络拓扑和通信延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E8%AE%BE%E5%A4%87%E4%B8%8A%E7%94%B5%E9%A1%BA%E5%BA%8F%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-number">8.</span> <span class="nav-text">6. 设备上电顺序不一致</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E8%A7%A6%E5%8F%91%E4%BF%A1%E5%8F%B7%E6%88%96%E5%90%AF%E5%8A%A8%E5%91%BD%E4%BB%A4%E4%B8%8D%E5%90%8C%E6%AD%A5"><span class="nav-number">9.</span> <span class="nav-text">7. 触发信号或启动命令不同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">10.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E4%BB%8E%E7%AB%99%E6%9C%89%E5%87%A0%E7%A7%8D%E7%8A%B6%E6%80%81"><span class="nav-number">11.</span> <span class="nav-text">EtherCAT 从站有几种状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E4%BB%8E%E7%AB%99%E7%9A%84-4-%E7%A7%8D%E7%8A%B6%E6%80%81"><span class="nav-number">12.</span> <span class="nav-text">EtherCAT 从站的 4 种状态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%9D%E5%A7%8B%E5%8C%96%EF%BC%88Init%EF%BC%89"><span class="nav-number">12.1.</span> <span class="nav-text">1. 初始化（Init）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%A2%84%E6%93%8D%E4%BD%9C%EF%BC%88Pre-Operational-Pre-Op%EF%BC%89"><span class="nav-number">12.2.</span> <span class="nav-text">2. 预操作（Pre-Operational, Pre-Op）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%89%E5%85%A8%E6%93%8D%E4%BD%9C%EF%BC%88Safe-Operational-Safe-Op%EF%BC%89"><span class="nav-number">12.3.</span> <span class="nav-text">3. 安全操作（Safe-Operational, Safe-Op）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%93%8D%E4%BD%9C%EF%BC%88Operational-OP%EF%BC%89"><span class="nav-number">12.4.</span> <span class="nav-text">4. 操作（Operational, OP）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2%E6%B5%81%E7%A8%8B"><span class="nav-number">13.</span> <span class="nav-text">状态转换流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E7%8A%B6%E6%80%81%E5%A4%84%E7%90%86"><span class="nav-number">14.</span> <span class="nav-text">异常状态处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">15.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ethercat-%E4%B8%BB%E7%AB%99%E4%B8%8E%E4%BB%8E%E7%AB%99%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE"><span class="nav-number">16.</span> <span class="nav-text">ethercat 主站与从站通讯协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-EtherCAT-%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E6%9E%B6%E6%9E%84"><span class="nav-number">17.</span> <span class="nav-text">1. EtherCAT 通讯协议架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-EtherCAT-%E9%80%9A%E8%AE%AF%E6%B5%81%E7%A8%8B"><span class="nav-number">18.</span> <span class="nav-text">2. EtherCAT 通讯流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-EtherCAT-%E5%B8%A7%E7%BB%93%E6%9E%84"><span class="nav-number">19.</span> <span class="nav-text">3. EtherCAT 帧结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%B8%BB%E8%A6%81EtherCAT%E9%80%9A%E4%BF%A1%E5%91%BD%E4%BB%A4"><span class="nav-number">20.</span> <span class="nav-text">4. 主要EtherCAT通信命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-EtherCAT-%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">21.</span> <span class="nav-text">5. EtherCAT 工作模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%BC%89%E8%87%AA%E7%94%B1%E8%BF%90%E8%A1%8C%E6%A8%A1%E5%BC%8F%EF%BC%88Free-Run-Mode%EF%BC%89"><span class="nav-number">21.1.</span> <span class="nav-text">1）自由运行模式（Free Run Mode）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%BC%89%E5%90%8C%E6%AD%A5%E7%AE%A1%E7%90%86%E6%A8%A1%E5%BC%8F%EF%BC%88SM-Sync-Mode%EF%BC%89"><span class="nav-number">21.2.</span> <span class="nav-text">2）同步管理模式（SM Sync Mode）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%BC%89%E5%88%86%E5%B8%83%E5%BC%8F%E6%97%B6%E9%92%9F%E6%A8%A1%E5%BC%8F%EF%BC%88DC-Mode%EF%BC%89"><span class="nav-number">21.3.</span> <span class="nav-text">3）分布式时钟模式（DC Mode）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%BC%89%E5%91%A8%E6%9C%9F%E5%90%8C%E6%AD%A5%E6%A8%A1%E5%BC%8F%EF%BC%88Cyclic-Sync-Mode%EF%BC%89"><span class="nav-number">21.4.</span> <span class="nav-text">4）周期同步模式（Cyclic Sync Mode）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-EtherCAT%E4%B8%8E%E5%85%B6%E4%BB%96%E5%B7%A5%E4%B8%9A%E6%80%BB%E7%BA%BF%E5%AF%B9%E6%AF%94"><span class="nav-number">22.</span> <span class="nav-text">6. EtherCAT与其他工业总线对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-EtherCAT-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">23.</span> <span class="nav-text">7. EtherCAT 应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E7%BB%93%E8%AE%BA"><span class="nav-number">24.</span> <span class="nav-text">8. 结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ethercat-%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">25.</span> <span class="nav-text">ethercat 是什么 详细解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EtherCAT-%E8%AF%A6%E8%A7%A3"><span class="nav-number">25.1.</span> <span class="nav-text">EtherCAT 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E7%82%B9"><span class="nav-number">25.1.1.</span> <span class="nav-text">核心特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82"><span class="nav-number">25.1.2.</span> <span class="nav-text">技术细节</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">25.1.3.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">25.1.4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E5%8C%96%E4%B8%8E%E7%94%9F%E6%80%81"><span class="nav-number">25.1.5.</span> <span class="nav-text">标准化与生态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">25.1.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ethercat-%E5%92%8C-xenomai-%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">26.</span> <span class="nav-text">ethercat 和 xenomai 分别是什么 详细解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-EtherCAT"><span class="nav-number">26.1.</span> <span class="nav-text">1. EtherCAT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">26.1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="nav-number">26.1.2.</span> <span class="nav-text">核心特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">26.1.3.</span> <span class="nav-text">工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="nav-number">26.1.4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-1"><span class="nav-number">26.1.5.</span> <span class="nav-text">优势</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Xenomai"><span class="nav-number">26.2.</span> <span class="nav-text">2. Xenomai</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89-1"><span class="nav-number">26.2.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7-1"><span class="nav-number">26.2.2.</span> <span class="nav-text">核心特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86-1"><span class="nav-number">26.2.3.</span> <span class="nav-text">工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-2"><span class="nav-number">26.2.4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-2"><span class="nav-number">26.2.5.</span> <span class="nav-text">优势</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-EtherCAT-%E4%B8%8E-Xenomai-%E7%9A%84%E7%BB%93%E5%90%88"><span class="nav-number">26.3.</span> <span class="nav-text">3. EtherCAT 与 Xenomai 的结合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">26.3.1.</span> <span class="nav-text">典型架构示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-2"><span class="nav-number">26.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT"><span class="nav-number">27.</span> <span class="nav-text">EtherCAT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EtherCAT-xenomai-%E5%AE%89%E8%A3%85"><span class="nav-number">27.1.</span> <span class="nav-text">EtherCAT xenomai 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9ARxPDOs"><span class="nav-number">27.2.</span> <span class="nav-text">固定RxPDOs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9ATxPDO"><span class="nav-number">27.3.</span> <span class="nav-text">固定TxPDO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E4%B8%BB%E7%AB%99"><span class="nav-number">27.4.</span> <span class="nav-text">请求主站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E7%AB%99%E9%85%8D%E7%BD%AE"><span class="nav-number">27.5.</span> <span class="nav-text">从站配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDO"><span class="nav-number">28.</span> <span class="nav-text">PDO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAN"><span class="nav-number">29.</span> <span class="nav-text">CAN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E4%BD%BF%E7%94%A8%E4%B8%8E%E8%A7%A3%E6%9E%90%E2%80%93%E5%85%B3%E4%BA%8Eethercat%E5%BA%94%E7%94%A8%E5%B1%82%E4%BD%BF%E7%94%A8"><span class="nav-number">30.</span> <span class="nav-text">EtherCAT 使用与解析–关于ethercat应用层使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ecrt-h%E5%A4%B4%E6%96%87%E4%BB%B6%E6%8E%A5%E5%8F%A3"><span class="nav-number">31.</span> <span class="nav-text">ecrt.h头文件接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8EPDO%E6%98%A0%E5%B0%84"><span class="nav-number">32.</span> <span class="nav-text">关于PDO映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E7%AB%99%E5%92%8C%E4%BB%8E%E7%AB%99"><span class="nav-number">33.</span> <span class="nav-text">主站和从站</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%8D%A1"><span class="nav-number">34.</span> <span class="nav-text">控制卡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%8D%A1%E5%88%86%E7%B1%BB"><span class="nav-number">34.1.</span> <span class="nav-text">控制卡分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF%E6%8E%A7%E5%88%B6%E5%8D%A1"><span class="nav-number">34.2.</span> <span class="nav-text">总线控制卡</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CAN%E6%80%BB%E7%BA%BF"><span class="nav-number">34.2.1.</span> <span class="nav-text">CAN总线</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EtherCAT%E6%80%BB%E7%BA%BF"><span class="nav-number">34.2.2.</span> <span class="nav-text">EtherCAT总线</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A9%B1%E5%8A%A8%E6%94%AF%E6%8C%81%E7%9A%84%E5%90%84%E7%A7%8D%E6%A8%A1%E5%BC%8F%E8%AF%A6%E8%A7%A3"><span class="nav-number">35.</span> <span class="nav-text">驱动支持的各种模式详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E9%85%8D%E7%BD%AE%E6%B5%81%E7%A8%8B"><span class="nav-number">36.</span> <span class="nav-text">EtherCAT 配置流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EtherCAT-%E9%80%9A%E8%AE%AF%E6%B5%81%E7%A8%8B"><span class="nav-number">37.</span> <span class="nav-text">EtherCAT 通讯流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDO-1"><span class="nav-number">38.</span> <span class="nav-text">PDO</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -1038,7 +1446,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">631</span>
+          <span class="site-state-item-count">633</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

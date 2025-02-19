@@ -191,6 +191,282 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/09/03/notes/Books/2024-09-03-Effective_Modern_C++/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/09/03/notes/Books/2024-09-03-Effective_Modern_C++/" class="post-title-link" itemprop="url">Effective Modern C++</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-09-03 09:00:00" itemprop="dateCreated datePublished" datetime="2024-09-03T09:00:00+08:00">2024-09-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Books/" itemprop="url" rel="index"><span itemprop="name">Books</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Effective Modern C++ 中文版学习笔记，Scott Meyers著作，高博译</li>
+</ul>
+<h2 id="译者序"><a href="#译者序" class="headerlink" title="译者序"></a>译者序</h2><ul>
+<li>现代C++在语言方面所进行的大刀阔斧，釜底抽薪式的变革，无需赘言。但是这些变革背后，更重要的反而是其保持不变者，即所谓C++语言的精神，或曰设计哲学。例如，由实际问题驱动，并立刻用于解决实际问题。现代C++中提供了并发API，在语言层面上支持并发程序设计，结束了在各种体系结构和操作系统之上存在很多互不兼容的第三方并发库的乱局，就是这种设计哲学的体现。<strong>程序员应该能够自由地选择自己的程序设计风格，而语言应该为该风格提供完备的支持</strong>。</li>
+<li>C++语言之难，主要还是在于众多语言特性之间的综合交叉。尤其对于新的语言特性，掌握其本身往往并不是很难，而要考虑到它与众多也已经存在的语言特性之发生的相互作用就不容易了。</li>
+</ul>
+<h2 id="绪论"><a href="#绪论" class="headerlink" title="绪论"></a>绪论</h2><ul>
+<li>本书的写作目的并非对于C++11和C++14特性的泛泛介绍，而是为了揭示他们的高效应用。</li>
+<li>本书中的信息被分解成若干准则，称为条款。本书中的条款都是准则，而非规则，因为准则允许有例外。条款给出的建议并非最要紧的部分，建议背后的原理才是精华。只有掌握了原理，你才能判定，你的项目面临的具体情况是否真的违反了条款所指。<strong>本书的真正目标并不在于告诉你什么该做，什么不该做，而是想要传达对C++11和C++14运作原理的更深入理解</strong>。</li>
+</ul>
+<h2 id="术语和惯例"><a href="#术语和惯例" class="headerlink" title="术语和惯例"></a>术语和惯例</h2><ul>
+<li><p>C++98缺乏并发支持(仅对C++98和C++03成立)</p>
+</li>
+<li><p>C++11支持lambda表达式(对C++11和C++14成立)</p>
+</li>
+<li><p>C++14提供了广义返回值性别推导(仅对C++14成立)</p>
+</li>
+<li><p>C++11被最广泛接受的特性可能莫过于移动语义，而移动语义的基础在于区分左值表达式和右值表达式。因为，一个对象是右值意味着能够对其实施移动语义，而左值则一般不然。从概念上说(实践上并不总是成立)，右值对应的是函数返回的临时对象，而左值对应的是可指涉的对象，而指涉的途径则无论通过名字，指针，还是左值引用皆可。</p>
+</li>
+<li><p>有一种甄别表达式是否左值的使用方法富有启发性，那就是检查能否取得该表达式的地址。如果可以取得，那么该表达式基本上可以断定是左值。如果不可以，则其通常是右值。这种方法之所以说富有启发性，是因为它让你记得，表达式的型别与它是左值还是右值没有关系。换言之，给定一型别T，则既有T型别的左值，也有T型别的右值。这一点在处理右值引用型别的形参时尤其要注意，因为该形参本身是个左值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Widget</span>(Widget&amp;&amp; rhs);   <span class="comment">// rhs是个左值，尽管它具有右值引用型别</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>在Widget的移动构造函数内部对rhs取址完全没有问题，所以rhs是个左值，尽管它的型别属于右值引用(基于类似的理由，我们可以得知，任何形参都是左值)</p>
+</li>
+<li><p>若某对象是依据同一型别的另一对象初始化出来的，则该新对象称为提供初始化依据的对象的一个副本，即使该副本是由移动构造函数创建的。这样称呼情有可原，因为C++中并无术语用以区分某对象到底是经由复制否早函数创建的副本，还是经由移动构造函数创建的副本。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunc</span><span class="params">(Widget w)</span></span>;    <span class="comment">// someFunc的形参w按值传递</span></span><br><span class="line">Widget wid;                 <span class="comment">// wid是Widget型别的某个对象</span></span><br><span class="line"><span class="built_in">someFunc</span>(wid);              <span class="comment">// 在这个对someFunc的调用中，w是wid经由复制构造函数创建的副本</span></span><br><span class="line"><span class="built_in">someFunc</span>(std::<span class="built_in">move</span>(wid));   <span class="comment">// 在这个对someFunc的调用中，w是wid经由移动构造函数创建的副本</span></span><br></pre></td></tr></table></figure></li>
+<li><p>右值的副本经常经由移动构造函数创建，而左值的副本通常经由复制构造函数创建。这也就是说，如果你仅仅了解到某个对象是另一个对象的副本，则还不能判断构造这个副本要花费多少成本。</p>
+</li>
+<li><p>在函数调用中，调用方的表达式，称为函数的实参。实参的用处，是初始化函数的形参。</p>
+</li>
+<li><p>在上面someFunc的第一次调用中，实参是wid。而在第二次调用中，实参则是std::move(wid)。在两次调用中，形参都是w。</p>
+</li>
+<li><p>实参和形参有着重大的区别，因为形参都是左值，而用来作为其初始化依据的实参，则极可能是右值，也可能是左值。这一点在完美转发(perfect forwarding)的过程中尤其关系重大，在这样的一个过程中，传递给某个函数的实参会被传递给另一个函数，并保持其右值性(rvalueness)或左值性(lvalueness)</p>
+</li>
+<li><p>设计良好的函数都是异常安全的，这意味着它们至少会提供基本异常安全保证(即基本保证)。提供了基本保证的函数能够向调用者确保即使有异常抛出，程序的不变量不会受到影响(即不会有数据结构被破坏)，且不会发生资源泄露。而提供了强异常安全保证(即强保证)的函数则能够通过向调用者确保即使有异常抛出，程序状态会在调用前后保持不变。</p>
+</li>
+<li><p>当提及函数对象时，我通常意指某个对象，其型别支持operator()成员函数。换言之，就是说该对象表现得像个函数。进一步泛化这一术语的话，就涵盖了指涉到成员函数的指针，从而得到了所谓的可调用物。一般情况下，你可以不用关心这些含义之前的细微差别，函数指针也好，可调用物也罢，你只需要知道他们在C++中表示某种函数调用语法加以调用就行了。</p>
+</li>
+<li><p>经由lambda表达式创建的函数对象称为闭包，将lambda表达式和他们创建的闭包区分开来，意义不大，所以我经常把他们统称为lambda式。</p>
+</li>
+<li><p>相似的，我也很少区分函数模板(即用以生成函数的模板)和模板函数(即从函数模板生成的函数)。类模板和模板类的情形同上。</p>
+</li>
+<li><p>C++中有很多事物能够加以声明和定义。声明的作用是引入名字和型别，而不给出细节，例如存储位置或具体实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">int</span> x;               <span class="comment">// 对象生命</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Widget</span>;               <span class="comment">// 类声明</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">func</span><span class="params">(<span class="type">const</span> Widget&amp; w)</span></span>; <span class="comment">// 函数声明</span></span><br><span class="line"><span class="keyword">enum class</span> <span class="title class_">Color</span>;           <span class="comment">// 限定作用域的枚举声明</span></span><br></pre></td></tr></table></figure></li>
+<li><p>定义则会给出存储位置和具体实现的细节。</p>
+</li>
+<li><p>定义同时也可以当声明用。所以，除非某些场合非给出定义不可，我倾向于只使用声明。</p>
+</li>
+<li><p>我把函数声明的形参型别和返回值型别这部分定义为函数的签名，而函数名字和形参名字则不属于签名的组成部分。</p>
+</li>
+<li><p>函数声明除形参型别和返回值型别的其他组成元素(即可能存在的noexcept或constexpr)则被排除在外(noexcept和constexpr)</p>
+</li>
+<li><p>签名的官方定义与我给出的稍有不同，但是在本书中，我们定义的更加使用(官方定义有时会省区返回值型别)</p>
+</li>
+<li><p>标准有时会把某个操作的结果说成是未定义行为。意思是，其运行期行为不可预测，你当然会对这样的不确定性敬而远之。未定义行为的例子有，在方括号([])内使用越界值作为std::vector的下表，未初始化的迭代器实施提领操作，或者进入数据竞险(即两个或更多线程同时访问同一内存位置，且其中至少有一个执行写操作的情形)</p>
+</li>
+<li><p>我将内建的指针，就是new表达式返回的那些指针，称为萝指针。而与裸指针形成对照的，则是智能指针。智能指针通常都重载了指针提领运算符(operator-&gt;和operator*)</p>
+</li>
+</ul>
+<h2 id="第一张-型别推导"><a href="#第一张-型别推导" class="headerlink" title="第一张 型别推导"></a>第一张 型别推导</h2><ul>
+<li>C++98仅有一套型别推导规则，用于函数模板。C++11对这套规则进行了一些改动，并且增加了两套规则，一套用于auto，另一套用于decltype。后来，C++14又扩展了能够运用auto和decltype的语境。型别推导应用返回的不断普及，使得人们不惜再去写下那些不言自明或是完全冗余的型别。</li>
+<li>想要使用现代C++高效编程，就离不开对型别推导操作的坚实理解。型别推导设计的语境实在不胜枚举: 在函数模板的调用中，在auto现身的大多数场景中，在decltype表达式中，特别是在C++14中那个神秘莫测的decltype(auto)结构中</li>
+<li>本章解释了模板型别推导如何运作，auto的型别推导如何构建在此运作规则之上，以及decltype独特的型别推导规则。</li>
+</ul>
+<h3 id="条款一：理解模板型别推导"><a href="#条款一：理解模板型别推导" class="headerlink" title="条款一：理解模板型别推导"></a>条款一：理解模板型别推导</h3><ul>
+<li>如果一个复杂系统的用户对于该系统的运作方式一无所知，然而却对其提供的服务表示满意，这就充分说明系统设计得好。</li>
+<li>模板的型别推导，是现代C++最广泛应用的特性之一–auto的基础。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/09/03/notes/C++/C++_11_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/2024-09-03-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/09/03/notes/C++/C++_11_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/2024-09-03-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">单例模式</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-09-03 09:00:00" itemprop="dateCreated datePublished" datetime="2024-09-03T09:00:00+08:00">2024-09-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>单例模式相关学习笔记</li>
+</ul>
+<h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><ul>
+<li><p>单例模式，这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。</p>
+</li>
+<li><p>这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。</p>
+</li>
+<li><p>单例模式是一种创建型设计模式，它确保一个类只有一个实例，并提供了一个全局访问点来访问该实例。</p>
+</li>
+<li><p>注意：</p>
+<ul>
+<li>单例类只能有一个实例</li>
+<li>单例类必须自己创建自己的唯一实例</li>
+<li>单例类必须给所有其他对象提供这一实例</li>
+</ul>
+</li>
+<li><p>单例模式是设计模式中最简单，最常见的一种。其主要目的是确保整个进程中，只有一个类的实例，并且提供一个统一的访问接口。常用于Logger类，通信接口类，线程池等。</p>
+</li>
+</ul>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><ul>
+<li>限制用户直接访问类的构造函数，提供一个统一的public接口获取单例对象</li>
+<li>这里有一个先有鸡还是先有蛋的问题<ul>
+<li>因为用户无法访问构造函数，所以无法创建对象</li>
+<li>因为无法创建对象，所以不能调用普通的getInstance()方法来获取单例对象</li>
+</ul>
+</li>
+<li>解决这个问题的方法很简单，将 getInstance() 定义为static即可(这也会限制getInstance()内只能访问类的静态成员)</li>
+</ul>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
+<li>所有的构造函数是private</li>
+<li>拷贝构造，拷贝赋值运算符需要显示删除 &#x3D;delete，防止编译器自动合成</li>
+</ul>
+<h2 id="C-单例模式的几种实现方式"><a href="#C-单例模式的几种实现方式" class="headerlink" title="C++单例模式的几种实现方式"></a>C++单例模式的几种实现方式</h2><h3 id="版本一-饿汉式"><a href="#版本一-饿汉式" class="headerlink" title="版本一 饿汉式"></a>版本一 饿汉式</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton1</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton1* <span class="title">getInstance</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> &amp;inst; &#125;</span><br><span class="line">    <span class="built_in">Singleton1</span>(<span class="type">const</span> Singleton1&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton1&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton1&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton1</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton1 inst;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton1 Singleton1::inst;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这个版本在程序启动时创建单例对象，即使没有使用也会创建，浪费资源。</li>
+</ul>
+<h3 id="版本二-懒汉式"><a href="#版本二-懒汉式" class="headerlink" title="版本二 懒汉式"></a>版本二 懒汉式</h3><ul>
+<li>通过将单例对象的实例化会推迟到首次调用getInstance()，解决版本一的问题<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton2</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton2* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">            pSingleton = <span class="keyword">new</span> <span class="built_in">Singleton2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Singleton2</span>(<span class="type">const</span> Singleton2&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton2&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton2&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton2</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton2* pSingleton;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton2* Singleton2::pSingleton = <span class="literal">nullptr</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="版本三-线程安全"><a href="#版本三-线程安全" class="headerlink" title="版本三 线程安全"></a>版本三 线程安全</h3><ul>
+<li>在版本二中，如果多个线程同时调用getInstance()则有可能创建多个实例<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton3</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton3* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="function">lock_guard&lt;mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">            pSingleton = <span class="keyword">new</span> <span class="built_in">Singleton3</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Singleton3</span>(<span class="type">const</span> Singleton3&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton3&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton3&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton3</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton3* pSingleton;</span><br><span class="line">    <span class="type">static</span> mutex mtx;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton3* Singleton3::pSingleton = <span class="literal">nullptr</span>;</span><br><span class="line">mutex Singleton3::mtx;</span><br></pre></td></tr></table></figure></li>
+<li>加锁可以解决线程安全的问题，但是版本三的问题在于效率太低，每次调用getInstance()都需要加锁，而加锁的开销又是相当高昂的</li>
+</ul>
+<h3 id="版本四-DCL-Double-Checked-Locking"><a href="#版本四-DCL-Double-Checked-Locking" class="headerlink" title="版本四 DCL(Double-Checked Locking)"></a>版本四 DCL(Double-Checked Locking)</h3><ul>
+<li>版本四是版本三的改进版本，只有在指针为空的时候才会进行加锁，然后再次判断指针是否为空。而一旦首次初始化完成之后，指针不为空，则不再进行加锁。既保证了线程安全，又不会导致后续每次调用都产生锁的开销<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton4</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton4* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">            <span class="function">lock_guard&lt;mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">            <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">                pSingleton = <span class="keyword">new</span> <span class="built_in">Singleton4</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Singleton4</span>(<span class="type">const</span> Singleton4&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton4&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton4&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton4</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton4* pSingleton;</span><br><span class="line">    <span class="type">static</span> mutex mtx;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton4* Singleton4::pSingleton = <span class="literal">nullptr</span>;</span><br><span class="line">mutex Singleton4::mtx;</span><br></pre></td></tr></table></figure></li>
+<li>DCL在很长一段时间内被认为是C++单例模式的最佳实践。但是也有文章表示DCL的正确性取决于内存模型。关于这部分的深入讨论可以参考以下两篇文章<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html">https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/">https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="版本五-Meyer’s-Singleton"><a href="#版本五-Meyer’s-Singleton" class="headerlink" title="版本五 Meyer’s Singleton"></a>版本五 Meyer’s Singleton</h3><ul>
+<li>这个版本利用局部静态变量来实现单例模式。最早由C++大佬，Effective C++系列的作者Scott Meyers提出，因此也被称为Meyers’ Singleton</li>
+<li>TLDR: 这就是C++11之后的单例模式最佳实践，没有之一<ul>
+<li>最简洁： 不需要额外定义类的静态成员</li>
+<li>线程安全：不需要额外加锁</li>
+<li>没有烦人的指针</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton5</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton5&amp; <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> Singleton5 inst;</span><br><span class="line">        <span class="keyword">return</span> inst;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Singleton5</span>(<span class="type">const</span> Singleton5&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton5&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton5&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton5</span>() = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/08/31/notes/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-08-31-python_3_bs4%E6%A8%A1%E5%9D%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -6525,7 +6801,7 @@
 </li>
 <li>rk<ul>
 <li>常州建安平台反光衣检测算法优化 ： 拷贝视频 – gh-rk-1023 [defer]</li>
-<li>ssh -o ‘proxycommand socat - PROXY:47.100.31.121:gh-rk-1023:22,proxyport&#x3D;5002’ <a href="mailto:&#114;&#x6f;&#111;&#x74;&#x40;&#52;&#55;&#46;&#49;&#x30;&#x30;&#x2e;&#51;&#x31;&#46;&#x31;&#x32;&#x31;">&#114;&#x6f;&#111;&#x74;&#x40;&#52;&#55;&#46;&#49;&#x30;&#x30;&#x2e;&#51;&#x31;&#46;&#x31;&#x32;&#x31;</a></li>
+<li>ssh -o ‘proxycommand socat - PROXY:47.100.31.121:gh-rk-1023:22,proxyport&#x3D;5002’ <a href="mailto:&#x72;&#111;&#111;&#116;&#64;&#x34;&#x37;&#x2e;&#49;&#48;&#48;&#x2e;&#51;&#x31;&#x2e;&#x31;&#x32;&#49;">&#x72;&#111;&#111;&#116;&#64;&#x34;&#x37;&#x2e;&#49;&#48;&#48;&#x2e;&#51;&#x31;&#x2e;&#x31;&#x32;&#49;</a></li>
 </ul>
 </li>
 <li>construction vehicle(工地车辆)<ul>
@@ -9325,204 +9601,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/20/notes/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-07-20-C++STL%E6%95%99%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/07/20/notes/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-07-20-C++STL%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">C++ STL教程</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-07-20 09:00:00" itemprop="dateCreated datePublished" datetime="2024-07-20T09:00:00+08:00">2024-07-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-31 10:58:51" itemprop="dateModified" datetime="2024-12-31T10:58:51+08:00">2024-12-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li><p>C++ 标准模板库(Standard Template Library, STL)是一套功能强大的C++模板类和函数的集合，它提供了一系列通用的，可复用的算法和数据结构。</p>
-</li>
-<li><p>STL的设计基于泛型编程，这意味着使用模板可以编写出独立于任何特定数据类型的代码。</p>
-</li>
-<li><p>STL分为多个组件，包括容器(Containers)，迭代器(Iterators)，算法(Algorithms)，函数对象(Function Objects)和适配器(Adapters)等</p>
-</li>
-<li><p>使用STL的好处</p>
-<ul>
-<li>代码复用: STL提供了大量通用数据和算法，可以减少重复编写代码的工作</li>
-<li>性能优化: STL中的算法和数据结构都经过了优化，以提供最佳的性能</li>
-<li>泛型编程: 使用模板，STL支持泛型编程，使得算法和数据结构可以适用于任何数据类型</li>
-<li>易于维护: STL的设计使得代码更加模板化，易于阅读和维护</li>
-</ul>
-</li>
-<li><p>C++标准模板库的核心包括以下重要组件</p>
-<ul>
-<li>容器(Containers): 容器是STL中最基本的组件之一，提供了各种数据结构，包括向量(vector)，链表(list)，队列(queue)，栈(stack)，集合(set)，映射(map)等。这些容器具有不同的特性和用途，可以根据实际需求选择合适的容器</li>
-<li>算法(Algorithms): STL提供了大量的算法，用于对容器中的元素进行各种操作，包括排序，搜索，复制，移动，变换等。这些算法在使用时不需要关心容器的具体类型，只需要指定要操作的范围即可。</li>
-<li>迭代器(iterators): 迭代器用于遍历容器中的元素，允许以统一的方式访问容器中的元素，而不用关心容器的内部实现细节。STL提供了多种类型的迭代器，包括随机访问迭代器，双向迭代器，前向迭代器和输入输出迭代器等</li>
-<li>函数对象(Function Objects): 函数对象是可以像函数一样调用的对象，可以用于算法中的各种操作。STL提供了多种函数对象，包括一元函数对象 ，二元函数对象，谓词等，可以满足不同的需求</li>
-<li>适配器(Adapters): 适配器用于将一种容器或迭代器适配成另一种容器或迭代器，以满足特定的需求。STL提供了多种适配器，包括栈适配器(stack adapter)，队列适配器(queue adapter)和优先队列适配器(priority queue adapter)等。</li>
-</ul>
-</li>
-<li><p>Containers are used to store the data</p>
-</li>
-<li><p>Algorithms are used to process the data</p>
-</li>
-<li><p>Functors are used to write custom algorithms</p>
-</li>
-<li><p>Iterators are used to navigate through the data</p>
-</li>
-<li><p>All of them are part of STL</p>
-</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/07/20/notes/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-07-20-C++STL%E6%95%99%E7%A8%8B/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/18/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-07-18_VideoWriter/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/07/18/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-07-18_VideoWriter/" class="post-title-link" itemprop="url">VideoWrite</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-07-18 09:00:00" itemprop="dateCreated datePublished" datetime="2024-07-18T09:00:00+08:00">2024-07-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-31 09:12:08" itemprop="dateModified" datetime="2024-12-31T09:12:08+08:00">2024-12-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>cv::VideoWrite类相关笔记</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/07/18/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-07-18_VideoWriter/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -9592,7 +9670,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">631</span>
+          <span class="site-state-item-count">633</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
