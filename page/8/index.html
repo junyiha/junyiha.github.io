@@ -191,6 +191,764 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/17/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-07-17-linux_2_97_strace/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/17/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-07-17-linux_2_97_strace/" class="post-title-link" itemprop="url">linux_2_96_strace</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-07-17 09:00:00" itemprop="dateCreated datePublished" datetime="2024-07-17T09:00:00+08:00">2024-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>strace命令相关笔记</li>
+</ul>
+<h2 id="linux-strace命令是什么"><a href="#linux-strace命令是什么" class="headerlink" title="linux strace命令是什么"></a>linux strace命令是什么</h2><p><code>strace</code> 是 Linux 下的一个用于诊断和调试程序的命令，它可以跟踪系统调用和接收的信号。<code>strace</code> 工具允许你查看一个进程执行期间所有的系统调用和它们的返回值，这对理解程序的行为和调试问题非常有帮助。</p>
+<p>以下是 <code>strace</code> 的一些常见用法：</p>
+<ol>
+<li><p><strong>跟踪一个程序的系统调用</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o output.txt program_name</span><br></pre></td></tr></table></figure>
+<p>这会启动 <code>program_name</code> 并将所有的系统调用记录到 <code>output.txt</code> 文件中。</p>
+</li>
+<li><p><strong>跟踪一个已经在运行的进程</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -p pid</span><br></pre></td></tr></table></figure>
+<p>其中 <code>pid</code> 是进程的 ID。这会附加到已经运行的进程并开始跟踪它的系统调用。</p>
+</li>
+<li><p><strong>只跟踪特定类型的系统调用</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=open,<span class="built_in">read</span>,write program_name</span><br></pre></td></tr></table></figure>
+<p>这将只跟踪 <code>open</code>、<code>read</code> 和 <code>write</code> 系统调用。</p>
+</li>
+<li><p><strong>打印每个系统调用所花费的时间</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -T program_name</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>跟踪系统调用和信号</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -c program_name</span><br></pre></td></tr></table></figure>
+<p>这会总结系统调用的次数、出错次数和执行时间。</p>
+</li>
+</ol>
+<p>示例：使用 <code>strace</code> 跟踪 <code>ls</code> 命令的系统调用：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<p>这个命令会在终端中打印出 <code>ls</code> 命令执行期间所有的系统调用和它们的返回值。</p>
+<p><code>strace</code> 是一个非常强大的工具，特别是在调试程序、分析系统性能和排查系统问题时非常有用。</p>
+<h2 id="linux-strace命令-详解"><a href="#linux-strace命令-详解" class="headerlink" title="linux strace命令 详解"></a>linux strace命令 详解</h2><p><code>strace</code> 是一个强大的 Linux 工具，用于诊断和调试程序。它能够跟踪系统调用（syscalls）和信号（signals），从而帮助用户了解程序的行为、查找问题根源、调试错误等。以下是 <code>strace</code> 的详细使用说明和示例。</p>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><h4 id="跟踪一个程序的系统调用"><a href="#跟踪一个程序的系统调用" class="headerlink" title="跟踪一个程序的系统调用"></a>跟踪一个程序的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace program_name</span><br></pre></td></tr></table></figure>
+
+<p>这会启动 <code>program_name</code> 并在终端上显示其所有系统调用。</p>
+<h4 id="将输出重定向到文件"><a href="#将输出重定向到文件" class="headerlink" title="将输出重定向到文件"></a>将输出重定向到文件</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o output.txt program_name</span><br></pre></td></tr></table></figure>
+
+<p>将系统调用输出记录到 <code>output.txt</code> 文件中。</p>
+<h4 id="跟踪已经运行的进程"><a href="#跟踪已经运行的进程" class="headerlink" title="跟踪已经运行的进程"></a>跟踪已经运行的进程</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -p pid</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>pid</code> 是进程的 ID。这会附加到已经运行的进程并开始跟踪它的系统调用。</p>
+<h3 id="过滤系统调用"><a href="#过滤系统调用" class="headerlink" title="过滤系统调用"></a>过滤系统调用</h3><h4 id="只跟踪特定类型的系统调用"><a href="#只跟踪特定类型的系统调用" class="headerlink" title="只跟踪特定类型的系统调用"></a>只跟踪特定类型的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=open,<span class="built_in">read</span>,write program_name</span><br></pre></td></tr></table></figure>
+
+<p>这将只跟踪 <code>open</code>、<code>read</code> 和 <code>write</code> 系统调用。</p>
+<h4 id="跟踪所有文件相关的系统调用"><a href="#跟踪所有文件相关的系统调用" class="headerlink" title="跟踪所有文件相关的系统调用"></a>跟踪所有文件相关的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=file program_name</span><br></pre></td></tr></table></figure>
+
+<p>这会跟踪所有与文件操作相关的系统调用，例如 <code>open</code>、<code>read</code>、<code>write</code> 等。</p>
+<h4 id="跟踪所有网络相关的系统调用"><a href="#跟踪所有网络相关的系统调用" class="headerlink" title="跟踪所有网络相关的系统调用"></a>跟踪所有网络相关的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=network program_name</span><br></pre></td></tr></table></figure>
+
+<p>这会跟踪所有与网络操作相关的系统调用，例如 <code>socket</code>、<code>connect</code>、<code>send</code>、<code>recv</code> 等。</p>
+<h3 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h3><h4 id="打印每个系统调用所花费的时间"><a href="#打印每个系统调用所花费的时间" class="headerlink" title="打印每个系统调用所花费的时间"></a>打印每个系统调用所花费的时间</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -T program_name</span><br></pre></td></tr></table></figure>
+
+<p>在输出中包含每个系统调用所花费的时间。</p>
+<h4 id="打印时间戳"><a href="#打印时间戳" class="headerlink" title="打印时间戳"></a>打印时间戳</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -t program_name</span><br></pre></td></tr></table></figure>
+
+<p>在每个系统调用前面加上时间戳。</p>
+<h4 id="显示相对时间戳"><a href="#显示相对时间戳" class="headerlink" title="显示相对时间戳"></a>显示相对时间戳</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -r program_name</span><br></pre></td></tr></table></figure>
+
+<p>在每个系统调用前面显示相对于前一个系统调用的时间间隔。</p>
+<h3 id="统计信息"><a href="#统计信息" class="headerlink" title="统计信息"></a>统计信息</h3><h4 id="汇总系统调用的次数、出错次数和执行时间"><a href="#汇总系统调用的次数、出错次数和执行时间" class="headerlink" title="汇总系统调用的次数、出错次数和执行时间"></a>汇总系统调用的次数、出错次数和执行时间</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -c program_name</span><br></pre></td></tr></table></figure>
+
+<p>程序执行完毕后，输出汇总统计信息。</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><h4 id="跟踪-ls-命令的系统调用"><a href="#跟踪-ls-命令的系统调用" class="headerlink" title="跟踪 ls 命令的系统调用"></a>跟踪 <code>ls</code> 命令的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">execve(&quot;/bin/ls&quot;, [&quot;ls&quot;], 0x7ffccf5a8c38 /* 20 vars */) = 0</span><br><span class="line">brk(NULL)                               = 0x56325f1ff000</span><br><span class="line">access(&quot;/etc/ld.so.nohwcap&quot;, F_OK)      = -1 ENOENT (No such file or directory)</span><br><span class="line">mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fbb6141f000</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h4 id="跟踪一个已经运行的进程"><a href="#跟踪一个已经运行的进程" class="headerlink" title="跟踪一个已经运行的进程"></a>跟踪一个已经运行的进程</h4><p>假设进程 ID 为 1234：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -p 1234</span><br></pre></td></tr></table></figure>
+
+<h4 id="只跟踪-open-和-read-系统调用"><a href="#只跟踪-open-和-read-系统调用" class="headerlink" title="只跟踪 open 和 read 系统调用"></a>只跟踪 <code>open</code> 和 <code>read</code> 系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=open,<span class="built_in">read</span> <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="常见系统调用解释"><a href="#常见系统调用解释" class="headerlink" title="常见系统调用解释"></a>常见系统调用解释</h3><ul>
+<li><code>execve</code>: 执行程序。</li>
+<li><code>open</code>: 打开文件。</li>
+<li><code>read</code>: 读取文件。</li>
+<li><code>write</code>: 写入文件。</li>
+<li><code>close</code>: 关闭文件描述符。</li>
+<li><code>brk</code>: 调整数据段末尾位置，用于内存分配。</li>
+<li><code>mmap</code>: 内存映射，用于文件或设备的内存访问。</li>
+</ul>
+<p><code>strace</code> 是一个非常强大的工具，特别是在调试程序、分析系统性能和排查系统问题时非常有用。它的输出可以帮助开发者理解程序的行为，找出问题的根源并进行优化。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/16/notes/Tools/2024-07-16-Zabbix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/16/notes/Tools/2024-07-16-Zabbix/" class="post-title-link" itemprop="url">Zabbix</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-07-16 11:00:00" itemprop="dateCreated datePublished" datetime="2024-07-16T11:00:00+08:00">2024-07-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>zabbix工具相关笔记</li>
+</ul>
+<h2 id="Zabbix是什么"><a href="#Zabbix是什么" class="headerlink" title="Zabbix是什么"></a>Zabbix是什么</h2><p>Zabbix 是一个开源的企业级监控解决方案，旨在监控和跟踪 IT 基础设施的健康和性能。它提供了多种功能来帮助管理员监控网络、服务器、应用程序、云服务等。以下是 Zabbix 的一些主要特点：</p>
+<ol>
+<li><p><strong>全面的监控</strong>：Zabbix 能够监控各种类型的网络设备、服务器、虚拟机、云服务和应用程序。它支持多种协议，如 SNMP、IPMI、JMX、HTTP、SSH、Telnet 等。</p>
+</li>
+<li><p><strong>数据收集和分析</strong>：Zabbix 可以收集大量的性能和可用性数据，并对这些数据进行存储和分析。它提供了强大的数据可视化工具，如图表、仪表盘和报告。</p>
+</li>
+<li><p><strong>告警和通知</strong>：Zabbix 支持复杂的告警机制，可以根据预定义的条件触发告警，并通过多种渠道（如邮件、短信、Slack、Telegram 等）发送通知。</p>
+</li>
+<li><p><strong>自动化和自愈</strong>：Zabbix 提供了自动化功能，可以在检测到问题时自动执行预定义的操作，如重启服务或执行脚本，以实现自愈。</p>
+</li>
+<li><p><strong>高扩展性</strong>：Zabbix 设计为高扩展性，可以支持从小型环境到大型企业环境的监控需求。它支持分布式监控和代理模式，能够轻松扩展。</p>
+</li>
+<li><p><strong>开源和社区支持</strong>：Zabbix 是开源软件，拥有活跃的社区和广泛的用户基础。社区提供了大量的插件、模板和文档，帮助用户快速上手和扩展功能。</p>
+</li>
+</ol>
+<p>Zabbix 的灵活性和强大的功能使其成为许多企业和组织选择的监控解决方案。无论是用于监控网络设备、服务器性能，还是应用程序健康，Zabbix 都能提供可靠的支持。</p>
+<h2 id="zabbix-详解"><a href="#zabbix-详解" class="headerlink" title="zabbix 详解"></a>zabbix 详解</h2><h3 id="什么是-Zabbix？"><a href="#什么是-Zabbix？" class="headerlink" title="什么是 Zabbix？"></a>什么是 Zabbix？</h3><p>Zabbix 是一个开源的监控软件工具，旨在监控和跟踪 IT 基础设施、网络、服务器、虚拟机、应用程序和云服务的健康状况和性能。它提供了一整套功能，从数据收集、存储、分析到告警和自动化操作。由于其高扩展性和灵活性，Zabbix 可以满足从小型组织到大型企业的不同需求。</p>
+<h3 id="主要功能和特点"><a href="#主要功能和特点" class="headerlink" title="主要功能和特点"></a>主要功能和特点</h3><h4 id="1-数据收集和监控"><a href="#1-数据收集和监控" class="headerlink" title="1. 数据收集和监控"></a>1. <strong>数据收集和监控</strong></h4><ul>
+<li><strong>广泛的支持</strong>：支持多种协议和技术，如 SNMP、IPMI、JMX、HTTP、SSH、Telnet 等，可以监控各种设备和应用程序。</li>
+<li><strong>主动监控</strong>：通过代理（Agent）和代理代理（Proxy）模式，支持分布式监控，能够在网络的不同部分进行监控。</li>
+<li><strong>被动监控</strong>：支持从设备和应用程序中获取数据，适用于需要从设备中获取状态和性能信息的场景。</li>
+</ul>
+<h4 id="2-数据存储和处理"><a href="#2-数据存储和处理" class="headerlink" title="2. 数据存储和处理"></a>2. <strong>数据存储和处理</strong></h4><ul>
+<li><strong>历史数据存储</strong>：Zabbix 可以存储大量的历史数据，支持长期的数据保留和分析。</li>
+<li><strong>灵活的数据处理</strong>：通过自定义的触发器和阈值，能够对监控数据进行实时处理和分析。</li>
+</ul>
+<h4 id="3-告警和通知"><a href="#3-告警和通知" class="headerlink" title="3. 告警和通知"></a>3. <strong>告警和通知</strong></h4><ul>
+<li><strong>复杂的告警机制</strong>：支持根据预定义的条件和阈值触发告警，告警可以基于多个条件进行组合和过滤。</li>
+<li><strong>多渠道通知</strong>：支持通过邮件、短信、IM（如 Slack、Telegram 等）和脚本发送通知，确保管理员能够及时收到告警信息。</li>
+<li><strong>告警升级</strong>：支持告警的升级和降级，确保重要问题能够及时得到关注和处理。</li>
+</ul>
+<h4 id="4-数据可视化"><a href="#4-数据可视化" class="headerlink" title="4. 数据可视化"></a>4. <strong>数据可视化</strong></h4><ul>
+<li><strong>图表和仪表盘</strong>：提供强大的图表和仪表盘功能，能够直观地展示监控数据和趋势。</li>
+<li><strong>报告和分析</strong>：支持生成各种报告，帮助管理员了解系统的健康状况和性能。</li>
+</ul>
+<h4 id="5-自动化和自愈"><a href="#5-自动化和自愈" class="headerlink" title="5. 自动化和自愈"></a>5. <strong>自动化和自愈</strong></h4><ul>
+<li><strong>自动操作</strong>：支持在检测到问题时自动执行预定义的操作，如重启服务、执行脚本等。</li>
+<li><strong>自愈功能</strong>：通过自动化操作实现系统的自愈，减少人为干预，提高系统的可靠性。</li>
+</ul>
+<h4 id="6-高扩展性"><a href="#6-高扩展性" class="headerlink" title="6. 高扩展性"></a>6. <strong>高扩展性</strong></h4><ul>
+<li><strong>分布式监控</strong>：支持代理和代理代理模式，能够扩展到大规模的分布式环境中进行监控。</li>
+<li><strong>高可用性</strong>：通过集群和冗余设计，确保监控系统的高可用性和可靠性。</li>
+</ul>
+<h4 id="7-开源和社区支持"><a href="#7-开源和社区支持" class="headerlink" title="7. 开源和社区支持"></a>7. <strong>开源和社区支持</strong></h4><ul>
+<li><strong>开源许可</strong>：Zabbix 是开源软件，拥有 GPL 许可，用户可以自由使用、修改和分发。</li>
+<li><strong>活跃的社区</strong>：拥有庞大且活跃的用户和开发者社区，提供丰富的插件、模板和文档资源，用户可以从社区中获取支持和帮助。</li>
+</ul>
+<h3 id="典型应用场景"><a href="#典型应用场景" class="headerlink" title="典型应用场景"></a>典型应用场景</h3><ul>
+<li><strong>网络监控</strong>：监控路由器、交换机、防火墙等网络设备的性能和状态。</li>
+<li><strong>服务器监控</strong>：监控物理服务器和虚拟机的 CPU、内存、磁盘等资源的使用情况。</li>
+<li><strong>应用程序监控</strong>：监控数据库、Web 服务器、邮件服务器等应用程序的性能和健康状况。</li>
+<li><strong>云服务监控</strong>：监控 AWS、Azure 等云服务的资源使用情况和性能。</li>
+</ul>
+<h3 id="安装与配置"><a href="#安装与配置" class="headerlink" title="安装与配置"></a>安装与配置</h3><h4 id="1-系统要求"><a href="#1-系统要求" class="headerlink" title="1. 系统要求"></a>1. <strong>系统要求</strong></h4><ul>
+<li><strong>操作系统</strong>：支持多种操作系统，如 Linux、Windows 等。</li>
+<li><strong>数据库</strong>：需要一个数据库来存储监控数据，支持 MySQL、PostgreSQL、Oracle 等。</li>
+<li><strong>Web 服务器</strong>：需要一个 Web 服务器来运行 Zabbix 的前端界面，支持 Apache、Nginx 等。</li>
+</ul>
+<h4 id="2-安装步骤"><a href="#2-安装步骤" class="headerlink" title="2. 安装步骤"></a>2. <strong>安装步骤</strong></h4><ul>
+<li><strong>数据库安装和配置</strong>：安装并配置所需的数据库。</li>
+<li><strong>Zabbix 服务器安装</strong>：安装 Zabbix 服务器组件。</li>
+<li><strong>Zabbix 前端安装</strong>：安装并配置 Web 服务器和 Zabbix 前端。</li>
+<li><strong>Zabbix 代理安装</strong>：在需要监控的设备上安装 Zabbix 代理。</li>
+</ul>
+<h4 id="3-配置"><a href="#3-配置" class="headerlink" title="3. 配置"></a>3. <strong>配置</strong></h4><ul>
+<li><strong>添加主机和模板</strong>：在 Zabbix 前端界面中添加需要监控的主机，并应用相应的监控模板。</li>
+<li><strong>设置触发器和告警</strong>：配置触发器和告警规则，定义告警条件和通知方式。</li>
+<li><strong>创建图表和仪表盘</strong>：根据监控需求创建图表和仪表盘，直观展示监控数据。</li>
+</ul>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>Zabbix 是一个功能强大且灵活的监控解决方案，适用于各种 IT 环境。从网络设备和服务器的监控，到应用程序和云服务的监控，Zabbix 都能提供可靠的支持。通过其全面的数据收集、分析、告警和自动化功能，Zabbix 帮助企业提高 IT 基础设施的可见性和可靠性，从而更好地保障业务的连续性和性能。</p>
+<h2 id="zabbix-使用-示例"><a href="#zabbix-使用-示例" class="headerlink" title="zabbix 使用 示例"></a>zabbix 使用 示例</h2><p>以下是一个简单的 Zabbix 使用示例，展示如何安装、配置和使用 Zabbix 来监控一台服务器的基本性能指标。</p>
+<h3 id="示例环境"><a href="#示例环境" class="headerlink" title="示例环境"></a>示例环境</h3><ul>
+<li><strong>Zabbix Server</strong>：Ubuntu 20.04</li>
+<li><strong>监控对象</strong>：一台运行 Ubuntu 20.04 的服务器</li>
+</ul>
+<h3 id="步骤-1：安装-Zabbix-Server"><a href="#步骤-1：安装-Zabbix-Server" class="headerlink" title="步骤 1：安装 Zabbix Server"></a>步骤 1：安装 Zabbix Server</h3><ol>
+<li><p><strong>更新系统包</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt upgrade -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安装 Zabbix 存储库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> dpkg -i zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> apt update</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安装 Zabbix Server、前端和数据库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-agent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安装并配置 MySQL 数据库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install mysql-server</span><br><span class="line"><span class="built_in">sudo</span> mysql_secure_installation</span><br></pre></td></tr></table></figure>
+
+<p>进入 MySQL 命令行，创建数据库和用户：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE zabbix <span class="keyword">CHARACTER SET</span> utf8 <span class="keyword">COLLATE</span> utf8_bin;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">&#x27;zabbix&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;password&#x27;</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> zabbix.<span class="operator">*</span> <span class="keyword">TO</span> <span class="string">&#x27;zabbix&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span>;</span><br><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>导入初始架构和数据</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -p zabbix</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>配置 Zabbix Server 连接到数据库</strong></p>
+<p>编辑配置文件 <code>/etc/zabbix/zabbix_server.conf</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DBPassword=password</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>启动 Zabbix Server 和代理</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart zabbix-server zabbix-agent apache2</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> zabbix-server zabbix-agent apache2</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="步骤-2：安装和配置-Zabbix-Agent-在被监控服务器上"><a href="#步骤-2：安装和配置-Zabbix-Agent-在被监控服务器上" class="headerlink" title="步骤 2：安装和配置 Zabbix Agent 在被监控服务器上"></a>步骤 2：安装和配置 Zabbix Agent 在被监控服务器上</h3><ol>
+<li><p><strong>在被监控服务器上安装 Zabbix Agent</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> dpkg -i zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install zabbix-agent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>配置 Zabbix Agent</strong></p>
+<p>编辑配置文件 <code>/etc/zabbix/zabbix_agentd.conf</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Server=&lt;Zabbix Server IP&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>启动 Zabbix Agent</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart zabbix-agent</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> zabbix-agent</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="步骤-3：在-Zabbix-前端配置监控"><a href="#步骤-3：在-Zabbix-前端配置监控" class="headerlink" title="步骤 3：在 Zabbix 前端配置监控"></a>步骤 3：在 Zabbix 前端配置监控</h3><ol>
+<li><p><strong>访问 Zabbix 前端</strong></p>
+<p>在浏览器中访问 <code>http://&lt;Zabbix Server IP&gt;/zabbix</code>，按照提示完成初始设置。</p>
+</li>
+<li><p><strong>登录 Zabbix 前端</strong></p>
+<p>使用默认用户名 <code>Admin</code> 和密码 <code>zabbix</code> 登录。</p>
+</li>
+<li><p><strong>添加主机</strong></p>
+<ul>
+<li>导航到 <code>Configuration</code> -&gt; <code>Hosts</code> -&gt; <code>Create host</code>。</li>
+<li>填写主机名、组和 IP 地址。</li>
+<li>在 <code>Templates</code> 标签中，选择 <code>Template OS Linux</code> 模板。</li>
+</ul>
+</li>
+<li><p><strong>检查监控数据</strong></p>
+<ul>
+<li>导航到 <code>Monitoring</code> -&gt; <code>Latest data</code>。</li>
+<li>选择刚刚添加的主机，查看收集到的监控数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过以上步骤，你已经成功安装并配置了 Zabbix 服务器和代理，并添加了一台被监控的服务器。你可以通过 Zabbix 前端界面查看监控数据，设置告警规则，以及创建图表和仪表盘来直观展示数据。</p>
+<p>Zabbix 提供了强大的功能和灵活性，可以监控各种类型的 IT 资源和服务。根据实际需求，你可以进一步定制 Zabbix 的配置和功能，以满足特定的监控需求。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/13/notes/Video/2024-07-13-%E6%B5%81%E5%AA%92%E4%BD%93%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/13/notes/Video/2024-07-13-%E6%B5%81%E5%AA%92%E4%BD%93%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">流媒体基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-07-13 09:00:00" itemprop="dateCreated datePublished" datetime="2024-07-13T09:00:00+08:00">2024-07-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Video/" itemprop="url" rel="index"><span itemprop="name">Video</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>流媒体相关理论基础笔记</li>
+</ul>
+<h2 id="推流是什么"><a href="#推流是什么" class="headerlink" title="推流是什么"></a>推流是什么</h2><p>推流（Streaming）是指将音视频内容通过网络实时传输到远程服务器或客户端，使得用户可以在不下载完整文件的情况下进行实时播放。推流技术广泛应用于直播、视频会议、在线教育、远程监控等领域。</p>
+<h3 id="推流的基本原理"><a href="#推流的基本原理" class="headerlink" title="推流的基本原理"></a>推流的基本原理</h3><ol>
+<li><p><strong>采集</strong>：</p>
+<ul>
+<li>通过摄像头、麦克风或其他输入设备采集音视频数据。</li>
+</ul>
+</li>
+<li><p><strong>编码</strong>：</p>
+<ul>
+<li>将采集到的音视频数据压缩编码，以减少数据量。常用的视频编码格式有 H.264、H.265，音频编码格式有 AAC、MP3 等。</li>
+</ul>
+</li>
+<li><p><strong>封装</strong>：</p>
+<ul>
+<li>将编码后的音视频数据封装成适合传输的流媒体格式，如 FLV、HLS 等。</li>
+</ul>
+</li>
+<li><p><strong>传输</strong>：</p>
+<ul>
+<li>将封装后的流媒体数据通过网络传输到流媒体服务器。常用的传输协议有 RTMP、HTTP、WebRTC 等。</li>
+</ul>
+</li>
+<li><p><strong>分发和播放</strong>：</p>
+<ul>
+<li>流媒体服务器接收推流数据后，进行处理和分发。用户端可以通过播放器软件或网页实时接收并播放流媒体内容。</li>
+</ul>
+</li>
+</ol>
+<h3 id="常用的推流协议和工具"><a href="#常用的推流协议和工具" class="headerlink" title="常用的推流协议和工具"></a>常用的推流协议和工具</h3><h4 id="推流协议"><a href="#推流协议" class="headerlink" title="推流协议"></a>推流协议</h4><ol>
+<li><p><strong>RTMP（Real-Time Messaging Protocol）</strong>：</p>
+<ul>
+<li>广泛应用于直播推流，尤其是与 Adobe Flash 配合使用。尽管 Flash 技术逐渐被淘汰，但 RTMP 仍然被很多直播平台所支持。</li>
+</ul>
+</li>
+<li><p><strong>HLS（HTTP Live Streaming）</strong>：</p>
+<ul>
+<li>由苹果公司开发，广泛应用于点播和直播流媒体服务。使用 HTTP 协议进行传输，兼容性好，特别适合在不同设备和网络条件下使用。</li>
+</ul>
+</li>
+<li><p><strong>WebRTC（Web Real-Time Communication）</strong>：</p>
+<ul>
+<li>支持实时音视频通信，适用于视频通话、视频会议等场景。WebRTC 具有低延迟、点对点通信等优点。</li>
+</ul>
+</li>
+</ol>
+<h4 id="推流工具"><a href="#推流工具" class="headerlink" title="推流工具"></a>推流工具</h4><ol>
+<li><p><strong>OBS（Open Broadcaster Software）</strong>：</p>
+<ul>
+<li>免费开源的推流和录屏软件，支持多种推流协议和平台。适合游戏直播、网络直播等场景。</li>
+</ul>
+</li>
+<li><p><strong>FFmpeg</strong>：</p>
+<ul>
+<li>强大的多媒体处理工具，支持音视频采集、编码、封装和推流。适合高级用户和开发者。</li>
+</ul>
+</li>
+<li><p><strong>Wirecast</strong>：</p>
+<ul>
+<li>专业的直播推流软件，提供丰富的功能和插件，适用于高质量直播需求。</li>
+</ul>
+</li>
+<li><p><strong>Streamlabs OBS</strong>：</p>
+<ul>
+<li>基于 OBS 开发的推流工具，集成了更多直播相关的功能和插件，适合游戏直播和网络主播。</li>
+</ul>
+</li>
+</ol>
+<h3 id="示例：使用-FFmpeg-推流"><a href="#示例：使用-FFmpeg-推流" class="headerlink" title="示例：使用 FFmpeg 推流"></a>示例：使用 FFmpeg 推流</h3><p>假设你想使用 FFmpeg 将本地视频文件推流到 RTMP 服务器，命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -re -i input.mp4 -c:v libx264 -c:a aac -strict experimental -f flv rtmp://example.com/live/stream_key</span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<ul>
+<li><code>-re</code>：按实时速率读取输入文件。</li>
+<li><code>-i input.mp4</code>：指定输入文件。</li>
+<li><code>-c:v libx264</code>：使用 H.264 编码器。</li>
+<li><code>-c:a aac</code>：使用 AAC 音频编码器。</li>
+<li><code>-strict experimental</code>：允许使用实验性 AAC 编码器。</li>
+<li><code>-f flv</code>：指定输出格式为 FLV。</li>
+<li><code>rtmp://example.com/live/stream_key</code>：RTMP 服务器地址和流密钥。</li>
+</ul>
+<h3 id="推流应用场景"><a href="#推流应用场景" class="headerlink" title="推流应用场景"></a>推流应用场景</h3><ul>
+<li><strong>游戏直播</strong>：通过推流软件将游戏画面和声音实时传输到直播平台，观众可以实时观看游戏过程。</li>
+<li><strong>在线教育</strong>：教师通过摄像头和麦克风实时讲解课程内容，学生可以通过网络实时观看和互动。</li>
+<li><strong>视频会议</strong>：通过推流技术，多个用户可以实时进行音视频交流，适用于远程办公和在线会议。</li>
+<li><strong>远程监控</strong>：通过摄像头实时推流监控画面，用户可以通过网络随时查看监控区域的情况。</li>
+</ul>
+<p>推流技术为各种实时音视频应用提供了基础支持，使得用户能够在不同设备和网络条件下享受到流畅的实时音视频体验。</p>
+<h2 id="拉流-取流是什么"><a href="#拉流-取流是什么" class="headerlink" title="拉流&#x2F;取流是什么"></a>拉流&#x2F;取流是什么</h2><p>拉流（Pull Streaming）或取流（Fetching Stream）是指从服务器端获取实时音视频流并在客户端进行播放的过程。与推流（Push Streaming）相对应，拉流是接收端的操作，常用于观看直播、视频会议、监控等场景。</p>
+<h3 id="拉流的基本原理"><a href="#拉流的基本原理" class="headerlink" title="拉流的基本原理"></a>拉流的基本原理</h3><ol>
+<li><p><strong>连接服务器</strong>：</p>
+<ul>
+<li>客户端通过指定的协议和地址连接到流媒体服务器。</li>
+</ul>
+</li>
+<li><p><strong>请求流</strong>：</p>
+<ul>
+<li>客户端向服务器发送请求，要求获取特定的流媒体内容。</li>
+</ul>
+</li>
+<li><p><strong>接收流</strong>：</p>
+<ul>
+<li>服务器将实时的音视频数据发送给客户端。</li>
+</ul>
+</li>
+<li><p><strong>解码和播放</strong>：</p>
+<ul>
+<li>客户端接收数据后，进行解码并播放音视频内容。</li>
+</ul>
+</li>
+</ol>
+<h3 id="常用的拉流协议和工具"><a href="#常用的拉流协议和工具" class="headerlink" title="常用的拉流协议和工具"></a>常用的拉流协议和工具</h3><h4 id="拉流协议"><a href="#拉流协议" class="headerlink" title="拉流协议"></a>拉流协议</h4><ol>
+<li><p><strong>RTMP（Real-Time Messaging Protocol）</strong>：</p>
+<ul>
+<li>常用于直播流的传输，尤其是与 Adobe Flash 配合使用。许多直播平台仍然支持 RTMP。</li>
+</ul>
+</li>
+<li><p><strong>HLS（HTTP Live Streaming）</strong>：</p>
+<ul>
+<li>由苹果公司开发，广泛应用于点播和直播流媒体服务。使用 HTTP 协议进行传输，兼容性好，特别适合在不同设备和网络条件下使用。</li>
+</ul>
+</li>
+<li><p><strong>DASH（Dynamic Adaptive Streaming over HTTP）</strong>：</p>
+<ul>
+<li>一种基于 HTTP 的自适应流媒体传输协议，可以根据网络条件动态调整视频质量。</li>
+</ul>
+</li>
+<li><p><strong>WebRTC（Web Real-Time Communication）</strong>：</p>
+<ul>
+<li>支持实时音视频通信，适用于视频通话、视频会议等场景。具有低延迟、点对点通信等优点。</li>
+</ul>
+</li>
+</ol>
+<h4 id="拉流工具"><a href="#拉流工具" class="headerlink" title="拉流工具"></a>拉流工具</h4><ol>
+<li><p><strong>VLC Media Player</strong>：</p>
+<ul>
+<li>开源的多媒体播放器，支持多种流媒体协议，常用于播放 RTMP、HLS 等流媒体内容。</li>
+</ul>
+</li>
+<li><p><strong>FFmpeg</strong>：</p>
+<ul>
+<li>强大的多媒体处理工具，支持音视频采集、编码、封装和拉流。适合高级用户和开发者。</li>
+</ul>
+</li>
+<li><p><strong>OBS（Open Broadcaster Software）</strong>：</p>
+<ul>
+<li>虽然主要用于推流，也可以配置为接收和播放拉流内容。</li>
+</ul>
+</li>
+<li><p><strong>Web 浏览器</strong>：</p>
+<ul>
+<li>现代浏览器支持 HLS、DASH 和 WebRTC，可以直接在网页中播放流媒体内容。</li>
+</ul>
+</li>
+</ol>
+<h3 id="示例：使用-FFmpeg-拉流"><a href="#示例：使用-FFmpeg-拉流" class="headerlink" title="示例：使用 FFmpeg 拉流"></a>示例：使用 FFmpeg 拉流</h3><p>假设你想使用 FFmpeg 从 RTMP 服务器拉取流媒体并保存到本地文件，命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i rtmp://example.com/live/stream_key -c copy output.mp4</span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<ul>
+<li><code>-i rtmp://example.com/live/stream_key</code>：指定输入流地址。</li>
+<li><code>-c copy</code>：直接复制流媒体数据，不进行重新编码。</li>
+<li><code>output.mp4</code>：指定输出文件名和格式。</li>
+</ul>
+<h3 id="示例：使用-VLC-拉流"><a href="#示例：使用-VLC-拉流" class="headerlink" title="示例：使用 VLC 拉流"></a>示例：使用 VLC 拉流</h3><p>假设你想使用 VLC 播放 HLS 流媒体，可以按以下步骤操作：</p>
+<ol>
+<li>打开 VLC Media Player。</li>
+<li>选择“媒体”菜单，然后选择“打开网络串流”。</li>
+<li>在网络 URL 输入框中输入 HLS 流地址，例如：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/live/stream.m3u8</span><br></pre></td></tr></table></figure></li>
+<li>点击“播放”按钮，VLC 将开始播放流媒体内容。</li>
+</ol>
+<h3 id="拉流应用场景"><a href="#拉流应用场景" class="headerlink" title="拉流应用场景"></a>拉流应用场景</h3><ul>
+<li><strong>观看直播</strong>：用户通过拉流技术从直播服务器获取实时音视频流，观看直播节目、体育赛事、游戏直播等。</li>
+<li><strong>视频会议</strong>：会议参与者通过拉流技术获取其他参与者的音视频流，实现实时交流。</li>
+<li><strong>远程监控</strong>：监控系统通过拉流技术从摄像头获取实时视频流，监控人员可以随时查看监控区域的情况。</li>
+<li><strong>在线教育</strong>：学生通过拉流技术观看教师的实时讲解和课程内容，进行在线学习。</li>
+</ul>
+<p>拉流技术是流媒体应用的重要组成部分，使用户能够在不同设备和网络条件下实时获取和播放音视频内容，为各种实时互动和直播应用提供了支持。</p>
+<h2 id="流媒体服务器是什么"><a href="#流媒体服务器是什么" class="headerlink" title="流媒体服务器是什么"></a>流媒体服务器是什么</h2><p>流媒体服务器是一种专门用于传输和分发音视频内容的服务器。它可以处理实时音视频流的接收、转码、存储和分发，使得用户能够通过网络实时观看或收听音视频内容。流媒体服务器在直播、点播、视频会议和远程教育等场景中发挥着关键作用。</p>
+<h3 id="流媒体服务器的主要功能"><a href="#流媒体服务器的主要功能" class="headerlink" title="流媒体服务器的主要功能"></a>流媒体服务器的主要功能</h3><ol>
+<li><p><strong>接收推流</strong>：</p>
+<ul>
+<li>接收来自客户端或设备的实时音视频流（推流）。这些流可以来自摄像头、麦克风、编码器或其他推流设备。</li>
+</ul>
+</li>
+<li><p><strong>转码</strong>：</p>
+<ul>
+<li>将音视频流转码为不同的格式或码率，以适应不同的网络条件和设备。例如，将高分辨率视频转码为多种分辨率和码率，以便用户根据自己的网络状况选择最佳的播放质量。</li>
+</ul>
+</li>
+<li><p><strong>存储</strong>：</p>
+<ul>
+<li>将流媒体内容存储在服务器上，以便后续点播。存储的内容可以是完整的视频文件，也可以是分片的流媒体文件（如 HLS 的 TS 分片）。</li>
+</ul>
+</li>
+<li><p><strong>分发拉流</strong>：</p>
+<ul>
+<li>将流媒体内容分发给客户端（拉流）。客户端可以是播放器、浏览器、移动应用等。</li>
+</ul>
+</li>
+<li><p><strong>负载均衡</strong>：</p>
+<ul>
+<li>管理多个流媒体服务器，以处理大量的并发请求，确保系统的稳定性和高可用性。</li>
+</ul>
+</li>
+<li><p><strong>安全性</strong>：</p>
+<ul>
+<li>提供访问控制、加密和认证等安全措施，确保流媒体内容的安全传输和访问。</li>
+</ul>
+</li>
+</ol>
+<h3 id="常见的流媒体服务器软件"><a href="#常见的流媒体服务器软件" class="headerlink" title="常见的流媒体服务器软件"></a>常见的流媒体服务器软件</h3><ol>
+<li><p><strong>Nginx + RTMP 模块</strong>：</p>
+<ul>
+<li>Nginx 是一个高性能的 HTTP 服务器和反向代理服务器，通过 RTMP 模块扩展，可以实现 RTMP 推流和拉流功能。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/arut/nginx-rtmp-module">Nginx RTMP Module</a></li>
+</ul>
+</li>
+<li><p><strong>Wowza Streaming Engine</strong>：</p>
+<ul>
+<li>商用的流媒体服务器，支持多种流媒体协议和功能，适用于企业级应用。</li>
+<li><a target="_blank" rel="noopener" href="https://www.wowza.com/">Wowza</a></li>
+</ul>
+</li>
+<li><p><strong>Red5</strong>：</p>
+<ul>
+<li>开源的流媒体服务器，支持 RTMP 和 WebRTC 等协议，适用于实时音视频通信。</li>
+<li><a target="_blank" rel="noopener" href="https://red5pro.com/">Red5</a></li>
+</ul>
+</li>
+<li><p><strong>Flussonic</strong>：</p>
+<ul>
+<li>商用的流媒体服务器，支持多种协议和高级功能，如转码、存储和分发。</li>
+<li><a target="_blank" rel="noopener" href="https://flussonic.com/">Flussonic</a></li>
+</ul>
+</li>
+<li><p><strong>Kurento</strong>：</p>
+<ul>
+<li>开源的 WebRTC 流媒体服务器，适用于视频会议和实时通信应用。</li>
+<li><a target="_blank" rel="noopener" href="https://www.kurento.org/">Kurento</a></li>
+</ul>
+</li>
+<li><p><strong>Adobe Media Server</strong>：</p>
+<ul>
+<li>商用的流媒体服务器，支持 RTMP 和 HLS 等协议，适用于专业的流媒体应用。</li>
+<li><a target="_blank" rel="noopener" href="https://www.adobe.com/products/adobe-media-server-family.html">Adobe Media Server</a></li>
+</ul>
+</li>
+</ol>
+<h3 id="示例：使用-Nginx-RTMP-模块搭建流媒体服务器"><a href="#示例：使用-Nginx-RTMP-模块搭建流媒体服务器" class="headerlink" title="示例：使用 Nginx + RTMP 模块搭建流媒体服务器"></a>示例：使用 Nginx + RTMP 模块搭建流媒体服务器</h3><ol>
+<li><p><strong>安装 Nginx 和 RTMP 模块</strong>：</p>
+<ul>
+<li>在 Ubuntu 系统上，首先安装必要的依赖：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get update</span><br><span class="line"><span class="built_in">sudo</span> apt-get install build-essential libpcre3 libpcre3-dev libssl-dev</span><br></pre></td></tr></table></figure></li>
+<li>下载并编译 Nginx 和 RTMP 模块：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget http://nginx.org/download/nginx-1.19.6.tar.gz</span><br><span class="line">wget https://github.com/arut/nginx-rtmp-module/archive/master.zip</span><br><span class="line">tar -zxvf nginx-1.19.6.tar.gz</span><br><span class="line">unzip master.zip</span><br><span class="line"><span class="built_in">cd</span> nginx-1.19.6</span><br><span class="line">./configure --add-module=../nginx-rtmp-module-master --with-http_ssl_module</span><br><span class="line">make</span><br><span class="line"><span class="built_in">sudo</span> make install</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>配置 Nginx</strong>：</p>
+<ul>
+<li>编辑 Nginx 配置文件（通常位于 <code>/usr/local/nginx/conf/nginx.conf</code>）：<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="section">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">rtmp</span> &#123;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span> <span class="number">1935</span>;</span><br><span class="line">        <span class="attribute">chunk_size</span> <span class="number">4096</span>;</span><br><span class="line"></span><br><span class="line">        <span class="attribute">application</span> live &#123;</span><br><span class="line">            <span class="attribute">live</span> <span class="literal">on</span>;</span><br><span class="line">            <span class="attribute">record</span> <span class="literal">off</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>启动 Nginx</strong>：</p>
+<ul>
+<li>启动 Nginx 流媒体服务器：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> /usr/local/nginx/sbin/nginx</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>推流和拉流</strong>：</p>
+<ul>
+<li>使用推流工具（如 OBS 或 FFmpeg）将流媒体推送到服务器：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -re -i input.mp4 -c:v libx264 -c:a aac -strict experimental -f flv rtmp://your_server_ip/live/stream_key</span><br></pre></td></tr></table></figure></li>
+<li>使用拉流工具（如 VLC）从服务器获取流媒体：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rtmp://your_server_ip/live/stream_key</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<p>流媒体服务器在现代网络音视频应用中起到了至关重要的作用，通过合理的部署和配置，可以实现高效、稳定和安全的实时音视频传输。</p>
+<h2 id="linux-循环推流-详解"><a href="#linux-循环推流-详解" class="headerlink" title="linux 循环推流 详解"></a>linux 循环推流 详解</h2><p>在 Linux 上进行循环推流意味着将一个视频文件不断地推送到流媒体服务器，以便进行持续播放。这通常用于 24&#x2F;7 直播、广告循环播放等场景。使用 <code>FFmpeg</code> 是实现这一功能的常见方法，因为它非常灵活且支持多种音视频处理任务。</p>
+<h3 id="步骤详解"><a href="#步骤详解" class="headerlink" title="步骤详解"></a>步骤详解</h3><h4 id="安装-FFmpeg"><a href="#安装-FFmpeg" class="headerlink" title="安装 FFmpeg"></a>安装 FFmpeg</h4><p>如果尚未安装 FFmpeg，请先进行安装：</p>
+<p>对于 Debian&#x2F;Ubuntu 系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install ffmpeg</span><br></pre></td></tr></table></figure>
+
+<p>对于 CentOS&#x2F;RHEL 系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> yum install epel-release</span><br><span class="line"><span class="built_in">sudo</span> yum install ffmpeg</span><br></pre></td></tr></table></figure>
+
+<h4 id="编写循环推流脚本"><a href="#编写循环推流脚本" class="headerlink" title="编写循环推流脚本"></a>编写循环推流脚本</h4><p>以下是一个简单的 Bash 脚本示例，用于实现视频文件的循环推流：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 推流地址</span></span><br><span class="line">RTMP_URL=<span class="string">&quot;rtmp://example.com/live/stream_key&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 视频文件路径</span></span><br><span class="line">VIDEO_FILE=<span class="string">&quot;input.mp4&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 循环推流</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span>; <span class="keyword">do</span></span><br><span class="line">    ffmpeg -re -stream_loop -1 -i <span class="string">&quot;<span class="variable">$VIDEO_FILE</span>&quot;</span> -c:v libx264 -c:a aac -f flv <span class="string">&quot;<span class="variable">$RTMP_URL</span>&quot;</span></span><br><span class="line">    <span class="keyword">if</span> [ $? -ne 0 ]; <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;推流失败，等待 5 秒后重试...&quot;</span></span><br><span class="line">        <span class="built_in">sleep</span> 5</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<ul>
+<li><code>RTMP_URL</code>：指定 RTMP 服务器的推流地址。</li>
+<li><code>VIDEO_FILE</code>：指定要推流的视频文件。</li>
+<li><code>while true; do ... done</code>：无限循环执行推流命令。</li>
+<li><code>ffmpeg -re -stream_loop -1 -i &quot;$VIDEO_FILE&quot; -c:v libx264 -c:a aac -f flv &quot;$RTMP_URL&quot;</code>：<ul>
+<li><code>-re</code>：按实时速率读取输入文件。</li>
+<li><code>-stream_loop -1</code>：无限循环输入文件。</li>
+<li><code>-i &quot;$VIDEO_FILE&quot;</code>：指定输入文件。</li>
+<li><code>-c:v libx264</code>：使用 H.264 视频编码器。</li>
+<li><code>-c:a aac</code>：使用 AAC 音频编码器。</li>
+<li><code>-f flv &quot;$RTMP_URL&quot;</code>：指定输出格式为 FLV，并推送到 RTMP 服务器。</li>
+</ul>
+</li>
+<li><code>if [ $? -ne 0 ]; then ...</code>：如果 FFmpeg 命令失败，等待 5 秒后重试。</li>
+</ul>
+<h4 id="运行脚本"><a href="#运行脚本" class="headerlink" title="运行脚本"></a>运行脚本</h4><p>保存上述脚本为 <code>loop_stream.sh</code>，然后赋予其执行权限并运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x loop_stream.sh</span><br><span class="line">./loop_stream.sh</span><br></pre></td></tr></table></figure>
+
+<h4 id="处理特殊情况"><a href="#处理特殊情况" class="headerlink" title="处理特殊情况"></a>处理特殊情况</h4><p>有时你可能需要在每次循环结束后对推流进行一些清理工作，或者在推流过程中处理网络中断等情况。可以通过捕捉信号或检查推流状态来实现更复杂的逻辑。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">RTMP_URL=<span class="string">&quot;rtmp://example.com/live/stream_key&quot;</span></span><br><span class="line">VIDEO_FILE=<span class="string">&quot;input.mp4&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 捕捉退出信号以进行清理</span></span><br><span class="line"><span class="built_in">trap</span> <span class="string">&#x27;echo &quot;脚本终止&quot;; exit 0&#x27;</span> SIGINT SIGTERM</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span>; <span class="keyword">do</span></span><br><span class="line">    ffmpeg -re -stream_loop -1 -i <span class="string">&quot;<span class="variable">$VIDEO_FILE</span>&quot;</span> -c:v libx264 -c:a aac -f flv <span class="string">&quot;<span class="variable">$RTMP_URL</span>&quot;</span></span><br><span class="line">    <span class="keyword">if</span> [ $? -ne 0 ]; <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;推流失败，等待 5 秒后重试...&quot;</span></span><br><span class="line">        <span class="built_in">sleep</span> 5</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>此脚本在接收到中断信号（如 <code>Ctrl+C</code>）时会优雅地退出。</p>
+<h3 id="其他考虑"><a href="#其他考虑" class="headerlink" title="其他考虑"></a>其他考虑</h3><ul>
+<li><strong>性能优化</strong>：根据实际需求调整 FFmpeg 编码参数，以优化推流性能。</li>
+<li><strong>监控和日志</strong>：可以将推流日志重定向到文件，并使用监控工具（如 <code>supervisord</code>、<code>systemd</code>）来确保推流脚本的运行和自动重启。</li>
+<li><strong>多文件循环播放</strong>：如果需要循环播放多个视频文件，可以修改脚本以支持多文件循环。例如，使用 <code>ffmpeg</code> 的 <code>concat</code> 过滤器。</li>
+</ul>
+<h3 id="多文件循环播放示例"><a href="#多文件循环播放示例" class="headerlink" title="多文件循环播放示例"></a>多文件循环播放示例</h3><p>以下是一个多文件循环播放的脚本示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">RTMP_URL=<span class="string">&quot;rtmp://example.com/live/stream_key&quot;</span></span><br><span class="line">VIDEO_FILES=(<span class="string">&quot;video1.mp4&quot;</span> <span class="string">&quot;video2.mp4&quot;</span> <span class="string">&quot;video3.mp4&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 捕捉退出信号以进行清理</span></span><br><span class="line"><span class="built_in">trap</span> <span class="string">&#x27;echo &quot;脚本终止&quot;; exit 0&#x27;</span> SIGINT SIGTERM</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span>; <span class="keyword">do</span></span><br><span class="line">    <span class="keyword">for</span> VIDEO_FILE <span class="keyword">in</span> <span class="string">&quot;<span class="variable">$&#123;VIDEO_FILES[@]&#125;</span>&quot;</span>; <span class="keyword">do</span></span><br><span class="line">        ffmpeg -re -i <span class="string">&quot;<span class="variable">$VIDEO_FILE</span>&quot;</span> -c:v libx264 -c:a aac -f flv <span class="string">&quot;<span class="variable">$RTMP_URL</span>&quot;</span></span><br><span class="line">        <span class="keyword">if</span> [ $? -ne 0 ]; <span class="keyword">then</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">&quot;推流失败，等待 5 秒后重试...&quot;</span></span><br><span class="line">            <span class="built_in">sleep</span> 5</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>此脚本会按顺序循环播放 <code>VIDEO_FILES</code> 列表中的每个视频文件，并在所有文件播放完毕后重新开始。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/12/notes/Tools/2024-07-12-LZ4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2878,451 +3636,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/06/19/notes/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/06/19/notes/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/" class="post-title-link" itemprop="url">C++中的NaN 产生原因，特性及处理方法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-06-19 09:00:00" itemprop="dateCreated datePublished" datetime="2024-06-19T09:00:00+08:00">2024-06-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-31 10:58:51" itemprop="dateModified" datetime="2024-12-31T10:58:51+08:00">2024-12-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>在C++编程中， NaN(Not a number)是浮点数类型(例如float, double, long double)中的一种特殊值，用于表示无法定义的数值或者操作结果。NaN在数值计算和科学计算中十分常见，正确理解和处理NaN对于编写健壮和可靠的代码至关重要。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/06/19/notes/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/06/19/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-06-19-linux_2_96_rsync/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/06/19/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-06-19-linux_2_96_rsync/" class="post-title-link" itemprop="url">linux_2_96_rsync</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-06-19 09:00:00" itemprop="dateCreated datePublished" datetime="2024-06-19T09:00:00+08:00">2024-06-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="linux-rsync命令是什么"><a href="#linux-rsync命令是什么" class="headerlink" title="linux rsync命令是什么"></a>linux rsync命令是什么</h2><p><code>rsync</code> 是一个用于在本地或远程同步文件和目录的开源实用工具。它非常强大和灵活，支持递归传输、保持文件权限、压缩传输等功能，使其成为文件同步和备份的首选工具之一。</p>
-<p>以下是 <code>rsync</code> 的一些常用选项和示例：</p>
-<h3 id="常用选项"><a href="#常用选项" class="headerlink" title="常用选项"></a>常用选项</h3><ul>
-<li><code>-a, --archive</code>：归档模式，等同于 <code>-rlptgoD</code>，保留文件的权限、时间戳、符号链接等。</li>
-<li><code>-v, --verbose</code>：详细模式，显示传输过程中的详细信息。</li>
-<li><code>-z, --compress</code>：在传输过程中压缩文件以节省带宽。</li>
-<li><code>-P</code>：显示传输进度并部分保留已传输的文件（等同于 <code>--partial --progress</code>）。</li>
-<li><code>--exclude</code>：排除指定的文件或目录。</li>
-<li><code>--delete</code>：删除目标目录中在源目录中不存在的文件。</li>
-</ul>
-<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><h4 id="本地复制"><a href="#本地复制" class="headerlink" title="本地复制"></a>本地复制</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /source/directory /destination/directory</span><br></pre></td></tr></table></figure>
-<p>将 <code>/source/directory</code> 复制到 <code>/destination/directory</code>。</p>
-<h4 id="远程复制"><a href="#远程复制" class="headerlink" title="远程复制"></a>远程复制</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /local/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-<p>将本地目录 <code>/local/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av user@remote_host:/remote/directory /local/directory</span><br></pre></td></tr></table></figure>
-<p>将远程主机 <code>remote_host</code> 的 <code>/remote/directory</code> 复制到本地目录 <code>/local/directory</code>。</p>
-<h4 id="使用-exclude-排除特定目录"><a href="#使用-exclude-排除特定目录" class="headerlink" title="使用 --exclude 排除特定目录"></a>使用 <code>--exclude</code> 排除特定目录</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;exclude_directory&#x27;</span> /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-<p>将本地目录 <code>/source/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，但排除 <code>exclude_directory</code> 目录。</p>
-<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><ol>
-<li><p><strong>同步本地目录</strong></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /home/user/data /backup</span><br></pre></td></tr></table></figure>
-<p>将 <code>/home/user/data</code> 目录同步到 <code>/backup</code> 目录。</p>
-</li>
-<li><p><strong>排除特定目录</strong></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;tmp&#x27;</span> /home/user/data /backup</span><br></pre></td></tr></table></figure>
-<p>将 <code>/home/user/data</code> 目录同步到 <code>/backup</code> 目录，但排除 <code>tmp</code> 目录。</p>
-</li>
-<li><p><strong>同步到远程主机</strong></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz /home/user/data user@remote_host:/backup</span><br></pre></td></tr></table></figure>
-<p>将本地 <code>/home/user/data</code> 目录同步到远程主机 <code>remote_host</code> 的 <code>/backup</code> 目录，并在传输过程中进行压缩。</p>
-</li>
-<li><p><strong>从远程主机同步到本地</strong></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz user@remote_host:/backup /home/user/data</span><br></pre></td></tr></table></figure>
-<p>将远程主机 <code>remote_host</code> 的 <code>/backup</code> 目录同步到本地的 <code>/home/user/data</code> 目录，并在传输过程中进行压缩。</p>
-</li>
-<li><p><strong>显示进度</strong></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avP /home/user/data user@remote_host:/backup</span><br></pre></td></tr></table></figure>
-<p>将本地 <code>/home/user/data</code> 目录同步到远程主机 <code>remote_host</code> 的 <code>/backup</code> 目录，并显示传输进度。</p>
-</li>
-</ol>
-<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p><code>rsync</code> 是一个非常强大且灵活的工具，适用于各种文件同步和备份需求。通过熟练使用 <code>rsync</code> 的各种选项，你可以高效地完成复杂的文件传输和同步任务。</p>
-<h2 id="linux-rsync命令-详解"><a href="#linux-rsync命令-详解" class="headerlink" title="linux rsync命令 详解"></a>linux rsync命令 详解</h2><p><code>rsync</code> 是一个强大的文件同步工具，常用于在本地或远程主机之间复制和同步文件和目录。它支持增量传输、保持文件权限、压缩传输等功能。以下是 <code>rsync</code> 的详细说明和一些示例。</p>
-<h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync [OPTION]... SRC [SRC]... DEST</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>SRC</code>：源文件或目录</li>
-<li><code>DEST</code>：目标文件或目录</li>
-</ul>
-<h3 id="常用选项-1"><a href="#常用选项-1" class="headerlink" title="常用选项"></a>常用选项</h3><ul>
-<li><code>-a, --archive</code>：归档模式，相当于 <code>-rlptgoD</code>，保留文件属性。<ul>
-<li><code>-r, --recursive</code>：递归处理目录。</li>
-<li><code>-l, --links</code>：保留符号链接。</li>
-<li><code>-p, --perms</code>：保留文件权限。</li>
-<li><code>-t, --times</code>：保持文件修改时间。</li>
-<li><code>-g, --group</code>：保留文件组信息。</li>
-<li><code>-o, --owner</code>：保留文件所有者信息。</li>
-<li><code>-D</code>：保留设备文件和特殊文件。</li>
-</ul>
-</li>
-<li><code>-v, --verbose</code>：详细输出。</li>
-<li><code>-z, --compress</code>：在传输过程中压缩文件。</li>
-<li><code>-P</code>：显示传输进度和部分传输的文件（等同于 <code>--partial --progress</code>）。<ul>
-<li><code>--partial</code>：保留部分传输的文件，以便恢复。</li>
-<li><code>--progress</code>：显示传输进度。</li>
-</ul>
-</li>
-<li><code>--exclude</code>：指定排除的文件或目录模式。</li>
-<li><code>--delete</code>：删除目标目录中在源目录中不存在的文件。</li>
-<li><code>--bwlimit=RATE</code>：限制 I&#x2F;O 带宽，单位为 KB&#x2F;s。</li>
-<li><code>-e, --rsh=COMMAND</code>：指定远程 shell 程序。</li>
-<li><code>--checksum</code>：基于文件校验和进行比较，而不是文件大小和修改时间。</li>
-</ul>
-<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><h4 id="本地复制-1"><a href="#本地复制-1" class="headerlink" title="本地复制"></a>本地复制</h4><p>将本地目录 <code>/source/directory</code> 复制到 <code>/destination/directory</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /source/directory /destination/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="远程复制-1"><a href="#远程复制-1" class="headerlink" title="远程复制"></a>远程复制</h4><p>将本地目录 <code>/local/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /local/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<p>将远程主机 <code>remote_host</code> 的 <code>/remote/directory</code> 复制到本地目录 <code>/local/directory</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av user@remote_host:/remote/directory /local/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="排除特定目录"><a href="#排除特定目录" class="headerlink" title="排除特定目录"></a>排除特定目录</h4><p>将本地目录 <code>/source/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，但排除 <code>exclude_directory</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;exclude_directory&#x27;</span> /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="显示进度"><a href="#显示进度" class="headerlink" title="显示进度"></a>显示进度</h4><p>在传输过程中显示进度：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avP /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="同步文件并删除目标目录中多余的文件"><a href="#同步文件并删除目标目录中多余的文件" class="headerlink" title="同步文件并删除目标目录中多余的文件"></a>同步文件并删除目标目录中多余的文件</h4><p>将本地目录 <code>/source/directory</code> 同步到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，并删除目标目录中多余的文件：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --delete /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="限制传输带宽"><a href="#限制传输带宽" class="headerlink" title="限制传输带宽"></a>限制传输带宽</h4><p>将本地目录 <code>/source/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，并限制传输带宽为 500 KB&#x2F;s：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz --bwlimit=500 /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="使用-SSH-进行传输"><a href="#使用-SSH-进行传输" class="headerlink" title="使用 SSH 进行传输"></a>使用 SSH 进行传输</h4><p>通过 SSH 进行文件传输：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz -e ssh /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<h4 id="基于校验和进行比较"><a href="#基于校验和进行比较" class="headerlink" title="基于校验和进行比较"></a>基于校验和进行比较</h4><p>基于文件校验和进行比较，而不是文件大小和修改时间：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz --checksum /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
-
-<h3 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h3><p><code>rsync</code> 是一个非常强大且灵活的工具，可以满足各种文件同步和备份需求。通过掌握 <code>rsync</code> 的各种选项和用法，你可以高效地完成复杂的文件传输和同步任务。</p>
-<h2 id="linux-rsync命令-拷贝目录并且忽略指定目录"><a href="#linux-rsync命令-拷贝目录并且忽略指定目录" class="headerlink" title="linux rsync命令 拷贝目录并且忽略指定目录"></a>linux rsync命令 拷贝目录并且忽略指定目录</h2><p>在 Linux 上使用 <code>rsync</code> 拷贝目录并且忽略指定目录的具体步骤如下。假设你要拷贝 <code>/source/directory</code> 到目标目录 <code>/destination/directory</code>，但要忽略 <code>ignore_directory</code> 目录。</p>
-<h3 id="示例命令"><a href="#示例命令" class="headerlink" title="示例命令"></a>示例命令</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
-
-<h3 id="详细说明"><a href="#详细说明" class="headerlink" title="详细说明"></a>详细说明</h3><ul>
-<li><code>-a, --archive</code>：归档模式，表示递归复制目录，并保持文件属性。</li>
-<li><code>-v, --verbose</code>：详细模式，显示传输过程中的信息。</li>
-<li><code>--exclude &#39;ignore_directory&#39;</code>：指定要排除的目录 <code>ignore_directory</code>。</li>
-<li><code>/source/directory/</code>：源目录路径，末尾的 <code>/</code> 表示拷贝目录内的内容。</li>
-<li><code>/destination/directory/</code>：目标目录路径，末尾的 <code>/</code> 表示将内容复制到该目录中。</li>
-</ul>
-<h3 id="更详细的例子"><a href="#更详细的例子" class="headerlink" title="更详细的例子"></a>更详细的例子</h3><p>假设有如下目录结构：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/source/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">├── file2.txt</span><br><span class="line">└── ignore_directory/</span><br><span class="line">    ├── file3.txt</span><br><span class="line">    └── file4.txt</span><br></pre></td></tr></table></figure>
-
-<p>使用上述 <code>rsync</code> 命令：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
-
-<p>结果是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/destination/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">└── file2.txt</span><br></pre></td></tr></table></figure>
-
-<h3 id="其他选项"><a href="#其他选项" class="headerlink" title="其他选项"></a>其他选项</h3><ul>
-<li>如果你有多个目录或文件需要排除，可以使用多个 <code>--exclude</code> 选项：</li>
-</ul>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory1&#x27;</span> --exclude <span class="string">&#x27;ignore_directory2&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>你也可以使用 <code>--exclude-from</code> 选项从文件中读取排除的目录和文件列表。假设排除列表文件 <code>exclude-list.txt</code> 内容如下：</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ignore_directory1</span><br><span class="line">ignore_directory2</span><br><span class="line">ignore_file.txt</span><br></pre></td></tr></table></figure>
-
-<p>使用命令：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude-from=<span class="string">&#x27;exclude-list.txt&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
-
-<h3 id="结论-2"><a href="#结论-2" class="headerlink" title="结论"></a>结论</h3><p>通过以上方法，你可以使用 <code>rsync</code> 高效地复制目录，同时忽略指定的目录或文件。这些选项提供了灵活的排除机制，使 <code>rsync</code> 成为处理文件同步和备份任务的强大工具。</p>
-<h2 id="linux-rsync命令-远程拷贝目录并且忽略指定目录"><a href="#linux-rsync命令-远程拷贝目录并且忽略指定目录" class="headerlink" title="linux rsync命令 远程拷贝目录并且忽略指定目录"></a>linux rsync命令 远程拷贝目录并且忽略指定目录</h2><p>使用 <code>rsync</code> 命令可以实现远程拷贝目录并且忽略指定目录。以下是详细步骤和示例。</p>
-<h3 id="示例命令-1"><a href="#示例命令-1" class="headerlink" title="示例命令"></a>示例命令</h3><p>假设你要将本地的 <code>/source/directory</code> 目录拷贝到远程主机 <code>remote_host</code> 的 <code>/destination/directory</code>，但要忽略 <code>ignore_directory</code> 目录。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
-
-<h3 id="详细说明-1"><a href="#详细说明-1" class="headerlink" title="详细说明"></a>详细说明</h3><ul>
-<li><code>-a, --archive</code>：归档模式，表示递归复制目录，并保持文件属性。</li>
-<li><code>-v, --verbose</code>：详细模式，显示传输过程中的信息。</li>
-<li><code>--exclude &#39;ignore_directory&#39;</code>：指定要排除的目录 <code>ignore_directory</code>。</li>
-<li><code>/source/directory/</code>：源目录路径，末尾的 <code>/</code> 表示拷贝目录内的内容。</li>
-<li><code>user@remote_host:/destination/directory/</code>：目标目录路径，格式为 <code>user@host:/path</code>。</li>
-</ul>
-<h3 id="更详细的例子-1"><a href="#更详细的例子-1" class="headerlink" title="更详细的例子"></a>更详细的例子</h3><p>假设有如下本地目录结构：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/source/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">├── file2.txt</span><br><span class="line">└── ignore_directory/</span><br><span class="line">    ├── file3.txt</span><br><span class="line">    └── file4.txt</span><br></pre></td></tr></table></figure>
-
-<p>使用上述 <code>rsync</code> 命令：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
-
-<p>结果是远程主机 <code>remote_host</code> 上的 <code>/destination/directory/</code> 目录结构为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/destination/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">└── file2.txt</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用多个排除选项"><a href="#使用多个排除选项" class="headerlink" title="使用多个排除选项"></a>使用多个排除选项</h3><p>如果你有多个目录或文件需要排除，可以使用多个 <code>--exclude</code> 选项：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory1&#x27;</span> --exclude <span class="string">&#x27;ignore_directory2&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用排除列表文件"><a href="#使用排除列表文件" class="headerlink" title="使用排除列表文件"></a>使用排除列表文件</h3><p>你也可以使用 <code>--exclude-from</code> 选项从文件中读取排除的目录和文件列表。假设排除列表文件 <code>exclude-list.txt</code> 内容如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ignore_directory1</span><br><span class="line">ignore_directory2</span><br><span class="line">ignore_file.txt</span><br></pre></td></tr></table></figure>
-
-<p>使用命令：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude-from=<span class="string">&#x27;exclude-list.txt&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
-
-<h3 id="结论-3"><a href="#结论-3" class="headerlink" title="结论"></a>结论</h3><p>通过以上方法，你可以使用 <code>rsync</code> 高效地实现远程目录拷贝，同时忽略指定的目录或文件。这些选项提供了灵活的排除机制，使 <code>rsync</code> 成为处理远程文件同步和备份任务的强大工具。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/06/17/notes/Personal/2024-06-17-%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E5%BC%80%E5%8F%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/06/17/notes/Personal/2024-06-17-%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E5%BC%80%E5%8F%91/" class="post-title-link" itemprop="url">计算机视觉开发</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-06-17 22:00:00" itemprop="dateCreated datePublished" datetime="2024-06-17T22:00:00+08:00">2024-06-17</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-02-18 15:40:45" itemprop="dateModified" datetime="2025-02-18T15:40:45+08:00">2025-02-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Personal/" itemprop="url" rel="index"><span itemprop="name">Personal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>计算机视觉(Computer Vision, CV)。</li>
-<li>CV算法工程师负责设计，开发和优化各种算法，以处理和分析图像和视频数据。</li>
-</ul>
-<h2 id="图像获取"><a href="#图像获取" class="headerlink" title="图像获取"></a>图像获取</h2><ul>
-<li>提取二维图像，三维图组，图像序列或相关的物理数据，例如声波，电磁波或核磁共振的深度，吸收度或反射度。</li>
-</ul>
-<h2 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h2><ul>
-<li>对图像作一种或一些预处理，使图像满足后继处理的要求，例如： 二次取样保证图像坐标的正确，平滑去噪等。</li>
-</ul>
-<h2 id="特征提取"><a href="#特征提取" class="headerlink" title="特征提取"></a>特征提取</h2><ul>
-<li>从图像中提取各种复杂度的特征，例如，线，边缘提取和脊检测，边角检测，斑点检测等局部化的特征点检测</li>
-</ul>
-<h2 id="检测-分割"><a href="#检测-分割" class="headerlink" title="检测&#x2F;分割"></a>检测&#x2F;分割</h2><ul>
-<li>对图像进行分割，提取有价值的内容，用于后继处理，例如：筛选特征点，分割含有特定目标的部分。</li>
-</ul>
-<h2 id="高级处理"><a href="#高级处理" class="headerlink" title="高级处理"></a>高级处理</h2><ul>
-<li>验证得到的数据是否匹配前提要求，估测特定系数，对目标进行分类。</li>
-</ul>
-<h2 id="数学基础知识"><a href="#数学基础知识" class="headerlink" title="数学基础知识"></a>数学基础知识</h2><ul>
-<li>线性代数： 矩阵运算，特征值与特征向量，向量空间等</li>
-<li>微积分： 导数，梯度，偏导数，泰勒级数等</li>
-<li>概率论与数理统计： 随即变量，概率分布，期望，方差，协方差，贝叶斯定理等</li>
-<li>优化理论： 梯度下降，牛顿法，拟牛顿法，拉格朗日乘数法等</li>
-</ul>
-<h2 id="编程基础知识"><a href="#编程基础知识" class="headerlink" title="编程基础知识"></a>编程基础知识</h2><ul>
-<li>Python： 掌握Python基础语法，熟悉Numpy，Pandas，Matplotlib等库</li>
-<li>C&#x2F;C++： 理解指针，内存管理，面向对象编程等概念，用于算法的高效实现</li>
-<li>OpenCV： 学习OpenCV库的使用，熟悉图像处理和计算机视觉的基础操作。</li>
-</ul>
-<h2 id="计算机视觉技术"><a href="#计算机视觉技术" class="headerlink" title="计算机视觉技术"></a>计算机视觉技术</h2><ul>
-<li><p>图像处理</p>
-<ul>
-<li>图像增强： 灰度变换，直方图均衡化，滤波等</li>
-<li>图像分割：阈值分割，边缘检测，区域生长等</li>
-<li>图像特征提取：角点检测，SIFT，SURF，ORB等</li>
-</ul>
-</li>
-<li><p>计算机视觉算法</p>
-<ul>
-<li>目标检测： R-CNN系列(R-CNN, Fast R-CNN, Faster R-CNN), YOLO系列，SSD等</li>
-<li>图像识别： CNN(卷积神经网络)，ResNet,VGG,MobileNet等</li>
-<li>图像生成： GAN(生成对抗网络)，VAE(变分自编码器)等</li>
-<li>三维视觉： 立体视觉，结构光，深度估计等</li>
-</ul>
-</li>
-<li><p>深度学习框架</p>
-<ul>
-<li>TensorFlow： 学习TensorFlow的基础使用，熟悉其高级API(例如Keras)和底层实现</li>
-<li>PyTorch： 掌握Pytorch的动态图特性，熟悉其网络设计和优化工具</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -3392,7 +3705,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">628</span>
+          <span class="site-state-item-count">631</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
