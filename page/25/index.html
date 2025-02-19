@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_16_more/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_14_trap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -205,7 +205,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_16_more/" class="post-title-link" itemprop="url">linux_2_16_more</a>
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_14_trap/" class="post-title-link" itemprop="url">linux_2_14_trap</a>
         </h2>
 
         <div class="post-meta">
@@ -246,210 +246,85 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>more命令</li>
+<li>trap命令</li>
 </ul>
-<h2 id="more"><a href="#more" class="headerlink" title="more"></a>more</h2><ul>
-<li>more, 一次显示一页</li>
+<h2 id="trap-信号"><a href="#trap-信号" class="headerlink" title="trap 信号"></a>trap 信号</h2><h3 id="1-1-简单使用"><a href="#1-1-简单使用" class="headerlink" title="1.1 简单使用"></a>1.1 简单使用</h3><ul>
+<li><p>trap命令，用于指定在接收到信号后将要采取的动作。常见的用途是在脚本程序被中断时完成清理工作。</p>
+</li>
+<li><p>历史上，shell总是用数字来代表信号，而新的脚本程序应该使用信号的名字，它们保存在用<code>#include</code>命令包含进来的<code>signal.h</code>头文件中，在使用信号名时需要省略<code>SIG</code>前缀</p>
+</li>
+<li><p>kill和trap等都可以看到信号编号及其关联的名称。“信号”是指那些被异步发送到一个程序的事件。默认情况下，它们通常会终止一个程序的运行。</p>
+</li>
+<li><p>查看所有信号的：</p>
+<ul>
+<li><code>trap -l</code></li>
 </ul>
-<p>在Linux中，<code>more</code>命令用于逐页显示文本文件的内容。它允许您按页浏览文本文件，以便更好地查看和阅读长篇文本。</p>
-<p>以下是<code>more</code>命令的一般语法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more [options] [file]</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="1-2-trap的使用"><a href="#1-2-trap的使用" class="headerlink" title="1.2 trap的使用"></a>1.2 trap的使用</h3><ul>
+<li>trap命令的参数分为两部分，前一部分是接收到指定信号时将要采取的行动，后一部分是要处理的信号名。<ul>
+<li><code>trap command signal</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="linux-trap命令-详解"><a href="#linux-trap命令-详解" class="headerlink" title="linux trap命令 详解"></a>linux trap命令 详解</h2><p><code>trap</code> 命令在 Linux 和其他类 Unix 操作系统中用于捕获和处理信号。信号是一种在 Unix 系统中用于通知进程发生了某个事件的机制。<code>trap</code> 命令允许你为脚本或命令设置对信号的处理方式。</p>
+<p><strong>语法：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> [命令] [信号]</span><br></pre></td></tr></table></figure>
 
-<p>其中，<code>options</code>是可选的一些选项，<code>file</code>是要显示的文本文件。</p>
-<p>以下是一些常见的<code>more</code>命令选项和用法：</p>
+<p><strong>常见用法：</strong></p>
 <ol>
-<li><p>逐页显示文件内容：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将按一页一页地显示<code>file.txt</code>文件的内容。您可以使用空格键向下翻页，按<code>q</code>键退出。</p>
+<li><p><strong>设置捕获信号的动作：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;命令&quot;</span> 信号</span><br></pre></td></tr></table></figure>
+<p>例如，以下命令设置在收到 <code>SIGINT</code> 信号时执行 <code>echo &quot;Caught interrupt signal&quot;</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;echo &#x27;Caught interrupt signal&#x27;&quot;</span> SIGINT</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>显示行号：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more -n file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将在每一行前显示行号。</p>
+<li><p><strong>禁用信号的默认行为：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;&quot;</span> 信号</span><br></pre></td></tr></table></figure>
+<p>例如，以下命令禁用 <code>SIGINT</code> 信号的默认行为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;&quot;</span> SIGINT</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>显示百分比：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more -p file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将在屏幕底部显示当前显示内容相对于整个文件的百分比。</p>
+<li><p><strong>恢复信号的默认行为：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> - 信号</span><br></pre></td></tr></table></figure>
+<p>例如，以下命令恢复 <code>SIGINT</code> 信号的默认行为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> - SIGINT</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>搜索文本：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more -s file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将禁止滚屏显示，只显示与搜索模式匹配的行。</p>
-</li>
-<li><p>跳转到指定行：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more +10 file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将从第10行开始显示文件内容。</p>
-</li>
-</ol>
-<p>请注意，<code>more</code>命令仅支持向前翻页，无法向后翻页。如果您需要更强大和灵活的文本查看工具，可以考虑使用<code>less</code>命令，它提供了更多功能，如向前翻页、向后翻页、搜索等。</p>
-<p>这些是<code>more</code>命令的一些常见选项和用法。您可以根据需要选择适合的选项来浏览和查看文本文件的内容。</p>
-<h2 id="linux-more命令-详解"><a href="#linux-more命令-详解" class="headerlink" title="linux more命令 详解"></a>linux more命令 详解</h2><p><code>more</code> 命令用于在终端逐页显示文本文件的内容。它允许用户逐页查看文件内容，提供一种按需加载的方式，使用户可以方便地浏览大型文本文件。</p>
-<p><strong>基本语法：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more [选项] 文件名</span><br></pre></td></tr></table></figure>
-
-<p><code>more</code> 命令的一些常见选项和用法：</p>
-<ol>
-<li><strong>空格键：</strong> 显示下一页。</li>
-<li><strong>Enter 键：</strong> 显示下一行。</li>
-<li><strong>q 键：</strong> 退出 <code>more</code>。</li>
-<li><strong>&#x2F; 搜索字符串：</strong> 在文本中搜索指定字符串。</li>
-<li><strong>n 键：</strong> 跳到下一次出现搜索字符串的位置。</li>
-<li><strong>b 键：</strong> 返回到上一页。</li>
-<li><strong>:f：</strong> 显示当前文件名和行号。</li>
-<li><strong>:n：</strong> 切换行号显示。</li>
-<li><strong>v 键：</strong> 使用系统默认编辑器（如 <code>vi</code>）打开文件进行编辑。</li>
+<li><p><strong>捕获多个信号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;命令&quot;</span> 信号1 信号2 ...</span><br></pre></td></tr></table></figure>
+<p>例如，以下命令设置在收到 <code>SIGINT</code> 或 <code>SIGTERM</code> 信号时执行 <code>echo &quot;Caught interrupt or termination signal&quot;</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;echo &#x27;Caught interrupt or termination signal&#x27;&quot;</span> SIGINT SIGTERM</span><br></pre></td></tr></table></figure></li>
 </ol>
 <p><strong>示例：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more example.txt</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置捕获 Ctrl+C 信号</span></span><br><span class="line"><span class="built_in">trap</span> <span class="string">&quot;echo &#x27;Caught interrupt signal&#x27;&quot;</span> SIGINT</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Running script...&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 模拟一个长时间运行的任务</span></span><br><span class="line"><span class="built_in">sleep</span> 10</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Script completed.&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p><code>more</code> 命令按页显示 <code>example.txt</code> 文件的内容，允许用户逐页查看文本文件。</p>
-<p><strong>注意：</strong> <code>more</code> 命令是一个相对简单的分页查看工具。在实际使用中，可能会使用更强大的分页工具，如 <code>less</code>，它提供了更多的交互性和搜索功能。</p>
-<p>如果你想要查看更多 <code>more</code> 命令的选项和功能，你可以查阅 <code>man more</code> 或 <code>more --help</code>。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_17_less/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_17_less/" class="post-title-link" itemprop="url">linux_2_17_less</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>less命令</li>
-</ul>
-<h2 id="less"><a href="#less" class="headerlink" title="less"></a>less</h2><p>在Linux中，<code>less</code>命令用于逐页浏览文本文件的内容。它是对<code>more</code>命令的改进，提供了更多的功能和灵活性。</p>
-<p>以下是<code>less</code>命令的一般语法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less [options] [file]</span><br></pre></td></tr></table></figure>
-
-<p>其中，<code>options</code>是可选的一些选项，<code>file</code>是要显示的文本文件。</p>
-<p>以下是一些常见的<code>less</code>命令选项和用法：</p>
+<p>在上述脚本中，当用户按下 <code>Ctrl+C</code> 时，<code>trap</code> 命令将捕获 <code>SIGINT</code> 信号并执行指定的命令，这里是输出 “Caught interrupt signal”。</p>
+<p><code>trap</code> 命令通常用于确保在脚本执行期间捕获特定信号时执行某些操作，例如清理资源或执行特定的处理程序。</p>
+<h2 id="linux-trap命令-常用技巧"><a href="#linux-trap命令-常用技巧" class="headerlink" title="linux trap命令 常用技巧"></a>linux trap命令 常用技巧</h2><p><code>trap</code> 命令在脚本编写中可以用于处理信号，以下是一些 <code>trap</code> 命令的常用技巧：</p>
 <ol>
-<li><p>逐页浏览文件内容：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将按一页一页地显示<code>file.txt</code>文件的内容。您可以使用空格键向下翻页，按<code>b</code>键向上翻页，按<code>q</code>键退出。</p>
+<li><p><strong>捕获并忽略信号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;&quot;</span> 信号</span><br></pre></td></tr></table></figure>
+<p>通过将空字符串指定为命令，可以捕获并忽略特定信号的默认动作。例如，以下命令会忽略 <code>SIGTERM</code> 信号：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;&quot;</span> SIGTERM</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>搜索文本：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less -p pattern file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将打开文件并搜索与<code>pattern</code>匹配的文本。按<code>n</code>键向下查找下一个匹配项，按<code>N</code>键向上查找上一个匹配项。</p>
+<li><p><strong>处理脚本终止信号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;cleanup_function&quot;</span> EXIT</span><br></pre></td></tr></table></figure>
+<p>在脚本退出时执行清理函数。<code>EXIT</code> 是一个特殊的信号，表示脚本即将退出。例如，以下命令会在脚本退出时调用名为 <code>cleanup</code> 的清理函数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;cleanup&quot;</span> EXIT</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">cleanup</span></span>() &#123;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;Performing cleanup...&quot;</span></span><br><span class="line">    <span class="comment"># 其他清理操作</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 脚本的主要逻辑</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>显示行号：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less -N file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将在每一行前显示行号。</p>
+<li><p><strong>防止脚本被中断：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;echo &#x27;Script is running. Please wait...&#x27;&quot;</span> SIGINT</span><br></pre></td></tr></table></figure>
+<p>通过捕获 <code>SIGINT</code> 信号（Ctrl+C）并输出一条消息，可以防止用户中断正在执行的脚本。这样，用户按下 Ctrl+C 时，只会得到一条消息而不是立即中断脚本。</p>
 </li>
-<li><p>显示文件大小和位置：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less -m file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将在屏幕底部显示当前显示内容相对于整个文件的百分比、文件大小和当前显示内容的行数。</p>
+<li><p><strong>设置错误处理：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;error_handler&quot;</span> ERR</span><br></pre></td></tr></table></figure>
+<p>在脚本中设置一个错误处理函数，以便在命令发生错误时执行特定的操作。例如，以下命令会在发生错误时调用名为 <code>handle_error</code> 的错误处理函数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;handle_error&quot;</span> ERR</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">handle_error</span></span>() &#123;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;An error occurred. Exiting...&quot;</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 脚本的主要逻辑</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>跳转到指定行：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less +10 file.txt</span><br></pre></td></tr></table></figure>
-
-<p>此命令将从第10行开始显示文件内容。</p>
-</li>
-<li><p>从命令行读取输入：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">command | less</span><br></pre></td></tr></table></figure>
-
-<p>此命令将从命令行输出中读取内容并使用<code>less</code>进行浏览。</p>
-</li>
+<li><p><strong>临时捕获信号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;cleanup_function&quot;</span> SIGNAL</span><br></pre></td></tr></table></figure>
+<p>可以在脚本的特定部分设置 <code>trap</code>，然后在执行完该部分后恢复原有的信号处理。例如，以下命令会在执行某个任务期间捕获 <code>SIGINT</code> 信号，执行清理操作，然后在任务完成后恢复默认的信号处理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&quot;cleanup_function&quot;</span> SIGINT</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行某个任务</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 恢复默认的信号处理</span></span><br><span class="line"><span class="built_in">trap</span> - SIGINT</span><br></pre></td></tr></table></figure></li>
 </ol>
-<p><code>less</code>命令还支持其他一些选项和操作，如按字母排序、复制文本、显示特定行范围等。您可以使用<code>man less</code>命令查看完整的选项和用法说明。</p>
-<p>总体而言，<code>less</code>命令是一个功能强大且灵活的文本浏览器，它可以帮助您浏览和查看大型文本文件，并提供了许多方便的功能。</p>
-<h2 id="linux-less命令-详解"><a href="#linux-less命令-详解" class="headerlink" title="linux less命令 详解"></a>linux less命令 详解</h2><p><code>less</code> 命令也是一个用于在终端中逐页显示文本文件内容的分页查看工具，它相对于 <code>more</code> 具有更多的交互性和功能。<code>less</code> 允许用户在查看文件时进行搜索、滚动、跳转等操作。</p>
-<p><strong>基本语法：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less [选项] 文件名</span><br></pre></td></tr></table></figure>
-
-<p>一些常见的 <code>less</code> 命令选项和用法：</p>
-<ol>
-<li><strong>空格键：</strong> 显示下一页。</li>
-<li><strong>b 键：</strong> 显示上一页。</li>
-<li><strong>Enter 键：</strong> 显示下一行。</li>
-<li><strong>q 键：</strong> 退出 <code>less</code>。</li>
-<li><strong>&#x2F; 搜索字符串：</strong> 在文本中搜索指定字符串。</li>
-<li><strong>n 键：</strong> 跳到下一次出现搜索字符串的位置。</li>
-<li><strong>N 键：</strong> 反向跳到上一次出现搜索字符串的位置。</li>
-<li><strong>g 键：</strong> 跳到文件开头。</li>
-<li><strong>G 键：</strong> 跳到文件末尾。</li>
-<li><strong>:f：</strong> 显示当前文件名和行号。</li>
-<li><strong>:n：</strong> 切换行号显示。</li>
-<li><strong>! 命令：</strong> 执行外部命令。</li>
-<li><strong>v 键：</strong> 使用系统默认编辑器（如 <code>vi</code>）打开文件进行编辑。</li>
-</ol>
-<p><strong>示例：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less example.txt</span><br></pre></td></tr></table></figure>
-
-<p><code>less</code> 命令将以分页形式显示 <code>example.txt</code> 文件的内容，并提供了上述交互式功能。</p>
-<p>与 <code>more</code> 不同，<code>less</code> 允许用户向前和向后滚动，支持搜索字符串，提供更多的浏览和搜索选项，使得在查看大型文本文件时更为方便。</p>
-<p>如果你想要查看更多 <code>less</code> 命令的选项和功能，你可以查阅 <code>man less</code> 或 <code>less --help</code>。</p>
+<p>这些技巧可以帮助你更好地处理脚本中的信号，确保在发生特定事件时执行适当的操作。</p>
 
       
     </div>
@@ -625,6 +500,148 @@
 </li>
 </ol>
 <p>这些技巧可以帮助你更灵活地使用 <code>nohup</code> 命令来管理在后台运行的任务。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_17_less/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_17_less/" class="post-title-link" itemprop="url">linux_2_17_less</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>less命令</li>
+</ul>
+<h2 id="less"><a href="#less" class="headerlink" title="less"></a>less</h2><p>在Linux中，<code>less</code>命令用于逐页浏览文本文件的内容。它是对<code>more</code>命令的改进，提供了更多的功能和灵活性。</p>
+<p>以下是<code>less</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less [options] [file]</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>file</code>是要显示的文本文件。</p>
+<p>以下是一些常见的<code>less</code>命令选项和用法：</p>
+<ol>
+<li><p>逐页浏览文件内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less file.txt</span><br></pre></td></tr></table></figure>
+
+<p>此命令将按一页一页地显示<code>file.txt</code>文件的内容。您可以使用空格键向下翻页，按<code>b</code>键向上翻页，按<code>q</code>键退出。</p>
+</li>
+<li><p>搜索文本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less -p pattern file.txt</span><br></pre></td></tr></table></figure>
+
+<p>此命令将打开文件并搜索与<code>pattern</code>匹配的文本。按<code>n</code>键向下查找下一个匹配项，按<code>N</code>键向上查找上一个匹配项。</p>
+</li>
+<li><p>显示行号：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less -N file.txt</span><br></pre></td></tr></table></figure>
+
+<p>此命令将在每一行前显示行号。</p>
+</li>
+<li><p>显示文件大小和位置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less -m file.txt</span><br></pre></td></tr></table></figure>
+
+<p>此命令将在屏幕底部显示当前显示内容相对于整个文件的百分比、文件大小和当前显示内容的行数。</p>
+</li>
+<li><p>跳转到指定行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less +10 file.txt</span><br></pre></td></tr></table></figure>
+
+<p>此命令将从第10行开始显示文件内容。</p>
+</li>
+<li><p>从命令行读取输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">command | less</span><br></pre></td></tr></table></figure>
+
+<p>此命令将从命令行输出中读取内容并使用<code>less</code>进行浏览。</p>
+</li>
+</ol>
+<p><code>less</code>命令还支持其他一些选项和操作，如按字母排序、复制文本、显示特定行范围等。您可以使用<code>man less</code>命令查看完整的选项和用法说明。</p>
+<p>总体而言，<code>less</code>命令是一个功能强大且灵活的文本浏览器，它可以帮助您浏览和查看大型文本文件，并提供了许多方便的功能。</p>
+<h2 id="linux-less命令-详解"><a href="#linux-less命令-详解" class="headerlink" title="linux less命令 详解"></a>linux less命令 详解</h2><p><code>less</code> 命令也是一个用于在终端中逐页显示文本文件内容的分页查看工具，它相对于 <code>more</code> 具有更多的交互性和功能。<code>less</code> 允许用户在查看文件时进行搜索、滚动、跳转等操作。</p>
+<p><strong>基本语法：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less [选项] 文件名</span><br></pre></td></tr></table></figure>
+
+<p>一些常见的 <code>less</code> 命令选项和用法：</p>
+<ol>
+<li><strong>空格键：</strong> 显示下一页。</li>
+<li><strong>b 键：</strong> 显示上一页。</li>
+<li><strong>Enter 键：</strong> 显示下一行。</li>
+<li><strong>q 键：</strong> 退出 <code>less</code>。</li>
+<li><strong>&#x2F; 搜索字符串：</strong> 在文本中搜索指定字符串。</li>
+<li><strong>n 键：</strong> 跳到下一次出现搜索字符串的位置。</li>
+<li><strong>N 键：</strong> 反向跳到上一次出现搜索字符串的位置。</li>
+<li><strong>g 键：</strong> 跳到文件开头。</li>
+<li><strong>G 键：</strong> 跳到文件末尾。</li>
+<li><strong>:f：</strong> 显示当前文件名和行号。</li>
+<li><strong>:n：</strong> 切换行号显示。</li>
+<li><strong>! 命令：</strong> 执行外部命令。</li>
+<li><strong>v 键：</strong> 使用系统默认编辑器（如 <code>vi</code>）打开文件进行编辑。</li>
+</ol>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less example.txt</span><br></pre></td></tr></table></figure>
+
+<p><code>less</code> 命令将以分页形式显示 <code>example.txt</code> 文件的内容，并提供了上述交互式功能。</p>
+<p>与 <code>more</code> 不同，<code>less</code> 允许用户向前和向后滚动，支持搜索字符串，提供更多的浏览和搜索选项，使得在查看大型文本文件时更为方便。</p>
+<p>如果你想要查看更多 <code>less</code> 命令的选项和功能，你可以查阅 <code>man less</code> 或 <code>less --help</code>。</p>
 
       
     </div>
@@ -1025,151 +1042,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_22_ar/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_22_ar/" class="post-title-link" itemprop="url">linux_2_22_ar</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>ar命令</li>
-</ul>
-<h2 id="ar"><a href="#ar" class="headerlink" title="ar"></a>ar</h2><ul>
-<li>ar命令，用于建立或修改备存文件，或者是从备存文件中抽取文件</li>
-<li>ar可以集合许多文件，成为单一的备存文件。在备存文件中，所有成员文件皆保有原来的属性与权限</li>
-<li>语法<ul>
-<li><code>ar [ -dmpqrtx ] [ cfosSuvV ] [ a&lt;成员文件&gt; ] [ b&lt;成员文件&gt; ] [ i&lt;成员文件&gt; ] [ 备存文件 ] [ 成员文件 ]</code></li>
-</ul>
-</li>
-<li>参数<ul>
-<li><code>-d</code> : 删除备存文件中的成员文件</li>
-<li><code>-m</code> : 变更成员文件在备存文件中的次序</li>
-<li><code>-p</code> : 显示备存文件中的成员文件内容</li>
-<li><code>-q</code> : 将文件附加在备存文件末端</li>
-<li><code>-r</code> : 将文件插入备存文件中</li>
-<li><code>-t</code> : 显示备存文件中所包含的文件</li>
-<li><code>-x</code> : 自备存文件中取出成员文件</li>
-</ul>
-</li>
-<li>选项参数：<ul>
-<li><code>a&lt;成员文件&gt;</code> : 将文件插入备存文件中指定的成员文件之后</li>
-<li><code>b&lt;成员文件&gt;</code> : 将文件插入备存文件中指定的成员文件之前</li>
-<li><code>c</code> : <strong>建立备存文件</strong></li>
-<li><code>f</code> : 为避免过场的文件名不兼容于其他系统的ar指令，因此可使用此参数，截掉要放入备存文件中过长的成员文件名称</li>
-<li><code>i&lt;成员文件&gt;</code> : 将文件插入备存文件中指定的成员文件之前</li>
-<li><code>o</code> : 保留备存文件中文件的日期</li>
-<li><code>s</code> : 若备存文件中包含了对象模式，可利用此参数建立备存文件的符号表</li>
-<li><code>S</code> : 不产生符号表</li>
-<li><code>u</code> : 只将日期较新文件插入备存文件中</li>
-<li><code>v</code> : 程序执行时显示详细的信息</li>
-<li><code>V</code> : 显示版本信息</li>
-</ul>
-</li>
-</ul>
-<h2 id="linux-ar命令-详解"><a href="#linux-ar命令-详解" class="headerlink" title="linux ar命令 详解"></a>linux ar命令 详解</h2><p><code>ar</code> 命令是用于创建和维护静态库（archive）的工具。静态库是包含了多个目标文件的归档文件，通常用于在编译和链接时与程序一起使用。</p>
-<p><strong>基本语法：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar [选项] [archive] [files]</span><br></pre></td></tr></table></figure>
-
-<p><strong>常见选项：</strong></p>
-<ul>
-<li><code>r</code>：将文件添加到归档中。</li>
-<li><code>x</code>：从归档中提取文件。</li>
-<li><code>t</code>：列出归档中的文件。</li>
-<li><code>d</code>：从归档中删除文件。</li>
-<li><code>c</code>：创建归档。</li>
-</ul>
-<p><strong>示例：</strong></p>
-<ol>
-<li><p><strong>创建静态库：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar rcs libexample.a file1.o file2.o file3.o</span><br></pre></td></tr></table></figure>
-<p>这将创建名为 <code>libexample.a</code> 的静态库，并将 <code>file1.o</code>、<code>file2.o</code> 和 <code>file3.o</code> 添加到其中。</p>
-</li>
-<li><p><strong>从静态库中提取文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar x libexample.a file2.o</span><br></pre></td></tr></table></figure>
-<p>这将从 <code>libexample.a</code> 中提取 <code>file2.o</code>。</p>
-</li>
-<li><p><strong>列出静态库中的文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar t libexample.a</span><br></pre></td></tr></table></figure>
-<p>这将列出 <code>libexample.a</code> 中包含的文件。</p>
-</li>
-<li><p><strong>从静态库中删除文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar d libexample.a file1.o</span><br></pre></td></tr></table></figure>
-<p>这将从 <code>libexample.a</code> 中删除 <code>file1.o</code>。</p>
-</li>
-</ol>
-<p><strong>注意：</strong></p>
-<ul>
-<li>静态库通常使用 <code>.a</code> 扩展名，但这并不是强制的。</li>
-<li>在许多情况下，开发人员更倾向于使用共享库（动态库）而不是静态库，因为共享库在运行时动态加载，更加灵活。</li>
-</ul>
-<p><code>ar</code> 命令通常与编译器（如 <code>gcc</code>）一起使用，用于创建和管理程序的静态库。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_21_wc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1502,6 +1374,697 @@
 <li><strong>rmmod：</strong> 用于卸载已加载的模块。</li>
 </ul>
 <p>通过 <code>lsmod</code> 命令，你可以快速了解系统中哪些内核模块正在使用，以及它们的大小和被哪些进程所使用。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_24_screen/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_24_screen/" class="post-title-link" itemprop="url">linux_2_24_screen</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>screen命令</li>
+</ul>
+<h2 id="screen"><a href="#screen" class="headerlink" title="screen"></a>screen</h2><p>在Linux中，<code>screen</code>命令用于创建和管理会话（session），它允许您在单个终端窗口中同时运行多个终端会话。<code>screen</code>命令提供了一种将会话分离和重新连接的机制，使您可以在需要时断开会话，并在稍后重新连接，而不会丢失会话的状态和进程。</p>
+<p>以下是<code>screen</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen [options] [command [args]]</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>command</code>是要运行的命令，<code>args</code>是传递给命令的参数。</p>
+<p>以下是一些常见的<code>screen</code>命令选项和用法：</p>
+<ol>
+<li><p>创建新会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen</span><br></pre></td></tr></table></figure>
+
+<p>此命令将创建一个新的<code>screen</code>会话。</p>
+</li>
+<li><p>列出所有会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -ls</span><br></pre></td></tr></table></figure>
+
+<p>此命令将列出所有已经存在的<code>screen</code>会话。</p>
+</li>
+<li><p>连接到会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r session_id</span><br></pre></td></tr></table></figure>
+
+<p>此命令将连接到指定的会话，<code>session_id</code>是会话的唯一标识符。</p>
+</li>
+<li><p>断开会话：<br>在<code>screen</code>会话中按下<code>Ctrl + A</code>，然后按下<code>d</code>键。</p>
+<p>此命令将断开当前的<code>screen</code>会话，但会话仍在后台运行。</p>
+</li>
+<li><p>重新连接会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r session_id</span><br></pre></td></tr></table></figure>
+
+<p>此命令将重新连接之前断开的<code>screen</code>会话。</p>
+</li>
+<li><p>指定会话名称：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -S session_name</span><br></pre></td></tr></table></figure>
+
+<p>此命令将创建一个具有指定名称的<code>screen</code>会话。</p>
+</li>
+</ol>
+<p><code>screen</code>命令还支持其他一些选项和操作，如分割窗口、滚动缓冲区、复制粘贴等。您可以使用<code>man screen</code>命令查看完整的选项和用法说明。</p>
+<p><code>screen</code>命令对于在远程服务器上长时间运行的任务、会话的持久性以及同时管理多个终端会话非常有用。它提供了一种灵活和强大的方式来处理会话管理和终端复用。</p>
+<h2 id="linux-screen命令-详解"><a href="#linux-screen命令-详解" class="headerlink" title="linux screen命令 详解"></a>linux screen命令 详解</h2><p><code>screen</code> 是一个在 Linux 系统中常用的终端复用工具，它允许用户在一个终端会话中创建多个窗口，并在这些窗口之间进行切换，同时还能够在后台运行进程。以下是关于 <code>screen</code> 命令的详解：</p>
+<h3 id="1-安装-screen"><a href="#1-安装-screen" class="headerlink" title="1. 安装 screen"></a>1. 安装 <code>screen</code></h3><p>在大多数 Linux 发行版中，<code>screen</code> 已经预装。如果未安装，可以使用包管理工具进行安装：</p>
+<ul>
+<li>在 Debian&#x2F;Ubuntu 上：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install screen</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在 Red Hat&#x2F;CentOS 上：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> yum install screen</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-基本用法"><a href="#2-基本用法" class="headerlink" title="2. 基本用法"></a>2. 基本用法</h3><ul>
+<li>启动 <code>screen</code> 会话：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>创建一个新窗口：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>C</code>。</p>
+</li>
+<li><p>在窗口之间切换：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>n</code>（下一个窗口）或 <code>p</code>（上一个窗口）。</p>
+</li>
+<li><p>分离会话：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>d</code>。这会将 <code>screen</code> 会话放入后台，并保持运行。</p>
+</li>
+<li><p>重新连接会话：使用以下命令重新连接到 <code>screen</code> 会话：</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-高级用法"><a href="#3-高级用法" class="headerlink" title="3. 高级用法"></a>3. 高级用法</h3><ul>
+<li>查看会话列表：可以使用以下命令查看所有 <code>screen</code> 会话：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -<span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>重新连接到指定会话：如果有多个会话，可以使用以下命令重新连接到指定会话：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r &lt;session_id&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>给会话命名：在创建会话时，可以使用 <code>-S</code> 选项为会话指定一个名称：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -S mysession</span><br></pre></td></tr></table></figure>
+
+<p>然后可以使用以下命令重新连接到该会话：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r mysession</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看帮助：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>?</code>。</li>
+</ul>
+<h3 id="4-其他常用操作"><a href="#4-其他常用操作" class="headerlink" title="4. 其他常用操作"></a>4. 其他常用操作</h3><ul>
+<li><p>关闭当前窗口：在窗口中执行 <code>exit</code> 或按下 <code>Ctrl</code> + <code>D</code>。</p>
+</li>
+<li><p>暂停和恢复滚动：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>[</code> 进入滚动模式，按 <code>Space</code> 开始滚动，按 <code>Esc</code> 退出滚动模式。</p>
+</li>
+<li><p>在多用户模式下共享会话：可以在多个用户之间共享 <code>screen</code> 会话，具体用法可参考 <code>man screen</code> 中的说明。</p>
+</li>
+</ul>
+<p>这些是 <code>screen</code> 命令的一些基本和高级用法，它是一个强大的工具，特别是在需要在远程服务器上长时间运行任务或会话的情况下。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_22_ar/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_22_ar/" class="post-title-link" itemprop="url">linux_2_22_ar</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>ar命令</li>
+</ul>
+<h2 id="ar"><a href="#ar" class="headerlink" title="ar"></a>ar</h2><ul>
+<li>ar命令，用于建立或修改备存文件，或者是从备存文件中抽取文件</li>
+<li>ar可以集合许多文件，成为单一的备存文件。在备存文件中，所有成员文件皆保有原来的属性与权限</li>
+<li>语法<ul>
+<li><code>ar [ -dmpqrtx ] [ cfosSuvV ] [ a&lt;成员文件&gt; ] [ b&lt;成员文件&gt; ] [ i&lt;成员文件&gt; ] [ 备存文件 ] [ 成员文件 ]</code></li>
+</ul>
+</li>
+<li>参数<ul>
+<li><code>-d</code> : 删除备存文件中的成员文件</li>
+<li><code>-m</code> : 变更成员文件在备存文件中的次序</li>
+<li><code>-p</code> : 显示备存文件中的成员文件内容</li>
+<li><code>-q</code> : 将文件附加在备存文件末端</li>
+<li><code>-r</code> : 将文件插入备存文件中</li>
+<li><code>-t</code> : 显示备存文件中所包含的文件</li>
+<li><code>-x</code> : 自备存文件中取出成员文件</li>
+</ul>
+</li>
+<li>选项参数：<ul>
+<li><code>a&lt;成员文件&gt;</code> : 将文件插入备存文件中指定的成员文件之后</li>
+<li><code>b&lt;成员文件&gt;</code> : 将文件插入备存文件中指定的成员文件之前</li>
+<li><code>c</code> : <strong>建立备存文件</strong></li>
+<li><code>f</code> : 为避免过场的文件名不兼容于其他系统的ar指令，因此可使用此参数，截掉要放入备存文件中过长的成员文件名称</li>
+<li><code>i&lt;成员文件&gt;</code> : 将文件插入备存文件中指定的成员文件之前</li>
+<li><code>o</code> : 保留备存文件中文件的日期</li>
+<li><code>s</code> : 若备存文件中包含了对象模式，可利用此参数建立备存文件的符号表</li>
+<li><code>S</code> : 不产生符号表</li>
+<li><code>u</code> : 只将日期较新文件插入备存文件中</li>
+<li><code>v</code> : 程序执行时显示详细的信息</li>
+<li><code>V</code> : 显示版本信息</li>
+</ul>
+</li>
+</ul>
+<h2 id="linux-ar命令-详解"><a href="#linux-ar命令-详解" class="headerlink" title="linux ar命令 详解"></a>linux ar命令 详解</h2><p><code>ar</code> 命令是用于创建和维护静态库（archive）的工具。静态库是包含了多个目标文件的归档文件，通常用于在编译和链接时与程序一起使用。</p>
+<p><strong>基本语法：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar [选项] [archive] [files]</span><br></pre></td></tr></table></figure>
+
+<p><strong>常见选项：</strong></p>
+<ul>
+<li><code>r</code>：将文件添加到归档中。</li>
+<li><code>x</code>：从归档中提取文件。</li>
+<li><code>t</code>：列出归档中的文件。</li>
+<li><code>d</code>：从归档中删除文件。</li>
+<li><code>c</code>：创建归档。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<ol>
+<li><p><strong>创建静态库：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar rcs libexample.a file1.o file2.o file3.o</span><br></pre></td></tr></table></figure>
+<p>这将创建名为 <code>libexample.a</code> 的静态库，并将 <code>file1.o</code>、<code>file2.o</code> 和 <code>file3.o</code> 添加到其中。</p>
+</li>
+<li><p><strong>从静态库中提取文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar x libexample.a file2.o</span><br></pre></td></tr></table></figure>
+<p>这将从 <code>libexample.a</code> 中提取 <code>file2.o</code>。</p>
+</li>
+<li><p><strong>列出静态库中的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar t libexample.a</span><br></pre></td></tr></table></figure>
+<p>这将列出 <code>libexample.a</code> 中包含的文件。</p>
+</li>
+<li><p><strong>从静态库中删除文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar d libexample.a file1.o</span><br></pre></td></tr></table></figure>
+<p>这将从 <code>libexample.a</code> 中删除 <code>file1.o</code>。</p>
+</li>
+</ol>
+<p><strong>注意：</strong></p>
+<ul>
+<li>静态库通常使用 <code>.a</code> 扩展名，但这并不是强制的。</li>
+<li>在许多情况下，开发人员更倾向于使用共享库（动态库）而不是静态库，因为共享库在运行时动态加载，更加灵活。</li>
+</ul>
+<p><code>ar</code> 命令通常与编译器（如 <code>gcc</code>）一起使用，用于创建和管理程序的静态库。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_26_tar/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_26_tar/" class="post-title-link" itemprop="url">linux_2_26_tar</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>tar命令</li>
+</ul>
+<h2 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h2><ul>
+<li>解压文件:<code>tar -zxf filename -C destination-path</code></li>
+<li>压缩文件:<code>tar -zcf filename</code></li>
+</ul>
+<h2 id="linux-tar命令-详解"><a href="#linux-tar命令-详解" class="headerlink" title="linux tar命令 详解"></a>linux tar命令 详解</h2><p><code>tar</code>是Linux系统中一个用于归档和压缩文件的命令行工具。它的名称来源于”tape archive”，最初设计是为了在磁带上创建备份。下面是<code>tar</code>命令的一些常见用法和参数：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar [选项] [文件或目录]</span><br></pre></td></tr></table></figure>
+
+<h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
+<li><p><strong>创建归档文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cvf archive.tar file1 file2 directory</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-c</code>: 创建归档文件。</li>
+<li><code>-v</code>: 显示详细信息。</li>
+<li><code>-f</code>: 指定归档文件的名称。</li>
+</ul>
+</li>
+<li><p><strong>解压缩归档文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf archive.tar</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-x</code>: 解压缩归档文件。</li>
+</ul>
+</li>
+<li><p><strong>查看归档文件内容：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tvf archive.tar</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-t</code>: 列出归档文件中的内容。</li>
+</ul>
+</li>
+<li><p><strong>添加文件到已有归档文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -rvf archive.tar newfile</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-r</code>: 向已有归档文件中添加文件。</li>
+</ul>
+</li>
+<li><p><strong>从归档中删除文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar --delete -f archive.tar file1</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>--delete</code>: 从归档文件中删除文件。</li>
+</ul>
+</li>
+<li><p><strong>指定工作目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -C /path/to/directory -xvf archive.tar</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-C</code>: 指定解压缩时的工作目录。</li>
+</ul>
+</li>
+<li><p><strong>压缩归档文件（使用gzip）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf archive.tar.gz directory</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-z</code>: 使用gzip进行压缩。</li>
+</ul>
+</li>
+<li><p><strong>压缩归档文件（使用bzip2）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cjvf archive.tar.bz2 directory</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-j</code>: 使用bzip2进行压缩。</li>
+</ul>
+</li>
+</ol>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
+<li><p>创建归档文件并压缩：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf archive.tar.gz directory</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解压缩压缩过的归档文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf archive.tar.gz</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看归档文件内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tvf archive.tar</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>请注意，<code>tar</code>命令的选项可能有所不同，具体取决于系统和<code>tar</code>版本。你可以使用<code>man tar</code>命令查看<code>tar</code>的手册页以获<br>取更详细的信息。</p>
+<h2 id="linux-tar命令-常用技巧"><a href="#linux-tar命令-常用技巧" class="headerlink" title="linux tar命令 常用技巧"></a>linux tar命令 常用技巧</h2><p>在使用<code>tar</code>命令时，有一些常用的技巧和实用的选项，可以帮助你更有效地处理文件和目录。以下是一些常用的<code>tar</code>命令技巧：</p>
+<ol>
+<li><p><strong>压缩和解压缩：</strong></p>
+<ul>
+<li>压缩文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf archive.tar.gz file1 file2 directory</span><br></pre></td></tr></table></figure></li>
+<li>解压缩文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf archive.tar.gz</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>使用不同的压缩算法：</strong></p>
+<ul>
+<li>使用bzip2进行压缩：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cjvf archive.tar.bz2 directory</span><br></pre></td></tr></table></figure></li>
+<li>使用xz进行压缩：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cJvf archive.tar.xz directory</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>仅显示归档文件的内容而不解压缩：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tvf archive.tar</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>向归档文件添加新文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -rvf archive.tar newfile</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>从归档文件中删除文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar --delete -f archive.tar file1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>创建归档时排除特定文件或目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar --exclude=pattern -cvf archive.tar directory</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>压缩归档文件时显示进度信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf - directory | pv &gt; archive.tar.gz</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>pv</code>是一个用于显示数据流进度的命令。</li>
+</ul>
+</li>
+<li><p><strong>在指定目录解压缩文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -C /path/to/destination -xvzf archive.tar.gz</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>将归档文件从远程服务器传输到本地：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh user@remote <span class="string">&#x27;tar -czvf - directory&#x27;</span> | tar -xzvf -</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>仅解压缩归档文件的部分内容：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf archive.tar.gz --wildcards <span class="string">&#x27;*.txt&#x27;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>仅解压缩归档文件中扩展名为<code>.txt</code>的文件。</li>
+</ul>
+</li>
+</ol>
+<p>这些技巧可以帮助你更灵活地使用<code>tar</code>命令，提高在文件和目录处理方面的效率。记得查看<code>man tar</code>以获取更多详细信息。</p>
+<h2 id="tar-1"><a href="#tar-1" class="headerlink" title="tar"></a>tar</h2><ul>
+<li><p>tar(tape archive),命令用于备份文件</p>
+</li>
+<li><p>tar是用来建立,还原备份文件的工具程序,它可以加入,解开备份文件内的文件</p>
+</li>
+<li><p>tar命令 可以为linux的文件和目录创建档案。利用tar，可以为某一特定文件创建档案（备份文件），也可以在档案中改变文件，或者向档案中加入新的文件。tar最初被用来在磁带上创建档案，现在，用户可以在任何设备上创建档案。利用tar命令，可以把一大堆的文件和目录全部打包成一个文件，这对于备份文件或将几个文件组合成为一个文件以便于网络传输是非常有用的。</p>
+</li>
+<li><p>首先要弄清两个概念：打包和压缩。打包是指将一大堆文件或目录变成一个总的文件；压缩则是将一个大的文件通过一些压缩算法变成一个小文件。</p>
+</li>
+<li><p>为什么要区分这两个概念呢？</p>
+<ul>
+<li>这源于Linux中很多压缩程序只能针对一个文件进行压缩，这样当你想要压缩一大堆文件时，你得先将这一大堆文件先打成一个包（tar命令），然后再用压缩程序进行压缩（gzip bzip2命令）。</li>
+</ul>
+</li>
+<li><p>语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">tar [-ABcdgGhiklmMoOpPrRsStuUvwWxzZ][-b &lt;区块数目&gt;][-C &lt;目的目录&gt;]</span><br><span class="line">    [-f &lt;备份文件&gt;][-F &lt;Script文件&gt;][-K &lt;文件&gt;][-L &lt;媒体容量&gt;][-N &lt;日期时间&gt;]</span><br><span class="line">    [-T &lt;范本文件&gt;][-V &lt;卷册名称&gt;][-X &lt;范本文件&gt;][-&lt;设备编号&gt;&lt;存储密度&gt;]</span><br><span class="line">    [--after-date=&lt;日期时间&gt;][--atime-preserve][--backuup=&lt;备份方式&gt;]</span><br><span class="line">    [--checkpoint][--concatenate][--confirmation][--delete]</span><br><span class="line">    [--exclude=&lt;范本样式&gt;][--force-local][--group=&lt;群组名称&gt;][--help]</span><br><span class="line">    [--ignore-failed-read][--new-volume-script=&lt;Script文件&gt;][--newer-mtime]</span><br><span class="line">    [--no-recursion][--null][--numeric-owner][--owner=&lt;用户名称&gt;][--posix]</span><br><span class="line">    [--erve][--preserve-order][--preserve-permissions]</span><br><span class="line">    [--record-size=&lt;区块数目&gt;][--recursive-unlink][--remove-files]</span><br><span class="line">    [--rsh-command=&lt;执行指令&gt;][--same-owner][--suffix=&lt;备份字尾字符串&gt;]</span><br><span class="line">    [--totals][--use-compress-program=&lt;执行指令&gt;][--version]</span><br><span class="line">    [--volno-file=&lt;编号文件&gt;][文件或目录...]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>选项：</p>
+<ul>
+<li>-A或–catenate：新增文件到以存在的备份文件；</li>
+<li>-b&lt;区块数目&gt;或–blocking-factor&#x3D;&lt;区块数目&gt;；</li>
+<li>-B：设置区块大小；</li>
+<li>-c或–create：建立新的备份文件；</li>
+<li>-C &lt;目录&gt;：切换工作目录，先进入指定目录再执行压缩&#x2F;解压缩操作，可用于仅压缩特定目录里的内容或解压缩到特定目录</li>
+<li>-d或–diff或–compare 对比备份文件内和文件系统上的文件的差异。</li>
+<li>-f&lt;备份文件&gt;或–file&#x3D;&lt;备份文件&gt; 指定备份文件。</li>
+<li>-F&lt;Script文件&gt;或–info-script&#x3D;&lt;Script文件&gt; 每次更换磁带时，就执行指定的Script文件</li>
+<li>-g或–listed-incremental 处理GNU格式的大量备份。</li>
+<li>-G或–incremental 处理旧的GNU格式的大量备份。</li>
+<li>-h或–dereference 不建立符号连接，直接复制该连接所指向的原始文件。</li>
+<li>-i或–ignore-zeros 忽略备份文件中的0 Byte区块，也就是EOF。</li>
+<li>-k或–keep-old-files 解开备份文件时，不覆盖已有的文件。</li>
+<li>-K&lt;文件&gt;或–starting-file&#x3D;&lt;文件&gt; 从指定的文件开始还原。</li>
+<li>-l或–one-file-system 复制的文件或目录存放的文件系统，必须与tar指令执行时所处的文件系统相同，否则不予复制</li>
+<li>-L&lt;媒体容量&gt;或-tape-length&#x3D;&lt;媒体容量&gt; 设置存放每体的容量，单位以1024 Bytes计算。</li>
+<li>-m或–modification-time 还原文件时，不变更文件的更改时间。</li>
+<li>-M或–multi-volume 在建立，还原备份文件或列出其中的内容时，采用多卷册模式。</li>
+<li>-N&lt;日期格式&gt;或–newer&#x3D;&lt;日期时间&gt; 只将较指定日期更新的文件保存到备份文件里。</li>
+<li>-o或–old-archive或–portability 将资料写入备份文件时使用V7格式。</li>
+<li>-O或–stdout 把从备份文件里还原的文件输出到标准输出设备。</li>
+<li>-p或–same-permissions 用原来的文件权限还原文件。</li>
+<li>-P或–absolute-names 文件名使用绝对名称，不移除文件名称前的”&#x2F;”号。</li>
+<li>-r或–append 新增文件到已存在的备份文件的结尾部分。</li>
+<li>-R或–block-number 列出每个信息在备份文件中的区块编号。</li>
+<li>-s或–same-order 还原文件的顺序和备份文件内的存放顺序相同。</li>
+<li>-S或–sparse 倘若一个文件内含大量的连续0字节，则将此文件存成稀疏文件。</li>
+<li>-t或–list 列出备份文件的内容。</li>
+<li>-T&lt;范本文件&gt;或–files-from&#x3D;&lt;范本文件&gt; 指定范本文件，其内含有一个或多个范本样式，让tar解开或建立符合设置条件的文件。</li>
+<li>-u或–update 仅置换较备份文件内的文件更新的文件。</li>
+<li>-U或–unlink-first 解开压缩文件还原文件之前，先解除文件的连接。</li>
+<li>-v或–verbose 显示指令执行过程。</li>
+<li>-V&lt;卷册名称&gt;或–label&#x3D;&lt;卷册名称&gt; 建立使用指定的卷册名称的备份文件。</li>
+<li>-w或–interactive 遭遇问题时先询问用户。</li>
+<li>-W或–verify 写入备份文件后，确认文件正确无误。</li>
+<li>-x或–extract或–get：从备份文件中还原文件；</li>
+<li>-t或–list：列出备份文件的内容；</li>
+<li>-z或–gzip或–ungzip：通过gzip指令处理备份文件；</li>
+<li>-Z或–compress或–uncompress：通过compress指令处理备份文件；</li>
+<li>-&lt;设备编号&gt;&lt;存储密度&gt;  设置备份用的外围设备编号及存放数据的密度。</li>
+<li>–after-date&#x3D;&lt;日期时间&gt; 此参数的效果和指定”-N”参数相同。</li>
+<li>–atime-preserve 不变更文件的存取时间。</li>
+<li>–backup&#x3D;&lt;备份方式&gt;或–backup 移除文件前先进行备份。</li>
+<li>–checkpoint 读取备份文件时列出目录名称。</li>
+<li>–concatenate 此参数的效果和指定”-A”参数相同。</li>
+<li>–confirmation 此参数的效果和指定”-w”参数相同。</li>
+<li>–delete 从备份文件中删除指定的文件。</li>
+<li>–exclude&#x3D;&lt;范本样式&gt; 排除符合范本样式的问家。</li>
+<li>–group&#x3D;&lt;群组名称&gt;  把加入设备文件中的文件的所属群组设成指定的群组。</li>
+<li>–help 在线帮助。</li>
+<li>–ignore-failed-read 忽略数据读取错误，不中断程序的执行。</li>
+<li>–new-volume-script&#x3D;&lt;Script文件&gt;  此参数的效果和指定”-F”参数相同。</li>
+<li>–newer-mtime 只保存更改过的文件。</li>
+<li>–no-recursion  不做递归处理，也就是指定目录下的所有文件及子目录不予处理。</li>
+<li>–null 从null设备读取文件名称。</li>
+<li>–numeric-owner 以用户识别码及群组识别码取代用户名称和群组名称。</li>
+<li>–owner&#x3D;&lt;用户名称&gt; 把加入备份文件中的文件的拥有者设成指定的用户。</li>
+<li>–posix 将数据写入备份文件时使用POSIX格式。</li>
+<li>–preserve 此参数的效果和指定”-ps”参数相同。</li>
+<li>–preserve-order 此参数的效果和指定”-A”参数相同。</li>
+<li>–preserve-permissions 此参数的效果和指定”-p”参数相同。</li>
+<li>–record-size&#x3D;&lt;区块数目&gt; 此参数的效果和指定”-b”参数相同。</li>
+<li>–recursive-unlink 解开压缩文件还原目录之前，先解除整个目录下所有文件的连接。</li>
+<li>–remove-files 文件加入备份文件后，就将其删除。</li>
+<li>–rsh-command&#x3D;&lt;执行指令&gt; 设置要在远端主机上执行的指令，以取代rsh指令。</li>
+<li>–same-owner 尝试以相同的文件拥有者还原问家你。</li>
+<li>–suffix&#x3D;&lt;备份字尾字符串&gt; 移除文件前先行备份。</li>
+<li>–totals 备份文件建立后，列出文件大小。</li>
+<li>–use-compress-program&#x3D;&lt;执行指令&gt; 通过指定的指令处理备份文件。</li>
+<li>–version 显示版本信息。</li>
+<li>–volno-file&#x3D;&lt;编号文件&gt; 使用指定文件内的编号取代预设的卷册编号。</li>
+</ul>
+</li>
+<li><p>参数：文件或目录：指定要打包的文件或目录列表。</p>
+</li>
+<li><p>实例：</p>
+<ul>
+<li><code>-z</code>：有gzip属性的</li>
+<li><code>-j</code>：有bz2属性的</li>
+<li><code>-Z</code>：有compress属性的</li>
+<li><code>-v</code>：显示所有过程</li>
+<li><code>-O</code>：将文件解开到标准输出</li>
+</ul>
+</li>
+<li><p>下面的参数-f是必须的</p>
+<ul>
+<li>-f: 使用档案名字，切记，这个参数是最后一个参数，后面只能接档案名。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">tar -cf all.tar *.jpg</span><br><span class="line"># 这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。</span><br><span class="line"></span><br><span class="line">tar -rf all.tar *.gif</span><br><span class="line"># 这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。</span><br><span class="line"></span><br><span class="line">tar -uf all.tar logo.gif</span><br><span class="line"># 这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。</span><br><span class="line"></span><br><span class="line">tar -tf all.tar</span><br><span class="line"># 这条命令是列出all.tar包中所有文件，-t是列出文件的意思</span><br><span class="line"></span><br><span class="line">tar -cfv archive.tar foo bar  # 从文件foo和bar创建archive.tar。</span><br><span class="line">tar -tvf archive.tar         # 详细列出archive.tar中的所有文件。</span><br><span class="line">tar -xf archive.tar          # 从archive.tar提取所有文件。</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>zip格式</p>
+<ul>
+<li>压缩： zip -r [目标文件名].zip [原文件&#x2F;目录名]</li>
+<li>解压： unzip [原文件名].zip</li>
+<li>注：-r参数代表递归</li>
+</ul>
+</li>
+<li><p>tar格式（该格式仅仅打包，不压缩）</p>
+<ul>
+<li>打包：tar -cvf [目标文件名].tar [原文件名&#x2F;目录名]</li>
+<li>解包：tar -xvf [原文件名].tar</li>
+<li>注：c参数代表create（创建），x参数代表extract（解包），v参数代表verbose（详细信息），f参数代表filename（文件名），所以f后必须接文件名。</li>
+</ul>
+</li>
+<li><p>tar.gz格式</p>
+<ul>
+<li>方式一：利用前面已经打包好的tar文件，直接用压缩命令。<ul>
+<li>压缩：gzip [原文件名].tar</li>
+<li>解压：gunzip [原文件名].tar.gz</li>
+</ul>
+</li>
+<li>方式二：一次性打包并压缩、解压并解包<ul>
+<li>打包并压缩： tar -zcvf [目标文件名].tar.gz [原文件名&#x2F;目录名]</li>
+<li>解压并解包： tar -zxvf [原文件名].tar.gz</li>
+<li>注：z代表用gzip算法来压缩&#x2F;解压。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>tar.bz2格式</p>
+<ul>
+<li>方式一：利用已经打包好的tar文件，直接执行压缩命令：<ul>
+<li>压缩：bzip2 [原文件名].tar</li>
+<li>解压：bunzip2 [原文件名].tar.bz2</li>
+</ul>
+</li>
+<li>方式二：一次性打包并压缩、解压并解包<ul>
+<li>打包并压缩： tar -jcvf [目标文件名].tar.bz2 [原文件名&#x2F;目录名]</li>
+<li>解压并解包： tar -jxvf [原文件名].tar.bz2</li>
+<li>注：小写j代表用bzip2算法来压缩&#x2F;解压。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>tar.xz格式</p>
+<ul>
+<li>方式一：利用已经打包好的tar文件，直接用压缩命令：<ul>
+<li>压缩：xz [原文件名].tar</li>
+<li>解压：unxz [原文件名].tar.xz</li>
+</ul>
+</li>
+<li>方式二：一次性打包并压缩、解压并解包<ul>
+<li>打包并压缩： tar -Jcvf [目标文件名].tar.xz [原文件名&#x2F;目录名]</li>
+<li>解压并解包： tar -Jxvf [原文件名].tar.xz</li>
+<li>注：大写J代表用xz算法来压缩&#x2F;解压。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>jar格式</p>
+<ul>
+<li>压缩：jar -cvf [目标文件名].jar [原文件名&#x2F;目录名]</li>
+<li>解压：jar -xvf [原文件名].jar</li>
+</ul>
+</li>
+<li><p>7z格式</p>
+<ul>
+<li>压缩：7z a [目标文件名].7z [原文件名&#x2F;目录名]</li>
+<li>解压：7z x [原文件名].7z</li>
+<li>注：这个7z解压命令支持rar格式</li>
+</ul>
+</li>
+</ul>
 
       
     </div>
@@ -2170,7 +2733,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_26_tar/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_29_userdel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2184,7 +2747,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_26_tar/" class="post-title-link" itemprop="url">linux_2_26_tar</a>
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_29_userdel/" class="post-title-link" itemprop="url">linux_2_29_userdel</a>
         </h2>
 
         <div class="post-meta">
@@ -2225,305 +2788,101 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>tar命令</li>
+<li>userdel命令</li>
 </ul>
-<h2 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h2><ul>
-<li>解压文件:<code>tar -zxf filename -C destination-path</code></li>
-<li>压缩文件:<code>tar -zcf filename</code></li>
-</ul>
-<h2 id="linux-tar命令-详解"><a href="#linux-tar命令-详解" class="headerlink" title="linux tar命令 详解"></a>linux tar命令 详解</h2><p><code>tar</code>是Linux系统中一个用于归档和压缩文件的命令行工具。它的名称来源于”tape archive”，最初设计是为了在磁带上创建备份。下面是<code>tar</code>命令的一些常见用法和参数：</p>
-<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar [选项] [文件或目录]</span><br></pre></td></tr></table></figure>
+<h2 id="linux-userdel命令-详解"><a href="#linux-userdel命令-详解" class="headerlink" title="linux userdel命令 详解"></a>linux userdel命令 详解</h2><p><code>userdel</code>命令用于从Linux系统中删除用户账号。同时，它也可以删除与用户关联的相关文件和目录。以下是<code>userdel</code>命令的基本语法和一些常见选项：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel [选项] 用户名</span><br></pre></td></tr></table></figure>
 
 <h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
-<li><p><strong>创建归档文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cvf archive.tar file1 file2 directory</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-c</code>: 创建归档文件。</li>
-<li><code>-v</code>: 显示详细信息。</li>
-<li><code>-f</code>: 指定归档文件的名称。</li>
-</ul>
+<li><p><strong>仅删除用户账号，保留家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel username</span><br></pre></td></tr></table></figure>
+<p>默认情况下，<code>userdel</code>命令会保留用户的家目录。这意味着用户的文件和目录将不被删除。</p>
 </li>
-<li><p><strong>解压缩归档文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf archive.tar</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-x</code>: 解压缩归档文件。</li>
-</ul>
+<li><p><strong>删除用户账号及其家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-r</code>选项，<code>userdel</code>会删除用户账号以及相关的家目录和邮件目录等文件。</p>
 </li>
-<li><p><strong>查看归档文件内容：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tvf archive.tar</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-t</code>: 列出归档文件中的内容。</li>
-</ul>
+<li><p><strong>同时删除用户主目录中的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure>
+<p><code>-f</code>选项用于强制删除，即使用户当前登录也会执行删除操作。</p>
 </li>
-<li><p><strong>添加文件到已有归档文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -rvf archive.tar newfile</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-r</code>: 向已有归档文件中添加文件。</li>
-</ul>
-</li>
-<li><p><strong>从归档中删除文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar --delete -f archive.tar file1</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>--delete</code>: 从归档文件中删除文件。</li>
-</ul>
-</li>
-<li><p><strong>指定工作目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -C /path/to/directory -xvf archive.tar</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-C</code>: 指定解压缩时的工作目录。</li>
-</ul>
-</li>
-<li><p><strong>压缩归档文件（使用gzip）：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf archive.tar.gz directory</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-z</code>: 使用gzip进行压缩。</li>
-</ul>
-</li>
-<li><p><strong>压缩归档文件（使用bzip2）：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cjvf archive.tar.bz2 directory</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>-j</code>: 使用bzip2进行压缩。</li>
-</ul>
+<li><p><strong>不检查用户是否当前登录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure>
+<p><code>-f</code>选项用于强制删除，即使用户当前登录也会执行删除操作。</p>
 </li>
 </ol>
 <h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
-<li><p>创建归档文件并压缩：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf archive.tar.gz directory</span><br></pre></td></tr></table></figure>
+<li><p>仅删除用户账号，保留家目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel username</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>解压缩压缩过的归档文件：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf archive.tar.gz</span><br></pre></td></tr></table></figure>
+<li><p>删除用户账号及其家目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r username</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>查看归档文件内容：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tvf archive.tar</span><br></pre></td></tr></table></figure></li>
+<li><p>强制删除用户账号及其家目录，不检查用户是否当前登录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure></li>
 </ul>
-<p>请注意，<code>tar</code>命令的选项可能有所不同，具体取决于系统和<code>tar</code>版本。你可以使用<code>man tar</code>命令查看<code>tar</code>的手册页以获<br>取更详细的信息。</p>
-<h2 id="linux-tar命令-常用技巧"><a href="#linux-tar命令-常用技巧" class="headerlink" title="linux tar命令 常用技巧"></a>linux tar命令 常用技巧</h2><p>在使用<code>tar</code>命令时，有一些常用的技巧和实用的选项，可以帮助你更有效地处理文件和目录。以下是一些常用的<code>tar</code>命令技巧：</p>
+<p>请谨慎使用<code>userdel</code>命令，特别是在删除用户及其家目录时，以免误删重要数据。建议在执行删除操作前备份需要保留的数据。你还可以查看<code>man userdel</code>获取更详细的帮助和选项信息。</p>
+<h2 id="linux-userdel命令-常用技巧"><a href="#linux-userdel命令-常用技巧" class="headerlink" title="linux userdel命令 常用技巧"></a>linux userdel命令 常用技巧</h2><p><code>userdel</code>命令用于删除用户账号，而且可以选择是否删除相关的家目录和文件。以下是一些常用的<code>userdel</code>命令技巧：</p>
 <ol>
-<li><p><strong>压缩和解压缩：</strong></p>
-<ul>
-<li>压缩文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf archive.tar.gz file1 file2 directory</span><br></pre></td></tr></table></figure></li>
-<li>解压缩文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf archive.tar.gz</span><br></pre></td></tr></table></figure></li>
-</ul>
+<li><p><strong>删除用户账号，保留家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel username</span><br></pre></td></tr></table></figure>
+<p>这将只删除用户账号，而不会删除用户的家目录及其内容。</p>
 </li>
-<li><p><strong>使用不同的压缩算法：</strong></p>
-<ul>
-<li>使用bzip2进行压缩：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cjvf archive.tar.bz2 directory</span><br></pre></td></tr></table></figure></li>
-<li>使用xz进行压缩：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cJvf archive.tar.xz directory</span><br></pre></td></tr></table></figure></li>
-</ul>
+<li><p><strong>删除用户账号及其家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-r</code>选项会删除用户账号以及相关的家目录和邮件目录等文件。</p>
 </li>
-<li><p><strong>仅显示归档文件的内容而不解压缩：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tvf archive.tar</span><br></pre></td></tr></table></figure>
+<li><p><strong>删除用户账号及其家目录，不显示提示信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r -f username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-f</code>选项可以强制删除用户账号及其家目录，而且不会显示提示信息。</p>
 </li>
-<li><p><strong>向归档文件添加新文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -rvf archive.tar newfile</span><br></pre></td></tr></table></figure>
+<li><p><strong>批量删除用户账号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">cat</span> userlist.txt | xargs <span class="built_in">sudo</span> userdel -r</span><br></pre></td></tr></table></figure>
+<p>假设有一个包含要删除用户的列表的<code>userlist.txt</code>文件，可以使用<code>xargs</code>命令结合<code>userdel</code>命令批量删除这些用户。</p>
 </li>
-<li><p><strong>从归档文件中删除文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar --delete -f archive.tar file1</span><br></pre></td></tr></table></figure>
+<li><p><strong>删除用户账号但不删除家目录，仅将其重命名：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -l newname -d /home/newname oldname</span><br></pre></td></tr></table></figure>
+<p>这会通过<code>usermod</code>命令将用户的账号和家目录进行重命名。</p>
 </li>
-<li><p><strong>创建归档时排除特定文件或目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar --exclude=pattern -cvf archive.tar directory</span><br></pre></td></tr></table></figure>
+<li><p><strong>删除用户账号及其邮箱文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r -m username</span><br></pre></td></tr></table></figure>
+<p><code>-m</code>选项删除用户账号及其家目录，包括邮件目录等。</p>
 </li>
-<li><p><strong>压缩归档文件时显示进度信息：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czvf - directory | pv &gt; archive.tar.gz</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>pv</code>是一个用于显示数据流进度的命令。</li>
-</ul>
+<li><p><strong>不检查用户是否当前登录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-f</code>选项可以强制删除用户账号及其家目录，即使用户当前登录也会执行删除操作。</p>
 </li>
-<li><p><strong>在指定目录解压缩文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -C /path/to/destination -xvzf archive.tar.gz</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>将归档文件从远程服务器传输到本地：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh user@remote <span class="string">&#x27;tar -czvf - directory&#x27;</span> | tar -xzvf -</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>仅解压缩归档文件的部分内容：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf archive.tar.gz --wildcards <span class="string">&#x27;*.txt&#x27;</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>仅解压缩归档文件中扩展名为<code>.txt</code>的文件。</li>
-</ul>
+<li><p><strong>查看<code>userdel</code>的帮助文档：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">man userdel</span><br></pre></td></tr></table></figure>
+<p>使用<code>man</code>命令查看<code>userdel</code>命令的详细帮助文档，了解更多选项和用法。</p>
 </li>
 </ol>
-<p>这些技巧可以帮助你更灵活地使用<code>tar</code>命令，提高在文件和目录处理方面的效率。记得查看<code>man tar</code>以获取更多详细信息。</p>
-<h2 id="tar-1"><a href="#tar-1" class="headerlink" title="tar"></a>tar</h2><ul>
-<li><p>tar(tape archive),命令用于备份文件</p>
-</li>
-<li><p>tar是用来建立,还原备份文件的工具程序,它可以加入,解开备份文件内的文件</p>
-</li>
-<li><p>tar命令 可以为linux的文件和目录创建档案。利用tar，可以为某一特定文件创建档案（备份文件），也可以在档案中改变文件，或者向档案中加入新的文件。tar最初被用来在磁带上创建档案，现在，用户可以在任何设备上创建档案。利用tar命令，可以把一大堆的文件和目录全部打包成一个文件，这对于备份文件或将几个文件组合成为一个文件以便于网络传输是非常有用的。</p>
-</li>
-<li><p>首先要弄清两个概念：打包和压缩。打包是指将一大堆文件或目录变成一个总的文件；压缩则是将一个大的文件通过一些压缩算法变成一个小文件。</p>
-</li>
-<li><p>为什么要区分这两个概念呢？</p>
-<ul>
-<li>这源于Linux中很多压缩程序只能针对一个文件进行压缩，这样当你想要压缩一大堆文件时，你得先将这一大堆文件先打成一个包（tar命令），然后再用压缩程序进行压缩（gzip bzip2命令）。</li>
+<p>请注意，删除用户账号是一个敏感操作，务必谨慎操作。在执行删除操作前，最好确保备份需要保留的数据。</p>
+<h2 id="userdel"><a href="#userdel" class="headerlink" title="userdel"></a>userdel</h2><ul>
+<li>命令用于删除用户账号</li>
+<li>userdel可删除用户账号与相关的文件,若不加参数,则仅删除用户账号,而不删除相关文件</li>
+<li><code>userdel -r username</code></li>
 </ul>
+<p>在Linux中，<code>userdel</code>命令用于删除用户账号。它是用于管理用户的基本命令之一。</p>
+<p>以下是<code>userdel</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel [options] username</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>username</code>是要删除的用户账号的用户名。</p>
+<p>以下是一些常见的<code>userdel</code>命令选项和用法：</p>
+<ol>
+<li><p>删除用户账号：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将删除指定用户名的用户账号。注意，这只会删除用户账号本身，不会删除用户的主目录或其他相关文件。</p>
 </li>
-<li><p>语法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">tar [-ABcdgGhiklmMoOpPrRsStuUvwWxzZ][-b &lt;区块数目&gt;][-C &lt;目的目录&gt;]</span><br><span class="line">    [-f &lt;备份文件&gt;][-F &lt;Script文件&gt;][-K &lt;文件&gt;][-L &lt;媒体容量&gt;][-N &lt;日期时间&gt;]</span><br><span class="line">    [-T &lt;范本文件&gt;][-V &lt;卷册名称&gt;][-X &lt;范本文件&gt;][-&lt;设备编号&gt;&lt;存储密度&gt;]</span><br><span class="line">    [--after-date=&lt;日期时间&gt;][--atime-preserve][--backuup=&lt;备份方式&gt;]</span><br><span class="line">    [--checkpoint][--concatenate][--confirmation][--delete]</span><br><span class="line">    [--exclude=&lt;范本样式&gt;][--force-local][--group=&lt;群组名称&gt;][--help]</span><br><span class="line">    [--ignore-failed-read][--new-volume-script=&lt;Script文件&gt;][--newer-mtime]</span><br><span class="line">    [--no-recursion][--null][--numeric-owner][--owner=&lt;用户名称&gt;][--posix]</span><br><span class="line">    [--erve][--preserve-order][--preserve-permissions]</span><br><span class="line">    [--record-size=&lt;区块数目&gt;][--recursive-unlink][--remove-files]</span><br><span class="line">    [--rsh-command=&lt;执行指令&gt;][--same-owner][--suffix=&lt;备份字尾字符串&gt;]</span><br><span class="line">    [--totals][--use-compress-program=&lt;执行指令&gt;][--version]</span><br><span class="line">    [--volno-file=&lt;编号文件&gt;][文件或目录...]</span><br></pre></td></tr></table></figure>
+<li><p>删除用户账号及其主目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel -r username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将删除指定用户名的用户账号，并且同时删除用户的主目录及其内容。</p>
 </li>
-<li><p>选项：</p>
-<ul>
-<li>-A或–catenate：新增文件到以存在的备份文件；</li>
-<li>-b&lt;区块数目&gt;或–blocking-factor&#x3D;&lt;区块数目&gt;；</li>
-<li>-B：设置区块大小；</li>
-<li>-c或–create：建立新的备份文件；</li>
-<li>-C &lt;目录&gt;：切换工作目录，先进入指定目录再执行压缩&#x2F;解压缩操作，可用于仅压缩特定目录里的内容或解压缩到特定目录</li>
-<li>-d或–diff或–compare 对比备份文件内和文件系统上的文件的差异。</li>
-<li>-f&lt;备份文件&gt;或–file&#x3D;&lt;备份文件&gt; 指定备份文件。</li>
-<li>-F&lt;Script文件&gt;或–info-script&#x3D;&lt;Script文件&gt; 每次更换磁带时，就执行指定的Script文件</li>
-<li>-g或–listed-incremental 处理GNU格式的大量备份。</li>
-<li>-G或–incremental 处理旧的GNU格式的大量备份。</li>
-<li>-h或–dereference 不建立符号连接，直接复制该连接所指向的原始文件。</li>
-<li>-i或–ignore-zeros 忽略备份文件中的0 Byte区块，也就是EOF。</li>
-<li>-k或–keep-old-files 解开备份文件时，不覆盖已有的文件。</li>
-<li>-K&lt;文件&gt;或–starting-file&#x3D;&lt;文件&gt; 从指定的文件开始还原。</li>
-<li>-l或–one-file-system 复制的文件或目录存放的文件系统，必须与tar指令执行时所处的文件系统相同，否则不予复制</li>
-<li>-L&lt;媒体容量&gt;或-tape-length&#x3D;&lt;媒体容量&gt; 设置存放每体的容量，单位以1024 Bytes计算。</li>
-<li>-m或–modification-time 还原文件时，不变更文件的更改时间。</li>
-<li>-M或–multi-volume 在建立，还原备份文件或列出其中的内容时，采用多卷册模式。</li>
-<li>-N&lt;日期格式&gt;或–newer&#x3D;&lt;日期时间&gt; 只将较指定日期更新的文件保存到备份文件里。</li>
-<li>-o或–old-archive或–portability 将资料写入备份文件时使用V7格式。</li>
-<li>-O或–stdout 把从备份文件里还原的文件输出到标准输出设备。</li>
-<li>-p或–same-permissions 用原来的文件权限还原文件。</li>
-<li>-P或–absolute-names 文件名使用绝对名称，不移除文件名称前的”&#x2F;”号。</li>
-<li>-r或–append 新增文件到已存在的备份文件的结尾部分。</li>
-<li>-R或–block-number 列出每个信息在备份文件中的区块编号。</li>
-<li>-s或–same-order 还原文件的顺序和备份文件内的存放顺序相同。</li>
-<li>-S或–sparse 倘若一个文件内含大量的连续0字节，则将此文件存成稀疏文件。</li>
-<li>-t或–list 列出备份文件的内容。</li>
-<li>-T&lt;范本文件&gt;或–files-from&#x3D;&lt;范本文件&gt; 指定范本文件，其内含有一个或多个范本样式，让tar解开或建立符合设置条件的文件。</li>
-<li>-u或–update 仅置换较备份文件内的文件更新的文件。</li>
-<li>-U或–unlink-first 解开压缩文件还原文件之前，先解除文件的连接。</li>
-<li>-v或–verbose 显示指令执行过程。</li>
-<li>-V&lt;卷册名称&gt;或–label&#x3D;&lt;卷册名称&gt; 建立使用指定的卷册名称的备份文件。</li>
-<li>-w或–interactive 遭遇问题时先询问用户。</li>
-<li>-W或–verify 写入备份文件后，确认文件正确无误。</li>
-<li>-x或–extract或–get：从备份文件中还原文件；</li>
-<li>-t或–list：列出备份文件的内容；</li>
-<li>-z或–gzip或–ungzip：通过gzip指令处理备份文件；</li>
-<li>-Z或–compress或–uncompress：通过compress指令处理备份文件；</li>
-<li>-&lt;设备编号&gt;&lt;存储密度&gt;  设置备份用的外围设备编号及存放数据的密度。</li>
-<li>–after-date&#x3D;&lt;日期时间&gt; 此参数的效果和指定”-N”参数相同。</li>
-<li>–atime-preserve 不变更文件的存取时间。</li>
-<li>–backup&#x3D;&lt;备份方式&gt;或–backup 移除文件前先进行备份。</li>
-<li>–checkpoint 读取备份文件时列出目录名称。</li>
-<li>–concatenate 此参数的效果和指定”-A”参数相同。</li>
-<li>–confirmation 此参数的效果和指定”-w”参数相同。</li>
-<li>–delete 从备份文件中删除指定的文件。</li>
-<li>–exclude&#x3D;&lt;范本样式&gt; 排除符合范本样式的问家。</li>
-<li>–group&#x3D;&lt;群组名称&gt;  把加入设备文件中的文件的所属群组设成指定的群组。</li>
-<li>–help 在线帮助。</li>
-<li>–ignore-failed-read 忽略数据读取错误，不中断程序的执行。</li>
-<li>–new-volume-script&#x3D;&lt;Script文件&gt;  此参数的效果和指定”-F”参数相同。</li>
-<li>–newer-mtime 只保存更改过的文件。</li>
-<li>–no-recursion  不做递归处理，也就是指定目录下的所有文件及子目录不予处理。</li>
-<li>–null 从null设备读取文件名称。</li>
-<li>–numeric-owner 以用户识别码及群组识别码取代用户名称和群组名称。</li>
-<li>–owner&#x3D;&lt;用户名称&gt; 把加入备份文件中的文件的拥有者设成指定的用户。</li>
-<li>–posix 将数据写入备份文件时使用POSIX格式。</li>
-<li>–preserve 此参数的效果和指定”-ps”参数相同。</li>
-<li>–preserve-order 此参数的效果和指定”-A”参数相同。</li>
-<li>–preserve-permissions 此参数的效果和指定”-p”参数相同。</li>
-<li>–record-size&#x3D;&lt;区块数目&gt; 此参数的效果和指定”-b”参数相同。</li>
-<li>–recursive-unlink 解开压缩文件还原目录之前，先解除整个目录下所有文件的连接。</li>
-<li>–remove-files 文件加入备份文件后，就将其删除。</li>
-<li>–rsh-command&#x3D;&lt;执行指令&gt; 设置要在远端主机上执行的指令，以取代rsh指令。</li>
-<li>–same-owner 尝试以相同的文件拥有者还原问家你。</li>
-<li>–suffix&#x3D;&lt;备份字尾字符串&gt; 移除文件前先行备份。</li>
-<li>–totals 备份文件建立后，列出文件大小。</li>
-<li>–use-compress-program&#x3D;&lt;执行指令&gt; 通过指定的指令处理备份文件。</li>
-<li>–version 显示版本信息。</li>
-<li>–volno-file&#x3D;&lt;编号文件&gt; 使用指定文件内的编号取代预设的卷册编号。</li>
-</ul>
-</li>
-<li><p>参数：文件或目录：指定要打包的文件或目录列表。</p>
-</li>
-<li><p>实例：</p>
-<ul>
-<li><code>-z</code>：有gzip属性的</li>
-<li><code>-j</code>：有bz2属性的</li>
-<li><code>-Z</code>：有compress属性的</li>
-<li><code>-v</code>：显示所有过程</li>
-<li><code>-O</code>：将文件解开到标准输出</li>
-</ul>
-</li>
-<li><p>下面的参数-f是必须的</p>
-<ul>
-<li>-f: 使用档案名字，切记，这个参数是最后一个参数，后面只能接档案名。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">tar -cf all.tar *.jpg</span><br><span class="line"># 这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。</span><br><span class="line"></span><br><span class="line">tar -rf all.tar *.gif</span><br><span class="line"># 这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。</span><br><span class="line"></span><br><span class="line">tar -uf all.tar logo.gif</span><br><span class="line"># 这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。</span><br><span class="line"></span><br><span class="line">tar -tf all.tar</span><br><span class="line"># 这条命令是列出all.tar包中所有文件，-t是列出文件的意思</span><br><span class="line"></span><br><span class="line">tar -cfv archive.tar foo bar  # 从文件foo和bar创建archive.tar。</span><br><span class="line">tar -tvf archive.tar         # 详细列出archive.tar中的所有文件。</span><br><span class="line">tar -xf archive.tar          # 从archive.tar提取所有文件。</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>zip格式</p>
-<ul>
-<li>压缩： zip -r [目标文件名].zip [原文件&#x2F;目录名]</li>
-<li>解压： unzip [原文件名].zip</li>
-<li>注：-r参数代表递归</li>
-</ul>
-</li>
-<li><p>tar格式（该格式仅仅打包，不压缩）</p>
-<ul>
-<li>打包：tar -cvf [目标文件名].tar [原文件名&#x2F;目录名]</li>
-<li>解包：tar -xvf [原文件名].tar</li>
-<li>注：c参数代表create（创建），x参数代表extract（解包），v参数代表verbose（详细信息），f参数代表filename（文件名），所以f后必须接文件名。</li>
-</ul>
-</li>
-<li><p>tar.gz格式</p>
-<ul>
-<li>方式一：利用前面已经打包好的tar文件，直接用压缩命令。<ul>
-<li>压缩：gzip [原文件名].tar</li>
-<li>解压：gunzip [原文件名].tar.gz</li>
-</ul>
-</li>
-<li>方式二：一次性打包并压缩、解压并解包<ul>
-<li>打包并压缩： tar -zcvf [目标文件名].tar.gz [原文件名&#x2F;目录名]</li>
-<li>解压并解包： tar -zxvf [原文件名].tar.gz</li>
-<li>注：z代表用gzip算法来压缩&#x2F;解压。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>tar.bz2格式</p>
-<ul>
-<li>方式一：利用已经打包好的tar文件，直接执行压缩命令：<ul>
-<li>压缩：bzip2 [原文件名].tar</li>
-<li>解压：bunzip2 [原文件名].tar.bz2</li>
-</ul>
-</li>
-<li>方式二：一次性打包并压缩、解压并解包<ul>
-<li>打包并压缩： tar -jcvf [目标文件名].tar.bz2 [原文件名&#x2F;目录名]</li>
-<li>解压并解包： tar -jxvf [原文件名].tar.bz2</li>
-<li>注：小写j代表用bzip2算法来压缩&#x2F;解压。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>tar.xz格式</p>
-<ul>
-<li>方式一：利用已经打包好的tar文件，直接用压缩命令：<ul>
-<li>压缩：xz [原文件名].tar</li>
-<li>解压：unxz [原文件名].tar.xz</li>
-</ul>
-</li>
-<li>方式二：一次性打包并压缩、解压并解包<ul>
-<li>打包并压缩： tar -Jcvf [目标文件名].tar.xz [原文件名&#x2F;目录名]</li>
-<li>解压并解包： tar -Jxvf [原文件名].tar.xz</li>
-<li>注：大写J代表用xz算法来压缩&#x2F;解压。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>jar格式</p>
-<ul>
-<li>压缩：jar -cvf [目标文件名].jar [原文件名&#x2F;目录名]</li>
-<li>解压：jar -xvf [原文件名].jar</li>
-</ul>
-</li>
-<li><p>7z格式</p>
-<ul>
-<li>压缩：7z a [目标文件名].7z [原文件名&#x2F;目录名]</li>
-<li>解压：7z x [原文件名].7z</li>
-<li>注：这个7z解压命令支持rar格式</li>
-</ul>
-</li>
-</ul>
+</ol>
+<p><code>userdel</code>命令还支持其他一些选项，如指定用户的辅助组保留其文件、强制删除用户账号等。您可以使用<code>man userdel</code>命令查看完整的选项和用法说明。</p>
+<p>请注意，删除用户账号可能会导致与该用户相关的文件和权限失效。在删除用户账号之前，请确保您了解其影响，并根据需要备份相关文件。</p>
 
       
     </div>
@@ -2543,7 +2902,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_24_screen/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_30_usermod/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2557,7 +2916,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_24_screen/" class="post-title-link" itemprop="url">linux_2_24_screen</a>
+            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_30_usermod/" class="post-title-link" itemprop="url">linux_2_30_usermod</a>
         </h2>
 
         <div class="post-meta">
@@ -2598,105 +2957,133 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>screen命令</li>
+<li>usermod命令</li>
 </ul>
-<h2 id="screen"><a href="#screen" class="headerlink" title="screen"></a>screen</h2><p>在Linux中，<code>screen</code>命令用于创建和管理会话（session），它允许您在单个终端窗口中同时运行多个终端会话。<code>screen</code>命令提供了一种将会话分离和重新连接的机制，使您可以在需要时断开会话，并在稍后重新连接，而不会丢失会话的状态和进程。</p>
-<p>以下是<code>screen</code>命令的一般语法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen [options] [command [args]]</span><br></pre></td></tr></table></figure>
+<h2 id="linux-usermod命令-详解"><a href="#linux-usermod命令-详解" class="headerlink" title="linux usermod命令 详解"></a>linux usermod命令 详解</h2><p><code>usermod</code>命令用于修改用户账号的属性，包括用户ID（UID）、组ID（GID）、家目录、登录Shell等。以下是<code>usermod</code>命令的基本语法和一些常见选项：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod [选项] 用户名</span><br></pre></td></tr></table></figure>
 
-<p>其中，<code>options</code>是可选的一些选项，<code>command</code>是要运行的命令，<code>args</code>是传递给命令的参数。</p>
-<p>以下是一些常见的<code>screen</code>命令选项和用法：</p>
-<ol>
-<li><p>创建新会话：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen</span><br></pre></td></tr></table></figure>
-
-<p>此命令将创建一个新的<code>screen</code>会话。</p>
+<h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
+<li><p><strong>修改用户ID（UID）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -u 1001 username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-u</code>选项可以修改用户的用户ID。</p>
 </li>
-<li><p>列出所有会话：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -ls</span><br></pre></td></tr></table></figure>
-
-<p>此命令将列出所有已经存在的<code>screen</code>会话。</p>
+<li><p><strong>修改用户组ID（GID）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -g <span class="built_in">users</span> username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-g</code>选项可以修改用户的主组ID。</p>
 </li>
-<li><p>连接到会话：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r session_id</span><br></pre></td></tr></table></figure>
-
-<p>此命令将连接到指定的会话，<code>session_id</code>是会话的唯一标识符。</p>
+<li><p><strong>修改附加组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -G wheel,ftp username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-G</code>选项可以修改用户的附加组。</p>
 </li>
-<li><p>断开会话：<br>在<code>screen</code>会话中按下<code>Ctrl + A</code>，然后按下<code>d</code>键。</p>
-<p>此命令将断开当前的<code>screen</code>会话，但会话仍在后台运行。</p>
+<li><p><strong>修改家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -d /newhome username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-d</code>选项可以修改用户的家目录路径。</p>
 </li>
-<li><p>重新连接会话：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r session_id</span><br></pre></td></tr></table></figure>
-
-<p>此命令将重新连接之前断开的<code>screen</code>会话。</p>
+<li><p><strong>修改登录Shell：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -s /bin/bash username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-s</code>选项可以修改用户的登录Shell。</p>
 </li>
-<li><p>指定会话名称：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -S session_name</span><br></pre></td></tr></table></figure>
-
-<p>此命令将创建一个具有指定名称的<code>screen</code>会话。</p>
+<li><p><strong>修改用户的账号过期时间：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -e 2023-01-31 username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-e</code>选项可以修改用户的账号过期时间。</p>
+</li>
+<li><p><strong>将用户添加到附加组而不移除原有组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG additionalgroup username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-aG</code>选项可以将用户添加到附加组，而不会移除原有组。</p>
 </li>
 </ol>
-<p><code>screen</code>命令还支持其他一些选项和操作，如分割窗口、滚动缓冲区、复制粘贴等。您可以使用<code>man screen</code>命令查看完整的选项和用法说明。</p>
-<p><code>screen</code>命令对于在远程服务器上长时间运行的任务、会话的持久性以及同时管理多个终端会话非常有用。它提供了一种灵活和强大的方式来处理会话管理和终端复用。</p>
-<h2 id="linux-screen命令-详解"><a href="#linux-screen命令-详解" class="headerlink" title="linux screen命令 详解"></a>linux screen命令 详解</h2><p><code>screen</code> 是一个在 Linux 系统中常用的终端复用工具，它允许用户在一个终端会话中创建多个窗口，并在这些窗口之间进行切换，同时还能够在后台运行进程。以下是关于 <code>screen</code> 命令的详解：</p>
-<h3 id="1-安装-screen"><a href="#1-安装-screen" class="headerlink" title="1. 安装 screen"></a>1. 安装 <code>screen</code></h3><p>在大多数 Linux 发行版中，<code>screen</code> 已经预装。如果未安装，可以使用包管理工具进行安装：</p>
-<ul>
-<li>在 Debian&#x2F;Ubuntu 上：</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install screen</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>在 Red Hat&#x2F;CentOS 上：</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> yum install screen</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-基本用法"><a href="#2-基本用法" class="headerlink" title="2. 基本用法"></a>2. 基本用法</h3><ul>
-<li>启动 <code>screen</code> 会话：</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>创建一个新窗口：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>C</code>。</p>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
+<li><p>修改用户ID（UID）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -u 1001 username</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>在窗口之间切换：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>n</code>（下一个窗口）或 <code>p</code>（上一个窗口）。</p>
+<li><p>修改用户组ID（GID）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -g <span class="built_in">users</span> username</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>分离会话：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>d</code>。这会将 <code>screen</code> 会话放入后台，并保持运行。</p>
+<li><p>修改附加组：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -G wheel,ftp username</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>重新连接会话：使用以下命令重新连接到 <code>screen</code> 会话：</p>
+<li><p>修改家目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -d /newhome username</span><br></pre></td></tr></table></figure>
 </li>
+<li><p>修改登录Shell：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -s /bin/bash username</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改用户的账号过期时间：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -e 2023-01-31 username</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将用户添加到附加组而不移除原有组：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG additionalgroup username</span><br></pre></td></tr></table></figure></li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r</span><br></pre></td></tr></table></figure>
+<p>请注意，使用<code>usermod</code>命令修改用户属性时，需要小心确保不会导致数据丢失或访问权限问题。记得查看<code>man usermod</code>获取更多详细信息。</p>
+<h2 id="linux-usermod命令-常用技巧"><a href="#linux-usermod命令-常用技巧" class="headerlink" title="linux usermod命令 常用技巧"></a>linux usermod命令 常用技巧</h2><p>在使用<code>usermod</code>命令时，有一些常用的技巧和选项，可以帮助你更灵活地修改用户账号的属性。以下是一些常见的<code>usermod</code>命令技巧：</p>
+<ol>
+<li><p><strong>添加用户到附加组而不移除原有组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG additionalgroup username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-aG</code>选项可以将用户添加到附加组，而不会移除原有组。这对于给用户分配额外权限非常有用。</p>
+</li>
+<li><p><strong>一次性修改多个属性：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -u 1001 -g <span class="built_in">users</span> -G wheel,ftp -s /bin/bash -d /newhome -e 2023-01-31 username</span><br></pre></td></tr></table></figure>
+<p>你可以在一次命令中修改多个用户属性，以逗号分隔。</p>
+</li>
+<li><p><strong>通过交互式方式修改用户属性：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -i -s /bin/bash username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-i</code>选项可以在交互式模式下修改用户属性，系统将提示你输入新值。</p>
+</li>
+<li><p><strong>批量修改用户属性：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">cat</span> userlist.txt | xargs <span class="built_in">sudo</span> usermod -s /bin/bash</span><br></pre></td></tr></table></figure>
+<p>如果有一个包含用户名列表的<code>userlist.txt</code>文件，可以使用<code>xargs</code>命令结合<code>usermod</code>命令批量修改这些用户的属性。</p>
+</li>
+<li><p><strong>将用户添加到新的主组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -g newgroup username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-g</code>选项可以将用户添加到新的主组。</p>
+</li>
+<li><p><strong>将用户从附加组中移除：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -G <span class="string">&quot;&quot;</span> username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-G</code>选项并指定空字符串，可以将用户从所有附加组中移除。</p>
+</li>
+<li><p><strong>将用户账号设置为永不过期：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -e <span class="string">&quot;&quot;</span> username</span><br></pre></td></tr></table></figure>
+<p>使用<code>-e</code>选项并指定空字符串，可以将用户账号的过期时间设置为永不过期。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更好地使用<code>usermod</code>命令，根据具体需求修改用户账号的属性。确保在执行修改操作前理解修改的影响，并确保备份需要保留的数据。记得查看<code>man usermod</code>以获取更多详细信息。</p>
+<h2 id="usermod"><a href="#usermod" class="headerlink" title="usermod"></a>usermod</h2><ul>
+<li>usermod,命令用于修改用户账号的各项设定<br>在Linux中，<code>usermod</code>命令用于修改用户账号的属性。它可以用于更改用户账号的各种设置，如用户名、用户ID、所属组、主目录等。</li>
+</ul>
+<p>以下是<code>usermod</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod [options] username</span><br></pre></td></tr></table></figure>
 
-<h3 id="3-高级用法"><a href="#3-高级用法" class="headerlink" title="3. 高级用法"></a>3. 高级用法</h3><ul>
-<li>查看会话列表：可以使用以下命令查看所有 <code>screen</code> 会话：</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -<span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>其中，<code>options</code>是可选的一些选项，<code>username</code>是要修改属性的用户账号的用户名。</p>
+<p>以下是一些常见的<code>usermod</code>命令选项和用法：</p>
+<ol>
+<li><p>修改用户名：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -l new_username username</span><br></pre></td></tr></table></figure>
 
-<ul>
-<li>重新连接到指定会话：如果有多个会话，可以使用以下命令重新连接到指定会话：</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r &lt;session_id&gt;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>给会话命名：在创建会话时，可以使用 <code>-S</code> 选项为会话指定一个名称：</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -S mysession</span><br></pre></td></tr></table></figure>
-
-<p>然后可以使用以下命令重新连接到该会话：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r mysession</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>查看帮助：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>?</code>。</li>
-</ul>
-<h3 id="4-其他常用操作"><a href="#4-其他常用操作" class="headerlink" title="4. 其他常用操作"></a>4. 其他常用操作</h3><ul>
-<li><p>关闭当前窗口：在窗口中执行 <code>exit</code> 或按下 <code>Ctrl</code> + <code>D</code>。</p>
+<p>此命令将将指定用户名的用户账号修改为新的用户名。</p>
 </li>
-<li><p>暂停和恢复滚动：按下 <code>Ctrl</code> + <code>A</code>，然后按下 <code>[</code> 进入滚动模式，按 <code>Space</code> 开始滚动，按 <code>Esc</code> 退出滚动模式。</p>
+<li><p>修改用户ID（UID）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -u new_uid username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将为指定用户名的用户账号修改用户ID（UID）为新的UID。</p>
 </li>
-<li><p>在多用户模式下共享会话：可以在多个用户之间共享 <code>screen</code> 会话，具体用法可参考 <code>man screen</code> 中的说明。</p>
+<li><p>修改用户所属的初始组：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -g new_groupname username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将将指定用户名的用户账号修改为新的初始组。</p>
 </li>
-</ul>
-<p>这些是 <code>screen</code> 命令的一些基本和高级用法，它是一个强大的工具，特别是在需要在远程服务器上长时间运行任务或会话的情况下。</p>
+<li><p>修改用户主目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -d new_homedir username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将将指定用户名的用户账号修改为新的主目录。</p>
+</li>
+<li><p>修改用户的登录Shell：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -s new_shell username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将将指定用户名的用户账号修改为新的登录Shell。</p>
+</li>
+</ol>
+<p><code>usermod</code>命令还支持其他一些选项，如设置密码过期时间、添加或删除用户的附加组、锁定或解锁用户账号等。您可以使用<code>man usermod</code>命令查看完整的选项和用法说明。</p>
+<p>请注意，在修改用户账号属性之前，请谨慎操作，并确保了解其影响。某些修改可能会影响用户的文件和权限访问。</p>
 
       
     </div>
@@ -3013,207 +3400,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_30_usermod/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_30_usermod/" class="post-title-link" itemprop="url">linux_2_30_usermod</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>usermod命令</li>
-</ul>
-<h2 id="linux-usermod命令-详解"><a href="#linux-usermod命令-详解" class="headerlink" title="linux usermod命令 详解"></a>linux usermod命令 详解</h2><p><code>usermod</code>命令用于修改用户账号的属性，包括用户ID（UID）、组ID（GID）、家目录、登录Shell等。以下是<code>usermod</code>命令的基本语法和一些常见选项：</p>
-<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod [选项] 用户名</span><br></pre></td></tr></table></figure>
-
-<h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
-<li><p><strong>修改用户ID（UID）：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -u 1001 username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-u</code>选项可以修改用户的用户ID。</p>
-</li>
-<li><p><strong>修改用户组ID（GID）：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -g <span class="built_in">users</span> username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-g</code>选项可以修改用户的主组ID。</p>
-</li>
-<li><p><strong>修改附加组：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -G wheel,ftp username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-G</code>选项可以修改用户的附加组。</p>
-</li>
-<li><p><strong>修改家目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -d /newhome username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-d</code>选项可以修改用户的家目录路径。</p>
-</li>
-<li><p><strong>修改登录Shell：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -s /bin/bash username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-s</code>选项可以修改用户的登录Shell。</p>
-</li>
-<li><p><strong>修改用户的账号过期时间：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -e 2023-01-31 username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-e</code>选项可以修改用户的账号过期时间。</p>
-</li>
-<li><p><strong>将用户添加到附加组而不移除原有组：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG additionalgroup username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-aG</code>选项可以将用户添加到附加组，而不会移除原有组。</p>
-</li>
-</ol>
-<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
-<li><p>修改用户ID（UID）：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -u 1001 username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>修改用户组ID（GID）：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -g <span class="built_in">users</span> username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>修改附加组：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -G wheel,ftp username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>修改家目录：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -d /newhome username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>修改登录Shell：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -s /bin/bash username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>修改用户的账号过期时间：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -e 2023-01-31 username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将用户添加到附加组而不移除原有组：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG additionalgroup username</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>请注意，使用<code>usermod</code>命令修改用户属性时，需要小心确保不会导致数据丢失或访问权限问题。记得查看<code>man usermod</code>获取更多详细信息。</p>
-<h2 id="linux-usermod命令-常用技巧"><a href="#linux-usermod命令-常用技巧" class="headerlink" title="linux usermod命令 常用技巧"></a>linux usermod命令 常用技巧</h2><p>在使用<code>usermod</code>命令时，有一些常用的技巧和选项，可以帮助你更灵活地修改用户账号的属性。以下是一些常见的<code>usermod</code>命令技巧：</p>
-<ol>
-<li><p><strong>添加用户到附加组而不移除原有组：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG additionalgroup username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-aG</code>选项可以将用户添加到附加组，而不会移除原有组。这对于给用户分配额外权限非常有用。</p>
-</li>
-<li><p><strong>一次性修改多个属性：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -u 1001 -g <span class="built_in">users</span> -G wheel,ftp -s /bin/bash -d /newhome -e 2023-01-31 username</span><br></pre></td></tr></table></figure>
-<p>你可以在一次命令中修改多个用户属性，以逗号分隔。</p>
-</li>
-<li><p><strong>通过交互式方式修改用户属性：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -i -s /bin/bash username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-i</code>选项可以在交互式模式下修改用户属性，系统将提示你输入新值。</p>
-</li>
-<li><p><strong>批量修改用户属性：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">cat</span> userlist.txt | xargs <span class="built_in">sudo</span> usermod -s /bin/bash</span><br></pre></td></tr></table></figure>
-<p>如果有一个包含用户名列表的<code>userlist.txt</code>文件，可以使用<code>xargs</code>命令结合<code>usermod</code>命令批量修改这些用户的属性。</p>
-</li>
-<li><p><strong>将用户添加到新的主组：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -g newgroup username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-g</code>选项可以将用户添加到新的主组。</p>
-</li>
-<li><p><strong>将用户从附加组中移除：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -G <span class="string">&quot;&quot;</span> username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-G</code>选项并指定空字符串，可以将用户从所有附加组中移除。</p>
-</li>
-<li><p><strong>将用户账号设置为永不过期：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -e <span class="string">&quot;&quot;</span> username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-e</code>选项并指定空字符串，可以将用户账号的过期时间设置为永不过期。</p>
-</li>
-</ol>
-<p>这些技巧可以帮助你更好地使用<code>usermod</code>命令，根据具体需求修改用户账号的属性。确保在执行修改操作前理解修改的影响，并确保备份需要保留的数据。记得查看<code>man usermod</code>以获取更多详细信息。</p>
-<h2 id="usermod"><a href="#usermod" class="headerlink" title="usermod"></a>usermod</h2><ul>
-<li>usermod,命令用于修改用户账号的各项设定<br>在Linux中，<code>usermod</code>命令用于修改用户账号的属性。它可以用于更改用户账号的各种设置，如用户名、用户ID、所属组、主目录等。</li>
-</ul>
-<p>以下是<code>usermod</code>命令的一般语法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod [options] username</span><br></pre></td></tr></table></figure>
-
-<p>其中，<code>options</code>是可选的一些选项，<code>username</code>是要修改属性的用户账号的用户名。</p>
-<p>以下是一些常见的<code>usermod</code>命令选项和用法：</p>
-<ol>
-<li><p>修改用户名：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -l new_username username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将将指定用户名的用户账号修改为新的用户名。</p>
-</li>
-<li><p>修改用户ID（UID）：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -u new_uid username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将为指定用户名的用户账号修改用户ID（UID）为新的UID。</p>
-</li>
-<li><p>修改用户所属的初始组：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -g new_groupname username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将将指定用户名的用户账号修改为新的初始组。</p>
-</li>
-<li><p>修改用户主目录：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -d new_homedir username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将将指定用户名的用户账号修改为新的主目录。</p>
-</li>
-<li><p>修改用户的登录Shell：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -s new_shell username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将将指定用户名的用户账号修改为新的登录Shell。</p>
-</li>
-</ol>
-<p><code>usermod</code>命令还支持其他一些选项，如设置密码过期时间、添加或删除用户的附加组、锁定或解锁用户账号等。您可以使用<code>man usermod</code>命令查看完整的选项和用法说明。</p>
-<p>请注意，在修改用户账号属性之前，请谨慎操作，并确保了解其影响。某些修改可能会影响用户的文件和权限访问。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_32_eval/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3351,175 +3537,6 @@
 </li>
 </ol>
 <p><code>eval</code>命令的主要用途是动态地构建和执行命令，可以在脚本中生成复杂的命令行操作。但需要注意，使用<code>eval</code>命令要谨慎，确保参数的来源可信，以避免安全风险。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_29_userdel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_29_userdel/" class="post-title-link" itemprop="url">linux_2_29_userdel</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>userdel命令</li>
-</ul>
-<h2 id="linux-userdel命令-详解"><a href="#linux-userdel命令-详解" class="headerlink" title="linux userdel命令 详解"></a>linux userdel命令 详解</h2><p><code>userdel</code>命令用于从Linux系统中删除用户账号。同时，它也可以删除与用户关联的相关文件和目录。以下是<code>userdel</code>命令的基本语法和一些常见选项：</p>
-<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel [选项] 用户名</span><br></pre></td></tr></table></figure>
-
-<h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
-<li><p><strong>仅删除用户账号，保留家目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel username</span><br></pre></td></tr></table></figure>
-<p>默认情况下，<code>userdel</code>命令会保留用户的家目录。这意味着用户的文件和目录将不被删除。</p>
-</li>
-<li><p><strong>删除用户账号及其家目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-r</code>选项，<code>userdel</code>会删除用户账号以及相关的家目录和邮件目录等文件。</p>
-</li>
-<li><p><strong>同时删除用户主目录中的文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure>
-<p><code>-f</code>选项用于强制删除，即使用户当前登录也会执行删除操作。</p>
-</li>
-<li><p><strong>不检查用户是否当前登录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure>
-<p><code>-f</code>选项用于强制删除，即使用户当前登录也会执行删除操作。</p>
-</li>
-</ol>
-<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
-<li><p>仅删除用户账号，保留家目录：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除用户账号及其家目录：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r username</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>强制删除用户账号及其家目录，不检查用户是否当前登录：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>请谨慎使用<code>userdel</code>命令，特别是在删除用户及其家目录时，以免误删重要数据。建议在执行删除操作前备份需要保留的数据。你还可以查看<code>man userdel</code>获取更详细的帮助和选项信息。</p>
-<h2 id="linux-userdel命令-常用技巧"><a href="#linux-userdel命令-常用技巧" class="headerlink" title="linux userdel命令 常用技巧"></a>linux userdel命令 常用技巧</h2><p><code>userdel</code>命令用于删除用户账号，而且可以选择是否删除相关的家目录和文件。以下是一些常用的<code>userdel</code>命令技巧：</p>
-<ol>
-<li><p><strong>删除用户账号，保留家目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel username</span><br></pre></td></tr></table></figure>
-<p>这将只删除用户账号，而不会删除用户的家目录及其内容。</p>
-</li>
-<li><p><strong>删除用户账号及其家目录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-r</code>选项会删除用户账号以及相关的家目录和邮件目录等文件。</p>
-</li>
-<li><p><strong>删除用户账号及其家目录，不显示提示信息：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r -f username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-f</code>选项可以强制删除用户账号及其家目录，而且不会显示提示信息。</p>
-</li>
-<li><p><strong>批量删除用户账号：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">cat</span> userlist.txt | xargs <span class="built_in">sudo</span> userdel -r</span><br></pre></td></tr></table></figure>
-<p>假设有一个包含要删除用户的列表的<code>userlist.txt</code>文件，可以使用<code>xargs</code>命令结合<code>userdel</code>命令批量删除这些用户。</p>
-</li>
-<li><p><strong>删除用户账号但不删除家目录，仅将其重命名：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -l newname -d /home/newname oldname</span><br></pre></td></tr></table></figure>
-<p>这会通过<code>usermod</code>命令将用户的账号和家目录进行重命名。</p>
-</li>
-<li><p><strong>删除用户账号及其邮箱文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -r -m username</span><br></pre></td></tr></table></figure>
-<p><code>-m</code>选项删除用户账号及其家目录，包括邮件目录等。</p>
-</li>
-<li><p><strong>不检查用户是否当前登录：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> userdel -f -r username</span><br></pre></td></tr></table></figure>
-<p>使用<code>-f</code>选项可以强制删除用户账号及其家目录，即使用户当前登录也会执行删除操作。</p>
-</li>
-<li><p><strong>查看<code>userdel</code>的帮助文档：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">man userdel</span><br></pre></td></tr></table></figure>
-<p>使用<code>man</code>命令查看<code>userdel</code>命令的详细帮助文档，了解更多选项和用法。</p>
-</li>
-</ol>
-<p>请注意，删除用户账号是一个敏感操作，务必谨慎操作。在执行删除操作前，最好确保备份需要保留的数据。</p>
-<h2 id="userdel"><a href="#userdel" class="headerlink" title="userdel"></a>userdel</h2><ul>
-<li>命令用于删除用户账号</li>
-<li>userdel可删除用户账号与相关的文件,若不加参数,则仅删除用户账号,而不删除相关文件</li>
-<li><code>userdel -r username</code></li>
-</ul>
-<p>在Linux中，<code>userdel</code>命令用于删除用户账号。它是用于管理用户的基本命令之一。</p>
-<p>以下是<code>userdel</code>命令的一般语法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel [options] username</span><br></pre></td></tr></table></figure>
-
-<p>其中，<code>options</code>是可选的一些选项，<code>username</code>是要删除的用户账号的用户名。</p>
-<p>以下是一些常见的<code>userdel</code>命令选项和用法：</p>
-<ol>
-<li><p>删除用户账号：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将删除指定用户名的用户账号。注意，这只会删除用户账号本身，不会删除用户的主目录或其他相关文件。</p>
-</li>
-<li><p>删除用户账号及其主目录：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userdel -r username</span><br></pre></td></tr></table></figure>
-
-<p>此命令将删除指定用户名的用户账号，并且同时删除用户的主目录及其内容。</p>
-</li>
-</ol>
-<p><code>userdel</code>命令还支持其他一些选项，如指定用户的辅助组保留其文件、强制删除用户账号等。您可以使用<code>man userdel</code>命令查看完整的选项和用法说明。</p>
-<p>请注意，删除用户账号可能会导致与该用户相关的文件和权限失效。在删除用户账号之前，请确保您了解其影响，并根据需要备份相关文件。</p>
 
       
     </div>
@@ -4302,13 +4319,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-count">51</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">94</span>
+        <span class="site-state-item-count">95</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
