@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_sntp/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_tls/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -205,7 +205,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_sntp/" class="post-title-link" itemprop="url">mongoose_sntp</a>
+            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_tls/" class="post-title-link" itemprop="url">mongoose_tls</a>
         </h2>
 
         <div class="post-meta">
@@ -246,46 +246,46 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>SNTP server(simple network time protocol), 是一种用于提供时间同步服务的网络服务器。它基于网络通信协议，允许计算机和其他网络设备通过网络获取准确的时间信息</li>
+<li>TLS(Transport Layer Security)，是一种用于保护网络通信安全性的加密协议。它建立在传输层协议(例如TCP)之上，用于在客户端和服务器之间创建安全的通信通道</li>
 </ul>
-<h2 id="mg-sntp-connect"><a href="#mg-sntp-connect" class="headerlink" title="mg_sntp_connect"></a>mg_sntp_connect</h2><ul>
+<h2 id="struct-mg-tls-opts"><a href="#struct-mg-tls-opts" class="headerlink" title="struct mg_tls_opts"></a>struct mg_tls_opts</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>连接SNTP服务器。</li>
+<li>TLS初始化结构</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_connection</span> *<span class="built_in">mg_sntp_connect</span>(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">const</span> <span class="type">char</span> *url,</span><br><span class="line">                                      <span class="type">mg_event_handler_t</span> fn, <span class="type">void</span> *fn_data)</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_tls_opts</span> &#123;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *ca;        <span class="comment">// CA certificate file. For both listeners and clients</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *crl;       <span class="comment">// Certificate Revocation List. For clients</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *cert;      <span class="comment">// Certificate</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *certkey;   <span class="comment">// Certificate key</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *ciphers;   <span class="comment">// Cipher list</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> srvname; <span class="comment">// If not empty, enables server name verification</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_fs</span> *fs;      <span class="comment">// FS API for reading certificate files</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>参数：</p>
 <ul>
-<li>mgr – 使用的事件管理器</li>
-<li>url – 指定远程URL，如果为空，则为time.google.com。</li>
-<li>fn  – 事件处理函数</li>
-<li>fn_data – 一个任意指针，在调用事件处理程序时作为fn_data传递。该指针也将作为c-&gt;fn_data存储在连接结构中。</li>
+<li>ca – 证书颁发机构。可以是文件名或字符串。用于验证另一端发送给我们的证书。如果为空，则禁用证书检查。</li>
+<li>crl – 证书吊销列表。可以是文件名或字符串。用于验证另一端发送给我们的证书。如果为空，则禁用证书吊销检查。</li>
+<li>cert – 我们自己的证书。可以是文件名或字符串。如果为NULL，则不与对方进行认证。</li>
+<li>certkey – 证书的密钥。有时，证书和它的密钥绑定在一个.pem文件中，在这种情况下，cert和certkey的值可能是相同的</li>
+<li>ciphers – 允许使用的密码列表</li>
+<li>srvname – 启用服务器名称验证</li>
 </ul>
 </li>
-<li><p>返回值：</p>
+<li><p>注：</p>
 <ul>
-<li>成功，返回指向创建的连接的指针</li>
-<li>失败，返回NULL</li>
+<li>如果ca和cert都设置了，那么所谓的双向TLS就启用了，这时双方都要互相验证。通常，服务器端连接同时设置ca和cert，而客户端只设置ca。</li>
 </ul>
 </li>
-<li><p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">sntp_cb</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">int</span> ev, <span class="type">void</span> *evd, <span class="type">void</span> *fnd)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (ev == MG_EV_SNTP_TIME) &#123;</span><br><span class="line">    <span class="comment">// Time received</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">timeval</span> *tv = (<span class="keyword">struct</span> timeval *tv)evd;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"><span class="built_in">mg_sntp_connect</span>(mgr&amp;, <span class="literal">NULL</span> <span class="comment">/* connect to time.google.com */</span>, sntp_cb, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="mg-sntp-request"><a href="#mg-sntp-request" class="headerlink" title="mg_sntp_request"></a>mg_sntp_request</h2><ul>
+<h2 id="mg-tls-init"><a href="#mg-tls-init" class="headerlink" title="mg_tls_init"></a>mg_tls_init</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>向SNTP服务器发送时间请求</li>
+<li>在给定连接上初始化TLS</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_sntp_request</span><span class="params">(<span class="keyword">struct</span> mg_connection *c)</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_tls_init</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="keyword">struct</span> mg_tls_opts *opts)</span></span>;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>参数：</p>
 <ul>
-<li>c – 使用的连接</li>
+<li>c – 需要初始化TLS的连接</li>
+<li>opts – TLS初始化参数</li>
 </ul>
 </li>
 <li><p>返回值：</p>
@@ -294,7 +294,13 @@
 </ul>
 </li>
 <li><p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mg_sntp_request</span>(c);</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_tls_opts</span> opts = &#123;.cert = <span class="string">&quot;ca.pem&quot;</span>&#125;;</span><br><span class="line"><span class="built_in">mg_tls_init</span>(c, &amp;opts);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注：</p>
+<ul>
+<li>mbedTLS使用mg_random作为RNG。mg_random可以通过设置MG_ENABLE_CUSTOM_RANDOM&#x3D;1并定义自己的mg_random()实现来覆盖。</li>
+</ul>
+</li>
 </ul>
 
       
@@ -315,7 +321,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_timer/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_rpc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -329,7 +335,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_timer/" class="post-title-link" itemprop="url">mongoose_timer</a>
+            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_rpc/" class="post-title-link" itemprop="url">mongoose_rpc</a>
         </h2>
 
         <div class="post-meta">
@@ -370,144 +376,139 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>mongoose工具的计时器相关笔记</li>
+<li>RPC(Remote Procedure Call, 远程过程调用),是一种通信协议和编程模型，用于实现分布式系统中不同节点之间的远程调用。它允许在不同计算机或进程之间像调用本地函数一样调用远程函数，隐藏了底层网络通信的细节</li>
+<li>Mongoose包含一组函数，通过RPC方法简化服务器端处理。</li>
 </ul>
-<h2 id="struct-mg-timer"><a href="#struct-mg-timer" class="headerlink" title="struct mg_timer"></a>struct mg_timer</h2><ul>
+<h2 id="struct-mg-rpc"><a href="#struct-mg-rpc" class="headerlink" title="struct mg_rpc"></a>struct mg_rpc</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>计时器结构体。描述一个软件计时器。计时器粒度与主事件循环中的<code>mg_mgr_poll()</code>的超时参数相同</li>
+<li>RPC方法处理程序结构。每个方法在一个链表中都有一个入口，每个入口指向一个字符串，该字符串描述了将调用该方法的模式，以及为满足该方法调用而调用的函数，并带有一个适当的函数参数。</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> &#123;</span></span><br><span class="line">  <span class="type">uint64_t</span> period_ms;       <span class="comment">// Timer period in milliseconds</span></span><br><span class="line">  <span class="type">uint64_t</span> expire;          <span class="comment">// Expiration timestamp in milliseconds</span></span><br><span class="line">  <span class="type">unsigned</span> flags;           <span class="comment">// Possible flags values below</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MG_TIMER_ONCE 0     <span class="comment">// Call function once</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MG_TIMER_REPEAT 1   <span class="comment">// Call function periodically</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MG_TIMER_RUN_NOW 2  <span class="comment">// Call immediately when timer is set</span></span></span><br><span class="line">  <span class="type">void</span> (*fn)(<span class="type">void</span> *);       <span class="comment">// Function to call</span></span><br><span class="line">  <span class="type">void</span> *arg;                <span class="comment">// Function argument</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> *<span class="title">next</span>;</span>    <span class="comment">// Linkage</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> &#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *next;              <span class="comment">// Next in list</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> method;             <span class="comment">// Method pattern</span></span><br><span class="line">  <span class="built_in">void</span> (*fn)(<span class="keyword">struct</span> mg_rpc_req *);  <span class="comment">// Handler function</span></span><br><span class="line">  <span class="type">void</span> *fn_data;                    <span class="comment">// Handler function argument</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="mg-timer-add"><a href="#mg-timer-add" class="headerlink" title="mg_timer_add"></a>mg_timer_add</h2><ul>
+<h2 id="struct-mg-rpc-req"><a href="#struct-mg-rpc-req" class="headerlink" title="struct mg_rpc_req"></a>struct mg_rpc_req</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>设置一个计时器。这是一个高级计时器API，允许将软件计时器添加到活动管理器。</li>
-<li>这个函数使用<code>calloc()</code>一个新的计时器，并将它添加到<code>mgr-&gt;timers</code>列表中。</li>
-<li>当调用<code>mg_mgr_poll()</code>时，所有添加的计时器均进行轮询，并在计时器到期时调用计时器设定的函数</li>
+<li>RPC请求描述符。被调用的方法会收到一个包含请求的描述符，以及一个指向函数的指针，该函数将被调用来打印输出响应，并带有一个适当的函数参数；例如：mg_pfn_realloc() 或 mg_pfn_iobuf()</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> mg_timer *<span class="title function_">mg_timer_add</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">uint64_t</span> period_ms, <span class="type">unsigned</span> flags, <span class="type">void</span> (*fn)(<span class="type">void</span> *), <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc_req</span> &#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_rpc</span> **head;  <span class="comment">// RPC handlers list head</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *rpc;    <span class="comment">// RPC handler being called</span></span><br><span class="line">  <span class="type">mg_pfn_t</span> pfn;          <span class="comment">// Response printing function</span></span><br><span class="line">  <span class="type">void</span> *pfn_data;        <span class="comment">// Response printing function data</span></span><br><span class="line">  <span class="type">void</span> *req_data;        <span class="comment">// Arbitrary request data</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> frame;   <span class="comment">// Request, e.g. &#123;&quot;id&quot;:1,&quot;method&quot;:&quot;add&quot;,&quot;params&quot;:[1,2]&#125;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-add"><a href="#mg-rpc-add" class="headerlink" title="mg_rpc_add"></a>mg_rpc_add</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>将方法method_pattern添加到RPC方法列表的头部。调用该方法将调用handler，并将handler_data与请求一起传递给它(如下使用示例中的r-&gt;fn_data)。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_add</span><span class="params">(<span class="keyword">struct</span> mg_rpc **head, <span class="keyword">struct</span> mg_str method_pattern,</span></span></span><br><span class="line"><span class="params"><span class="function">                <span class="type">void</span> (*handler)(<span class="keyword">struct</span> mg_rpc_req *), <span class="type">void</span> *handler_data)</span></span>;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>参数：</p>
 <ul>
-<li><code>mgr</code>   –  指向事件管理器的结构体指针</li>
-<li><code>ms</code>    –  一个时间间隔，以毫秒为单位</li>
-<li><code>flags</code> –  计时器标志掩码：<code>MG_TIMER_REPEAT</code>和<code>MG_TIMER_RUN_NOW</code></li>
-<li><code>fn</code>    –  函数调用</li>
-<li><code>fn_data</code>  –  调用的函数参数</li>
+<li>head – 链表指针</li>
+<li>method_pattern – 方法的名称</li>
+<li>handler – 执行该方法操作的RPC函数</li>
+<li>handler_data – 任意函数数据</li>
 </ul>
 </li>
-<li><p>返回值：</p>
+<li><p>注：</p>
 <ul>
-<li>返回一个指向创建的计时器的指针</li>
-</ul>
-</li>
-<li><p>详解：</p>
-<ul>
-<li>确保计时器的间隔等于或大于<code>mg_mgr_poll()</code>的超时时间</li>
+<li>如果method_pattern为空字符串，该处理程序将被调用来处理JSON-RPC响应。如果JSON请求是由双方发起的，那么处理响应可能是必要的。</li>
 </ul>
 </li>
 <li><p>示例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_fn</span><span class="params">(<span class="type">void</span> *data)</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mg_timer_add(mgr, <span class="number">1000</span>, MG_TIMER_REPEAT, timer_fn, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *s_rpc_head = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_sum</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;</span><br><span class="line">  <span class="type">double</span> a = <span class="number">0.0</span>, b = <span class="number">0.0</span>;</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[0]&quot;</span>, &amp;a);</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[1]&quot;</span>, &amp;b);</span><br><span class="line">  <span class="built_in">mg_rpc_ok</span>(r, <span class="string">&quot;%g&quot;</span>, a + b);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_mul</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;<span class="comment">//...&#125;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">mg_rpc_add</span>(&amp;s_rpc_head, <span class="built_in">mg_str</span>(<span class="string">&quot;sum&quot;</span>), rpc_sum, <span class="literal">NULL</span>);</span><br><span class="line">  <span class="built_in">mg_rpc_add</span>(&amp;s_rpc_head, <span class="built_in">mg_str</span>(<span class="string">&quot;mul&quot;</span>), rpc_mul, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="mg-timer-init"><a href="#mg-timer-init" class="headerlink" title="mg_timer_init"></a>mg_timer_init</h2><ul>
+<h2 id="mg-rpc-del"><a href="#mg-rpc-del" class="headerlink" title="mg_rpc_del"></a>mg_rpc_del</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>设置一个计时器</li>
+<li>从RPC方法列表中删除带有RPC函数处理程序的方法</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_timer_init</span><span class="params">(<span class="keyword">struct</span> mg_timer **head, <span class="keyword">struct</span> mg_timer *t, <span class="type">uint64_t</span> period_ms, <span class="type">unsigned</span> flags, <span class="type">void</span> (*fn)(<span class="type">void</span> *), <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_del</span><span class="params">(<span class="keyword">struct</span> mg_rpc **head, <span class="type">void</span> (*handler)(<span class="keyword">struct</span> mg_rpc_req *))</span></span>;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>参数：</p>
 <ul>
-<li><code>head</code>    –  指向<code>mg_timer</code>队列头部的指针</li>
-<li><code>t</code>       –  指向一个需要被初始化的<code>mg_timer</code></li>
-<li><code>ms</code>      –  时间间隔，以毫秒为单位</li>
-<li><code>flags</code>   –  计时器标志掩码：<code>MG_TIMER_REPEAT</code>和<code>MG_TIMER_RUN_NOW</code></li>
-<li><code>fn</code>    –  函数调用</li>
-<li><code>fn_data</code>  –  调用的函数参数</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>无</li>
-</ul>
-</li>
-<li><p>示例</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_fn</span><span class="params">(<span class="type">void</span> *data)</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> <span class="title">timer</span>, *<span class="title">head</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">mg_timer_init(&amp;head, &amp;timer, <span class="number">1000</span>, MG_TIMER_REPEAT, timer_fn, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="mg-timer-free"><a href="#mg-timer-free" class="headerlink" title="mg_timer_free"></a>mg_timer_free</h2><ul>
-<li><p>简介：</p>
-<ul>
-<li>释放计时器，将其从内部计时器列表中删除。</li>
-</ul>
-</li>
-<li><p>原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_timer_free</span><span class="params">(<span class="keyword">struct</span> mg_timer **head, <span class="keyword">struct</span> mg_timer *t)</span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>参数：</p>
-<ul>
-<li><code>head</code>  –  指向<code>mg_timer</code>队列头部的指针</li>
-<li><code>t</code>     –  需要释放的计时器</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>无</li>
+<li>head – 链表指针</li>
+<li>handler – RPC函数处理程序的方法，使用NULL删除全部</li>
 </ul>
 </li>
 <li><p>示例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> <span class="title">timer</span>;</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">mg_timer_free(&amp;timer);</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *s_rpc_head = <span class="literal">NULL</span>;</span><br><span class="line"><span class="comment">// add methods</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Time to cleanup</span></span><br><span class="line"><span class="built_in">mg_rpc_del</span>(&amp;s_rpc_head, rpc_mul);    <span class="comment">// Deallocate specific handler</span></span><br><span class="line"><span class="built_in">mg_rpc_del</span>(&amp;s_rpc_head, <span class="literal">NULL</span>);       <span class="comment">// Deallocate all RPC handlers</span></span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="mg-timer-poll"><a href="#mg-timer-poll" class="headerlink" title="mg_timer_poll"></a>mg_timer_poll</h2><ul>
+<h2 id="mg-rpc-process"><a href="#mg-rpc-process" class="headerlink" title="mg_rpc_process"></a>mg_rpc_process</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>如果当前的时间戳<code>uptime_ms</code>超过了计时器的到期时间，则计时器遍历列表，并调用它们</li>
+<li>为这个请求调用合适的方法。如果请求的方法不存在，将调用mg_rpc_err()并打印错误提示。</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_timer_poll</span><span class="params">(<span class="keyword">struct</span> mg_timer **head, <span class="type">uint64_t</span> uptime_ms)</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_process</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *req)</span></span>;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>参数：</p>
 <ul>
-<li><code>head</code>   –  指向<code>mg_timer</code>列表头部的指针</li>
-<li><code>uptime_ms</code>  –  当前时间戳</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>无</li>
+<li>req – 一个请求</li>
 </ul>
 </li>
 <li><p>示例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mg_timer_poll(mg_millis());</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *s_rpcs = <span class="literal">NULL</span>;                               <span class="comment">// Empty RPC list head</span></span><br><span class="line"><span class="built_in">mg_rpc_add</span>(&amp;s_rpcs, <span class="built_in">mg_str</span>(<span class="string">&quot;rpc.list&quot;</span>), mg_rpc_list, <span class="literal">NULL</span>); <span class="comment">// Add rpc.list</span></span><br><span class="line"><span class="comment">// ... add more RPC methods</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// On request, process the incoming frame</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_str</span> req = <span class="built_in">mg_str</span>(<span class="string">&quot;&#123;\&quot;id\&quot;:1,\&quot;method\&quot;:\&quot;sum\&quot;,\&quot;params\&quot;:[1,2]&#125;&quot;</span>);</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_iobuf</span> io = &#123;<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">512</span>&#125;;  <span class="comment">// Empty IO buf, with 512 realloc granularity</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc_req</span> r = &#123;</span><br><span class="line">  .head = &amp;s_rpcs,        <span class="comment">// RPC list head</span></span><br><span class="line">  .rpc = <span class="literal">NULL</span>,            <span class="comment">// This will be set by mg_rpc_process()</span></span><br><span class="line">  .pfn = mg_pfn_iobuf,    <span class="comment">// Printing function: print into the io buffer</span></span><br><span class="line">  .pfn_data = &amp;io,        <span class="comment">// Pass our io buffer as a parameter</span></span><br><span class="line">  .req_data = <span class="literal">NULL</span>,       <span class="comment">// No specific request data</span></span><br><span class="line">  .frame = req,           <span class="comment">// Specify incoming frame</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">mg_rpc_process</span>(&amp;r);</span><br><span class="line"><span class="keyword">if</span> (io.buf != <span class="literal">NULL</span>) <span class="built_in">printf</span>(<span class="string">&quot;Response: %s\n&quot;</span>, (<span class="type">char</span> *) io.buf);</span><br><span class="line"><span class="built_in">mg_iobuf_free</span>(&amp;io);</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="mg-millis"><a href="#mg-millis" class="headerlink" title="mg_millis"></a>mg_millis</h2><ul>
+<h2 id="mg-rpc-ok-mg-rpc-vok"><a href="#mg-rpc-ok-mg-rpc-vok" class="headerlink" title="mg_rpc_ok, mg_rpc_vok"></a>mg_rpc_ok, mg_rpc_vok</h2><ul>
 <li><p>简介：</p>
 <ul>
-<li>以毫秒为单位返回当前运行时间。</li>
+<li>打印结果帧的辅助函数</li>
 </ul>
 </li>
 <li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int64_t</span> <span class="title">mg_millis</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_ok</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_vok</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">const</span> <span class="type">char</span> *fmt, va_list *ap)</span></span>;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>参数：</p>
 <ul>
-<li>无</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>当前时间</li>
+<li>req – 一个请求</li>
+<li>fmt – 使用printf语义格式化的字符串</li>
 </ul>
 </li>
 <li><p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int64_t</span> uptime = <span class="built_in">mg_millis</span>();</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_sum</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;</span><br><span class="line">  <span class="type">double</span> a = <span class="number">0.0</span>, b = <span class="number">0.0</span>;</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[0]&quot;</span>, &amp;a);</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[1]&quot;</span>, &amp;b);</span><br><span class="line">  <span class="built_in">mg_rpc_ok</span>(r, <span class="string">&quot;%g&quot;</span>, a + b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-err-mg-rpc-verr"><a href="#mg-rpc-err-mg-rpc-verr" class="headerlink" title="mg_rpc_err, mg_rpc_verr"></a>mg_rpc_err, mg_rpc_verr</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>打印错误帧的辅助函数</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_err</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">int</span> code, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_verr</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">int</span> code, <span class="type">const</span> <span class="type">char</span> *fmt, va_list *)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>req – 一个请求</li>
+<li>fmt – 使用printf语义格式化的字符串</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_dosome</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="built_in">mg_rpc_err</span>(r, <span class="number">-32109</span>, <span class="string">&quot;\&quot;%.*s not found\&quot;&quot;</span>, len, &amp;r-&gt;frame.ptr[offset]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-list"><a href="#mg-rpc-list" class="headerlink" title="mg_rpc_list"></a>mg_rpc_list</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>内置RPC方法，用于列出所有已注册的RPC方法。该函数通常不直接调用，而是作为方法注册。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_list</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>req – 一个请求</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mg_rpc_add</span>(&amp;s_rpc_head, <span class="built_in">mg_str</span>(<span class="string">&quot;rpc.list&quot;</span>), mg_rpc_list, &amp;s_rpc_head);</span><br></pre></td></tr></table></figure></li>
 </ul>
 
       
@@ -741,552 +742,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_tls/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_tls/" class="post-title-link" itemprop="url">mongoose_tls</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>TLS(Transport Layer Security)，是一种用于保护网络通信安全性的加密协议。它建立在传输层协议(例如TCP)之上，用于在客户端和服务器之间创建安全的通信通道</li>
-</ul>
-<h2 id="struct-mg-tls-opts"><a href="#struct-mg-tls-opts" class="headerlink" title="struct mg_tls_opts"></a>struct mg_tls_opts</h2><ul>
-<li><p>简介：</p>
-<ul>
-<li>TLS初始化结构</li>
-</ul>
-</li>
-<li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_tls_opts</span> &#123;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *ca;        <span class="comment">// CA certificate file. For both listeners and clients</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *crl;       <span class="comment">// Certificate Revocation List. For clients</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *cert;      <span class="comment">// Certificate</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *certkey;   <span class="comment">// Certificate key</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *ciphers;   <span class="comment">// Cipher list</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> srvname; <span class="comment">// If not empty, enables server name verification</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_fs</span> *fs;      <span class="comment">// FS API for reading certificate files</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>参数：</p>
-<ul>
-<li>ca – 证书颁发机构。可以是文件名或字符串。用于验证另一端发送给我们的证书。如果为空，则禁用证书检查。</li>
-<li>crl – 证书吊销列表。可以是文件名或字符串。用于验证另一端发送给我们的证书。如果为空，则禁用证书吊销检查。</li>
-<li>cert – 我们自己的证书。可以是文件名或字符串。如果为NULL，则不与对方进行认证。</li>
-<li>certkey – 证书的密钥。有时，证书和它的密钥绑定在一个.pem文件中，在这种情况下，cert和certkey的值可能是相同的</li>
-<li>ciphers – 允许使用的密码列表</li>
-<li>srvname – 启用服务器名称验证</li>
-</ul>
-</li>
-<li><p>注：</p>
-<ul>
-<li>如果ca和cert都设置了，那么所谓的双向TLS就启用了，这时双方都要互相验证。通常，服务器端连接同时设置ca和cert，而客户端只设置ca。</li>
-</ul>
-</li>
-</ul>
-<h2 id="mg-tls-init"><a href="#mg-tls-init" class="headerlink" title="mg_tls_init"></a>mg_tls_init</h2><ul>
-<li><p>简介：</p>
-<ul>
-<li>在给定连接上初始化TLS</li>
-</ul>
-</li>
-<li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_tls_init</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="keyword">struct</span> mg_tls_opts *opts)</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>参数：</p>
-<ul>
-<li>c – 需要初始化TLS的连接</li>
-<li>opts – TLS初始化参数</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>无</li>
-</ul>
-</li>
-<li><p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_tls_opts</span> opts = &#123;.cert = <span class="string">&quot;ca.pem&quot;</span>&#125;;</span><br><span class="line"><span class="built_in">mg_tls_init</span>(c, &amp;opts);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>注：</p>
-<ul>
-<li>mbedTLS使用mg_random作为RNG。mg_random可以通过设置MG_ENABLE_CUSTOM_RANDOM&#x3D;1并定义自己的mg_random()实现来覆盖。</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_utility/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_utility/" class="post-title-link" itemprop="url">mongoose_utility</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>mongoose 工具</li>
-</ul>
-<h2 id="mg-call"><a href="#mg-call" class="headerlink" title="mg_call"></a>mg_call</h2><ul>
-<li><p>简介：</p>
-<ul>
-<li>发送ev事件到c事件处理程序。该函数在实现您自己的协议时非常有用。</li>
-</ul>
-</li>
-<li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_call</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">int</span> ev, <span class="type">void</span> *ev_data)</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>参数：</p>
-<ul>
-<li>c – 发送事件的连接</li>
-<li>ev – 发送的事件</li>
-<li>ev_data – 附加事件参数</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>无</li>
-</ul>
-</li>
-<li><p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// In a timer callback, send MG_EV_USER event to all connections</span></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">timer_fn</span><span class="params">(<span class="type">void</span> *arg)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_mgr</span> *mgr = (<span class="keyword">struct</span> mg_mgr *) arg;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">struct</span> mg_connection *c = mgr-&gt;conns; c != <span class="literal">NULL</span>; c = c-&gt;next) &#123;</span><br><span class="line">    <span class="built_in">mg_call</span>(c, MG_EV_USER, <span class="string">&quot;hi!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h2 id="mg-error"><a href="#mg-error" class="headerlink" title="mg_error"></a>mg_error</h2><ul>
-<li><p>简介：</p>
-<ul>
-<li>向连接事件处理程序发送MG_EV_ERROR，并使用printf语义格式化错误信息。</li>
-</ul>
-</li>
-<li><p>原型：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_error</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>参数：</p>
-<ul>
-<li>c – 发送事件的连接</li>
-<li>fmt – 使用printf语义格式化的字符串</li>
-</ul>
-</li>
-<li><p>返回值：</p>
-<ul>
-<li>无</li>
-</ul>
-</li>
-<li><p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mg_error</span>(c, <span class="string">&quot;Operation failed, error code: %d&quot;</span>, errno);</span><br></pre></td></tr></table></figure></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-question_%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-question_%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="post-title-link" itemprop="url">question_问题与解决方案</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>本教程将向你展示如何以一系列MJPEG帧的形式发送视频流。这里使用的技术是：<ul>
-<li>以不可缓存的方式提供页面，并表明内容类型为multipart&#x2F;x-mixed-replace。</li>
-<li>定期发送一个不同的JPEG文件的内容，取代以前的文件</li>
-</ul>
-</li>
-</ul>
-<h2 id="单次文件上传大小为3MB"><a href="#单次文件上传大小为3MB" class="headerlink" title="单次文件上传大小为3MB"></a>单次文件上传大小为3MB</h2><ul>
-<li>修改宏<code>MG_MAX_RECV_SIZE</code><ul>
-<li>在<code>mongoose.h</code>中，宏<code>MG_MAX_RECV_SIZE</code>默认定义为<code>3 * 1024 * 1024</code></li>
-<li>修改即可</li>
-</ul>
-</li>
-</ul>
-<h2 id="文件上传问题"><a href="#文件上传问题" class="headerlink" title="文件上传问题"></a>文件上传问题</h2><h3 id="HTTP协议上传文件原理"><a href="#HTTP协议上传文件原理" class="headerlink" title="HTTP协议上传文件原理"></a>HTTP协议上传文件原理</h3><p>HTTP 协议中的文件上传是通过 POST 请求来实现的，具体的原理如下：</p>
-<ol>
-<li><p>客户端发送一个 HTTP POST 请求到服务器，并在请求头中指定 Content-Type 为 multipart&#x2F;form-data。这告诉服务器该请求是一个包含多部分内容的表单数据。</p>
-</li>
-<li><p>服务器收到请求后，解析请求头中的 Content-Type，确认请求是一个文件上传请求。</p>
-</li>
-<li><p>客户端将要上传的文件分割成多个部分（或者称为数据包），每个数据包都包含一个文件的一部分内容。</p>
-</li>
-<li><p>客户端将每个数据包作为一个独立的部分，依次发送给服务器。每个数据包都会包含一些额外的元数据，例如文件名、文件类型等。</p>
-</li>
-<li><p>服务器接收到每个数据包后，根据数据包的元数据信息和内容进行处理。通常情况下，服务器会将接收到的数据包保存到临时文件或内存中。</p>
-</li>
-<li><p>当所有数据包都接收完毕后，服务器根据接收到的数据包重新构建原始文件，并将其保存到指定的位置。</p>
-</li>
-</ol>
-<p>需要注意的是，文件上传的过程中可能会涉及到数据包的分片、文件大小限制、上传进度监测等细节处理。一般来说，服务器端会提供相应的接口或库来处理文件上传，以简化开发过程。</p>
-<h3 id="Mongoose解决方案"><a href="#Mongoose解决方案" class="headerlink" title="Mongoose解决方案"></a>Mongoose解决方案</h3><ul>
-<li>两种情况：<ul>
-<li>要上传的文件很小–明显小于可用RAM的数量。例如，我们在一个有64MB内存的嵌入式Linux系统上运行Mongoose，并上传一些大小为1KB的JSON配置。在这种情况下，我们可以使用一个标准的HTML表单上传，并在一个POST请求中接收整个文件</li>
-<li>要上传的文件很大–与可用RAM的数量相比，或者明显超过这个数量。例如，我们想上传一个大小为512KB的新文件系统镜像到ESP8266设备上，该设备有大约30KB的可用RAM。在这种情况下，没有办法在内存中保存整个文件。它应该被分成小块处理，Mongoose应该接收每个小块并将其追加到写入的文件中，直到全部接收完毕。在这里，我们可以遵循两条路径：<ul>
-<li>使用单个POST请求发送文件，将文件内容作为POST主体传递–即使用二进制上传。</li>
-<li>在客户端将文件分成小块（如2Kb），并将每个小块作为一个单独的POST请求发送。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="form-upload"><a href="#form-upload" class="headerlink" title="form upload"></a>form upload</h4><h4 id="binary-upload-single-POST"><a href="#binary-upload-single-POST" class="headerlink" title="binary upload, single POST"></a>binary upload, single POST</h4><ul>
-<li><p>当Mongoose收到一个大的HTTP请求时，它会缓冲传入的数据，对于每一个收到的数据块，它会产生MG_EV_HTTP_CHUNK请求。当一个完整的HTTP消息被缓冲时，那么最后一个零长度的MG_EV_HTTP_CHUNK被产生，然后是MG_EV_HTTP_MSG </p>
-</li>
-<li><p>然而，服务器端可能不会等到完整的消息被缓冲在内存中，但它可以使用mg_http_delete_chunk()函数删除传入的chunk。如果块被删除，那么在最后一个零长度的块之后就不会产生MG_EV_HTTP_MSG。这样一来，服务器就可以在块到达时进行处理–例如，将块写入文件中。</p>
-</li>
-<li><p>MG_EV_HTTP_CHUNK消息也是为表单上传生成的。然而，Mongoose并不剥离多部分标记。如果表单上传的消息被保存到一个文件中，它将包含多部分标记。</p>
-</li>
-<li><p>0长度的chunk是最后一个chunk。使用MG_IO_SIZE构建常数来限制服务器端的最大分块大小。</p>
-</li>
-<li><p>服务器接收每个块，处理它并删除它。当收到最后一个分块时，发送一个响应。</p>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">OpenCV 理论基础</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-02-14 14:31:58" itemprop="dateModified" datetime="2025-02-14T14:31:58+08:00">2025-02-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>OpenCV 相关理论基础知识笔记</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_2_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_2_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">OpenCV 常见数据结构</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-02-14 14:32:28" itemprop="dateModified" datetime="2025-02-14T14:32:28+08:00">2025-02-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>OpenCV 常见的数据结构笔记</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_2_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_websocket/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1498,6 +953,130 @@
 </li>
 <li><p>示例:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> len = c-&gt;send.len;         <span class="comment">// Store output buffer len</span></span><br><span class="line"><span class="built_in">mg_mqtt_login</span>(c, s_url, &amp;opts);   <span class="comment">// Write MQTT login message</span></span><br><span class="line"><span class="built_in">mg_ws_wrap</span>(c, c-&gt;send.len - len, WEBSOCKET_OP_BINARY); <span class="comment">// Wrap it into WS</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_utility/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_utility/" class="post-title-link" itemprop="url">mongoose_utility</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>mongoose 工具</li>
+</ul>
+<h2 id="mg-call"><a href="#mg-call" class="headerlink" title="mg_call"></a>mg_call</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>发送ev事件到c事件处理程序。该函数在实现您自己的协议时非常有用。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_call</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">int</span> ev, <span class="type">void</span> *ev_data)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>c – 发送事件的连接</li>
+<li>ev – 发送的事件</li>
+<li>ev_data – 附加事件参数</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// In a timer callback, send MG_EV_USER event to all connections</span></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">timer_fn</span><span class="params">(<span class="type">void</span> *arg)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_mgr</span> *mgr = (<span class="keyword">struct</span> mg_mgr *) arg;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">struct</span> mg_connection *c = mgr-&gt;conns; c != <span class="literal">NULL</span>; c = c-&gt;next) &#123;</span><br><span class="line">    <span class="built_in">mg_call</span>(c, MG_EV_USER, <span class="string">&quot;hi!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="mg-error"><a href="#mg-error" class="headerlink" title="mg_error"></a>mg_error</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>向连接事件处理程序发送MG_EV_ERROR，并使用printf语义格式化错误信息。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_error</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>c – 发送事件的连接</li>
+<li>fmt – 使用printf语义格式化的字符串</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mg_error</span>(c, <span class="string">&quot;Operation failed, error code: %d&quot;</span>, errno);</span><br></pre></td></tr></table></figure></li>
 </ul>
 
       
@@ -2011,6 +1590,208 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/2024-05-22-mongoose_2_1%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Mongoose/mongoose_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/2024-05-22-mongoose_2_1%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" class="post-title-link" itemprop="url">mongoose_2_1常用技巧</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>mongoose网络库的常用技巧</li>
+</ul>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-question_%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-question_%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="post-title-link" itemprop="url">question_问题与解决方案</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>本教程将向你展示如何以一系列MJPEG帧的形式发送视频流。这里使用的技术是：<ul>
+<li>以不可缓存的方式提供页面，并表明内容类型为multipart&#x2F;x-mixed-replace。</li>
+<li>定期发送一个不同的JPEG文件的内容，取代以前的文件</li>
+</ul>
+</li>
+</ul>
+<h2 id="单次文件上传大小为3MB"><a href="#单次文件上传大小为3MB" class="headerlink" title="单次文件上传大小为3MB"></a>单次文件上传大小为3MB</h2><ul>
+<li>修改宏<code>MG_MAX_RECV_SIZE</code><ul>
+<li>在<code>mongoose.h</code>中，宏<code>MG_MAX_RECV_SIZE</code>默认定义为<code>3 * 1024 * 1024</code></li>
+<li>修改即可</li>
+</ul>
+</li>
+</ul>
+<h2 id="文件上传问题"><a href="#文件上传问题" class="headerlink" title="文件上传问题"></a>文件上传问题</h2><h3 id="HTTP协议上传文件原理"><a href="#HTTP协议上传文件原理" class="headerlink" title="HTTP协议上传文件原理"></a>HTTP协议上传文件原理</h3><p>HTTP 协议中的文件上传是通过 POST 请求来实现的，具体的原理如下：</p>
+<ol>
+<li><p>客户端发送一个 HTTP POST 请求到服务器，并在请求头中指定 Content-Type 为 multipart&#x2F;form-data。这告诉服务器该请求是一个包含多部分内容的表单数据。</p>
+</li>
+<li><p>服务器收到请求后，解析请求头中的 Content-Type，确认请求是一个文件上传请求。</p>
+</li>
+<li><p>客户端将要上传的文件分割成多个部分（或者称为数据包），每个数据包都包含一个文件的一部分内容。</p>
+</li>
+<li><p>客户端将每个数据包作为一个独立的部分，依次发送给服务器。每个数据包都会包含一些额外的元数据，例如文件名、文件类型等。</p>
+</li>
+<li><p>服务器接收到每个数据包后，根据数据包的元数据信息和内容进行处理。通常情况下，服务器会将接收到的数据包保存到临时文件或内存中。</p>
+</li>
+<li><p>当所有数据包都接收完毕后，服务器根据接收到的数据包重新构建原始文件，并将其保存到指定的位置。</p>
+</li>
+</ol>
+<p>需要注意的是，文件上传的过程中可能会涉及到数据包的分片、文件大小限制、上传进度监测等细节处理。一般来说，服务器端会提供相应的接口或库来处理文件上传，以简化开发过程。</p>
+<h3 id="Mongoose解决方案"><a href="#Mongoose解决方案" class="headerlink" title="Mongoose解决方案"></a>Mongoose解决方案</h3><ul>
+<li>两种情况：<ul>
+<li>要上传的文件很小–明显小于可用RAM的数量。例如，我们在一个有64MB内存的嵌入式Linux系统上运行Mongoose，并上传一些大小为1KB的JSON配置。在这种情况下，我们可以使用一个标准的HTML表单上传，并在一个POST请求中接收整个文件</li>
+<li>要上传的文件很大–与可用RAM的数量相比，或者明显超过这个数量。例如，我们想上传一个大小为512KB的新文件系统镜像到ESP8266设备上，该设备有大约30KB的可用RAM。在这种情况下，没有办法在内存中保存整个文件。它应该被分成小块处理，Mongoose应该接收每个小块并将其追加到写入的文件中，直到全部接收完毕。在这里，我们可以遵循两条路径：<ul>
+<li>使用单个POST请求发送文件，将文件内容作为POST主体传递–即使用二进制上传。</li>
+<li>在客户端将文件分成小块（如2Kb），并将每个小块作为一个单独的POST请求发送。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="form-upload"><a href="#form-upload" class="headerlink" title="form upload"></a>form upload</h4><h4 id="binary-upload-single-POST"><a href="#binary-upload-single-POST" class="headerlink" title="binary upload, single POST"></a>binary upload, single POST</h4><ul>
+<li><p>当Mongoose收到一个大的HTTP请求时，它会缓冲传入的数据，对于每一个收到的数据块，它会产生MG_EV_HTTP_CHUNK请求。当一个完整的HTTP消息被缓冲时，那么最后一个零长度的MG_EV_HTTP_CHUNK被产生，然后是MG_EV_HTTP_MSG </p>
+</li>
+<li><p>然而，服务器端可能不会等到完整的消息被缓冲在内存中，但它可以使用mg_http_delete_chunk()函数删除传入的chunk。如果块被删除，那么在最后一个零长度的块之后就不会产生MG_EV_HTTP_MSG。这样一来，服务器就可以在块到达时进行处理–例如，将块写入文件中。</p>
+</li>
+<li><p>MG_EV_HTTP_CHUNK消息也是为表单上传生成的。然而，Mongoose并不剥离多部分标记。如果表单上传的消息被保存到一个文件中，它将包含多部分标记。</p>
+</li>
+<li><p>0长度的chunk是最后一个chunk。使用MG_IO_SIZE构建常数来限制服务器端的最大分块大小。</p>
+</li>
+<li><p>服务器接收每个块，处理它并删除它。当收到最后一个分块时，发送一个响应。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_0_%E9%A2%86%E5%9F%9F%E7%9F%A5%E8%AF%86/2024-05-22-opencv_6_%E8%A7%86%E9%A2%91%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2391,7 +2172,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-opencv_3_02_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_2_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -2405,7 +2186,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/05/22/notes/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-opencv_3_02_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">opencv_3_02_常用函数</a>
+            <a href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_2_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">OpenCV 常见数据结构</a>
         </h2>
 
         <div class="post-meta">
@@ -2422,7 +2203,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-31 09:12:08" itemprop="dateModified" datetime="2024-12-31T09:12:08+08:00">2024-12-31</time>
+                <time title="Modified: 2025-02-14 14:32:28" itemprop="dateModified" datetime="2025-02-14T14:32:28+08:00">2025-02-14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -2446,11 +2227,94 @@
 
       
           <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>OpenCV 常用的函数</li>
+<li>OpenCV 常见的数据结构笔记</li>
 </ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2024/05/22/notes/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-opencv_3_02_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/#more" rel="contents">
+              <a class="btn" href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_2_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">OpenCV 理论基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-02-14 14:31:58" itemprop="dateModified" datetime="2025-02-14T14:31:58+08:00">2025-02-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>OpenCV 相关理论基础知识笔记</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/05/22/notes/OpenCV/opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-opencv_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -2628,6 +2492,102 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pyinstaller --onefile --add-binary <span class="string">&quot;path/to/Qt/QtWidgets.dll;.&quot;</span> your_script.py</span><br></pre></td></tr></table></figure>
 
 <h2 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a>总结</h2><p>这是一个简要的 PyInstaller 工具介绍，希望能够帮助您将 Python 程序打包成可执行文件。PyInstaller 提供了丰富的选项，可以满足不同的需求，从简单的命令行脚本到复杂的图形用户界面应用程序。要深入了解 PyInstaller 的所有功能和选项，您可以查阅 PyInstaller 的官方文档或其他教程资源。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Python/GUI_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-gui_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Python/GUI_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-gui_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">gui_2_常用函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Python GUI开发常见函数</li>
+</ul>
+<h1 id="Tkinter-packer-详解"><a href="#Tkinter-packer-详解" class="headerlink" title="Tkinter packer() 详解"></a>Tkinter packer() 详解</h1><p><code>pack()</code> 函数是 Python 中 <code>tkinter</code> 模块中用于布局和排列控件（widgets）的一个方法。它是一种简单的布局管理器，用于在父容器中自动排列控件。</p>
+<p>以下是 <code>pack()</code> 函数的详细解释和参数说明：</p>
+<h3 id="pack-函数的语法："><a href="#pack-函数的语法：" class="headerlink" title="pack() 函数的语法："></a><code>pack()</code> 函数的语法：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">widget.pack(options)</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数说明："><a href="#参数说明：" class="headerlink" title="参数说明："></a>参数说明：</h3><ul>
+<li><p><code>options</code>：一个可选的参数，用于配置控件在布局时的行为。这是一个字典（或关键字参数）的集合，其中包含各种选项。下面列出了一些常用的选项：</p>
+<ul>
+<li><code>side</code>：表示控件在父容器中的位置，可以是 <code>&quot;top&quot;</code>（上方，默认值）、<code>&quot;bottom&quot;</code>（下方）、<code>&quot;left&quot;</code>（左侧）、<code>&quot;right&quot;</code>（右侧）。</li>
+<li><code>fill</code>：设置控件在自身区域内的填充方式，可以是 <code>&quot;none&quot;</code>（默认值，不填充）、<code>&quot;x&quot;</code>（水平方向填充）、<code>&quot;y&quot;</code>（垂直方向填充）、<code>&quot;both&quot;</code>（水平和垂直方向填充）。</li>
+<li><code>expand</code>：如果设置为 <code>True</code>，则控件将尝试填充所有可用的空间。</li>
+<li><code>anchor</code>：用于指定控件在其空间内的对齐方式，可以是 <code>&quot;n&quot;</code>（北，顶部）、<code>&quot;s&quot;</code>（南，底部）、<code>&quot;e&quot;</code>（东，右侧）、<code>&quot;w&quot;</code>（西，左侧）等。</li>
+<li><code>ipadx</code> 和 <code>ipady</code>：在控件内部内容周围添加水平和垂直方向的内边距。</li>
+<li><code>padx</code> 和 <code>pady</code>：在控件周围添加水平和垂直方向的外边距。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例代码："><a href="#示例代码：" class="headerlink" title="示例代码："></a>示例代码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tkinter <span class="keyword">as</span> tk</span><br><span class="line"></span><br><span class="line">root = tk.Tk()</span><br><span class="line">root.title(<span class="string">&quot;pack() 函数示例&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建控件</span></span><br><span class="line">label1 = tk.Label(root, text=<span class="string">&quot;Label 1&quot;</span>, bg=<span class="string">&quot;red&quot;</span>)</span><br><span class="line">label2 = tk.Label(root, text=<span class="string">&quot;Label 2&quot;</span>, bg=<span class="string">&quot;green&quot;</span>)</span><br><span class="line">label3 = tk.Label(root, text=<span class="string">&quot;Label 3&quot;</span>, bg=<span class="string">&quot;blue&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 pack() 布局</span></span><br><span class="line">label1.pack(side=<span class="string">&quot;top&quot;</span>, fill=<span class="string">&quot;both&quot;</span>, expand=<span class="literal">True</span>, padx=<span class="number">10</span>, pady=<span class="number">10</span>)</span><br><span class="line">label2.pack(side=<span class="string">&quot;left&quot;</span>, fill=<span class="string">&quot;both&quot;</span>, padx=<span class="number">10</span>, pady=<span class="number">10</span>)</span><br><span class="line">label3.pack(side=<span class="string">&quot;right&quot;</span>, fill=<span class="string">&quot;both&quot;</span>, padx=<span class="number">10</span>, pady=<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">root.mainloop()</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中，我们创建了三个标签控件，并使用 <code>pack()</code> 方法对它们进行了布局。<code>side</code> 参数指定了标签在父容器中的位置，<code>fill</code> 参数指定了填充方式，<code>expand</code> 参数启用了扩展，<code>padx</code> 和 <code>pady</code> 参数设置了外边距。</p>
+<p>需要注意的是，<code>pack()</code> 布局管理器在简单的界面布局时非常方便，但在复杂的布局需求下可能会受到限制。如果需要更高级的布局管理，可以考虑使用 <code>grid()</code> 或 <code>place()</code> 方法。</p>
 
       
     </div>
@@ -2868,6 +2828,196 @@
 <p>请注意，上述示例假设图像数据已经按正确的格式（像素顺序、颜色通道顺序等）存储在 <code>image_data</code> 缓冲区中。如果图像数据的格式不匹配，可能会导致图像显示不正确。确保以正确的格式存储图像数据非常重要。</p>
 <p>此外，还可以根据实际需要对图像进行预处理，例如调整大小、转换颜色空间等操作。以上示例仅演示了从内存中读取图像数据并显示的基本操作，具体的图像处理和操作可以根据实际需求进行扩展。</p>
 <p>请注意，以上信息基于 OpenCV 4.5.2 版本。不同的版本可能会略有差异，建议参考官方文档获取特定版本的详细信息。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Python/python_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22--list/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/Python/python_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22--list/" class="post-title-link" itemprop="url">1_1_list</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>list 列表 相关笔记</li>
+</ul>
+<h2 id="python3-list是什么"><a href="#python3-list是什么" class="headerlink" title="python3 list是什么"></a>python3 list是什么</h2><p>在Python中，<code>list</code>（列表）是一种有序、可变、可重复的数据结构，用于存储一组元素。列表是Python中最常用的数据结构之一，非常灵活和强大，它可以包含任意类型的元素，包括整数、浮点数、字符串、甚至其他列表等。</p>
+<p>以下是关于Python列表的一些特点和用法：</p>
+<ol>
+<li><p><strong>有序性</strong>：列表中的元素是按照它们的插入顺序进行存储的，因此列表是有序的数据结构。</p>
+</li>
+<li><p><strong>可变性</strong>：列表是可变的，这意味着您可以随时修改列表中的元素，例如添加、删除或更新元素。</p>
+</li>
+<li><p><strong>可重复性</strong>：列表允许存储相同的元素，因此可以包含重复的值。</p>
+</li>
+<li><p><strong>索引访问</strong>：您可以使用索引来访问列表中的元素。列表的索引是从0开始的，即第一个元素的索引是0，第二个元素的索引是1，依此类推。</p>
+</li>
+<li><p><strong>列表推导式</strong>：列表推导式是一种简洁的方式来创建列表，它允许您使用一行代码生成一个新的列表，通常使用for循环和条件表达式来定义列表的内容。</p>
+</li>
+<li><p><strong>多种方法和操作</strong>：Python提供了丰富的列表方法和操作，如添加元素、删除元素、查找元素、列表切片等，这使得对列表进行各种操作变得非常方便。</p>
+</li>
+</ol>
+<p>以下是一个简单的示例，演示了如何创建和操作列表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个列表</span></span><br><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加元素</span></span><br><span class="line">my_list.append(<span class="number">6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除元素</span></span><br><span class="line">my_list.remove(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 列表切片</span></span><br><span class="line">subset = my_list[<span class="number">1</span>:<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用列表推导式生成新列表</span></span><br><span class="line">new_list = [x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> my_list]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印列表内容</span></span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [1, 2, 4, 5, 6]</span></span><br><span class="line"><span class="built_in">print</span>(subset)   <span class="comment"># 输出: [2, 4, 5]</span></span><br><span class="line"><span class="built_in">print</span>(new_list) <span class="comment"># 输出: [1, 4, 16, 25, 36]</span></span><br></pre></td></tr></table></figure>
+
+<p>总之，Python中的列表是一种非常常用且功能丰富的数据结构，它提供了灵活的方法来存储和操作一组元素。</p>
+<h2 id="python3-list-常用操作"><a href="#python3-list-常用操作" class="headerlink" title="python3 list 常用操作"></a>python3 list 常用操作</h2><p>Python中的列表（list）是一种非常灵活和常用的数据结构，它提供了许多常用的操作，使得对列表进行处理变得非常方便。以下是一些常用的Python列表操作：</p>
+<ol>
+<li><strong>创建列表</strong>：使用方括号<code>[]</code>来创建一个列表，并在其中添加元素。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>访问元素</strong>：使用索引来访问列表中的元素。列表的索引从0开始。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(my_list[<span class="number">0</span>])  <span class="comment"># 输出: 1</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>切片</strong>：使用切片来获取列表的子列表。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">subset = my_list[<span class="number">1</span>:<span class="number">4</span>]  <span class="comment"># 获取索引1到索引3的元素</span></span><br><span class="line"><span class="built_in">print</span>(subset)  <span class="comment"># 输出: [2, 3, 4]</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>添加元素</strong>：使用<code>append()</code>方法向列表末尾添加一个元素。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list.append(<span class="number">6</span>)</span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [1, 2, 3, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>删除元素</strong>：使用<code>remove()</code>方法删除列表中的指定元素，使用<code>del</code>语句删除列表中指定索引处的元素。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">my_list.remove(<span class="number">3</span>)  <span class="comment"># 删除元素3</span></span><br><span class="line"><span class="built_in">print</span>(my_list)     <span class="comment"># 输出: [1, 2, 4, 5, 6]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">del</span> my_list[<span class="number">0</span>]     <span class="comment"># 删除索引为0的元素</span></span><br><span class="line"><span class="built_in">print</span>(my_list)     <span class="comment"># 输出: [2, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><strong>列表长度</strong>：使用<code>len()</code>函数获取列表中元素的个数。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">length = <span class="built_in">len</span>(my_list)</span><br><span class="line"><span class="built_in">print</span>(length)  <span class="comment"># 输出: 4</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><strong>查找元素</strong>：使用<code>index()</code>方法查找列表中某个元素的索引。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index = my_list.index(<span class="number">4</span>)</span><br><span class="line"><span class="built_in">print</span>(index)  <span class="comment"># 输出: 1</span></span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><strong>反转列表</strong>：使用<code>reverse()</code>方法将列表中的元素反转。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list.reverse()</span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [6, 5, 4, 2]</span></span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li><strong>排序</strong>：使用<code>sort()</code>方法对列表中的元素进行排序。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list.sort()</span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [2, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
+
+<ol start="10">
+<li><strong>复制列表</strong>：使用切片或<code>copy()</code>方法复制一个列表。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new_list = my_list[:]  <span class="comment"># 使用切片复制列表</span></span><br><span class="line"><span class="comment"># 或者</span></span><br><span class="line">new_list = my_list.copy()  <span class="comment"># 使用copy()方法复制列表</span></span><br></pre></td></tr></table></figure>
+
+<p>这些是Python中列表的一些常用操作。列表还有很多其他方法和功能，具体取决于您的需求和情况。</p>
+<h2 id="python3-list-常用技巧"><a href="#python3-list-常用技巧" class="headerlink" title="python3 list 常用技巧"></a>python3 list 常用技巧</h2><p>在Python中，有许多技巧可以让您更有效地使用列表。以下是一些常用的Python列表技巧：</p>
+<ol>
+<li><strong>列表解析（List Comprehension）</strong>：列表解析是一种简洁而强大的方式来创建新的列表，它允许您在单个表达式中对列表元素进行转换或过滤。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个包含元素平方的新列表</span></span><br><span class="line">squared_list = [x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用条件筛选元素</span></span><br><span class="line">even_numbers = [x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>) <span class="keyword">if</span> x % <span class="number">2</span> == <span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>列表拼接</strong>：使用<code>+</code>运算符将两个列表拼接成一个新的列表。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">list1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">list2 = [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br><span class="line">combined_list = list1 + list2</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>列表切片赋值</strong>：使用切片来替换列表中的一部分元素。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">my_list[<span class="number">1</span>:<span class="number">3</span>] = [<span class="number">6</span>, <span class="number">7</span>]</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>使用<code>zip()</code>函数</strong>：<code>zip()</code>函数可以将多个列表按照索引位置进行组合，生成一个元组列表。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">names = [<span class="string">&#x27;Alice&#x27;</span>, <span class="string">&#x27;Bob&#x27;</span>, <span class="string">&#x27;Charlie&#x27;</span>]</span><br><span class="line">ages = [<span class="number">25</span>, <span class="number">30</span>, <span class="number">35</span>]</span><br><span class="line">combined_data = <span class="built_in">list</span>(<span class="built_in">zip</span>(names, ages))</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>翻转索引和值</strong>：使用字典的<code>zip()</code>和<code>dict()</code>函数可以快速创建一个索引-值对调的字典。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_dict = &#123;<span class="string">&#x27;a&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;b&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;c&#x27;</span>: <span class="number">3</span>&#125;</span><br><span class="line">inverted_dict = <span class="built_in">dict</span>(<span class="built_in">zip</span>(my_dict.values(), my_dict.keys()))</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><strong>获取唯一值</strong>：使用集合（set）可以快速获取列表中的唯一值。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>]</span><br><span class="line">unique_values = <span class="built_in">list</span>(<span class="built_in">set</span>(my_list))</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><strong>迭代时获取索引</strong>：使用<code>enumerate()</code>函数可以同时获取索引和值。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;c&#x27;</span>]</span><br><span class="line"><span class="keyword">for</span> index, value <span class="keyword">in</span> <span class="built_in">enumerate</span>(my_list):</span><br><span class="line">    <span class="built_in">print</span>(index, value)</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><strong>将多维列表展平</strong>：使用列表解析可以快速将多维列表展平为一维列表。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nested_list = [[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>], [<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>]]</span><br><span class="line">flattened_list = [item <span class="keyword">for</span> sublist <span class="keyword">in</span> nested_list <span class="keyword">for</span> item <span class="keyword">in</span> sublist]</span><br></pre></td></tr></table></figure>
+
+<p>这些是Python中常用的一些列表技巧。它们可以帮助您更加高效地处理和操作列表数据。</p>
 
       
     </div>
@@ -3691,102 +3841,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Python/GUI_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-gui_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Python/GUI_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-gui_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">gui_2_常用函数</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>Python GUI开发常见函数</li>
-</ul>
-<h1 id="Tkinter-packer-详解"><a href="#Tkinter-packer-详解" class="headerlink" title="Tkinter packer() 详解"></a>Tkinter packer() 详解</h1><p><code>pack()</code> 函数是 Python 中 <code>tkinter</code> 模块中用于布局和排列控件（widgets）的一个方法。它是一种简单的布局管理器，用于在父容器中自动排列控件。</p>
-<p>以下是 <code>pack()</code> 函数的详细解释和参数说明：</p>
-<h3 id="pack-函数的语法："><a href="#pack-函数的语法：" class="headerlink" title="pack() 函数的语法："></a><code>pack()</code> 函数的语法：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">widget.pack(options)</span><br></pre></td></tr></table></figure>
-
-<h3 id="参数说明："><a href="#参数说明：" class="headerlink" title="参数说明："></a>参数说明：</h3><ul>
-<li><p><code>options</code>：一个可选的参数，用于配置控件在布局时的行为。这是一个字典（或关键字参数）的集合，其中包含各种选项。下面列出了一些常用的选项：</p>
-<ul>
-<li><code>side</code>：表示控件在父容器中的位置，可以是 <code>&quot;top&quot;</code>（上方，默认值）、<code>&quot;bottom&quot;</code>（下方）、<code>&quot;left&quot;</code>（左侧）、<code>&quot;right&quot;</code>（右侧）。</li>
-<li><code>fill</code>：设置控件在自身区域内的填充方式，可以是 <code>&quot;none&quot;</code>（默认值，不填充）、<code>&quot;x&quot;</code>（水平方向填充）、<code>&quot;y&quot;</code>（垂直方向填充）、<code>&quot;both&quot;</code>（水平和垂直方向填充）。</li>
-<li><code>expand</code>：如果设置为 <code>True</code>，则控件将尝试填充所有可用的空间。</li>
-<li><code>anchor</code>：用于指定控件在其空间内的对齐方式，可以是 <code>&quot;n&quot;</code>（北，顶部）、<code>&quot;s&quot;</code>（南，底部）、<code>&quot;e&quot;</code>（东，右侧）、<code>&quot;w&quot;</code>（西，左侧）等。</li>
-<li><code>ipadx</code> 和 <code>ipady</code>：在控件内部内容周围添加水平和垂直方向的内边距。</li>
-<li><code>padx</code> 和 <code>pady</code>：在控件周围添加水平和垂直方向的外边距。</li>
-</ul>
-</li>
-</ul>
-<h3 id="示例代码："><a href="#示例代码：" class="headerlink" title="示例代码："></a>示例代码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tkinter <span class="keyword">as</span> tk</span><br><span class="line"></span><br><span class="line">root = tk.Tk()</span><br><span class="line">root.title(<span class="string">&quot;pack() 函数示例&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建控件</span></span><br><span class="line">label1 = tk.Label(root, text=<span class="string">&quot;Label 1&quot;</span>, bg=<span class="string">&quot;red&quot;</span>)</span><br><span class="line">label2 = tk.Label(root, text=<span class="string">&quot;Label 2&quot;</span>, bg=<span class="string">&quot;green&quot;</span>)</span><br><span class="line">label3 = tk.Label(root, text=<span class="string">&quot;Label 3&quot;</span>, bg=<span class="string">&quot;blue&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 pack() 布局</span></span><br><span class="line">label1.pack(side=<span class="string">&quot;top&quot;</span>, fill=<span class="string">&quot;both&quot;</span>, expand=<span class="literal">True</span>, padx=<span class="number">10</span>, pady=<span class="number">10</span>)</span><br><span class="line">label2.pack(side=<span class="string">&quot;left&quot;</span>, fill=<span class="string">&quot;both&quot;</span>, padx=<span class="number">10</span>, pady=<span class="number">10</span>)</span><br><span class="line">label3.pack(side=<span class="string">&quot;right&quot;</span>, fill=<span class="string">&quot;both&quot;</span>, padx=<span class="number">10</span>, pady=<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">root.mainloop()</span><br></pre></td></tr></table></figure>
-
-<p>在上面的示例中，我们创建了三个标签控件，并使用 <code>pack()</code> 方法对它们进行了布局。<code>side</code> 参数指定了标签在父容器中的位置，<code>fill</code> 参数指定了填充方式，<code>expand</code> 参数启用了扩展，<code>padx</code> 和 <code>pady</code> 参数设置了外边距。</p>
-<p>需要注意的是，<code>pack()</code> 布局管理器在简单的界面布局时非常方便，但在复杂的布局需求下可能会受到限制。如果需要更高级的布局管理，可以考虑使用 <code>grid()</code> 或 <code>place()</code> 方法。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Python/other/2024-05-22-kivy_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3878,196 +3932,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Python/python_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22--list/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/05/22/notes/Python/python_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22--list/" class="post-title-link" itemprop="url">1_1_list</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li>list 列表 相关笔记</li>
-</ul>
-<h2 id="python3-list是什么"><a href="#python3-list是什么" class="headerlink" title="python3 list是什么"></a>python3 list是什么</h2><p>在Python中，<code>list</code>（列表）是一种有序、可变、可重复的数据结构，用于存储一组元素。列表是Python中最常用的数据结构之一，非常灵活和强大，它可以包含任意类型的元素，包括整数、浮点数、字符串、甚至其他列表等。</p>
-<p>以下是关于Python列表的一些特点和用法：</p>
-<ol>
-<li><p><strong>有序性</strong>：列表中的元素是按照它们的插入顺序进行存储的，因此列表是有序的数据结构。</p>
-</li>
-<li><p><strong>可变性</strong>：列表是可变的，这意味着您可以随时修改列表中的元素，例如添加、删除或更新元素。</p>
-</li>
-<li><p><strong>可重复性</strong>：列表允许存储相同的元素，因此可以包含重复的值。</p>
-</li>
-<li><p><strong>索引访问</strong>：您可以使用索引来访问列表中的元素。列表的索引是从0开始的，即第一个元素的索引是0，第二个元素的索引是1，依此类推。</p>
-</li>
-<li><p><strong>列表推导式</strong>：列表推导式是一种简洁的方式来创建列表，它允许您使用一行代码生成一个新的列表，通常使用for循环和条件表达式来定义列表的内容。</p>
-</li>
-<li><p><strong>多种方法和操作</strong>：Python提供了丰富的列表方法和操作，如添加元素、删除元素、查找元素、列表切片等，这使得对列表进行各种操作变得非常方便。</p>
-</li>
-</ol>
-<p>以下是一个简单的示例，演示了如何创建和操作列表：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个列表</span></span><br><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加元素</span></span><br><span class="line">my_list.append(<span class="number">6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除元素</span></span><br><span class="line">my_list.remove(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 列表切片</span></span><br><span class="line">subset = my_list[<span class="number">1</span>:<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用列表推导式生成新列表</span></span><br><span class="line">new_list = [x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> my_list]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印列表内容</span></span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [1, 2, 4, 5, 6]</span></span><br><span class="line"><span class="built_in">print</span>(subset)   <span class="comment"># 输出: [2, 4, 5]</span></span><br><span class="line"><span class="built_in">print</span>(new_list) <span class="comment"># 输出: [1, 4, 16, 25, 36]</span></span><br></pre></td></tr></table></figure>
-
-<p>总之，Python中的列表是一种非常常用且功能丰富的数据结构，它提供了灵活的方法来存储和操作一组元素。</p>
-<h2 id="python3-list-常用操作"><a href="#python3-list-常用操作" class="headerlink" title="python3 list 常用操作"></a>python3 list 常用操作</h2><p>Python中的列表（list）是一种非常灵活和常用的数据结构，它提供了许多常用的操作，使得对列表进行处理变得非常方便。以下是一些常用的Python列表操作：</p>
-<ol>
-<li><strong>创建列表</strong>：使用方括号<code>[]</code>来创建一个列表，并在其中添加元素。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><strong>访问元素</strong>：使用索引来访问列表中的元素。列表的索引从0开始。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(my_list[<span class="number">0</span>])  <span class="comment"># 输出: 1</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><strong>切片</strong>：使用切片来获取列表的子列表。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">subset = my_list[<span class="number">1</span>:<span class="number">4</span>]  <span class="comment"># 获取索引1到索引3的元素</span></span><br><span class="line"><span class="built_in">print</span>(subset)  <span class="comment"># 输出: [2, 3, 4]</span></span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><strong>添加元素</strong>：使用<code>append()</code>方法向列表末尾添加一个元素。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list.append(<span class="number">6</span>)</span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [1, 2, 3, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li><strong>删除元素</strong>：使用<code>remove()</code>方法删除列表中的指定元素，使用<code>del</code>语句删除列表中指定索引处的元素。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">my_list.remove(<span class="number">3</span>)  <span class="comment"># 删除元素3</span></span><br><span class="line"><span class="built_in">print</span>(my_list)     <span class="comment"># 输出: [1, 2, 4, 5, 6]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">del</span> my_list[<span class="number">0</span>]     <span class="comment"># 删除索引为0的元素</span></span><br><span class="line"><span class="built_in">print</span>(my_list)     <span class="comment"># 输出: [2, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li><strong>列表长度</strong>：使用<code>len()</code>函数获取列表中元素的个数。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">length = <span class="built_in">len</span>(my_list)</span><br><span class="line"><span class="built_in">print</span>(length)  <span class="comment"># 输出: 4</span></span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li><strong>查找元素</strong>：使用<code>index()</code>方法查找列表中某个元素的索引。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index = my_list.index(<span class="number">4</span>)</span><br><span class="line"><span class="built_in">print</span>(index)  <span class="comment"># 输出: 1</span></span><br></pre></td></tr></table></figure>
-
-<ol start="8">
-<li><strong>反转列表</strong>：使用<code>reverse()</code>方法将列表中的元素反转。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list.reverse()</span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [6, 5, 4, 2]</span></span><br></pre></td></tr></table></figure>
-
-<ol start="9">
-<li><strong>排序</strong>：使用<code>sort()</code>方法对列表中的元素进行排序。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list.sort()</span><br><span class="line"><span class="built_in">print</span>(my_list)  <span class="comment"># 输出: [2, 4, 5, 6]</span></span><br></pre></td></tr></table></figure>
-
-<ol start="10">
-<li><strong>复制列表</strong>：使用切片或<code>copy()</code>方法复制一个列表。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new_list = my_list[:]  <span class="comment"># 使用切片复制列表</span></span><br><span class="line"><span class="comment"># 或者</span></span><br><span class="line">new_list = my_list.copy()  <span class="comment"># 使用copy()方法复制列表</span></span><br></pre></td></tr></table></figure>
-
-<p>这些是Python中列表的一些常用操作。列表还有很多其他方法和功能，具体取决于您的需求和情况。</p>
-<h2 id="python3-list-常用技巧"><a href="#python3-list-常用技巧" class="headerlink" title="python3 list 常用技巧"></a>python3 list 常用技巧</h2><p>在Python中，有许多技巧可以让您更有效地使用列表。以下是一些常用的Python列表技巧：</p>
-<ol>
-<li><strong>列表解析（List Comprehension）</strong>：列表解析是一种简洁而强大的方式来创建新的列表，它允许您在单个表达式中对列表元素进行转换或过滤。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个包含元素平方的新列表</span></span><br><span class="line">squared_list = [x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用条件筛选元素</span></span><br><span class="line">even_numbers = [x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>) <span class="keyword">if</span> x % <span class="number">2</span> == <span class="number">0</span>]</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><strong>列表拼接</strong>：使用<code>+</code>运算符将两个列表拼接成一个新的列表。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">list1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">list2 = [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br><span class="line">combined_list = list1 + list2</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><strong>列表切片赋值</strong>：使用切片来替换列表中的一部分元素。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line">my_list[<span class="number">1</span>:<span class="number">3</span>] = [<span class="number">6</span>, <span class="number">7</span>]</span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><strong>使用<code>zip()</code>函数</strong>：<code>zip()</code>函数可以将多个列表按照索引位置进行组合，生成一个元组列表。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">names = [<span class="string">&#x27;Alice&#x27;</span>, <span class="string">&#x27;Bob&#x27;</span>, <span class="string">&#x27;Charlie&#x27;</span>]</span><br><span class="line">ages = [<span class="number">25</span>, <span class="number">30</span>, <span class="number">35</span>]</span><br><span class="line">combined_data = <span class="built_in">list</span>(<span class="built_in">zip</span>(names, ages))</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li><strong>翻转索引和值</strong>：使用字典的<code>zip()</code>和<code>dict()</code>函数可以快速创建一个索引-值对调的字典。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_dict = &#123;<span class="string">&#x27;a&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;b&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;c&#x27;</span>: <span class="number">3</span>&#125;</span><br><span class="line">inverted_dict = <span class="built_in">dict</span>(<span class="built_in">zip</span>(my_dict.values(), my_dict.keys()))</span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li><strong>获取唯一值</strong>：使用集合（set）可以快速获取列表中的唯一值。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>]</span><br><span class="line">unique_values = <span class="built_in">list</span>(<span class="built_in">set</span>(my_list))</span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li><strong>迭代时获取索引</strong>：使用<code>enumerate()</code>函数可以同时获取索引和值。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">my_list = [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;c&#x27;</span>]</span><br><span class="line"><span class="keyword">for</span> index, value <span class="keyword">in</span> <span class="built_in">enumerate</span>(my_list):</span><br><span class="line">    <span class="built_in">print</span>(index, value)</span><br></pre></td></tr></table></figure>
-
-<ol start="8">
-<li><strong>将多维列表展平</strong>：使用列表解析可以快速将多维列表展平为一维列表。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nested_list = [[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>], [<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>]]</span><br><span class="line">flattened_list = [item <span class="keyword">for</span> sublist <span class="keyword">in</span> nested_list <span class="keyword">for</span> item <span class="keyword">in</span> sublist]</span><br></pre></td></tr></table></figure>
-
-<p>这些是Python中常用的一些列表技巧。它们可以帮助您更加高效地处理和操作列表数据。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/Python/python_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-1_2_%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -4132,6 +3996,89 @@
 
 <p>这个例子中，<code>...</code> 表示对所有维度的切片操作，后面的逗号和数字 <code>1</code> 指定了对第二维度（列）进行切片，并且取出了每个子列表的第二个元素。</p>
 
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notes/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-opencv_3_02_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/05/22/notes/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-opencv_3_02_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">opencv_3_02_常用函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-31 09:12:08" itemprop="dateModified" datetime="2024-12-31T09:12:08+08:00">2024-12-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>OpenCV 常用的函数</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/05/22/notes/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-opencv_3_02_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
