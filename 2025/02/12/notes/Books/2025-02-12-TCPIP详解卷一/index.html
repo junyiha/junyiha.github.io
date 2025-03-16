@@ -28,8 +28,10 @@
 <meta property="og:description" content="简介 阅读TCP&#x2F;IP详解卷一：协议的学习笔记">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.2.1-OSI%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.3--%E5%B0%81%E8%A3%85.png">
+<meta property="og:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.5--ARPANET.png">
 <meta property="article:published_time" content="2025-02-12T01:00:00.000Z">
-<meta property="article:modified_time" content="2025-02-13T09:23:46.361Z">
+<meta property="article:modified_time" content="2025-03-06T01:25:30.912Z">
 <meta property="article:author" content="zhang junyi">
 <meta property="article:tag" content="book">
 <meta name="twitter:card" content="summary">
@@ -227,7 +229,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-02-13 17:23:46" itemprop="dateModified" datetime="2025-02-13T17:23:46+08:00">2025-02-13</time>
+                <time title="Modified: 2025-03-06 09:25:30" itemprop="dateModified" datetime="2025-03-06T09:25:30+08:00">2025-03-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -299,6 +301,27 @@
 <li><p>最高层是应用层。各种应用通常会实现自己的应用层协议，他们对用户来说是最容易看到的。目前已存在大量的应用层协议，并且程序员仍在不断开发新协议。因此，应用层是创新最多，以及新功能开发和部署的地方。</p>
 </li>
 </ul>
+<h3 id="1-2-2-分层实现中的复用，分解和封装"><a href="#1-2-2-分层实现中的复用，分解和封装" class="headerlink" title="1.2.2 分层实现中的复用，分解和封装"></a>1.2.2 分层实现中的复用，分解和封装</h3><ul>
+<li>分层体系结构的一个主要优点是具有协议复用的能力。这种复用形式允许多种协议共存于同一基础设施中。它也允许相同协议对象(例如连接)的多个实例同时存在，并且不会被混淆。</li>
+<li>复用可以发生在不同层，并在每层都有不同类型的标识符，用于确定信息属于哪个协议或信息流。</li>
+<li>当某层的一个称为协议数据单元(PDU)的对象(分组，消息等)被低层携带时，这个过程称为在相邻低层的封装(作为不透明数据)。因此，第N层的多个对象可以通过第N-1层的封装而复用。 </li>
+<li>封装通常与分层一起使用。单纯的封装涉及获得某层的PDU，并在底层将它作为不透明(无需解释)的数据来处理。封装发生在发送方，拆封(还原操作)发生在接收方。多数协议在封装过程中使用头部，少数协议也使用尾部。<br><img src="/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.3--%E5%B0%81%E8%A3%85.png" alt="1.3--封装"></li>
+<li>在上图中，每层都有自己的消息对象(PDU)的概念，对应于负责创建它的哪个特定层。例如，如果第四层(传输层)协议生成一个分组，将它称为第四层PDU或传输层PDU更准确。这是<strong>封装的本质</strong>，每层都将来自上层的数据看成不透明，无需解释的信息。</li>
+</ul>
+<h2 id="1-3-TCP-IP协议族结构和协议"><a href="#1-3-TCP-IP协议族结构和协议" class="headerlink" title="1.3 TCP&#x2F;IP协议族结构和协议"></a>1.3 TCP&#x2F;IP协议族结构和协议</h2><ul>
+<li>到目前为止，我们已讨论了体系结构，协议，协议族和抽象的实现技术。</li>
+</ul>
+<h3 id="ARPANET-参考模型"><a href="#ARPANET-参考模型" class="headerlink" title="ARPANET 参考模型"></a>ARPANET 参考模型</h3><p><img src="/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.5--ARPANET.png" alt="1.5--ARPANET"></p>
+<ul>
+<li>从图1-5底部沿着协议栈上移，我们首先看到的层次是2.5，这是一个 “非正式”的层，有几个协议工作在这层，一个最古老和最重要的协议是地址解析协议(ARP)。它是IPv4的专用协议，只用于多接入链路层协议(例如以太网和Wi-Fi)，未完成IP层使用的地址和链路层使用的地址之间的转换。</li>
+<li>编号为3的层中看到IP，它是TCP&#x2F;IP中最重要的网络层协议。IP发送给链路层协议的PDU称为IP数据报，它的大小是64KB(IPv6将它扩大为4GB)。在很多情况下，当使用的上下文是清晰的，我们将会使用简化的术语 “分组” 来表示IP数据报。 大的分组放入链路层PDU(称为帧)时需要进行缩小处理，这个过程称为分片，它通常由IP主机和某些路由器在必要时执行。在分片的过程中，大数据报的一部分被放入多个称为分片的小鼠举报中，并在到达目的地后组合(称为重组)。</li>
+<li>由于每个IP分组都是一个数据报，所以都包含发送方和接收方的第三层地址。这些地址称为IP地址，即32位的IPv4地址或128位的IPv6地址；IP地址长度不同是IPv4和IPv6之间的最大差别。每个数据报的目的地址用于决定将该数据报发送到哪里，而做出此决定和发送数据报到下一跳的过程称为转发。路由器和主机都能进行转发，但更多的是路由器实现转发。这里有3中类型的IP地址，地址类型决定如何进行转发：单播(目的地是一台主机)，广播(目的地是一个指定网络中的所有主机)和组播(目的地是属于一个组播组中的一组主机)。</li>
+<li>Internet控制消息协议(ICMP)是IP的一个辅助协议，我们将它标注为3.5层协议。IP层使用它与其他主机或路由器的IP层之间交换差错消息和其他重要信息。ICPM有两个版本：IPv4使用的ICMPv4，IPv6使用的ICMPv6.ICMPv6是相当复杂的，包括地址自动配置和邻居发现等功能，他们在IPv4网络中由其他协议处理。虽然ICMP主要由IP使用，但它也能被其他应用使用。事实上两个主流的诊断工具(ping, traceroute)都使用ICMP。ICMP消息被封装在IP数据报中，采用与传输层PDU相同的封装方式。</li>
+<li>Internet组管理协议(IGMP)是IPv4的另一个辅助协议。它采用组播寻址和交付来管理作为组播组成员的主机(一组接收方接收一个特定目的地址的组播流量)。</li>
+<li>在第四层中，常见的两种Internet传输协议有很大区别。广泛使用的传输控制协议(TCP)会处理数据包丢失，重复和重新排序等IP层不处理的问题。它采用面向连接(VC)的方式，并且不保留消息便捷。相反，用户数据包协议(UDP)仅提供比IP协议稍多的功能。UDP允许应用发送数据包并保留消息边界，但不强制实现速率控制或差错控制。</li>
+<li>TCP在两台主机之间提供可靠的数据流传输。TCP涉及很多工作，例如将来自应用的数据分解在网络层中传输的适当尺寸的块，确认接收到的分组和设置超时，以便对方能够确认自己发送的分组。由于传输层提供这种可靠的数据流，所以应用层可以忽略这些细节。TCP发送到IP的PDU称为TCP段</li>
+<li>另一方面，UDP为应用层提供一种更简单的服务。它允许将数据报从一台主机发送到另一台主机，但不保证</li>
+</ul>
 
     </div>
 
@@ -337,12 +360,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2025/02/12/notes/Interview/2025-02-12--%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="prev" title="多线程">
-      <i class="fa fa-chevron-left"></i> 多线程
+    <a href="/2025/02/12/notes/Interview/2025-02-12--%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="prev" title="数据库">
+      <i class="fa fa-chevron-left"></i> 数据库
     </a></div>
       <div class="post-nav-item">
-    <a href="/2025/02/14/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-14--CommandLineParser/" rel="next" title="CommandLineParser">
-      CommandLineParser <i class="fa fa-chevron-right"></i>
+    <a href="/2025/02/14/notes/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-14--TickMeter/" rel="next" title="TickMeter">
+      TickMeter <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -402,7 +425,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">第一章 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%8E%9F%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 体系结构原则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-%E5%88%86%E7%BB%84%EF%BC%8C%E8%BF%9E%E6%8E%A5%E5%92%8C%E6%95%B0%E6%8D%AE%E6%8A%A5"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1.1 分组，连接和数据报</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6%E5%92%8C%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="nav-number">2.1.2.</span> <span class="nav-text">1.1.3 差错控制和流量控制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 设计和实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-%E5%88%86%E5%B1%82"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.2.1 分层</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">第一章 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%8E%9F%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 体系结构原则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-%E5%88%86%E7%BB%84%EF%BC%8C%E8%BF%9E%E6%8E%A5%E5%92%8C%E6%95%B0%E6%8D%AE%E6%8A%A5"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1.1 分组，连接和数据报</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6%E5%92%8C%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="nav-number">2.1.2.</span> <span class="nav-text">1.1.3 差错控制和流量控制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 设计和实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-%E5%88%86%E5%B1%82"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.2.1 分层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-%E5%88%86%E5%B1%82%E5%AE%9E%E7%8E%B0%E4%B8%AD%E7%9A%84%E5%A4%8D%E7%94%A8%EF%BC%8C%E5%88%86%E8%A7%A3%E5%92%8C%E5%B0%81%E8%A3%85"><span class="nav-number">2.2.2.</span> <span class="nav-text">1.2.2 分层实现中的复用，分解和封装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E7%BB%93%E6%9E%84%E5%92%8C%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 TCP&#x2F;IP协议族结构和协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ARPANET-%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.1.</span> <span class="nav-text">ARPANET 参考模型</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -416,20 +439,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">659</span>
+          <span class="site-state-item-count">660</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-count">51</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">95</span>
+        <span class="site-state-item-count">96</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
