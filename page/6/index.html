@@ -191,6 +191,199 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/Qt/2024-09-05-qt_5_quick_designer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/30/notes/Qt/2024-09-05-qt_5_quick_designer/" class="post-title-link" itemprop="url">quick designer</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-30 09:25:51" itemprop="dateCreated datePublished" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>quick designer 使用笔记</li>
+</ul>
+<h2 id="Qt项目界面文件-ui-及其作用"><a href="#Qt项目界面文件-ui-及其作用" class="headerlink" title="Qt项目界面文件(.ui)及其作用"></a>Qt项目界面文件(.ui)及其作用</h2><ul>
+<li><p>Qt项目中，后缀为.ui的文件是可视化设计的窗体的定义文件，例如widget.ui。双击项目文件目录树中的文件widget.ui，会打开一个集成在Qt Creator中的Qt Designer对窗体进行可视化设计。</p>
+</li>
+<li><p>widget.ui文件，是窗体界面定义文件，是一个XML文件，定义了窗口上的所有组件的属性设置，布局，及其信号与槽函数的关联等。用UI设计器可视化设计的界面都由Qt自动解析，并以XML文件的形式保存下来。在设计界面时，只需在UI设计器里进行可视化设计即可。</p>
+</li>
+<li><p>ui_widget.h文件，是对widget.ui文件编译后生成的一个文件，ui_widget.h会出现在编译后的目录下，或与widget.ui同目录</p>
+</li>
+<li><p>ui_widget.h并不会出现在QtCreator的项目文件目录树里，当然可以手动将ui_widget.h添加到项目中</p>
+</li>
+<li><p>注意，ui_widget.h是对widget.ui文件编译后自动生成的,widget.ui又是通过UI设计器可视化设计生成的。所有，对ui_widget.h手动进行修改没有什么意义，所有涉及界面的修改都应该直接在UI设计器里进行。</p>
+</li>
+<li><p>查看ui_widget.h文件的内容，发现它主要做了以下的一些工作</p>
+<ul>
+<li>定义了一个类Ui_Widget，用于封装可视化设计的界面</li>
+<li>自动生成了界面各个组件的类成员变量定义。在public部分为界面上每个组件定义了一个指针变量，变量的名称就是设置的objectName。例如，在窗体上放置了一个QLable和一个QPushButton并命名后，自动生成的定义是: QLabel *LabDemo; QPushButton *btnClose;</li>
+<li>定义了setupUi()函数，这个函数用于创建各个界面组件，并设置其位置，大小，文字内容，字体等属性，设置信号与槽的关联。setupUi()函数体的第一部分是根据可视化设计的界面内容，用C++代码创建界面上各组件，并设置其属性<ul>
+<li>接下来，setupUi()调用了函数retranslateUi(Widget)，用来设置界面各组件的文字内容属性，例如标签的问题，按键的文字，窗体的标题等。将界面上的文字设置的内容独立出来作为一个函数retranslateUi()，在设计多语言界面时会用到这个函数</li>
+<li>setupUi()函数的第三部分是设置信号与槽的关联。</li>
+<li>所以，在Widget的构造函数里调用ui-&gt;setupUi(this),就实现了窗体上组件的创建，属性设置，信号与槽的关联。</li>
+</ul>
+</li>
+<li>定义namespace Ui,并定义一个从Ui_Widget继承的类Widget<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Ui</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">Widget</span>::<span class="keyword">public</span> Ui_Widget&#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>提示，ui_widget.h文件里实现界面功能的类是Ui_Widget。再定义一个类Widget从Ui_Widget继承而来，并定义在namespace Ui里，这样Ui::Widget与widget.h里的类Widget同名，但是用namespace区分开来。所以，界面的Ui::Widget类与文件widget.h里定义的Widget类实际上是两个类，但是Qt的处理让用户感觉不到Ui::Widget类的存在，只需要直到在Widget类里用ui指针可以访问可视化设计的界面组件就可以了。</p>
+</li>
+</ul>
+<h2 id="把Qt的界面文件-ui文件-生成源文件-h或-cpp"><a href="#把Qt的界面文件-ui文件-生成源文件-h或-cpp" class="headerlink" title="把Qt的界面文件(.ui文件)生成源文件(.h或.cpp)"></a>把Qt的界面文件(.ui文件)生成源文件(.h或.cpp)</h2><ul>
+<li>在用Qt做开发时，为了方便快速，一般都使用Qt设计师界面类来做界面相关的布局，这个类在当前工程中是没有.cpp或.h文件的，但主类又有引入了这个头文件，点开转到定义或声明时，时打不开的。</li>
+<li>下面的一种办法<ul>
+<li>新建一个工程，包含ui文件，然后打开ui文件拖入想要的控件，保存，编译ui文件</li>
+<li>在qt安装路径下找到 uic.exe 文件，使用这个工具将ui文件生成.h或.cpp文件。例如<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">uic.exe test.ui -o test.h</span><br><span class="line">uic.exe test.ui -o test.cpp</span><br></pre></td></tr></table></figure></li>
+<li>.h或.cpp这两个文件只要一个就可以了</li>
+<li>把刚才生成的.h文件导入当前工程，然后打开刚刚生成的源码，可以看到整个类的所有属性和所有成员函数</li>
+</ul>
+</li>
+</ul>
+<h2 id="Qt-quick-designer-详解"><a href="#Qt-quick-designer-详解" class="headerlink" title="Qt quick designer 详解"></a>Qt quick designer 详解</h2><h1 id="Qt-Quick-Designer-详解"><a href="#Qt-Quick-Designer-详解" class="headerlink" title="Qt Quick Designer 详解"></a>Qt Quick Designer 详解</h1><h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p><strong>Qt Quick Designer</strong> 是 Qt Creator 集成开发环境（IDE）中的一个可视化设计工具，专用于设计和开发基于 <strong>Qt Quick（QML）</strong> 的用户界面。它提供了所见即所得（WYSIWYG）的编辑环境，使开发者能够通过拖放组件、调整属性等方式，快速构建现代化、响应式的用户界面，而无需手动编写大量的 QML 代码。</p>
+<hr>
+<h2 id="二、Qt-Quick-和-QML-简介"><a href="#二、Qt-Quick-和-QML-简介" class="headerlink" title="二、Qt Quick 和 QML 简介"></a>二、Qt Quick 和 QML 简介</h2><p>在深入了解 Qt Quick Designer 之前，先简单回顾一下 Qt Quick 和 QML：</p>
+<ul>
+<li><p><strong>Qt Quick</strong>：是 Qt 框架中用于创建动态用户界面的技术，特别适用于触摸屏和移动设备应用。它结合了 QML 和 JavaScript，实现了高性能的界面渲染和丰富的动画效果。</p>
+</li>
+<li><p><strong>QML（Qt Modeling Language）</strong>：是一种基于 JavaScript 的声明式语言，专门用于设计用户界面。通过 QML，可以以简洁直观的方式描述界面元素、布局和交互行为。</p>
+</li>
+</ul>
+<hr>
+<h2 id="三、Qt-Quick-Designer-的主要功能"><a href="#三、Qt-Quick-Designer-的主要功能" class="headerlink" title="三、Qt Quick Designer 的主要功能"></a>三、Qt Quick Designer 的主要功能</h2><h3 id="1-拖放式界面设计"><a href="#1-拖放式界面设计" class="headerlink" title="1. 拖放式界面设计"></a>1. 拖放式界面设计</h3><ul>
+<li><strong>组件面板</strong>：提供了丰富的预定义 UI 组件，如按钮、文本、图像、列表等。</li>
+<li><strong>拖放操作</strong>：直接将组件从面板拖拽到设计区域，快速构建界面布局。</li>
+</ul>
+<h3 id="2-属性编辑器"><a href="#2-属性编辑器" class="headerlink" title="2. 属性编辑器"></a>2. 属性编辑器</h3><ul>
+<li><strong>实时调整</strong>：选中组件后，可以在属性编辑器中修改其属性，如大小、位置、颜色等。</li>
+<li><strong>绑定支持</strong>：支持属性绑定，可以将组件的属性与数据模型或其他组件属性关联。</li>
+</ul>
+<h3 id="3-层次结构视图"><a href="#3-层次结构视图" class="headerlink" title="3. 层次结构视图"></a>3. 层次结构视图</h3><ul>
+<li><strong>组件管理</strong>：展示当前界面中所有组件的层次关系，方便组织和管理。</li>
+<li><strong>快速导航</strong>：通过层次结构视图，快速定位并选中特定的界面元素。</li>
+</ul>
+<h3 id="4-动画和过渡"><a href="#4-动画和过渡" class="headerlink" title="4. 动画和过渡"></a>4. 动画和过渡</h3><ul>
+<li><strong>动画编辑器</strong>：可视化地创建和调整动画效果，支持时间轴和关键帧。</li>
+<li><strong>状态和过渡</strong>：定义组件的不同状态，并设置状态之间的过渡动画。</li>
+</ul>
+<h3 id="5-实时预览"><a href="#5-实时预览" class="headerlink" title="5. 实时预览"></a>5. 实时预览</h3><ul>
+<li><strong>即时反馈</strong>：无需编译，即可在设计器中实时查看界面效果。</li>
+<li><strong>多设备预览</strong>：支持模拟不同设备的屏幕尺寸和分辨率，确保界面自适应性。</li>
+</ul>
+<h3 id="6-代码与设计视图同步"><a href="#6-代码与设计视图同步" class="headerlink" title="6. 代码与设计视图同步"></a>6. 代码与设计视图同步</h3><ul>
+<li><strong>双向编辑</strong>：在设计视图和代码视图之间切换，所有更改都会同步更新。</li>
+<li><strong>代码提示</strong>：在代码视图中提供智能提示和自动补全，加速手动编码过程。</li>
+</ul>
+<hr>
+<h2 id="四、使用-Qt-Quick-Designer-的步骤"><a href="#四、使用-Qt-Quick-Designer-的步骤" class="headerlink" title="四、使用 Qt Quick Designer 的步骤"></a>四、使用 Qt Quick Designer 的步骤</h2><h3 id="1-创建项目"><a href="#1-创建项目" class="headerlink" title="1. 创建项目"></a>1. 创建项目</h3><ul>
+<li><strong>新建项目</strong>：在 Qt Creator 中，选择“新建项目”，并选择“Qt Quick 应用程序”模板。</li>
+<li><strong>配置项目</strong>：按照向导提示，设置项目名称、位置和其他配置。</li>
+</ul>
+<h3 id="2-设计界面"><a href="#2-设计界面" class="headerlink" title="2. 设计界面"></a>2. 设计界面</h3><ul>
+<li><strong>打开主 QML 文件</strong>：在项目导航器中，找到 <code>Main.qml</code> 文件，双击打开。</li>
+<li><strong>切换到设计视图</strong>：在编辑器窗口顶部，选择“设计”选项卡。</li>
+</ul>
+<h3 id="3-添加和配置组件"><a href="#3-添加和配置组件" class="headerlink" title="3. 添加和配置组件"></a>3. 添加和配置组件</h3><ul>
+<li><strong>添加组件</strong>：从组件面板中拖放所需的组件到设计区域。</li>
+<li><strong>设置属性</strong>：选中组件，在属性编辑器中调整其属性，如位置、大小、样式等。</li>
+</ul>
+<h3 id="4-管理组件层次"><a href="#4-管理组件层次" class="headerlink" title="4. 管理组件层次"></a>4. 管理组件层次</h3><ul>
+<li><strong>调整层次结构</strong>：在层次结构视图中，通过拖放改变组件的父子关系。</li>
+<li><strong>命名组件</strong>：为组件设置 <code>id</code>，方便在代码中引用。</li>
+</ul>
+<h3 id="5-添加交互和动画"><a href="#5-添加交互和动画" class="headerlink" title="5. 添加交互和动画"></a>5. 添加交互和动画</h3><ul>
+<li><strong>定义状态</strong>：在状态编辑器中添加新的状态，描述组件在不同情况下的表现。</li>
+<li><strong>创建动画</strong>：使用动画编辑器，为属性变化添加动画效果。</li>
+</ul>
+<h3 id="6-预览和测试"><a href="#6-预览和测试" class="headerlink" title="6. 预览和测试"></a>6. 预览和测试</h3><ul>
+<li><strong>实时预览</strong>：点击预览按钮，查看界面的实时效果。</li>
+<li><strong>调试</strong>：使用 Qt Creator 的调试工具，检测和解决潜在的问题。</li>
+</ul>
+<hr>
+<h2 id="五、与代码编辑的结合"><a href="#五、与代码编辑的结合" class="headerlink" title="五、与代码编辑的结合"></a>五、与代码编辑的结合</h2><h3 id="1-代码视图"><a href="#1-代码视图" class="headerlink" title="1. 代码视图"></a>1. 代码视图</h3><ul>
+<li><strong>查看代码</strong>：在设计器中，随时切换到代码视图，查看生成的 QML 代码。</li>
+<li><strong>手动编辑</strong>：直接在代码中添加逻辑或自定义组件。</li>
+</ul>
+<h3 id="2-双向同步"><a href="#2-双向同步" class="headerlink" title="2. 双向同步"></a>2. 双向同步</h3><ul>
+<li><strong>设计与代码一致性</strong>：所有在设计视图中的更改都会反映到代码视图中，反之亦然。</li>
+<li><strong>冲突解决</strong>：当手动编辑的代码无法在设计视图中解析时，设计器会给出提示。</li>
+</ul>
+<hr>
+<h2 id="六、优势与应用场景"><a href="#六、优势与应用场景" class="headerlink" title="六、优势与应用场景"></a>六、优势与应用场景</h2><h3 id="1-提高开发效率"><a href="#1-提高开发效率" class="headerlink" title="1. 提高开发效率"></a>1. 提高开发效率</h3><ul>
+<li><strong>快速构建</strong>：拖放式设计减少了手动编码的时间，加快了界面开发速度。</li>
+<li><strong>直观性</strong>：所见即所得的编辑方式，使得界面设计更直观。</li>
+</ul>
+<h3 id="2-降低学习难度"><a href="#2-降低学习难度" class="headerlink" title="2. 降低学习难度"></a>2. 降低学习难度</h3><ul>
+<li><strong>适合初学者</strong>：对于不熟悉 QML 或编程的新手，Qt Quick Designer 提供了友好的入门途径。</li>
+<li><strong>丰富的组件库</strong>：预定义的组件和样式，降低了设计复杂界面的门槛。</li>
+</ul>
+<h3 id="3-促进团队协作"><a href="#3-促进团队协作" class="headerlink" title="3. 促进团队协作"></a>3. 促进团队协作</h3><ul>
+<li><strong>设计师参与</strong>：界面设计师可以直接使用 Qt Quick Designer 进行原型设计和界面布局。</li>
+<li><strong>开发与设计分离</strong>：开发者和设计师可以各自专注于逻辑实现和界面美化。</li>
+</ul>
+<hr>
+<h2 id="七、注意事项"><a href="#七、注意事项" class="headerlink" title="七、注意事项"></a>七、注意事项</h2><h3 id="1-理解生成的代码"><a href="#1-理解生成的代码" class="headerlink" title="1. 理解生成的代码"></a>1. 理解生成的代码</h3><ul>
+<li><strong>代码质量</strong>：尽管设计器生成的代码可用，但手动检查和优化代码有助于提高应用性能。</li>
+<li><strong>学习 QML</strong>：深入理解 QML 语言，有助于更好地利用 Qt Quick Designer。</li>
+</ul>
+<h3 id="2-兼容性问题"><a href="#2-兼容性问题" class="headerlink" title="2. 兼容性问题"></a>2. 兼容性问题</h3><ul>
+<li><strong>Qt 版本</strong>：确保使用的 Qt Creator 和 Qt 版本与项目需求一致，避免兼容性问题。</li>
+<li><strong>平台差异</strong>：在不同平台上测试界面，确保跨平台一致性。</li>
+</ul>
+<h3 id="3-性能优化"><a href="#3-性能优化" class="headerlink" title="3. 性能优化"></a>3. 性能优化</h3><ul>
+<li><strong>避免过度嵌套</strong>：过深的组件嵌套可能影响性能，需合理组织界面结构。</li>
+<li><strong>谨慎使用动画</strong>：大量或复杂的动画效果可能导致性能问题，应适度使用。</li>
+</ul>
+<hr>
+<h2 id="八、结论"><a href="#八、结论" class="headerlink" title="八、结论"></a>八、结论</h2><p>Qt Quick Designer 是开发 Qt Quick 应用程序的强大工具，提供了高效、直观的界面设计方式。通过结合拖放式设计、属性编辑、动画创建和代码同步等功能，它简化了用户界面的开发流程，适合从初学者到资深开发者的各种需求。熟练掌握 Qt Quick Designer，将有助于快速构建高质量的跨平台应用程序。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notes/Asio/2024-12-17-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2810,142 +3003,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/11/notes/Tools/2024-12-11-iconv/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/11/notes/Tools/2024-12-11-iconv/" class="post-title-link" itemprop="url">iconv</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-12-11 10:00:00" itemprop="dateCreated datePublished" datetime="2024-12-11T10:00:00+08:00">2024-12-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="iconv-命令-详解"><a href="#iconv-命令-详解" class="headerlink" title="iconv 命令 详解"></a>iconv 命令 详解</h2><p><code>iconv</code> 是一个强大的字符编码转换工具，常用于在不同编码之间转换文件或字符串的编码格式。以下是对其常用功能和参数的详解：</p>
-<hr>
-<h3 id="命令基本格式"><a href="#命令基本格式" class="headerlink" title="命令基本格式"></a><strong>命令基本格式</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv [选项] -f &lt;原始编码&gt; -t &lt;目标编码&gt; [输入文件] -o [输出文件]</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong><code>-f</code></strong>: 指定输入文件的编码（<code>from</code>）。</li>
-<li><strong><code>-t</code></strong>: 指定目标文件的编码（<code>to</code>）。</li>
-<li><strong><code>-o</code></strong>: 指定输出文件（默认输出到标准输出）。</li>
-</ul>
-<hr>
-<h3 id="常用参数详解"><a href="#常用参数详解" class="headerlink" title="常用参数详解"></a><strong>常用参数详解</strong></h3><ol>
-<li><p><strong>基本参数</strong></p>
-<ul>
-<li>**<code>-f</code>**：指定原始文件的编码格式。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK input.txt</span><br></pre></td></tr></table></figure></li>
-<li>**<code>-t</code>**：指定目标编码格式。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t ISO-8859-1 input.txt &gt; output.txt</span><br></pre></td></tr></table></figure></li>
-<li>**<code>-o</code>**：将输出保存到文件。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK input.txt -o output.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p><strong>列出支持的编码</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -l</span><br></pre></td></tr></table></figure>
-<p>该命令列出 <code>iconv</code> 支持的所有编码格式。</p>
-</li>
-<li><p><strong>处理标准输入</strong><br>使用管道将字符串直接传递给 <code>iconv</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;你好，世界&quot;</span> | iconv -f UTF-8 -t GBK</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>忽略或替代无效字符</strong></p>
-<ul>
-<li><code>//IGNORE</code>: 忽略无法转换的字符。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK//IGNORE input.txt -o output.txt</span><br></pre></td></tr></table></figure></li>
-<li><code>//TRANSLIT</code>: 用近似字符替换无法转换的字符。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t ASCII//TRANSLIT input.txt -o output.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="示例用法"><a href="#示例用法" class="headerlink" title="示例用法"></a><strong>示例用法</strong></h3><ol>
-<li><p><strong>将文件从 UTF-8 转换为 GBK</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK input.txt -o output.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>将字符串从 GBK 转换为 UTF-8</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;你好&quot;</span> | iconv -f GBK -t UTF-8</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>转换整个目录的文件</strong><br>使用 <code>find</code> 和 <code>iconv</code> 的组合：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find ./ -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">exec</span> iconv -f GBK -t UTF-8 &#123;&#125; -o converted_&#123;&#125; \;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>排查编码问题</strong><br>当文件中有乱码时，可以尝试转换为不同编码格式查看结果。</p>
-</li>
-</ol>
-<hr>
-<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a><strong>应用场景</strong></h3><ol>
-<li><strong>文本文件国际化</strong>：在跨平台和多语言环境中转换文件编码。</li>
-<li><strong>解决乱码问题</strong>：修复因编码不一致导致的显示错误。</li>
-<li><strong>批量处理文件</strong>：通过脚本将大量文件的编码格式进行转换。</li>
-</ol>
-<hr>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ul>
-<li>转换前确认文件的原始编码（例如通过工具 <code>file</code> 或 <code>chardet</code> 检测）。</li>
-<li>在转换时，确保目标编码支持原始文件中的所有字符，否则可能会出现数据丢失。</li>
-</ul>
-<hr>
-<p>更多参考资料：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/iconv.1.html">Linux iconv 手册</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.gnu.org/software/libc/manual/html_node/iconv-Invocation.html">GNU iconv 文档</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/11/notes/Tools/2024-12-11-Node/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3228,7 +3285,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/11/notes/BOOST/filesystem/2024-12-11-filesystem/">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/11/notes/Tools/2024-12-11-iconv/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -3242,7 +3299,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/12/11/notes/BOOST/filesystem/2024-12-11-filesystem/" class="post-title-link" itemprop="url">boost/filesystem概述</a>
+            <a href="/2024/12/11/notes/Tools/2024-12-11-iconv/" class="post-title-link" itemprop="url">iconv</a>
         </h2>
 
         <div class="post-meta">
@@ -3252,14 +3309,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2024-12-11 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-11T09:00:00+08:00">2024-12-11</time>
+              <time title="Created: 2024-12-11 10:00:00" itemprop="dateCreated datePublished" datetime="2024-12-11T10:00:00+08:00">2024-12-11</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -3267,7 +3324,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/BOOST/" itemprop="url" rel="index"><span itemprop="name">BOOST</span></a>
+                  <a href="/categories/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
                 </span>
             </span>
 
@@ -3282,107 +3339,69 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="boost-filesystem-详解"><a href="#boost-filesystem-详解" class="headerlink" title="boost&#x2F;filesystem 详解"></a>boost&#x2F;filesystem 详解</h2><p><strong>Boost.Filesystem</strong> 是 Boost 库中的一个模块，用于处理文件和目录操作。它提供了跨平台的接口，支持文件路径操作、文件系统查询、文件操作（如创建、删除、复制等），是开发跨平台文件管理工具的强大工具。</p>
+          <h2 id="iconv-命令-详解"><a href="#iconv-命令-详解" class="headerlink" title="iconv 命令 详解"></a>iconv 命令 详解</h2><p><code>iconv</code> 是一个强大的字符编码转换工具，常用于在不同编码之间转换文件或字符串的编码格式。以下是对其常用功能和参数的详解：</p>
 <hr>
-<h3 id="Boost-Filesystem-的主要功能"><a href="#Boost-Filesystem-的主要功能" class="headerlink" title="Boost.Filesystem 的主要功能"></a><strong>Boost.Filesystem 的主要功能</strong></h3><ol>
-<li><p><strong>文件路径操作</strong>：</p>
+<h3 id="命令基本格式"><a href="#命令基本格式" class="headerlink" title="命令基本格式"></a><strong>命令基本格式</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv [选项] -f &lt;原始编码&gt; -t &lt;目标编码&gt; [输入文件] -o [输出文件]</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>支持创建、解析、合并和操作文件路径。</li>
-<li>提供跨平台的路径表示方式，兼容 Windows 和 POSIX 系统。</li>
+<li><strong><code>-f</code></strong>: 指定输入文件的编码（<code>from</code>）。</li>
+<li><strong><code>-t</code></strong>: 指定目标文件的编码（<code>to</code>）。</li>
+<li><strong><code>-o</code></strong>: 指定输出文件（默认输出到标准输出）。</li>
+</ul>
+<hr>
+<h3 id="常用参数详解"><a href="#常用参数详解" class="headerlink" title="常用参数详解"></a><strong>常用参数详解</strong></h3><ol>
+<li><p><strong>基本参数</strong></p>
+<ul>
+<li>**<code>-f</code>**：指定原始文件的编码格式。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK input.txt</span><br></pre></td></tr></table></figure></li>
+<li>**<code>-t</code>**：指定目标编码格式。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t ISO-8859-1 input.txt &gt; output.txt</span><br></pre></td></tr></table></figure></li>
+<li>**<code>-o</code>**：将输出保存到文件。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK input.txt -o output.txt</span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
-<li><p><strong>文件和目录操作</strong>：</p>
-<ul>
-<li>创建、删除、重命名文件或目录。</li>
-<li>检查文件是否存在，以及其类型（文件、目录、符号链接等）。</li>
-</ul>
+<li><p><strong>列出支持的编码</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -l</span><br></pre></td></tr></table></figure>
+<p>该命令列出 <code>iconv</code> 支持的所有编码格式。</p>
 </li>
-<li><p><strong>文件系统遍历</strong>：</p>
-<ul>
-<li>提供目录遍历功能，可递归列出文件和子目录。</li>
-</ul>
+<li><p><strong>处理标准输入</strong><br>使用管道将字符串直接传递给 <code>iconv</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;你好，世界&quot;</span> | iconv -f UTF-8 -t GBK</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>文件属性查询</strong>：</p>
+<li><p><strong>忽略或替代无效字符</strong></p>
 <ul>
-<li>查询文件大小、修改时间、权限等元数据。</li>
-</ul>
-</li>
-<li><p><strong>跨平台支持</strong>：</p>
-<ul>
-<li>通过统一接口屏蔽了不同平台文件系统之间的差异。</li>
+<li><code>//IGNORE</code>: 忽略无法转换的字符。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK//IGNORE input.txt -o output.txt</span><br></pre></td></tr></table></figure></li>
+<li><code>//TRANSLIT</code>: 用近似字符替换无法转换的字符。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t ASCII//TRANSLIT input.txt -o output.txt</span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
 </ol>
 <hr>
-<h3 id="核心类和函数"><a href="#核心类和函数" class="headerlink" title="核心类和函数"></a><strong>核心类和函数</strong></h3><h4 id="1-boost-filesystem-path"><a href="#1-boost-filesystem-path" class="headerlink" title="1. boost::filesystem::path"></a><strong>1. <code>boost::filesystem::path</code></strong></h4><p>表示文件或目录路径的类。</p>
-<ul>
-<li>构造路径：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">boost::<span class="function">filesystem::path <span class="title">p</span><span class="params">(<span class="string">&quot;C:/example/file.txt&quot;</span>)</span></span>;</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Filename: &quot;</span> &lt;&lt; p.<span class="built_in">filename</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure></li>
-<li>常用方法：<ul>
-<li><code>filename()</code>：返回路径的文件名部分。</li>
-<li><code>parent_path()</code>：返回父目录路径。</li>
-<li><code>extension()</code>：返回文件扩展名。</li>
-<li><code>replace_extension()</code>：替换文件扩展名。</li>
-</ul>
+<h3 id="示例用法"><a href="#示例用法" class="headerlink" title="示例用法"></a><strong>示例用法</strong></h3><ol>
+<li><p><strong>将文件从 UTF-8 转换为 GBK</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iconv -f UTF-8 -t GBK input.txt -o output.txt</span><br></pre></td></tr></table></figure>
 </li>
-</ul>
-<hr>
-<h4 id="2-boost-filesystem-file-status"><a href="#2-boost-filesystem-file-status" class="headerlink" title="2. boost::filesystem::file_status"></a><strong>2. <code>boost::filesystem::file_status</code></strong></h4><p>表示文件的状态信息。</p>
-<ul>
-<li>常用方法：<ul>
-<li><code>exists()</code>：检查文件是否存在。</li>
-<li><code>is_regular_file()</code>：检查是否为常规文件。</li>
-<li><code>is_directory()</code>：检查是否为目录。</li>
-</ul>
+<li><p><strong>将字符串从 GBK 转换为 UTF-8</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;你好&quot;</span> | iconv -f GBK -t UTF-8</span><br></pre></td></tr></table></figure>
 </li>
-</ul>
-<hr>
-<h4 id="3-文件和目录操作函数"><a href="#3-文件和目录操作函数" class="headerlink" title="3. 文件和目录操作函数"></a><strong>3. 文件和目录操作函数</strong></h4><ul>
-<li><p><strong>文件操作</strong>：</p>
-<ul>
-<li><code>boost::filesystem::copy_file()</code>：复制文件。</li>
-<li><code>boost::filesystem::remove()</code>：删除文件或目录。</li>
-<li><code>boost::filesystem::rename()</code>：重命名文件或目录。</li>
-</ul>
+<li><p><strong>转换整个目录的文件</strong><br>使用 <code>find</code> 和 <code>iconv</code> 的组合：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find ./ -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">exec</span> iconv -f GBK -t UTF-8 &#123;&#125; -o converted_&#123;&#125; \;</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>目录操作</strong>：</p>
-<ul>
-<li><code>boost::filesystem::create_directory()</code>：创建目录。</li>
-<li><code>boost::filesystem::remove_all()</code>：递归删除目录及其内容。</li>
-</ul>
+<li><p><strong>排查编码问题</strong><br>当文件中有乱码时，可以尝试转换为不同编码格式查看结果。</p>
 </li>
-</ul>
-<hr>
-<h4 id="4-目录遍历"><a href="#4-目录遍历" class="headerlink" title="4. 目录遍历"></a><strong>4. 目录遍历</strong></h4><p>使用 <code>directory_iterator</code> 和 <code>recursive_directory_iterator</code> 遍历目录内容。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/filesystem.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::<span class="function">filesystem::path <span class="title">dir</span><span class="params">(<span class="string">&quot;C:/example&quot;</span>)</span></span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; entry : boost::filesystem::<span class="built_in">directory_iterator</span>(dir)) &#123;</span><br><span class="line">        std::cout &lt;&lt; entry.<span class="built_in">path</span>().<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h4 id="5-文件属性查询"><a href="#5-文件属性查询" class="headerlink" title="5. 文件属性查询"></a><strong>5. 文件属性查询</strong></h4><ul>
-<li><code>boost::filesystem::file_size()</code>：获取文件大小。</li>
-<li><code>boost::filesystem::last_write_time()</code>：获取文件最后修改时间。</li>
-<li><code>boost::filesystem::permissions()</code>：查询和设置文件权限。</li>
-</ul>
-<hr>
-<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a><strong>示例代码</strong></h3><h4 id="文件和目录操作"><a href="#文件和目录操作" class="headerlink" title="文件和目录操作"></a><strong>文件和目录操作</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/filesystem.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> fs = boost::filesystem;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">fs::path <span class="title">dir</span><span class="params">(<span class="string">&quot;example_dir&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建目录</span></span><br><span class="line">    <span class="keyword">if</span> (!fs::<span class="built_in">exists</span>(dir)) &#123;</span><br><span class="line">        fs::<span class="built_in">create_directory</span>(dir);</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Directory created: &quot;</span> &lt;&lt; dir.<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件路径</span></span><br><span class="line">    fs::path file = dir / <span class="string">&quot;example.txt&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件</span></span><br><span class="line">    std::<span class="built_in">ofstream</span>(file.<span class="built_in">string</span>()) &lt;&lt; <span class="string">&quot;Hello, Boost.Filesystem!&quot;</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;File created: &quot;</span> &lt;&lt; file.<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 删除文件和目录</span></span><br><span class="line">    fs::<span class="built_in">remove</span>(file);</span><br><span class="line">    fs::<span class="built_in">remove</span>(dir);</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Cleanup completed.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="遍历目录"><a href="#遍历目录" class="headerlink" title="遍历目录"></a><strong>遍历目录</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/filesystem.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> fs = boost::filesystem;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">fs::path <span class="title">dir</span><span class="params">(<span class="string">&quot;C:/example&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fs::<span class="built_in">exists</span>(dir) &amp;&amp; fs::<span class="built_in">is_directory</span>(dir)) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; entry : fs::<span class="built_in">recursive_directory_iterator</span>(dir)) &#123;</span><br><span class="line">            std::cout &lt;&lt; entry.<span class="built_in">path</span>().<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Directory does not exist.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="Boost-Filesystem-的优势"><a href="#Boost-Filesystem-的优势" class="headerlink" title="Boost.Filesystem 的优势"></a><strong>Boost.Filesystem 的优势</strong></h3><ol>
-<li><strong>跨平台一致性</strong>：统一的 API 屏蔽了底层平台差异。</li>
-<li><strong>丰富的功能</strong>：从路径操作到文件元数据查询应有尽有。</li>
-<li><strong>与标准库兼容</strong>：部分功能被 C++17 的 <code>std::filesystem</code> 所采纳。</li>
 </ol>
 <hr>
-<h3 id="Boost-Filesystem-与-C-标准库"><a href="#Boost-Filesystem-与-C-标准库" class="headerlink" title="Boost.Filesystem 与 C++ 标准库"></a><strong>Boost.Filesystem 与 C++ 标准库</strong></h3><ul>
-<li>Boost.Filesystem 是 <code>std::filesystem</code> 的前身，其大部分功能已纳入 C++17 标准。</li>
-<li>如果需要支持更老版本的 C++ 或使用扩展功能，Boost.Filesystem 仍是一个强大的工具。</li>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a><strong>应用场景</strong></h3><ol>
+<li><strong>文本文件国际化</strong>：在跨平台和多语言环境中转换文件编码。</li>
+<li><strong>解决乱码问题</strong>：修复因编码不一致导致的显示错误。</li>
+<li><strong>批量处理文件</strong>：通过脚本将大量文件的编码格式进行转换。</li>
+</ol>
+<hr>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ul>
+<li>转换前确认文件的原始编码（例如通过工具 <code>file</code> 或 <code>chardet</code> 检测）。</li>
+<li>在转换时，确保目标编码支持原始文件中的所有字符，否则可能会出现数据丢失。</li>
 </ul>
 <hr>
-<h3 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a><strong>相关资源</strong></h3><ul>
-<li><a target="_blank" rel="noopener" href="https://www.boost.org/doc/libs/release/libs/filesystem/">Boost.Filesystem 官方文档</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/filesystem">C++ std::filesystem 文档</a></li>
+<p>更多参考资料：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/iconv.1.html">Linux iconv 手册</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gnu.org/software/libc/manual/html_node/iconv-Invocation.html">GNU iconv 文档</a></li>
 </ul>
-<p>如果需要更详细的示例或进一步的解释，可以继续讨论！</p>
 
       
     </div>
@@ -3551,6 +3570,180 @@
 <li><a target="_blank" rel="noopener" href="https://www.boost.org/doc/libs/release/libs/asio/">Boost.Asio 网络编程参考</a></li>
 </ul>
 <p>如果需要更具体的用法或示例，可以进一步展开！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/11/notes/BOOST/filesystem/2024-12-11-filesystem/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/11/notes/BOOST/filesystem/2024-12-11-filesystem/" class="post-title-link" itemprop="url">boost/filesystem概述</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-11 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-11T09:00:00+08:00">2024-12-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:45" itemprop="dateModified" datetime="2024-12-30T09:25:45+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BOOST/" itemprop="url" rel="index"><span itemprop="name">BOOST</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="boost-filesystem-详解"><a href="#boost-filesystem-详解" class="headerlink" title="boost&#x2F;filesystem 详解"></a>boost&#x2F;filesystem 详解</h2><p><strong>Boost.Filesystem</strong> 是 Boost 库中的一个模块，用于处理文件和目录操作。它提供了跨平台的接口，支持文件路径操作、文件系统查询、文件操作（如创建、删除、复制等），是开发跨平台文件管理工具的强大工具。</p>
+<hr>
+<h3 id="Boost-Filesystem-的主要功能"><a href="#Boost-Filesystem-的主要功能" class="headerlink" title="Boost.Filesystem 的主要功能"></a><strong>Boost.Filesystem 的主要功能</strong></h3><ol>
+<li><p><strong>文件路径操作</strong>：</p>
+<ul>
+<li>支持创建、解析、合并和操作文件路径。</li>
+<li>提供跨平台的路径表示方式，兼容 Windows 和 POSIX 系统。</li>
+</ul>
+</li>
+<li><p><strong>文件和目录操作</strong>：</p>
+<ul>
+<li>创建、删除、重命名文件或目录。</li>
+<li>检查文件是否存在，以及其类型（文件、目录、符号链接等）。</li>
+</ul>
+</li>
+<li><p><strong>文件系统遍历</strong>：</p>
+<ul>
+<li>提供目录遍历功能，可递归列出文件和子目录。</li>
+</ul>
+</li>
+<li><p><strong>文件属性查询</strong>：</p>
+<ul>
+<li>查询文件大小、修改时间、权限等元数据。</li>
+</ul>
+</li>
+<li><p><strong>跨平台支持</strong>：</p>
+<ul>
+<li>通过统一接口屏蔽了不同平台文件系统之间的差异。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="核心类和函数"><a href="#核心类和函数" class="headerlink" title="核心类和函数"></a><strong>核心类和函数</strong></h3><h4 id="1-boost-filesystem-path"><a href="#1-boost-filesystem-path" class="headerlink" title="1. boost::filesystem::path"></a><strong>1. <code>boost::filesystem::path</code></strong></h4><p>表示文件或目录路径的类。</p>
+<ul>
+<li>构造路径：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">boost::<span class="function">filesystem::path <span class="title">p</span><span class="params">(<span class="string">&quot;C:/example/file.txt&quot;</span>)</span></span>;</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Filename: &quot;</span> &lt;&lt; p.<span class="built_in">filename</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure></li>
+<li>常用方法：<ul>
+<li><code>filename()</code>：返回路径的文件名部分。</li>
+<li><code>parent_path()</code>：返回父目录路径。</li>
+<li><code>extension()</code>：返回文件扩展名。</li>
+<li><code>replace_extension()</code>：替换文件扩展名。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="2-boost-filesystem-file-status"><a href="#2-boost-filesystem-file-status" class="headerlink" title="2. boost::filesystem::file_status"></a><strong>2. <code>boost::filesystem::file_status</code></strong></h4><p>表示文件的状态信息。</p>
+<ul>
+<li>常用方法：<ul>
+<li><code>exists()</code>：检查文件是否存在。</li>
+<li><code>is_regular_file()</code>：检查是否为常规文件。</li>
+<li><code>is_directory()</code>：检查是否为目录。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="3-文件和目录操作函数"><a href="#3-文件和目录操作函数" class="headerlink" title="3. 文件和目录操作函数"></a><strong>3. 文件和目录操作函数</strong></h4><ul>
+<li><p><strong>文件操作</strong>：</p>
+<ul>
+<li><code>boost::filesystem::copy_file()</code>：复制文件。</li>
+<li><code>boost::filesystem::remove()</code>：删除文件或目录。</li>
+<li><code>boost::filesystem::rename()</code>：重命名文件或目录。</li>
+</ul>
+</li>
+<li><p><strong>目录操作</strong>：</p>
+<ul>
+<li><code>boost::filesystem::create_directory()</code>：创建目录。</li>
+<li><code>boost::filesystem::remove_all()</code>：递归删除目录及其内容。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="4-目录遍历"><a href="#4-目录遍历" class="headerlink" title="4. 目录遍历"></a><strong>4. 目录遍历</strong></h4><p>使用 <code>directory_iterator</code> 和 <code>recursive_directory_iterator</code> 遍历目录内容。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/filesystem.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::<span class="function">filesystem::path <span class="title">dir</span><span class="params">(<span class="string">&quot;C:/example&quot;</span>)</span></span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; entry : boost::filesystem::<span class="built_in">directory_iterator</span>(dir)) &#123;</span><br><span class="line">        std::cout &lt;&lt; entry.<span class="built_in">path</span>().<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="5-文件属性查询"><a href="#5-文件属性查询" class="headerlink" title="5. 文件属性查询"></a><strong>5. 文件属性查询</strong></h4><ul>
+<li><code>boost::filesystem::file_size()</code>：获取文件大小。</li>
+<li><code>boost::filesystem::last_write_time()</code>：获取文件最后修改时间。</li>
+<li><code>boost::filesystem::permissions()</code>：查询和设置文件权限。</li>
+</ul>
+<hr>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a><strong>示例代码</strong></h3><h4 id="文件和目录操作"><a href="#文件和目录操作" class="headerlink" title="文件和目录操作"></a><strong>文件和目录操作</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/filesystem.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> fs = boost::filesystem;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">fs::path <span class="title">dir</span><span class="params">(<span class="string">&quot;example_dir&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建目录</span></span><br><span class="line">    <span class="keyword">if</span> (!fs::<span class="built_in">exists</span>(dir)) &#123;</span><br><span class="line">        fs::<span class="built_in">create_directory</span>(dir);</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Directory created: &quot;</span> &lt;&lt; dir.<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件路径</span></span><br><span class="line">    fs::path file = dir / <span class="string">&quot;example.txt&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件</span></span><br><span class="line">    std::<span class="built_in">ofstream</span>(file.<span class="built_in">string</span>()) &lt;&lt; <span class="string">&quot;Hello, Boost.Filesystem!&quot;</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;File created: &quot;</span> &lt;&lt; file.<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 删除文件和目录</span></span><br><span class="line">    fs::<span class="built_in">remove</span>(file);</span><br><span class="line">    fs::<span class="built_in">remove</span>(dir);</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Cleanup completed.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="遍历目录"><a href="#遍历目录" class="headerlink" title="遍历目录"></a><strong>遍历目录</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/filesystem.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> fs = boost::filesystem;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">fs::path <span class="title">dir</span><span class="params">(<span class="string">&quot;C:/example&quot;</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fs::<span class="built_in">exists</span>(dir) &amp;&amp; fs::<span class="built_in">is_directory</span>(dir)) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; entry : fs::<span class="built_in">recursive_directory_iterator</span>(dir)) &#123;</span><br><span class="line">            std::cout &lt;&lt; entry.<span class="built_in">path</span>().<span class="built_in">string</span>() &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Directory does not exist.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Boost-Filesystem-的优势"><a href="#Boost-Filesystem-的优势" class="headerlink" title="Boost.Filesystem 的优势"></a><strong>Boost.Filesystem 的优势</strong></h3><ol>
+<li><strong>跨平台一致性</strong>：统一的 API 屏蔽了底层平台差异。</li>
+<li><strong>丰富的功能</strong>：从路径操作到文件元数据查询应有尽有。</li>
+<li><strong>与标准库兼容</strong>：部分功能被 C++17 的 <code>std::filesystem</code> 所采纳。</li>
+</ol>
+<hr>
+<h3 id="Boost-Filesystem-与-C-标准库"><a href="#Boost-Filesystem-与-C-标准库" class="headerlink" title="Boost.Filesystem 与 C++ 标准库"></a><strong>Boost.Filesystem 与 C++ 标准库</strong></h3><ul>
+<li>Boost.Filesystem 是 <code>std::filesystem</code> 的前身，其大部分功能已纳入 C++17 标准。</li>
+<li>如果需要支持更老版本的 C++ 或使用扩展功能，Boost.Filesystem 仍是一个强大的工具。</li>
+</ul>
+<hr>
+<h3 id="相关资源"><a href="#相关资源" class="headerlink" title="相关资源"></a><strong>相关资源</strong></h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.boost.org/doc/libs/release/libs/filesystem/">Boost.Filesystem 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/filesystem">C++ std::filesystem 文档</a></li>
+</ul>
+<p>如果需要更详细的示例或进一步的解释，可以继续讨论！</p>
 
       
     </div>
@@ -3856,137 +4049,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/03/notes/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-12-03-python_3_zipfile%E6%A8%A1%E5%9D%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/12/03/notes/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-12-03-python_3_zipfile%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">python_3_zipfile模块</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-12-03 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-03T09:00:00+08:00">2024-12-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="python3-zipfile模块-详解"><a href="#python3-zipfile模块-详解" class="headerlink" title="python3 zipfile模块 详解"></a>python3 zipfile模块 详解</h2><p>Python 的 <code>zipfile</code> 模块用于处理 ZIP 文件。它支持创建、读取、写入、添加和解压 ZIP 文件。以下是对 <code>zipfile</code> 模块的详细介绍和用法。</p>
-<hr>
-<h3 id="1-基本用法"><a href="#1-基本用法" class="headerlink" title="1. 基本用法"></a>1. <strong>基本用法</strong></h3><h4 id="导入模块"><a href="#导入模块" class="headerlink" title="导入模块"></a>导入模块</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="2-创建-ZIP-文件"><a href="#2-创建-ZIP-文件" class="headerlink" title="2. 创建 ZIP 文件"></a>2. <strong>创建 ZIP 文件</strong></h3><h4 id="创建一个新-ZIP-文件并写入内容"><a href="#创建一个新-ZIP-文件并写入内容" class="headerlink" title="创建一个新 ZIP 文件并写入内容"></a>创建一个新 ZIP 文件并写入内容</h4><ul>
-<li>模式选项：<ul>
-<li><code>&#39;w&#39;</code>：创建一个新文件（如果文件已存在，将覆盖）。</li>
-<li><code>&#39;a&#39;</code>：添加到现有的 ZIP 文件中。</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.write(<span class="string">&#x27;file1.txt&#x27;</span>)  <span class="comment"># 添加文件到 ZIP 中</span></span><br><span class="line">    zipf.write(<span class="string">&#x27;file2.txt&#x27;</span>, arcname=<span class="string">&#x27;renamed_file2.txt&#x27;</span>)  <span class="comment"># 指定压缩时的文件名</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="3-读取-ZIP-文件"><a href="#3-读取-ZIP-文件" class="headerlink" title="3. 读取 ZIP 文件"></a>3. <strong>读取 ZIP 文件</strong></h3><h4 id="列出-ZIP-文件中的内容"><a href="#列出-ZIP-文件中的内容" class="headerlink" title="列出 ZIP 文件中的内容"></a>列出 ZIP 文件中的内容</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    <span class="built_in">print</span>(zipf.namelist())  <span class="comment"># 列出压缩包内所有文件和目录</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="读取文件信息"><a href="#读取文件信息" class="headerlink" title="读取文件信息"></a>读取文件信息</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    <span class="keyword">for</span> info <span class="keyword">in</span> zipf.infolist():</span><br><span class="line">        <span class="built_in">print</span>(info.filename, info.file_size, info.compress_size)</span><br></pre></td></tr></table></figure>
-
-<h4 id="解压-ZIP-文件"><a href="#解压-ZIP-文件" class="headerlink" title="解压 ZIP 文件"></a>解压 ZIP 文件</h4><ul>
-<li><p>解压到当前目录：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extractall()  <span class="comment"># 解压到当前目录</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>解压到指定目录：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extractall(<span class="string">&#x27;output_directory&#x27;</span>)  <span class="comment"># 解压到指定目录</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>解压单个文件：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extract(<span class="string">&#x27;file1.txt&#x27;</span>, <span class="string">&#x27;output_directory&#x27;</span>)  <span class="comment"># 解压指定文件到目录</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h3 id="4-追加文件到-ZIP"><a href="#4-追加文件到-ZIP" class="headerlink" title="4. 追加文件到 ZIP"></a>4. <strong>追加文件到 ZIP</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;a&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.write(<span class="string">&#x27;new_file.txt&#x27;</span>, arcname=<span class="string">&#x27;folder/new_file.txt&#x27;</span>)  <span class="comment"># 指定路径</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="5-压缩和解压密码保护的-ZIP-文件"><a href="#5-压缩和解压密码保护的-ZIP-文件" class="headerlink" title="5. 压缩和解压密码保护的 ZIP 文件"></a>5. <strong>压缩和解压密码保护的 ZIP 文件</strong></h3><h4 id="压缩带密码的-ZIP"><a href="#压缩带密码的-ZIP" class="headerlink" title="压缩带密码的 ZIP"></a>压缩带密码的 ZIP</h4><p>Python 的 <code>zipfile</code> 本身不支持加密 ZIP 文件，但可以使用第三方库如 <code>pyminizip</code> 或 <code>zipfile_with_password</code>。</p>
-<h4 id="解压带密码的-ZIP"><a href="#解压带密码的-ZIP" class="headerlink" title="解压带密码的 ZIP"></a>解压带密码的 ZIP</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;protected.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extractall(pwd=<span class="string">b&#x27;password&#x27;</span>)  <span class="comment"># 密码需要以字节形式提供</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="6-检查文件是否为-ZIP"><a href="#6-检查文件是否为-ZIP" class="headerlink" title="6. 检查文件是否为 ZIP"></a>6. <strong>检查文件是否为 ZIP</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> zipfile.is_zipfile(<span class="string">&#x27;example.zip&#x27;</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;是一个有效的 ZIP 文件&quot;</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;不是有效的 ZIP 文件&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="7-高级操作"><a href="#7-高级操作" class="headerlink" title="7. 高级操作"></a>7. <strong>高级操作</strong></h3><h4 id="获取压缩信息"><a href="#获取压缩信息" class="headerlink" title="获取压缩信息"></a>获取压缩信息</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    info = zipf.getinfo(<span class="string">&#x27;file1.txt&#x27;</span>)</span><br><span class="line">    <span class="built_in">print</span>(info.filename)</span><br><span class="line">    <span class="built_in">print</span>(info.compress_type)  <span class="comment"># 压缩方式</span></span><br><span class="line">    <span class="built_in">print</span>(info.file_size)      <span class="comment"># 原始大小</span></span><br><span class="line">    <span class="built_in">print</span>(info.compress_size)  <span class="comment"># 压缩后大小</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="自定义压缩级别"><a href="#自定义压缩级别" class="headerlink" title="自定义压缩级别"></a>自定义压缩级别</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br><span class="line"><span class="keyword">import</span> zlib</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;compressed.zip&#x27;</span>, <span class="string">&#x27;w&#x27;</span>, compression=zipfile.ZIP_DEFLATED, compresslevel=<span class="number">9</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.write(<span class="string">&#x27;file1.txt&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="8-支持的压缩类型"><a href="#8-支持的压缩类型" class="headerlink" title="8. 支持的压缩类型"></a>8. <strong>支持的压缩类型</strong></h3><ul>
-<li><code>zipfile.ZIP_STORED</code>：不压缩。</li>
-<li><code>zipfile.ZIP_DEFLATED</code>：标准压缩（需要 <code>zlib</code> 支持）。</li>
-<li><code>zipfile.ZIP_BZIP2</code>：bzip2 压缩（需要 <code>bz2</code> 支持）。</li>
-<li><code>zipfile.ZIP_LZMA</code>：LZMA 压缩（需要 <code>lzma</code> 支持）。</li>
-</ul>
-<hr>
-<h3 id="9-完整示例：批量压缩文件"><a href="#9-完整示例：批量压缩文件" class="headerlink" title="9. 完整示例：批量压缩文件"></a>9. <strong>完整示例：批量压缩文件</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">compress_directory</span>(<span class="params">dir_path, output_file</span>):</span><br><span class="line">    <span class="keyword">with</span> zipfile.ZipFile(output_file, <span class="string">&#x27;w&#x27;</span>, compression=zipfile.ZIP_DEFLATED) <span class="keyword">as</span> zipf:</span><br><span class="line">        <span class="keyword">for</span> foldername, subfolders, filenames <span class="keyword">in</span> os.walk(dir_path):</span><br><span class="line">            <span class="keyword">for</span> filename <span class="keyword">in</span> filenames:</span><br><span class="line">                file_path = os.path.join(foldername, filename)</span><br><span class="line">                arcname = os.path.relpath(file_path, dir_path)</span><br><span class="line">                zipf.write(file_path, arcname)</span><br><span class="line"></span><br><span class="line">compress_directory(<span class="string">&#x27;my_folder&#x27;</span>, <span class="string">&#x27;archive.zip&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="10-完整示例：批量解压-ZIP-文件"><a href="#10-完整示例：批量解压-ZIP-文件" class="headerlink" title="10. 完整示例：批量解压 ZIP 文件"></a>10. <strong>完整示例：批量解压 ZIP 文件</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">extract_all</span>(<span class="params">zip_file, output_dir</span>):</span><br><span class="line">    <span class="keyword">with</span> zipfile.ZipFile(zip_file, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">        zipf.extractall(output_dir)</span><br><span class="line"></span><br><span class="line">extract_all(<span class="string">&#x27;archive.zip&#x27;</span>, <span class="string">&#x27;extracted_files&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>希望这些内容能帮助你全面理解 <code>zipfile</code> 模块！如需更详细的实例或功能扩展，请告诉我。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/03/notes/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-12-03-python_3_pathlib%E6%A8%A1%E5%9D%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -4102,6 +4164,137 @@
 
 <hr>
 <p><code>pathlib</code> 模块非常强大且易于使用，大大简化了文件和路径操作。如需进一步扩展或解决特定问题，请告诉我！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/03/notes/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-12-03-python_3_zipfile%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/12/03/notes/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-12-03-python_3_zipfile%E6%A8%A1%E5%9D%97/" class="post-title-link" itemprop="url">python_3_zipfile模块</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-03 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-03T09:00:00+08:00">2024-12-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="python3-zipfile模块-详解"><a href="#python3-zipfile模块-详解" class="headerlink" title="python3 zipfile模块 详解"></a>python3 zipfile模块 详解</h2><p>Python 的 <code>zipfile</code> 模块用于处理 ZIP 文件。它支持创建、读取、写入、添加和解压 ZIP 文件。以下是对 <code>zipfile</code> 模块的详细介绍和用法。</p>
+<hr>
+<h3 id="1-基本用法"><a href="#1-基本用法" class="headerlink" title="1. 基本用法"></a>1. <strong>基本用法</strong></h3><h4 id="导入模块"><a href="#导入模块" class="headerlink" title="导入模块"></a>导入模块</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-创建-ZIP-文件"><a href="#2-创建-ZIP-文件" class="headerlink" title="2. 创建 ZIP 文件"></a>2. <strong>创建 ZIP 文件</strong></h3><h4 id="创建一个新-ZIP-文件并写入内容"><a href="#创建一个新-ZIP-文件并写入内容" class="headerlink" title="创建一个新 ZIP 文件并写入内容"></a>创建一个新 ZIP 文件并写入内容</h4><ul>
+<li>模式选项：<ul>
+<li><code>&#39;w&#39;</code>：创建一个新文件（如果文件已存在，将覆盖）。</li>
+<li><code>&#39;a&#39;</code>：添加到现有的 ZIP 文件中。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.write(<span class="string">&#x27;file1.txt&#x27;</span>)  <span class="comment"># 添加文件到 ZIP 中</span></span><br><span class="line">    zipf.write(<span class="string">&#x27;file2.txt&#x27;</span>, arcname=<span class="string">&#x27;renamed_file2.txt&#x27;</span>)  <span class="comment"># 指定压缩时的文件名</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-读取-ZIP-文件"><a href="#3-读取-ZIP-文件" class="headerlink" title="3. 读取 ZIP 文件"></a>3. <strong>读取 ZIP 文件</strong></h3><h4 id="列出-ZIP-文件中的内容"><a href="#列出-ZIP-文件中的内容" class="headerlink" title="列出 ZIP 文件中的内容"></a>列出 ZIP 文件中的内容</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    <span class="built_in">print</span>(zipf.namelist())  <span class="comment"># 列出压缩包内所有文件和目录</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="读取文件信息"><a href="#读取文件信息" class="headerlink" title="读取文件信息"></a>读取文件信息</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    <span class="keyword">for</span> info <span class="keyword">in</span> zipf.infolist():</span><br><span class="line">        <span class="built_in">print</span>(info.filename, info.file_size, info.compress_size)</span><br></pre></td></tr></table></figure>
+
+<h4 id="解压-ZIP-文件"><a href="#解压-ZIP-文件" class="headerlink" title="解压 ZIP 文件"></a>解压 ZIP 文件</h4><ul>
+<li><p>解压到当前目录：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extractall()  <span class="comment"># 解压到当前目录</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解压到指定目录：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extractall(<span class="string">&#x27;output_directory&#x27;</span>)  <span class="comment"># 解压到指定目录</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解压单个文件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extract(<span class="string">&#x27;file1.txt&#x27;</span>, <span class="string">&#x27;output_directory&#x27;</span>)  <span class="comment"># 解压指定文件到目录</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="4-追加文件到-ZIP"><a href="#4-追加文件到-ZIP" class="headerlink" title="4. 追加文件到 ZIP"></a>4. <strong>追加文件到 ZIP</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;a&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.write(<span class="string">&#x27;new_file.txt&#x27;</span>, arcname=<span class="string">&#x27;folder/new_file.txt&#x27;</span>)  <span class="comment"># 指定路径</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5-压缩和解压密码保护的-ZIP-文件"><a href="#5-压缩和解压密码保护的-ZIP-文件" class="headerlink" title="5. 压缩和解压密码保护的 ZIP 文件"></a>5. <strong>压缩和解压密码保护的 ZIP 文件</strong></h3><h4 id="压缩带密码的-ZIP"><a href="#压缩带密码的-ZIP" class="headerlink" title="压缩带密码的 ZIP"></a>压缩带密码的 ZIP</h4><p>Python 的 <code>zipfile</code> 本身不支持加密 ZIP 文件，但可以使用第三方库如 <code>pyminizip</code> 或 <code>zipfile_with_password</code>。</p>
+<h4 id="解压带密码的-ZIP"><a href="#解压带密码的-ZIP" class="headerlink" title="解压带密码的 ZIP"></a>解压带密码的 ZIP</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;protected.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.extractall(pwd=<span class="string">b&#x27;password&#x27;</span>)  <span class="comment"># 密码需要以字节形式提供</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="6-检查文件是否为-ZIP"><a href="#6-检查文件是否为-ZIP" class="headerlink" title="6. 检查文件是否为 ZIP"></a>6. <strong>检查文件是否为 ZIP</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> zipfile.is_zipfile(<span class="string">&#x27;example.zip&#x27;</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;是一个有效的 ZIP 文件&quot;</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;不是有效的 ZIP 文件&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="7-高级操作"><a href="#7-高级操作" class="headerlink" title="7. 高级操作"></a>7. <strong>高级操作</strong></h3><h4 id="获取压缩信息"><a href="#获取压缩信息" class="headerlink" title="获取压缩信息"></a>获取压缩信息</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;example.zip&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    info = zipf.getinfo(<span class="string">&#x27;file1.txt&#x27;</span>)</span><br><span class="line">    <span class="built_in">print</span>(info.filename)</span><br><span class="line">    <span class="built_in">print</span>(info.compress_type)  <span class="comment"># 压缩方式</span></span><br><span class="line">    <span class="built_in">print</span>(info.file_size)      <span class="comment"># 原始大小</span></span><br><span class="line">    <span class="built_in">print</span>(info.compress_size)  <span class="comment"># 压缩后大小</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="自定义压缩级别"><a href="#自定义压缩级别" class="headerlink" title="自定义压缩级别"></a>自定义压缩级别</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br><span class="line"><span class="keyword">import</span> zlib</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> zipfile.ZipFile(<span class="string">&#x27;compressed.zip&#x27;</span>, <span class="string">&#x27;w&#x27;</span>, compression=zipfile.ZIP_DEFLATED, compresslevel=<span class="number">9</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">    zipf.write(<span class="string">&#x27;file1.txt&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="8-支持的压缩类型"><a href="#8-支持的压缩类型" class="headerlink" title="8. 支持的压缩类型"></a>8. <strong>支持的压缩类型</strong></h3><ul>
+<li><code>zipfile.ZIP_STORED</code>：不压缩。</li>
+<li><code>zipfile.ZIP_DEFLATED</code>：标准压缩（需要 <code>zlib</code> 支持）。</li>
+<li><code>zipfile.ZIP_BZIP2</code>：bzip2 压缩（需要 <code>bz2</code> 支持）。</li>
+<li><code>zipfile.ZIP_LZMA</code>：LZMA 压缩（需要 <code>lzma</code> 支持）。</li>
+</ul>
+<hr>
+<h3 id="9-完整示例：批量压缩文件"><a href="#9-完整示例：批量压缩文件" class="headerlink" title="9. 完整示例：批量压缩文件"></a>9. <strong>完整示例：批量压缩文件</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">compress_directory</span>(<span class="params">dir_path, output_file</span>):</span><br><span class="line">    <span class="keyword">with</span> zipfile.ZipFile(output_file, <span class="string">&#x27;w&#x27;</span>, compression=zipfile.ZIP_DEFLATED) <span class="keyword">as</span> zipf:</span><br><span class="line">        <span class="keyword">for</span> foldername, subfolders, filenames <span class="keyword">in</span> os.walk(dir_path):</span><br><span class="line">            <span class="keyword">for</span> filename <span class="keyword">in</span> filenames:</span><br><span class="line">                file_path = os.path.join(foldername, filename)</span><br><span class="line">                arcname = os.path.relpath(file_path, dir_path)</span><br><span class="line">                zipf.write(file_path, arcname)</span><br><span class="line"></span><br><span class="line">compress_directory(<span class="string">&#x27;my_folder&#x27;</span>, <span class="string">&#x27;archive.zip&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="10-完整示例：批量解压-ZIP-文件"><a href="#10-完整示例：批量解压-ZIP-文件" class="headerlink" title="10. 完整示例：批量解压 ZIP 文件"></a>10. <strong>完整示例：批量解压 ZIP 文件</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> zipfile</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">extract_all</span>(<span class="params">zip_file, output_dir</span>):</span><br><span class="line">    <span class="keyword">with</span> zipfile.ZipFile(zip_file, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> zipf:</span><br><span class="line">        zipf.extractall(output_dir)</span><br><span class="line"></span><br><span class="line">extract_all(<span class="string">&#x27;archive.zip&#x27;</span>, <span class="string">&#x27;extracted_files&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>希望这些内容能帮助你全面理解 <code>zipfile</code> 模块！如需更详细的实例或功能扩展，请告诉我。</p>
 
       
     </div>
@@ -5142,526 +5335,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/11/18/notes/Qt/2024-11-18-qt_7_%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="zhang junyi">
-      <meta itemprop="description" content="工作学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="junyi's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/11/18/notes/Qt/2024-11-18-qt_7_%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">qt_7_常见函数</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-11-18 09:00:00" itemprop="dateCreated datePublished" datetime="2024-11-18T09:00:00+08:00">2024-11-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-12-30 09:25:51" itemprop="dateModified" datetime="2024-12-30T09:25:51+08:00">2024-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Qt-WindowStaysOnTopHint-是什么"><a href="#Qt-WindowStaysOnTopHint-是什么" class="headerlink" title="Qt::WindowStaysOnTopHint 是什么"></a>Qt::WindowStaysOnTopHint 是什么</h2><p><code>Qt::WindowStaysOnTopHint</code> 是 Qt 中的一个窗口标志（Window Flag），它用于使窗口始终保持在其他窗口的上方。</p>
-<p>当一个窗口设置了这个标志后，无论其他窗口是否被激活，该窗口都会始终位于最前面，类似于“置顶”的效果。</p>
-<hr>
-<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a><strong>使用方法</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setWindowFlags</span>(Qt::WindowStaysOnTopHint);</span><br></pre></td></tr></table></figure>
-<p>通常与其他标志组合使用，例如：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setWindowFlags</span>(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="常见场景"><a href="#常见场景" class="headerlink" title="常见场景"></a><strong>常见场景</strong></h3><ol>
-<li><strong>提示框</strong>：显示重要信息或通知时，不希望被其他窗口遮挡。</li>
-<li><strong>悬浮工具栏</strong>：开发一些辅助工具或快捷操作面板时。</li>
-<li><strong>系统通知</strong>：显示系统级通知或警告。</li>
-<li><strong>调试工具</strong>：为调试时的窗口提供置顶功能。</li>
-</ol>
-<hr>
-<h3 id="完整例子"><a href="#完整例子" class="headerlink" title="完整例子"></a><strong>完整例子</strong></h3><p>以下是一个简单的例子，展示如何使用 <code>Qt::WindowStaysOnTopHint</code>：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QLabel&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">QLabel <span class="title">label</span><span class="params">(<span class="string">&quot;我是置顶窗口&quot;</span>)</span></span>;</span><br><span class="line">    label.<span class="built_in">setWindowFlags</span>(Qt::Tool | Qt::WindowStaysOnTopHint);</span><br><span class="line">    label.<span class="built_in">setStyleSheet</span>(<span class="string">&quot;background-color: yellow; padding: 10px; font-size: 16px;&quot;</span>);</span><br><span class="line">    label.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运行后，<code>label</code> 将始终显示在其他窗口的上方。</p>
-<hr>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
-<li><p><strong>窗口管理器支持</strong>：</p>
-<ul>
-<li>在某些操作系统或桌面环境下，窗口管理器可能不完全支持此标志。</li>
-<li>特别是在某些 Linux 桌面环境中，置顶功能可能会受到限制。</li>
-</ul>
-</li>
-<li><p><strong>不适合主窗口</strong>：</p>
-<ul>
-<li>这个标志通常用于子窗口或辅助窗口，而不是主窗口（<code>QMainWindow</code>），否则会导致用户体验不佳。</li>
-</ul>
-</li>
-<li><p><strong>与其他标志冲突</strong>：</p>
-<ul>
-<li>如果设置了 <code>Qt::WindowStaysOnTopHint</code>，但窗口没有置顶，可能是其他窗口标志（如模态窗口）导致的冲突。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<p>通过这个标志，可以方便地实现类似系统通知、浮动工具栏等功能，提升程序的交互体验。</p>
-<h2 id="Qt-FramelessWindowHint"><a href="#Qt-FramelessWindowHint" class="headerlink" title="Qt::FramelessWindowHint"></a>Qt::FramelessWindowHint</h2><p><code>Qt::FramelessWindowHint</code> 是 Qt 中的一个窗口标志，用于移除窗口的标题栏和边框。设置该标志的窗口将变得无边框，并且不包含系统提供的关闭、最小化、最大化等按钮。</p>
-<hr>
-<h3 id="特点与用途"><a href="#特点与用途" class="headerlink" title="特点与用途"></a><strong>特点与用途</strong></h3><ul>
-<li><strong>去除边框和标题栏</strong>：<ul>
-<li>使窗口显示更加简洁，用于自定义界面。</li>
-</ul>
-</li>
-<li><strong>完全可控</strong>：<ul>
-<li>通常用于自定义窗口的外观，例如圆角窗口、透明窗口等。</li>
-</ul>
-</li>
-<li><strong>常见场景</strong>：<ul>
-<li>Splash Screen（启动画面）。</li>
-<li>自定义提示框。</li>
-<li>自定义主窗口或弹窗。</li>
-<li>不规则形状的窗口。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="使用方法-1"><a href="#使用方法-1" class="headerlink" title="使用方法"></a><strong>使用方法</strong></h3><p>通过 <code>setWindowFlags</code> 设置 <code>Qt::FramelessWindowHint</code>：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setWindowFlags</span>(Qt::FramelessWindowHint);</span><br></pre></td></tr></table></figure>
-
-<h4 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QWidget&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QWidget window;</span><br><span class="line">    window.<span class="built_in">setWindowFlags</span>(Qt::FramelessWindowHint); <span class="comment">// 设置无边框</span></span><br><span class="line">    window.<span class="built_in">setStyleSheet</span>(<span class="string">&quot;background-color: lightblue; border-radius: 10px;&quot;</span>);</span><br><span class="line">    window.<span class="built_in">setFixedSize</span>(<span class="number">400</span>, <span class="number">300</span>); <span class="comment">// 固定窗口大小</span></span><br><span class="line">    window.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运行后，窗口将显示为无边框的蓝色矩形。</p>
-<hr>
-<h3 id="组合使用"><a href="#组合使用" class="headerlink" title="组合使用"></a><strong>组合使用</strong></h3><p><code>Qt::FramelessWindowHint</code> 可以与其他窗口标志组合使用，以实现更多功能。例如：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setWindowFlags</span>(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="鼠标拖动窗口"><a href="#鼠标拖动窗口" class="headerlink" title="鼠标拖动窗口"></a><strong>鼠标拖动窗口</strong></h3><p>由于无边框窗口失去了默认的拖动功能，需要手动实现鼠标拖动窗口：</p>
-<h4 id="示例代码："><a href="#示例代码：" class="headerlink" title="示例代码："></a>示例代码：</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QWidget&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QMouseEvent&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FramelessWindow</span> : <span class="keyword">public</span> QWidget &#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">FramelessWindow</span><span class="params">(QWidget *parent = <span class="literal">nullptr</span>)</span> : QWidget(parent) &#123;</span></span><br><span class="line">        <span class="built_in">setWindowFlags</span>(Qt::FramelessWindowHint); <span class="comment">// 设置无边框</span></span><br><span class="line">        <span class="built_in">setStyleSheet</span>(<span class="string">&quot;background-color: lightgreen; border-radius: 10px;&quot;</span>);</span><br><span class="line">        <span class="built_in">setFixedSize</span>(<span class="number">400</span>, <span class="number">300</span>); <span class="comment">// 固定大小</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mousePressEvent</span><span class="params">(QMouseEvent *event)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (event-&gt;<span class="built_in">button</span>() == Qt::LeftButton) &#123;</span><br><span class="line">            dragStartPosition = event-&gt;<span class="built_in">globalPos</span>() - <span class="built_in">frameGeometry</span>().<span class="built_in">topLeft</span>();</span><br><span class="line">            event-&gt;<span class="built_in">accept</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mouseMoveEvent</span><span class="params">(QMouseEvent *event)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (event-&gt;<span class="built_in">buttons</span>() &amp; Qt::LeftButton) &#123;</span><br><span class="line">            <span class="built_in">move</span>(event-&gt;<span class="built_in">globalPos</span>() - dragStartPosition);</span><br><span class="line">            event-&gt;<span class="built_in">accept</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    QPoint dragStartPosition; <span class="comment">// 记录鼠标初始位置</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    FramelessWindow window;</span><br><span class="line">    window.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>此代码实现了一个无边框窗口，并支持用鼠标拖动。</p>
-<hr>
-<h3 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
-<li><p><strong>系统按钮功能缺失</strong>：</p>
-<ul>
-<li>无边框窗口会失去最小化、最大化和关闭按钮，需要自行实现这些功能。</li>
-</ul>
-</li>
-<li><p><strong>操作系统兼容性</strong>：</p>
-<ul>
-<li>在某些操作系统（如 macOS 和 Windows）上，去边框可能会带来窗口交互体验的差异，例如窗口无法调整大小。</li>
-</ul>
-</li>
-<li><p><strong>自定义效果</strong>：</p>
-<ul>
-<li>搭配 <code>QPainter</code> 或 <code>QStyleSheet</code>，可以实现更加复杂的窗口样式，比如圆角或透明效果。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<p>通过 <code>Qt::FramelessWindowHint</code>，开发者可以完全掌控窗口的外观和行为，是构建现代化、个性化界面的重要工具。</p>
-<h2 id="Qt-Tool"><a href="#Qt-Tool" class="headerlink" title="Qt::Tool"></a>Qt::Tool</h2><p><code>Qt::Tool</code> 是 Qt 中的一个窗口标志（Window Type），用于指定窗口作为工具窗口显示。</p>
-<p>工具窗口通常是一个小型的、非主窗口的辅助窗口，它的作用是提供附加功能或工具。比如，颜色选择器、调试面板、浮动工具栏等。</p>
-<hr>
-<h3 id="主要特点"><a href="#主要特点" class="headerlink" title="主要特点"></a><strong>主要特点</strong></h3><ol>
-<li><p><strong>非主窗口类型</strong>：</p>
-<ul>
-<li><code>Qt::Tool</code> 窗口是附属于主窗口的辅助窗口，但它不会在任务栏显示图标。</li>
-</ul>
-</li>
-<li><p><strong>置顶显示</strong>：</p>
-<ul>
-<li>通常，工具窗口会始终置顶在父窗口上方。</li>
-<li>如果需要它始终置顶所有窗口，可以额外使用 <code>Qt::WindowStaysOnTopHint</code>。</li>
-</ul>
-</li>
-<li><p><strong>独立窗口</strong>：</p>
-<ul>
-<li>工具窗口不会阻塞主窗口的操作，可以与主窗口同时交互。</li>
-</ul>
-</li>
-<li><p><strong>大小和外观</strong>：</p>
-<ul>
-<li>工具窗口通常比主窗口小，而且默认没有任务栏图标。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="使用方法-2"><a href="#使用方法-2" class="headerlink" title="使用方法"></a><strong>使用方法</strong></h3><h4 id="示例代码：-1"><a href="#示例代码：-1" class="headerlink" title="示例代码："></a>示例代码：</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QWidget&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QWidget mainWindow;</span><br><span class="line">    mainWindow.<span class="built_in">setWindowTitle</span>(<span class="string">&quot;主窗口&quot;</span>);</span><br><span class="line">    mainWindow.<span class="built_in">resize</span>(<span class="number">400</span>, <span class="number">300</span>);</span><br><span class="line">    mainWindow.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    QWidget toolWindow;</span><br><span class="line">    toolWindow.<span class="built_in">setWindowTitle</span>(<span class="string">&quot;工具窗口&quot;</span>);</span><br><span class="line">    toolWindow.<span class="built_in">setWindowFlags</span>(Qt::Tool); <span class="comment">// 设置为工具窗口</span></span><br><span class="line">    toolWindow.<span class="built_in">resize</span>(<span class="number">200</span>, <span class="number">150</span>);</span><br><span class="line">    toolWindow.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行后，你会看到：</p>
-<ul>
-<li>主窗口是常规的应用窗口。</li>
-<li>工具窗口不会在任务栏中显示。</li>
-</ul>
-<hr>
-<h3 id="组合使用-1"><a href="#组合使用-1" class="headerlink" title="组合使用"></a><strong>组合使用</strong></h3><p>可以将 <code>Qt::Tool</code> 与其他窗口标志结合使用，进一步控制工具窗口的行为。例如：</p>
-<h4 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">toolWindow.<span class="built_in">setWindowFlags</span>(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>**<code>Qt::FramelessWindowHint</code>**：去掉工具窗口的边框。</li>
-<li>**<code>Qt::WindowStaysOnTopHint</code>**：让工具窗口始终保持在所有窗口的最上方。</li>
-</ul>
-<hr>
-<h3 id="工具窗口的父子关系"><a href="#工具窗口的父子关系" class="headerlink" title="工具窗口的父子关系"></a><strong>工具窗口的父子关系</strong></h3><p>如果设置工具窗口的父窗口，则工具窗口会自动跟随主窗口（如一起最小化或隐藏）。</p>
-<h4 id="示例：-2"><a href="#示例：-2" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">toolWindow.<span class="built_in">setParent</span>(&amp;mainWindow); <span class="comment">// 设置父窗口</span></span><br><span class="line">toolWindow.<span class="built_in">setWindowFlags</span>(Qt::Tool);</span><br><span class="line">toolWindow.<span class="built_in">show</span>();</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>当主窗口被最小化时，工具窗口也会被最小化。</li>
-<li>工具窗口始终在其父窗口的范围内显示。</li>
-</ul>
-<hr>
-<h3 id="常见用途"><a href="#常见用途" class="headerlink" title="常见用途"></a><strong>常见用途</strong></h3><ol>
-<li><strong>浮动工具栏</strong>：<ul>
-<li>用于辅助功能（如编辑器的工具面板）。</li>
-</ul>
-</li>
-<li><strong>调试窗口</strong>：<ul>
-<li>用于显示调试信息或日志输出。</li>
-</ul>
-</li>
-<li><strong>颜色选择器</strong>：<ul>
-<li>提供小型的选择工具。</li>
-</ul>
-</li>
-<li><strong>弹出提示框</strong>：<ul>
-<li>实现自定义的提示窗口。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="注意事项-2"><a href="#注意事项-2" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
-<li><p><strong>任务栏图标</strong>：</p>
-<ul>
-<li>工具窗口不会显示在任务栏中，但如果需要显示，可以去掉 <code>Qt::Tool</code> 标志，改用普通窗口类型。</li>
-</ul>
-</li>
-<li><p><strong>行为依赖父窗口</strong>：</p>
-<ul>
-<li>如果没有设置父窗口，工具窗口的置顶行为可能不稳定。</li>
-</ul>
-</li>
-<li><p><strong>兼容性</strong>：</p>
-<ul>
-<li>在不同操作系统上的表现可能稍有差异，尤其是与其他窗口标志结合使用时。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<p>通过 <code>Qt::Tool</code>，可以轻松创建轻量级、功能明确的辅助窗口，提升应用程序的用户体验和功能扩展能力。</p>
-<h2 id="QGuiApplication-primaryScreen-详解"><a href="#QGuiApplication-primaryScreen-详解" class="headerlink" title="QGuiApplication::primaryScreen() 详解"></a>QGuiApplication::primaryScreen() 详解</h2><p><code>QGuiApplication::primaryScreen()</code> 是 Qt 提供的一个方法，用于获取系统的主屏幕对象（<code>QScreen</code>）。它属于 <code>QGuiApplication</code> 类，适用于需要处理屏幕信息的场景，比如获取屏幕分辨率、设置窗口位置、在多屏环境下处理窗口布局等。</p>
-<hr>
-<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a><strong>主要功能</strong></h3><ol>
-<li><strong>获取主屏幕信息</strong>：<ul>
-<li>返回一个 <code>QScreen*</code>，表示主屏幕对象。</li>
-</ul>
-</li>
-<li><strong>跨多屏支持</strong>：<ul>
-<li>在多显示器环境中，<code>primaryScreen()</code> 返回的是主屏幕（通常是显示系统任务栏的屏幕）。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="使用方法-3"><a href="#使用方法-3" class="headerlink" title="使用方法"></a><strong>使用方法</strong></h3><h4 id="获取主屏幕对象"><a href="#获取主屏幕对象" class="headerlink" title="获取主屏幕对象"></a>获取主屏幕对象</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QGuiApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QScreen&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QGuiApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QScreen *screen = QGuiApplication::<span class="built_in">primaryScreen</span>();</span><br><span class="line">    <span class="keyword">if</span> (screen) &#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Primary screen name:&quot;</span> &lt;&lt; screen-&gt;<span class="built_in">name</span>();</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Screen resolution:&quot;</span> &lt;&lt; screen-&gt;<span class="built_in">size</span>();</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Screen geometry:&quot;</span> &lt;&lt; screen-&gt;<span class="built_in">geometry</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例输出</strong>：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Primary screen name: &quot;eDP-1&quot;</span><br><span class="line">Screen resolution: QSize(1920, 1080)</span><br><span class="line">Screen geometry: QRect(0, 0, 1920, 1080)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="常见用途-1"><a href="#常见用途-1" class="headerlink" title="常见用途"></a><strong>常见用途</strong></h3><h4 id="1-获取主屏幕分辨率"><a href="#1-获取主屏幕分辨率" class="headerlink" title="1. 获取主屏幕分辨率"></a>1. <strong>获取主屏幕分辨率</strong></h4><p>可以通过 <code>QScreen</code> 的 <code>size()</code> 或 <code>availableGeometry()</code> 获取屏幕的分辨率。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">QScreen *screen = QGuiApplication::<span class="built_in">primaryScreen</span>();</span><br><span class="line"><span class="keyword">if</span> (screen) &#123;</span><br><span class="line">    QSize resolution = screen-&gt;<span class="built_in">size</span>(); <span class="comment">// 获取屏幕分辨率</span></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Screen resolution:&quot;</span> &lt;&lt; resolution;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-设置窗口到主屏幕中心"><a href="#2-设置窗口到主屏幕中心" class="headerlink" title="2. 设置窗口到主屏幕中心"></a>2. <strong>设置窗口到主屏幕中心</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QWidget&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QScreen&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QWidget window;</span><br><span class="line">    window.<span class="built_in">setFixedSize</span>(<span class="number">400</span>, <span class="number">300</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取主屏幕的几何信息</span></span><br><span class="line">    QScreen *screen = QGuiApplication::<span class="built_in">primaryScreen</span>();</span><br><span class="line">    <span class="keyword">if</span> (screen) &#123;</span><br><span class="line">        QRect screenGeometry = screen-&gt;<span class="built_in">geometry</span>();</span><br><span class="line">        <span class="type">int</span> x = screenGeometry.<span class="built_in">center</span>().<span class="built_in">x</span>() - window.<span class="built_in">width</span>() / <span class="number">2</span>;</span><br><span class="line">        <span class="type">int</span> y = screenGeometry.<span class="built_in">center</span>().<span class="built_in">y</span>() - window.<span class="built_in">height</span>() / <span class="number">2</span>;</span><br><span class="line">        window.<span class="built_in">move</span>(x, y);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    window.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-支持多屏幕环境"><a href="#3-支持多屏幕环境" class="headerlink" title="3. 支持多屏幕环境"></a>3. <strong>支持多屏幕环境</strong></h4><p>对于多屏幕环境，可以使用 <code>QGuiApplication::screens()</code> 获取所有屏幕的列表，并选择特定的屏幕进行操作。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QGuiApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QScreen&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QGuiApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QList&lt;QScreen *&gt; screens = QGuiApplication::<span class="built_in">screens</span>();</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Number of screens:&quot;</span> &lt;&lt; screens.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">for</span> (QScreen *screen : screens) &#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Screen name:&quot;</span> &lt;&lt; screen-&gt;<span class="built_in">name</span>();</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Resolution:&quot;</span> &lt;&lt; screen-&gt;<span class="built_in">size</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="常见方法"><a href="#常见方法" class="headerlink" title="常见方法"></a><strong>常见方法</strong></h3><p>以下是 <code>QScreen</code> 类常用的方法，可以结合 <code>primaryScreen()</code> 使用：</p>
-<table>
-<thead>
-<tr>
-<th>方法</th>
-<th>功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>geometry()</code></td>
-<td>返回屏幕的矩形区域（包括不可用部分）。</td>
-</tr>
-<tr>
-<td><code>availableGeometry()</code></td>
-<td>返回屏幕的可用区域（排除了任务栏和停靠窗口的部分）。</td>
-</tr>
-<tr>
-<td><code>size()</code></td>
-<td>返回屏幕的分辨率（<code>QSize</code>）。</td>
-</tr>
-<tr>
-<td><code>physicalSize()</code></td>
-<td>返回屏幕的物理尺寸（毫米为单位）。</td>
-</tr>
-<tr>
-<td><code>refreshRate()</code></td>
-<td>返回屏幕的刷新率（Hz）。</td>
-</tr>
-<tr>
-<td><code>logicalDotsPerInch()</code></td>
-<td>返回屏幕的逻辑 DPI（通常用于字体和布局的计算）。</td>
-</tr>
-<tr>
-<td><code>devicePixelRatio()</code></td>
-<td>返回屏幕的设备像素比率（高分屏时非常重要）。</td>
-</tr>
-</tbody></table>
-<hr>
-<h3 id="注意事项-3"><a href="#注意事项-3" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
-<li><p><strong>多屏环境</strong>：</p>
-<ul>
-<li>如果程序运行在多显示器环境下，<code>primaryScreen()</code> 返回的只是主屏幕，而其他屏幕需要通过 <code>QGuiApplication::screens()</code> 获取。</li>
-</ul>
-</li>
-<li><p><strong>跨平台差异</strong>：</p>
-<ul>
-<li>在某些平台（如 macOS）上，任务栏可能不总是定义主屏幕。</li>
-</ul>
-</li>
-<li><p><strong>高分屏支持</strong>：</p>
-<ul>
-<li>如果使用高分屏，记得考虑设备像素比率 (<code>devicePixelRatio()</code>)，以避免显示问题。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<p>通过 <code>QGuiApplication::primaryScreen()</code>，可以轻松获取屏幕的几何信息并灵活控制窗口的位置和布局，特别是在需要多屏支持或自定义布局时非常有用。</p>
-<h2 id="Qt-findChild-函数-详解"><a href="#Qt-findChild-函数-详解" class="headerlink" title="Qt findChild()函数 详解"></a>Qt findChild()函数 详解</h2><p><code>findChild()</code> 是 Qt 中用于查找某个特定类型或名称的子对象的函数。它通常用于在运行时查找对象树中的子对象，特别是在动态生成或加载 UI 元素时非常有用。</p>
-<h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function">T <span class="title">findChild</span><span class="params">(<span class="type">const</span> QString &amp;name = QString(), Qt::FindChildOptions options = Qt::FindChildrenRecursively)</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>T</strong>: 模板参数，表示要查找的对象类型（如 <code>QWidget*</code>、<code>QPushButton*</code> 等）。</li>
-<li><strong>name</strong>: 子对象的名称（对象名），可以省略。如果省略，表示查找第一个符合类型的对象。</li>
-<li><strong>options</strong>: 查找选项，可以指定查找的深度（递归或不递归）。</li>
-</ul>
-<h3 id="查找选项-Qt-FindChildOptions"><a href="#查找选项-Qt-FindChildOptions" class="headerlink" title="查找选项 (Qt::FindChildOptions)"></a>查找选项 (<code>Qt::FindChildOptions</code>)</h3><ul>
-<li><code>Qt::FindDirectChildrenOnly</code>: 仅查找直接子对象，不会递归查找子对象的子对象。</li>
-<li><code>Qt::FindChildrenRecursively</code>: 递归查找所有子对象（包括子对象的子对象）。这是默认选项。</li>
-</ul>
-<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>假设你有一个包含多个子部件的 <code>QWidget</code>，其中一个 <code>QPushButton</code> 名为 <code>&quot;myButton&quot;</code>，你可以使用 <code>findChild()</code> 来查找该按钮。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">QPushButton *button = parentWidget-&gt;<span class="built_in">findChild</span>&lt;QPushButton*&gt;(<span class="string">&quot;myButton&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (button) &#123;</span><br><span class="line">    <span class="comment">// 找到了名为 &quot;myButton&quot; 的按钮，可以在这里进行操作</span></span><br><span class="line">    button-&gt;<span class="built_in">setText</span>(<span class="string">&quot;Button Found!&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 没有找到该按钮</span></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Button not found!&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="查找没有名称的子对象"><a href="#查找没有名称的子对象" class="headerlink" title="查找没有名称的子对象"></a>查找没有名称的子对象</h3><p>如果你不关心对象名，只需要查找某一类型的子对象，可以不传入 <code>name</code> 参数：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">QLabel *label = parentWidget-&gt;<span class="built_in">findChild</span>&lt;QLabel*&gt;();</span><br><span class="line"><span class="keyword">if</span> (label) &#123;</span><br><span class="line">    <span class="comment">// 找到了某个 QLabel，可以在这里进行操作</span></span><br><span class="line">    label-&gt;<span class="built_in">setText</span>(<span class="string">&quot;Label Found!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="注意事项-4"><a href="#注意事项-4" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
-<li><strong>对象名必须唯一</strong>：如果查找指定名称的子对象，确保该名称在对象树中是唯一的。否则，<code>findChild()</code> 可能只返回找到的第一个匹配对象。</li>
-<li><strong>类型检查</strong>：模板参数 <code>T</code> 应与查找的子对象的实际类型匹配。否则，返回的指针将是 <code>nullptr</code>。</li>
-</ul>
-<h3 id="递归查找多个子对象"><a href="#递归查找多个子对象" class="headerlink" title="递归查找多个子对象"></a>递归查找多个子对象</h3><p>如果需要查找多个匹配的子对象，可以使用 <code>findChildren()</code> 函数：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">QList&lt;QPushButton*&gt; buttons = parentWidget-&gt;<span class="built_in">findChildren</span>&lt;QPushButton*&gt;(<span class="string">&quot;myButton&quot;</span>);</span><br><span class="line"><span class="keyword">for</span> (QPushButton *button : buttons) &#123;</span><br><span class="line">    <span class="comment">// 对每个找到的按钮进行操作</span></span><br><span class="line">    button-&gt;<span class="built_in">setText</span>(<span class="string">&quot;Found Multiple Buttons!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="常见应用场景"><a href="#常见应用场景" class="headerlink" title="常见应用场景"></a>常见应用场景</h3><ul>
-<li><strong>动态 UI 查找</strong>：在运行时查找动态生成的 UI 元素。</li>
-<li><strong>复用代码</strong>：通过查找对象，可以避免直接传递指针来访问特定 UI 元素，从而提高代码的可复用性和维护性。</li>
-<li><strong>调试</strong>：查找和验证某个对象是否正确创建并存在于对象树中。</li>
-</ul>
-<p><code>findChild()</code> 是 Qt 中非常强大的工具，特别适用于需要在运行时动态查找和操作 UI 元素的场景。</p>
-<h2 id="Qt-QTextCodec-setCodecForLocale-函数-详解"><a href="#Qt-QTextCodec-setCodecForLocale-函数-详解" class="headerlink" title="Qt QTextCodec::setCodecForLocale() 函数 详解"></a>Qt QTextCodec::setCodecForLocale() 函数 详解</h2><p><code>QTextCodec::setCodecForLocale()</code> 是 Qt 中用于设置程序的字符编码的函数。具体来说，它设置用于处理当前区域语言（locale）的字符编码。</p>
-<h3 id="1-函数原型"><a href="#1-函数原型" class="headerlink" title="1. 函数原型"></a>1. 函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">QTextCodec::setCodecForLocale</span><span class="params">(QTextCodec *codec)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-主要用途"><a href="#2-主要用途" class="headerlink" title="2. 主要用途"></a>2. 主要用途</h3><p><code>setCodecForLocale()</code> 函数的作用是为本地字符编码（locale）设置一个自定义的编码器（<code>QTextCodec</code>）。这影响到与本地字符编码相关的操作，如从文件系统读取文件名、处理文本输入输出等。</p>
-<p>Qt 中的字符编码处理依赖 <code>QTextCodec</code>，它是一个字符编码转换的类。不同的 <code>QTextCodec</code> 子类代表了不同的字符编码方式，例如 UTF-8、GBK、ISO 8859-1 等。</p>
-<h3 id="3-具体使用场景"><a href="#3-具体使用场景" class="headerlink" title="3. 具体使用场景"></a>3. 具体使用场景</h3><p>在多语言应用中，可能会遇到字符编码问题，例如中文路径或文件内容乱码。通过设置适当的 <code>QTextCodec</code>，可以解决这些问题。例如：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTextCodec&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置为 UTF-8 编码</span></span><br><span class="line">    QTextCodec::<span class="built_in">setCodecForLocale</span>(QTextCodec::<span class="built_in">codecForName</span>(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 或者设置为 GBK 编码（用于处理中文字符）</span></span><br><span class="line">    QTextCodec::<span class="built_in">setCodecForLocale</span>(QTextCodec::<span class="built_in">codecForName</span>(<span class="string">&quot;GBK&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 你的应用程序代码</span></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-注意事项"><a href="#4-注意事项" class="headerlink" title="4. 注意事项"></a>4. 注意事项</h3><p>从 Qt 5 开始，<code>setCodecForLocale()</code> 已经逐渐被淘汰，因为 Qt 更推荐使用 Unicode（如 UTF-8）作为全局字符编码。大多数现代应用不需要手动设置字符编码。Qt 默认使用 UTF-8 编码来处理字符串，并且建议开发者尽量遵循这个标准。</p>
-<h3 id="5-相关函数"><a href="#5-相关函数" class="headerlink" title="5. 相关函数"></a>5. 相关函数</h3><ul>
-<li><code>QTextCodec::codecForLocale()</code>: 获取当前设置的本地编码。</li>
-<li><code>QTextCodec::codecForName(const char *name)</code>: 根据编码名称获取对应的 <code>QTextCodec</code> 对象。</li>
-</ul>
-<h3 id="6-示例代码"><a href="#6-示例代码" class="headerlink" title="6. 示例代码"></a>6. 示例代码</h3><p>以下是如何在早期版本的 Qt 中使用 <code>setCodecForLocale()</code> 的一个典型场景：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTextCodec&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将本地编码设置为 GBK（适用于简体中文环境）</span></span><br><span class="line">    QTextCodec::<span class="built_in">setCodecForLocale</span>(QTextCodec::<span class="built_in">codecForName</span>(<span class="string">&quot;GBK&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 继续其他应用逻辑...</span></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="7-现代-Qt-的替代方案"><a href="#7-现代-Qt-的替代方案" class="headerlink" title="7. 现代 Qt 的替代方案"></a>7. 现代 Qt 的替代方案</h3><p>在现代 Qt 中，通常不需要显式设置编码。确保使用 QString、QByteArray 以及使用 UTF-8 编码文件可以避免大多数字符编码问题。</p>
-<p>通过以上内容，你应该了解了 <code>QTextCodec::setCodecForLocale()</code> 的用法及其在现代 Qt 开发中的替代方案。</p>
-<h2 id="QTextCodec-codecForName-函数-详解"><a href="#QTextCodec-codecForName-函数-详解" class="headerlink" title="QTextCodec::codecForName() 函数 详解"></a>QTextCodec::codecForName() 函数 详解</h2><p><code>QTextCodec::codecForName()</code> 是 Qt 中用于根据字符编码名称获取对应 <code>QTextCodec</code> 对象的静态函数。<code>QTextCodec</code> 是一个处理字符编码转换的类，这个函数允许开发者选择适当的字符编码以处理文本数据的编码和解码。</p>
-<h3 id="1-函数原型-1"><a href="#1-函数原型-1" class="headerlink" title="1. 函数原型"></a>1. 函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> QTextCodec *<span class="title">QTextCodec::codecForName</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span></span>;</span><br><span class="line"><span class="function"><span class="type">static</span> QTextCodec *<span class="title">QTextCodec::codecForName</span><span class="params">(<span class="type">const</span> QByteArray &amp;name)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-主要用途-1"><a href="#2-主要用途-1" class="headerlink" title="2. 主要用途"></a>2. 主要用途</h3><p><code>codecForName()</code> 函数用于根据指定的编码名称返回对应的 <code>QTextCodec</code> 实例。这对于在多语言环境下处理不同编码格式的文本文件或网络数据非常有用。例如，你可能需要处理 UTF-8、GBK 或 ISO-8859-1 等编码的文本内容。</p>
-<h3 id="3-具体用法"><a href="#3-具体用法" class="headerlink" title="3. 具体用法"></a>3. 具体用法</h3><p>下面是使用 <code>codecForName()</code> 的典型场景：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTextCodec&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QString&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取 UTF-8 编码的 QTextCodec 实例</span></span><br><span class="line">    QTextCodec *utf8Codec = QTextCodec::<span class="built_in">codecForName</span>(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将 QString 编码为 UTF-8 字节数组</span></span><br><span class="line">    QString str = <span class="string">&quot;Hello, 你好!&quot;</span>;</span><br><span class="line">    QByteArray encodedStr = utf8Codec-&gt;<span class="built_in">fromUnicode</span>(str);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将 UTF-8 字节数组解码为 QString</span></span><br><span class="line">    QString decodedStr = utf8Codec-&gt;<span class="built_in">toUnicode</span>(encodedStr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-参数说明"><a href="#4-参数说明" class="headerlink" title="4. 参数说明"></a>4. 参数说明</h3><ul>
-<li><strong><code>const char *name</code></strong>: 表示编码名称的 C 字符串，例如 <code>&quot;UTF-8&quot;</code>、<code>&quot;GBK&quot;</code>、<code>&quot;ISO-8859-1&quot;</code> 等。</li>
-<li><strong><code>const QByteArray &amp;name</code></strong>: 作为 QByteArray 类型的编码名称，适用于编码名称是动态生成的场景。</li>
-</ul>
-<h3 id="5-返回值"><a href="#5-返回值" class="headerlink" title="5. 返回值"></a>5. 返回值</h3><ul>
-<li>成功时返回对应编码的 <code>QTextCodec</code> 对象指针。</li>
-<li>如果找不到对应编码，返回 <code>nullptr</code>。</li>
-</ul>
-<h3 id="6-常用编码名称"><a href="#6-常用编码名称" class="headerlink" title="6. 常用编码名称"></a>6. 常用编码名称</h3><p>一些常用的编码名称包括：</p>
-<ul>
-<li><code>&quot;UTF-8&quot;</code>：用于处理 Unicode 的最常见编码，适合多语言文本。</li>
-<li><code>&quot;GBK&quot;</code>：中文常用编码。</li>
-<li><code>&quot;ISO-8859-1&quot;</code>：常见于西欧语言的编码。</li>
-<li><code>&quot;Shift-JIS&quot;</code>：用于日语编码。</li>
-</ul>
-<p>编码名称不区分大小写，输入 <code>&quot;utf-8&quot;</code> 或 <code>&quot;UTF-8&quot;</code> 均可。</p>
-<h3 id="7-示例代码"><a href="#7-示例代码" class="headerlink" title="7. 示例代码"></a>7. 示例代码</h3><p>下面的代码展示了如何根据不同的编码名称获取对应的 <code>QTextCodec</code>，并进行文本转换：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QTextCodec&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取 GBK 编码的 QTextCodec 实例</span></span><br><span class="line">    QTextCodec *codec = QTextCodec::<span class="built_in">codecForName</span>(<span class="string">&quot;GBK&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (codec) &#123;</span><br><span class="line">        QString text = <span class="string">&quot;你好, 世界!&quot;</span>;</span><br><span class="line">        QByteArray encodedText = codec-&gt;<span class="built_in">fromUnicode</span>(text);</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Encoded text (GBK):&quot;</span> &lt;&lt; encodedText;</span><br><span class="line"></span><br><span class="line">        QString decodedText = codec-&gt;<span class="built_in">toUnicode</span>(encodedText);</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Decoded text:&quot;</span> &lt;&lt; decodedText;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error: Codec not found!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="8-注意事项"><a href="#8-注意事项" class="headerlink" title="8. 注意事项"></a>8. 注意事项</h3><ul>
-<li>在调用 <code>codecForName()</code> 时，如果编码名称无效（如拼写错误或 Qt 不支持），函数将返回 <code>nullptr</code>，因此在使用返回值之前需要检查其有效性。</li>
-<li>尽量在现代应用中使用 Unicode（如 UTF-8）编码，减少字符编码转换问题。</li>
-</ul>
-<h3 id="9-相关函数"><a href="#9-相关函数" class="headerlink" title="9. 相关函数"></a>9. 相关函数</h3><ul>
-<li><code>QTextCodec::setCodecForLocale()</code>: 设置程序的本地字符编码。</li>
-<li><code>QTextCodec::codecForLocale()</code>: 获取当前本地环境使用的编码。</li>
-<li><code>QTextCodec::availableCodecs()</code>: 获取所有可用编码名称的列表。</li>
-</ul>
-<p>通过这些内容，你应该掌握了 <code>QTextCodec::codecForName()</code> 的用法以及它在字符编码处理中的重要作用。</p>
-<h2 id="Qt-QT-BEGIN-NAMESPACE-宏-详解"><a href="#Qt-QT-BEGIN-NAMESPACE-宏-详解" class="headerlink" title="Qt QT_BEGIN_NAMESPACE 宏 详解"></a>Qt QT_BEGIN_NAMESPACE 宏 详解</h2><p><code>QT_BEGIN_NAMESPACE</code> 是 Qt 中定义的一个宏，通常用于简化命名空间的管理，特别是在处理 Qt 库的代码时。这个宏与 <code>QT_END_NAMESPACE</code> 配合使用，主要目的是将 Qt 的类、函数等代码封装到命名空间 <code>Qt</code> 中。</p>
-<h3 id="1-作用和用法"><a href="#1-作用和用法" class="headerlink" title="1. 作用和用法"></a>1. 作用和用法</h3><p><code>QT_BEGIN_NAMESPACE</code> 是在代码中用于开启 Qt 命名空间的宏定义，它的作用相当于：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Qt &#123;</span><br></pre></td></tr></table></figure>
-
-<p>与之对应，<code>QT_END_NAMESPACE</code> 用于关闭命名空间，等同于：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-使用示例"><a href="#2-使用示例" class="headerlink" title="2. 使用示例"></a>2. 使用示例</h3><p>在 Qt 库的源码或插件开发中，可能会看到以下形式的代码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">QT_BEGIN_NAMESPACE</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">QWidget</span> &#123;</span><br><span class="line">    <span class="comment">// 类的定义</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">QT_END_NAMESPACE</span><br></pre></td></tr></table></figure>
-
-<p>这段代码实际上被处理为：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Qt &#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">QWidget</span> &#123;</span><br><span class="line">    <span class="comment">// 类的定义</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125; <span class="comment">// namespace Qt</span></span><br></pre></td></tr></table></figure>
-
-<p>通过使用这些宏，Qt 提供了一个方便的方式来管理命名空间，确保 Qt 库内部代码在正确的命名空间内被封装。</p>
-<h3 id="3-为什么使用这些宏？"><a href="#3-为什么使用这些宏？" class="headerlink" title="3. 为什么使用这些宏？"></a>3. 为什么使用这些宏？</h3><p>Qt 采用这些宏而不是直接使用 <code>namespace Qt &#123; ... &#125;</code> 这种语法的原因在于：</p>
-<ol>
-<li><strong>跨平台兼容性</strong>：Qt 是一个跨平台库，为了在不同的编译器、平台上保持代码一致性，使用宏可以更灵活地适应不同平台的特殊需求。</li>
-<li><strong>条件编译支持</strong>：通过这些宏，Qt 可以根据配置或编译选项有条件地开启或关闭命名空间。例如，在某些特殊编译环境下，可能不需要使用 <code>Qt</code> 命名空间，这时可以通过配置条件控制这些宏的行为。</li>
-<li><strong>简化代码维护</strong>：在大型代码库中使用宏，可以在需要更改命名空间策略时集中管理，避免大量手动修改。</li>
-</ol>
-<h3 id="4-相关宏"><a href="#4-相关宏" class="headerlink" title="4. 相关宏"></a>4. 相关宏</h3><p>除了 <code>QT_BEGIN_NAMESPACE</code> 和 <code>QT_END_NAMESPACE</code>，还有一些相关的宏，用于处理命名空间或条件编译：</p>
-<ul>
-<li><code>QT_USE_NAMESPACE</code>: 当在项目中使用 Qt 命名空间时，可以在代码中包含这个宏，以确保代码在正确的命名空间中运行。</li>
-<li><code>QT_PREPEND_NAMESPACE(ClassName)</code>: 这个宏用于在不使用命名空间时显式地为类名加上 <code>Qt::</code> 前缀，如 <code>Qt::QWidget</code>。</li>
-<li><code>QT_END_HEADER</code>: 用于在头文件中结束命名空间的定义，特别是在跨平台的头文件中使用。</li>
-</ul>
-<h3 id="5-在项目中的使用"><a href="#5-在项目中的使用" class="headerlink" title="5. 在项目中的使用"></a>5. 在项目中的使用</h3><p>在自己的项目中，通常不需要直接使用这些宏，除非你在开发 Qt 插件、扩展库或直接修改 Qt 源码。在普通的 Qt 应用程序开发中，直接使用 <code>Qt</code> 命名空间即可：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QWidget&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    QWidget window;</span><br><span class="line">    window.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这个例子中，你不需要关心 <code>QT_BEGIN_NAMESPACE</code> 等宏，因为 Qt 的头文件已经处理了命名空间的封装。</p>
-<h3 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h3><p><code>QT_BEGIN_NAMESPACE</code> 和 <code>QT_END_NAMESPACE</code> 是 Qt 用于命名空间管理的宏，它们的作用是简化 Qt 库代码中命名空间的封装。这种设计提高了代码的可维护性、跨平台兼容性，并为条件编译提供了灵活性。在大多数应用开发中，开发者不需要直接使用这些宏，只需知道它们在 Qt 库中的作用即可。</p>
-<h2 id="Qt-Q-OBJECT-宏-详解"><a href="#Qt-Q-OBJECT-宏-详解" class="headerlink" title="Qt Q_OBJECT 宏 详解"></a>Qt Q_OBJECT 宏 详解</h2><p><code>Q_OBJECT</code> 宏是 Qt 框架中用于支持 Qt 元对象系统的关键宏。这个宏通常放在 Qt 类的声明部分，特别是需要使用信号和槽机制的类。它使得 Qt 的一些高级特性，如信号和槽、属性系统、动态属性等，可以在类中工作。下面是对 <code>Q_OBJECT</code> 宏的详细解解：</p>
-<h3 id="1-定义和位置"><a href="#1-定义和位置" class="headerlink" title="1. 定义和位置"></a>1. <strong>定义和位置</strong></h3><p><code>Q_OBJECT</code> 宏必须放在类的 <code>public</code> 或 <code>protected</code> 访问修饰符下方，紧接在类声明的开头。这是因为宏会在类的头文件中生成一些额外的代码，类的元对象系统需要这些代码来实现 Qt 的信号和槽机制。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> : <span class="keyword">public</span> QObject</span><br><span class="line">&#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">MyClass</span><span class="params">(QObject *parent = <span class="literal">nullptr</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">signals:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mySignal</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mySlot</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-元对象系统"><a href="#2-元对象系统" class="headerlink" title="2. 元对象系统"></a>2. <strong>元对象系统</strong></h3><p>当你在一个类中使用 <code>Q_OBJECT</code> 宏时，Qt 的元对象系统会生成一些额外的代码，包括：</p>
-<ul>
-<li><strong>信号和槽机制的支持</strong>：<code>Q_OBJECT</code> 宏让类能够发射信号并处理槽函数。</li>
-<li><strong>动态属性的支持</strong>：允许类在运行时动态地添加和查询属性。</li>
-<li><strong>元对象信息</strong>：提供有关类的运行时信息，如类名、继承关系等。</li>
-</ul>
-<h3 id="3-MOC（Meta-Object-Compiler）"><a href="#3-MOC（Meta-Object-Compiler）" class="headerlink" title="3. MOC（Meta-Object Compiler）"></a>3. <strong>MOC（Meta-Object Compiler）</strong></h3><p><code>Q_OBJECT</code> 宏的主要作用是让 Qt 的 Meta-Object Compiler（MOC）工具生成相关的元对象代码。MOC 工具会读取你的类定义文件，并根据 <code>Q_OBJECT</code> 宏生成一个 <code>.moc</code> 文件，这个文件包含了信号和槽机制的实现代码。在编译过程中，MOC 生成的代码会被编译到最终的二进制文件中。</p>
-<h3 id="4-信号和槽"><a href="#4-信号和槽" class="headerlink" title="4. 信号和槽"></a>4. <strong>信号和槽</strong></h3><p>信号和槽是 Qt 的核心特性，<code>Q_OBJECT</code> 宏使得你可以在类中声明信号和槽，并且在运行时连接它们。信号是事件的通知，而槽是响应这些事件的函数。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明信号</span></span><br><span class="line">signals:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mySignal</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 声明槽</span></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mySlot</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="5-动态属性和其他功能"><a href="#5-动态属性和其他功能" class="headerlink" title="5. 动态属性和其他功能"></a>5. <strong>动态属性和其他功能</strong></h3><p>使用 <code>Q_OBJECT</code> 宏后，你的类还可以利用 Qt 的动态属性系统，允许在运行时设置和获取对象的属性。此外，<code>Q_OBJECT</code> 使得 Qt 能够在运行时查询类的元信息。</p>
-<h3 id="6-编译注意事项"><a href="#6-编译注意事项" class="headerlink" title="6. 编译注意事项"></a>6. <strong>编译注意事项</strong></h3><p>如果你更改了包含 <code>Q_OBJECT</code> 宏的类的定义，你必须重新运行 MOC 并重新编译项目。通常，Qt 的构建系统（如 qmake 或 CMake）会自动处理这个过程。</p>
-<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QObject&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> : <span class="keyword">public</span> QObject</span><br><span class="line">&#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">MyClass</span><span class="params">(QObject *parent = <span class="literal">nullptr</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">signals:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mySignal</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> slots:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">mySlot</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>总之，<code>Q_OBJECT</code> 宏是 Qt 的信号和槽机制、动态属性以及元对象系统的核心，它是实现 Qt 许多功能的基础。</p>
-<h2 id="Qt-connect-函数-详解"><a href="#Qt-connect-函数-详解" class="headerlink" title="Qt connect() 函数 详解"></a>Qt connect() 函数 详解</h2><p><code>connect()</code> 函数是 Qt 信号与槽机制的核心。它用于将信号和槽函数连接起来，使得当某个信号发出时，自动调用与其连接的槽函数。这种机制是 Qt 的基础，用于实现组件之间的松耦合通信，尤其在 GUI 编程中非常常用。</p>
-<h3 id="1-信号与槽机制简介"><a href="#1-信号与槽机制简介" class="headerlink" title="1. 信号与槽机制简介"></a>1. <strong>信号与槽机制简介</strong></h3><p>在 Qt 中，信号（signal）和槽（slot）是一种观察者模式的实现。信号用于通知事件的发生，而槽是用来处理这些事件的函数。当某个对象发出信号时，与之连接的槽函数会被自动调用。</p>
-<h3 id="2-connect-函数的语法"><a href="#2-connect-函数的语法" class="headerlink" title="2. connect() 函数的语法"></a>2. <strong>connect() 函数的语法</strong></h3><p>Qt 的 <code>connect()</code> 函数有多种形式，最常用的语法如下：</p>
-<h4 id="2-1-基于旧版字符串的连接（Qt4-风格）"><a href="#2-1-基于旧版字符串的连接（Qt4-风格）" class="headerlink" title="2.1 基于旧版字符串的连接（Qt4 风格）"></a>2.1 基于旧版字符串的连接（Qt4 风格）</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QObject::<span class="built_in">connect</span>(sender, <span class="built_in">SIGNAL</span>(<span class="built_in">signalName</span>(parameters)), receiver, <span class="built_in">SLOT</span>(<span class="built_in">slotName</span>(parameters)));</span><br></pre></td></tr></table></figure>
-
-<p>这种方法使用 <code>SIGNAL()</code> 和 <code>SLOT()</code> 宏将信号和槽的名称转换为字符串。虽然这种方式在旧版 Qt 中常用，但现在已不推荐使用。</p>
-<h4 id="2-2-基于新信号槽语法（Qt5-及以上）"><a href="#2-2-基于新信号槽语法（Qt5-及以上）" class="headerlink" title="2.2 基于新信号槽语法（Qt5 及以上）"></a>2.2 基于新信号槽语法（Qt5 及以上）</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QObject::<span class="built_in">connect</span>(sender, &amp;SenderClass::signalName, receiver, &amp;ReceiverClass::slotName);</span><br></pre></td></tr></table></figure>
-
-<p>这种方法是类型安全的，编译器会在编译期检查信号和槽的参数匹配情况，并且不需要使用宏，语法更加清晰和安全。</p>
-<h4 id="2-3-使用-Lambda-表达式"><a href="#2-3-使用-Lambda-表达式" class="headerlink" title="2.3 使用 Lambda 表达式"></a>2.3 使用 Lambda 表达式</h4><p>在 Qt5 中，槽函数还可以是一个 Lambda 表达式，非常适合简单的操作：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QObject::<span class="built_in">connect</span>(sender, &amp;SenderClass::signalName, [](parameters) &#123;</span><br><span class="line">    <span class="comment">// Lambda 表达式内的槽函数实现</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-connect-函数的参数详解"><a href="#3-connect-函数的参数详解" class="headerlink" title="3. connect() 函数的参数详解"></a>3. <strong>connect() 函数的参数详解</strong></h3><ul>
-<li>**<code>sender</code>**：发出信号的对象，通常是一个 <code>QObject</code> 或其派生类的实例。</li>
-<li>**<code>signalName</code>**：信号的名称。在旧版语法中，需要用 <code>SIGNAL()</code> 宏包裹；在新版语法中，直接使用指针形式 <code>&amp;SenderClass::signalName</code>。</li>
-<li>**<code>receiver</code>**：接收信号的对象，也是一个 <code>QObject</code> 或其派生类的实例。</li>
-<li>**<code>slotName</code>**：槽函数的名称。在旧版语法中，用 <code>SLOT()</code> 宏包裹；在新版语法中，直接使用指针形式 <code>&amp;ReceiverClass::slotName</code>。</li>
-</ul>
-<h3 id="4-connect-的高级用法"><a href="#4-connect-的高级用法" class="headerlink" title="4. connect() 的高级用法"></a>4. <strong>connect() 的高级用法</strong></h3><ul>
-<li><p><strong>连接到多个槽函数</strong>：一个信号可以连接到多个槽函数，信号发出时，这些槽函数会按连接顺序依次被调用。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">connect</span>(sender, &amp;SenderClass::signalName, receiver1, &amp;ReceiverClass1::slotName);</span><br><span class="line"><span class="built_in">connect</span>(sender, &amp;SenderClass::signalName, receiver2, &amp;ReceiverClass2::slotName);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>连接到同一个槽函数的多个信号</strong>：多个信号可以连接到同一个槽函数，这样无论哪个信号发出，都会调用相同的槽函数。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">connect</span>(sender1, &amp;SenderClass1::signalName, receiver, &amp;ReceiverClass::slotName);</span><br><span class="line"><span class="built_in">connect</span>(sender2, &amp;SenderClass2::signalName, receiver, &amp;ReceiverClass::slotName);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>连接到匿名槽（Lambda 表达式）</strong>：适用于只需处理简单逻辑的场景。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">connect</span>(button, &amp;QPushButton::clicked, []() &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Button clicked!&quot;</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>连接到 Qt 内置信号</strong>：很多 Qt 控件自带常用信号，如按钮的 <code>clicked()</code> 信号、文本框的 <code>textChanged()</code> 信号等。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">connect</span>(button, &amp;QPushButton::clicked, <span class="keyword">this</span>, &amp;MainWindow::onButtonClicked);</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="5-连接失败的原因及解决方法"><a href="#5-连接失败的原因及解决方法" class="headerlink" title="5. 连接失败的原因及解决方法"></a>5. <strong>连接失败的原因及解决方法</strong></h3><ul>
-<li><strong>信号和槽参数不匹配</strong>：信号和槽的参数类型和数量必须一致，否则连接将失败。</li>
-<li><strong>对象生命周期问题</strong>：<code>sender</code> 或 <code>receiver</code> 可能在信号发出前已经被销毁，导致连接失效。</li>
-<li><strong>无效的信号或槽名称</strong>：检查信号和槽是否拼写正确，且使用正确的语法（旧版或新版）。</li>
-<li><strong>类型不兼容</strong>：新版语法下，信号和槽必须是同一个类的成员函数指针。</li>
-</ul>
-<h3 id="6-断开信号与槽的连接"><a href="#6-断开信号与槽的连接" class="headerlink" title="6. 断开信号与槽的连接"></a>6. <strong>断开信号与槽的连接</strong></h3><p>使用 <code>QObject::disconnect()</code> 可以手动断开信号与槽的连接：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QObject::<span class="built_in">disconnect</span>(sender, &amp;SenderClass::signalName, receiver, &amp;ReceiverClass::slotName);</span><br></pre></td></tr></table></figure>
-
-<p>或者直接使用 <code>disconnect(sender)</code> 来断开 <code>sender</code> 发出的所有信号。</p>
-<h3 id="7-connect-的返回值"><a href="#7-connect-的返回值" class="headerlink" title="7. connect() 的返回值"></a>7. <strong>connect() 的返回值</strong></h3><p><code>connect()</code> 函数返回一个 <code>bool</code> 值，表示连接是否成功。通常不需要手动检查返回值，但在复杂或关键场景下，检查返回值可以帮助调试连接失败的原因。</p>
-<h3 id="8-常见示例"><a href="#8-常见示例" class="headerlink" title="8. 常见示例"></a>8. <strong>常见示例</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QPushButton&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QMessageBox&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">a</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">QPushButton <span class="title">button</span><span class="params">(<span class="string">&quot;Click Me&quot;</span>)</span></span>;</span><br><span class="line">    QObject::<span class="built_in">connect</span>(&amp;button, &amp;QPushButton::clicked, [&amp;]() &#123;</span><br><span class="line">        QMessageBox::<span class="built_in">information</span>(<span class="literal">nullptr</span>, <span class="string">&quot;Title&quot;</span>, <span class="string">&quot;Button clicked!&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    button.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> a.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>connect()</code> 是 Qt 信号与槽机制的核心，它允许在不同对象间实现松耦合的事件处理。在 Qt5 及以上版本中，推荐使用新版的指针语法，因为它类型安全、语法简洁且更易于维护。通过灵活使用 <code>connect()</code>，可以极大简化 Qt 程序中的事件处理流程。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -5731,7 +5404,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">629</span>
+          <span class="site-state-item-count">630</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -5744,7 +5417,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">95</span>
+        <span class="site-state-item-count">96</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
