@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 CUDA 中常见的函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CUDA 常见函数">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/18/notes/NVIDIA/CUDA/2025-02-18--%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 CUDA 中常见的函数">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-18T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-03-24T06:41:46.790Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CUDA">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/18/notes/NVIDIA/CUDA/2025-02-18--%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>CUDA 常见函数 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/18/notes/NVIDIA/CUDA/2025-02-18--%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CUDA 常见函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-18 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-18T09:00:00+08:00">2025-02-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-03-24 14:41:46" itemprop="dateModified" datetime="2025-03-24T14:41:46+08:00">2025-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NVIDIA/" itemprop="url" rel="index"><span itemprop="name">NVIDIA</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>CUDA 中常见的函数</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="cudaSetDevice-函数-详解"><a href="#cudaSetDevice-函数-详解" class="headerlink" title="cudaSetDevice() 函数 详解"></a>cudaSetDevice() 函数 详解</h2><h3 id="cudaSetDevice-函数详解"><a href="#cudaSetDevice-函数详解" class="headerlink" title="cudaSetDevice() 函数详解"></a><code>cudaSetDevice()</code> 函数详解</h3><h4 id="1-作用"><a href="#1-作用" class="headerlink" title="1. 作用"></a><strong>1. 作用</strong></h4><p><code>cudaSetDevice(int device)</code> 用于设置当前 CPU 线程要使用的 GPU 设备。在一个系统中可能有多个 GPU，此函数可以让程序选择特定的 GPU 进行计算。</p>
+<h4 id="2-语法"><a href="#2-语法" class="headerlink" title="2. 语法"></a><strong>2. 语法</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cudaError_t <span class="title">cudaSetDevice</span><span class="params">(<span class="type">int</span> device)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>device</code>：要选择的 GPU 设备的索引（从 0 开始）。</li>
+<li>返回值：返回 <code>cudaError_t</code> 类型的错误码，若成功返回 <code>cudaSuccess</code>。</li>
+</ul>
+<h4 id="3-相关说明"><a href="#3-相关说明" class="headerlink" title="3. 相关说明"></a><strong>3. 相关说明</strong></h4><ul>
+<li>必须在调用任何 CUDA API（如 <code>cudaMalloc()</code>、<code>cudaMemcpy()</code>）之前调用 <code>cudaSetDevice()</code>，否则可能会导致错误或影响性能。</li>
+<li>每个 CPU 线程只能绑定一个 GPU 设备，因此 <code>cudaSetDevice()</code> 仅影响当前线程。</li>
+<li>如果没有调用 <code>cudaSetDevice()</code>，CUDA 运行时默认选择 <code>device 0</code>。</li>
+<li>需要确保 <code>device</code> 值在可用的 GPU 范围内（可用 <code>cudaGetDeviceCount()</code> 获取 GPU 总数）。</li>
+</ul>
+<h4 id="4-代码示例"><a href="#4-代码示例" class="headerlink" title="4. 代码示例"></a><strong>4. 代码示例</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cuda_runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> deviceCount;</span><br><span class="line">    <span class="built_in">cudaGetDeviceCount</span>(&amp;deviceCount);</span><br><span class="line">    <span class="keyword">if</span> (deviceCount == <span class="number">0</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;No CUDA devices available.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> deviceId = <span class="number">1</span>; <span class="comment">// 假设想使用第 1 块 GPU</span></span><br><span class="line">    <span class="keyword">if</span> (deviceId &gt;= deviceCount) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Invalid device ID.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cudaError_t err = <span class="built_in">cudaSetDevice</span>(deviceId);</span><br><span class="line">    <span class="keyword">if</span> (err != cudaSuccess) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;cudaSetDevice failed: &quot;</span> &lt;&lt; <span class="built_in">cudaGetErrorString</span>(err) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Using GPU &quot;</span> &lt;&lt; deviceId &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-获取当前设备"><a href="#5-获取当前设备" class="headerlink" title="5. 获取当前设备"></a><strong>5. 获取当前设备</strong></h4><p>可以使用 <code>cudaGetDevice()</code> 获取当前线程绑定的 GPU：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> currentDevice;</span><br><span class="line"><span class="built_in">cudaGetDevice</span>(&amp;currentDevice);</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Current device: &quot;</span> &lt;&lt; currentDevice &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-线程与设备的关系"><a href="#6-线程与设备的关系" class="headerlink" title="6. 线程与设备的关系"></a><strong>6. 线程与设备的关系</strong></h4><ul>
+<li>在 <strong>单线程程序</strong> 中，每个 CPU 线程只能使用一个 GPU。</li>
+<li>在 <strong>多线程程序</strong> 中，不同的 CPU 线程可以绑定到不同的 GPU 以并行计算，但一个线程不能同时使用多个 GPU。</li>
+</ul>
+<h4 id="7-可能的错误"><a href="#7-可能的错误" class="headerlink" title="7. 可能的错误"></a><strong>7. 可能的错误</strong></h4><table>
+<thead>
+<tr>
+<th>错误代码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cudaErrorInvalidDevice</code></td>
+<td><code>device</code> 号超出 GPU 数量范围</td>
+</tr>
+<tr>
+<td><code>cudaErrorSetOnActiveProcess</code></td>
+<td>当前进程已经使用了另一个 GPU（在某些情况下）</td>
+</tr>
+</tbody></table>
+<h4 id="8-结合-cudaGetDeviceCount"><a href="#8-结合-cudaGetDeviceCount" class="headerlink" title="8. 结合 cudaGetDeviceCount()"></a><strong>8. 结合 <code>cudaGetDeviceCount()</code></strong></h4><p>在调用 <code>cudaSetDevice()</code> 之前，建议使用 <code>cudaGetDeviceCount()</code> 确保 <code>device</code> 值合法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> deviceCount;</span><br><span class="line"><span class="built_in">cudaGetDeviceCount</span>(&amp;deviceCount);</span><br><span class="line"><span class="keyword">if</span> (deviceCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">cudaSetDevice</span>(<span class="number">0</span>); <span class="comment">// 选择第一个 GPU</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="9-总结"><a href="#9-总结" class="headerlink" title="9. 总结"></a><strong>9. 总结</strong></h4><ul>
+<li><code>cudaSetDevice()</code> 用于选择 GPU，必须在 CUDA 相关 API 调用前使用。</li>
+<li>仅对当前 CPU 线程生效。</li>
+<li>在多 GPU 环境下，可结合 <code>cudaGetDeviceCount()</code> 和 <code>cudaGetDevice()</code> 确保选择有效设备。</li>
+</ul>
+<p>这样可以有效管理多 GPU 计算资源，提高 CUDA 程序的灵活性和性能。 🚀</p>
+<h2 id="cudaMalloc-函数-详解"><a href="#cudaMalloc-函数-详解" class="headerlink" title="cudaMalloc() 函数 详解"></a>cudaMalloc() 函数 详解</h2><h1 id="cudaMalloc-函数详解"><a href="#cudaMalloc-函数详解" class="headerlink" title="cudaMalloc() 函数详解"></a><strong><code>cudaMalloc()</code> 函数详解</strong></h1><h2 id="1-作用-1"><a href="#1-作用-1" class="headerlink" title="1. 作用"></a><strong>1. 作用</strong></h2><p><code>cudaMalloc()</code> 用于在 GPU 设备（Device）上分配全局内存（Global Memory）。这是 CUDA 中最基础的内存管理函数之一。</p>
+<hr>
+<h2 id="2-语法-1"><a href="#2-语法-1" class="headerlink" title="2. 语法"></a><strong>2. 语法</strong></h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cudaError_t <span class="title">cudaMalloc</span><span class="params">(<span class="type">void</span>** devPtr, <span class="type">size_t</span> size)</span></span>;</span><br></pre></td></tr></table></figure>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a><strong>参数</strong></h3><ul>
+<li><code>devPtr</code>：指向存储设备内存地址的指针变量（即指向 <code>void*</code> 的指针）。</li>
+<li><code>size</code>：要分配的内存大小（以字节为单位）。</li>
+</ul>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li><strong><code>cudaSuccess</code>（0）</strong>：分配成功。</li>
+<li><strong>其他错误码</strong>（如 <code>cudaErrorMemoryAllocation</code>）：分配失败。</li>
+</ul>
+<hr>
+<h2 id="3-使用示例"><a href="#3-使用示例" class="headerlink" title="3. 使用示例"></a><strong>3. 使用示例</strong></h2><h3 id="1-在-GPU-设备上分配内存"><a href="#1-在-GPU-设备上分配内存" class="headerlink" title="(1) 在 GPU 设备上分配内存"></a><strong>(1) 在 GPU 设备上分配内存</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cuda_runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span>* d_ptr;  <span class="comment">// 设备指针</span></span><br><span class="line">    <span class="type">size_t</span> size = <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>);  <span class="comment">// 分配 100 个 int</span></span><br><span class="line"></span><br><span class="line">    cudaError_t err = <span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_ptr, size);</span><br><span class="line">    <span class="keyword">if</span> (err != cudaSuccess) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;cudaMalloc failed: &quot;</span> &lt;&lt; <span class="built_in">cudaGetErrorString</span>(err) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Memory allocated on GPU.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放设备内存</span></span><br><span class="line">    <span class="built_in">cudaFree</span>(d_ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-相关注意事项"><a href="#4-相关注意事项" class="headerlink" title="4. 相关注意事项"></a><strong>4. 相关注意事项</strong></h2><h3 id="1-设备指针不能直接在主机（CPU）端访问"><a href="#1-设备指针不能直接在主机（CPU）端访问" class="headerlink" title="(1) 设备指针不能直接在主机（CPU）端访问"></a><strong>(1) 设备指针不能直接在主机（CPU）端访问</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>* d_ptr;</span><br><span class="line"><span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_ptr, <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">std::cout &lt;&lt; *d_ptr &lt;&lt; std::endl;  <span class="comment">// ❌ 错误！设备指针不能直接解引用</span></span><br></pre></td></tr></table></figure>
+<p><strong>正确做法</strong>：使用 <code>cudaMemcpy()</code> 将数据拷贝到主机：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> h_val;</span><br><span class="line"><span class="built_in">cudaMemcpy</span>(&amp;h_val, d_ptr, <span class="built_in">sizeof</span>(<span class="type">int</span>), cudaMemcpyDeviceToHost);</span><br><span class="line">std::cout &lt;&lt; h_val &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-设备内存需要手动释放"><a href="#2-设备内存需要手动释放" class="headerlink" title="(2) 设备内存需要手动释放"></a><strong>(2) 设备内存需要手动释放</strong></h3><ul>
+<li>使用 <code>cudaFree()</code> 释放内存：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cudaFree</span>(d_ptr);</span><br></pre></td></tr></table></figure></li>
+<li>如果忘记释放，会导致 <strong>显存泄漏（Memory Leak）</strong>。</li>
+</ul>
+<hr>
+<h3 id="3-检查-cudaMalloc-是否成功"><a href="#3-检查-cudaMalloc-是否成功" class="headerlink" title="(3) 检查 cudaMalloc() 是否成功"></a><strong>(3) 检查 <code>cudaMalloc()</code> 是否成功</strong></h3><ul>
+<li><strong>可能的错误</strong><ul>
+<li><code>cudaErrorMemoryAllocation</code>：显存不足</li>
+<li><code>cudaErrorInvalidValue</code>：<code>size</code> 为 0</li>
+<li><code>cudaErrorInvalidDevicePointer</code>：传入的指针非法</li>
+</ul>
+</li>
+<li><strong>建议：始终检查返回值</strong><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_ptr, size) != cudaSuccess) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Memory allocation failed!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="4-计算设备内存的使用情况"><a href="#4-计算设备内存的使用情况" class="headerlink" title="(4) 计算设备内存的使用情况"></a><strong>(4) 计算设备内存的使用情况</strong></h3><ul>
+<li><code>cudaMemGetInfo()</code> 可用于查询 GPU 剩余内存：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> freeMem, totalMem;</span><br><span class="line"><span class="built_in">cudaMemGetInfo</span>(&amp;freeMem, &amp;totalMem);</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;Free memory: &quot;</span> &lt;&lt; freeMem / (<span class="number">1024</span> * <span class="number">1024</span>) &lt;&lt; <span class="string">&quot; MB, &quot;</span></span><br><span class="line">          &lt;&lt; <span class="string">&quot;Total memory: &quot;</span> &lt;&lt; totalMem / (<span class="number">1024</span> * <span class="number">1024</span>) &lt;&lt; <span class="string">&quot; MB&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="5-多-GPU-环境"><a href="#5-多-GPU-环境" class="headerlink" title="(5) 多 GPU 环境"></a><strong>(5) 多 GPU 环境</strong></h3><ul>
+<li><code>cudaMalloc()</code> 仅在当前设备上分配内存。</li>
+<li>若使用多 GPU，可先调用 <code>cudaSetDevice(deviceId)</code> 切换 GPU：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cudaSetDevice</span>(<span class="number">1</span>);  <span class="comment">// 选择 GPU 1</span></span><br><span class="line"><span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_ptr, size);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="5-cudaMalloc-与其他-CUDA-内存管理函数的比较"><a href="#5-cudaMalloc-与其他-CUDA-内存管理函数的比较" class="headerlink" title="5. cudaMalloc() 与其他 CUDA 内存管理函数的比较"></a><strong>5. <code>cudaMalloc()</code> 与其他 CUDA 内存管理函数的比较</strong></h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+<th>适用场景</th>
+<th>释放方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cudaMalloc()</code></td>
+<td>设备全局内存分配</td>
+<td>GPU 计算数据存储</td>
+<td><code>cudaFree()</code></td>
+</tr>
+<tr>
+<td><code>cudaMallocHost()</code></td>
+<td>主机页锁定内存（可用于异步拷贝）</td>
+<td><code>cudaMemcpyAsync()</code></td>
+<td><code>cudaFreeHost()</code></td>
+</tr>
+<tr>
+<td><code>cudaMallocManaged()</code></td>
+<td>统一内存（主机和设备共享）</td>
+<td>统一内存编程</td>
+<td><code>cudaFree()</code></td>
+</tr>
+<tr>
+<td><code>cudaMallocPitch()</code></td>
+<td>2D 数组分配，优化对齐</td>
+<td>处理图像等 2D 数据</td>
+<td><code>cudaFree()</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h2><ul>
+<li><code>cudaMalloc()</code> 在 GPU 上分配全局内存，返回设备指针。</li>
+<li>不能直接访问设备指针，需要使用 <code>cudaMemcpy()</code> 进行数据传输。</li>
+<li>需要手动释放 <code>cudaFree()</code>，否则会导致显存泄漏。</li>
+<li>在多 GPU 环境下，应先调用 <code>cudaSetDevice()</code> 选择目标 GPU。</li>
+</ul>
+<p>合理使用 <code>cudaMalloc()</code> 进行显存管理，可以提高 CUDA 程序的性能和稳定性。 🚀</p>
+<h2 id="cudaStreamCreate-函数-详解"><a href="#cudaStreamCreate-函数-详解" class="headerlink" title="cudaStreamCreate() 函数 详解"></a>cudaStreamCreate() 函数 详解</h2><h1 id="cudaStreamCreate-函数详解"><a href="#cudaStreamCreate-函数详解" class="headerlink" title="cudaStreamCreate() 函数详解"></a><strong><code>cudaStreamCreate()</code> 函数详解</strong></h1><h2 id="1-作用-2"><a href="#1-作用-2" class="headerlink" title="1. 作用"></a><strong>1. 作用</strong></h2><p><code>cudaStreamCreate()</code> 用于创建 CUDA <strong>流（Stream）</strong>，流是一种异步执行的队列，可以在同一 GPU 上同时执行多个任务，实现 <strong>并行计算</strong> 和 <strong>异步执行</strong>。</p>
+<hr>
+<h2 id="2-语法-2"><a href="#2-语法-2" class="headerlink" title="2. 语法"></a><strong>2. 语法</strong></h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cudaError_t <span class="title">cudaStreamCreate</span><span class="params">(cudaStream_t* pStream)</span></span>;</span><br></pre></td></tr></table></figure>
+<h3 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a><strong>参数</strong></h3><ul>
+<li><code>pStream</code>：指向 <code>cudaStream_t</code> 类型的指针，用于存储创建的流的句柄。</li>
+</ul>
+<h3 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li><code>cudaSuccess</code>：流创建成功。</li>
+<li>其他 <code>cudaError_t</code> 错误码：创建失败，例如 <strong>内存不足</strong> 或 <strong>CUDA 上下文问题</strong>。</li>
+</ul>
+<hr>
+<h2 id="3-使用示例-1"><a href="#3-使用示例-1" class="headerlink" title="3. 使用示例"></a><strong>3. 使用示例</strong></h2><h3 id="1-创建并使用-CUDA-流"><a href="#1-创建并使用-CUDA-流" class="headerlink" title="(1) 创建并使用 CUDA 流"></a><strong>(1) 创建并使用 CUDA 流</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cuda_runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cudaStream_t stream;</span><br><span class="line">    cudaError_t err = <span class="built_in">cudaStreamCreate</span>(&amp;stream);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (err != cudaSuccess) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;cudaStreamCreate failed: &quot;</span> &lt;&lt; <span class="built_in">cudaGetErrorString</span>(err) &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;CUDA Stream created successfully!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用流进行异步计算（示例代码略）</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放流</span></span><br><span class="line">    <span class="built_in">cudaStreamDestroy</span>(stream);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-相关函数"><a href="#4-相关函数" class="headerlink" title="4. 相关函数"></a><strong>4. 相关函数</strong></h2><h3 id="1-cudaStreamDestroy-销毁-CUDA-流"><a href="#1-cudaStreamDestroy-销毁-CUDA-流" class="headerlink" title="(1) cudaStreamDestroy() - 销毁 CUDA 流"></a><strong>(1) <code>cudaStreamDestroy()</code> - 销毁 CUDA 流</strong></h3><p>每个创建的 CUDA 流在使用后应当释放：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cudaStreamDestroy</span>(stream);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-cudaMemcpyAsync-异步拷贝"><a href="#2-cudaMemcpyAsync-异步拷贝" class="headerlink" title="(2) cudaMemcpyAsync() - 异步拷贝"></a><strong>(2) <code>cudaMemcpyAsync()</code> - 异步拷贝</strong></h3><p>流可以与 <code>cudaMemcpyAsync()</code> 结合，实现 <strong>异步数据拷贝</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>* d_data;</span><br><span class="line"><span class="type">int</span> h_data[<span class="number">100</span>];</span><br><span class="line"><span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_data, <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>));</span><br><span class="line"></span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_data, h_data, <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>), cudaMemcpyHostToDevice, stream);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-cudaStreamSynchronize-等待流完成"><a href="#3-cudaStreamSynchronize-等待流完成" class="headerlink" title="(3) cudaStreamSynchronize() - 等待流完成"></a><strong>(3) <code>cudaStreamSynchronize()</code> - 等待流完成</strong></h3><p>使用 <code>cudaStreamSynchronize()</code> 可以等待特定流中的任务执行完毕：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cudaStreamSynchronize</span>(stream);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-CUDA-流的特点"><a href="#5-CUDA-流的特点" class="headerlink" title="5. CUDA 流的特点"></a><strong>5. CUDA 流的特点</strong></h2><h3 id="1-默认流（cudaStream-t-0-）"><a href="#1-默认流（cudaStream-t-0-）" class="headerlink" title="(1) 默认流（cudaStream_t(0)）"></a><strong>(1) 默认流（<code>cudaStream_t(0)</code>）</strong></h3><ul>
+<li>如果 <strong>不指定流</strong>，CUDA 内核和 <code>cudaMemcpy()</code> 运行在 <strong>默认流（默认队列）</strong> 中，按顺序执行：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cudaMemcpy</span>(d_data, h_data, <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>), cudaMemcpyHostToDevice);</span><br><span class="line">kernel&lt;&lt;&lt;grid, block&gt;&gt;&gt;(d_data);</span><br><span class="line"><span class="built_in">cudaMemcpy</span>(h_data, d_data, <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>), cudaMemcpyDeviceToHost);</span><br></pre></td></tr></table></figure></li>
+<li>这些操作会 <strong>按顺序执行</strong>，下一个任务必须等待上一个任务完成。</li>
+</ul>
+<h3 id="2-用户定义流（异步执行）"><a href="#2-用户定义流（异步执行）" class="headerlink" title="(2) 用户定义流（异步执行）"></a><strong>(2) 用户定义流（异步执行）</strong></h3><ul>
+<li>使用 <code>cudaStreamCreate()</code> 创建 <strong>多个流</strong>，可在同一 GPU 设备上同时执行 <strong>多个任务</strong>：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cudaStream_t stream1, stream2;</span><br><span class="line"><span class="built_in">cudaStreamCreate</span>(&amp;stream1);</span><br><span class="line"><span class="built_in">cudaStreamCreate</span>(&amp;stream2);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在 stream1 中执行内存拷贝</span></span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_data1, h_data1, size, cudaMemcpyHostToDevice, stream1);</span><br><span class="line"><span class="comment">// 在 stream2 中执行不同的任务</span></span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_data2, h_data2, size, cudaMemcpyHostToDevice, stream2);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待两个流完成</span></span><br><span class="line"><span class="built_in">cudaStreamSynchronize</span>(stream1);</span><br><span class="line"><span class="built_in">cudaStreamSynchronize</span>(stream2);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放流</span></span><br><span class="line"><span class="built_in">cudaStreamDestroy</span>(stream1);</span><br><span class="line"><span class="built_in">cudaStreamDestroy</span>(stream2);</span><br></pre></td></tr></table></figure>
+在这种情况下，<strong>数据拷贝和计算可以并行执行</strong>，提高 GPU 利用率。</li>
+</ul>
+<hr>
+<h2 id="6-使用多个-CUDA-流的应用场景"><a href="#6-使用多个-CUDA-流的应用场景" class="headerlink" title="6. 使用多个 CUDA 流的应用场景"></a><strong>6. 使用多个 CUDA 流的应用场景</strong></h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>数据拷贝与计算重叠</strong></td>
+<td><code>cudaMemcpyAsync()</code> 和 Kernel 在不同流中执行，提高效率</td>
+</tr>
+<tr>
+<td><strong>多 Kernel 并行执行</strong></td>
+<td>多个 Kernel 任务放入不同流，提高计算吞吐量</td>
+</tr>
+<tr>
+<td><strong>多线程任务调度</strong></td>
+<td>在多线程程序中，每个线程管理一个 CUDA 流</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="7-cudaStreamCreate-可能的错误"><a href="#7-cudaStreamCreate-可能的错误" class="headerlink" title="7. cudaStreamCreate() 可能的错误"></a><strong>7. <code>cudaStreamCreate()</code> 可能的错误</strong></h2><table>
+<thead>
+<tr>
+<th>错误码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cudaErrorInvalidValue</code></td>
+<td><code>pStream</code> 为空指针</td>
+</tr>
+<tr>
+<td><code>cudaErrorMemoryAllocation</code></td>
+<td>内存不足，无法创建流</td>
+</tr>
+<tr>
+<td><code>cudaErrorInitializationError</code></td>
+<td>CUDA 运行时未正确初始化</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="8-总结"><a href="#8-总结" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h2><ul>
+<li><code>cudaStreamCreate()</code> 创建 <strong>CUDA 流</strong>，用于异步执行任务。</li>
+<li>任务可使用 <code>cudaMemcpyAsync()</code> 或 <code>cudaLaunchKernel()</code> 提交到特定流。</li>
+<li>使用 <code>cudaStreamSynchronize()</code> 等待流完成，使用 <code>cudaStreamDestroy()</code> 释放资源。</li>
+<li>适用于 <strong>数据传输与计算重叠、Kernel 并行执行、多线程任务调度</strong> 等场景。</li>
+</ul>
+<p>合理使用 CUDA 流，可以 <strong>提升 GPU 并行计算效率</strong>，加速深度学习、科学计算等应用！🚀</p>
+<h2 id="cudaMemcpyAsync-函数-详解"><a href="#cudaMemcpyAsync-函数-详解" class="headerlink" title="cudaMemcpyAsync() 函数 详解"></a>cudaMemcpyAsync() 函数 详解</h2><h1 id="cudaMemcpyAsync-函数详解"><a href="#cudaMemcpyAsync-函数详解" class="headerlink" title="cudaMemcpyAsync() 函数详解"></a><strong><code>cudaMemcpyAsync()</code> 函数详解</strong></h1><h2 id="1-作用-3"><a href="#1-作用-3" class="headerlink" title="1. 作用"></a><strong>1. 作用</strong></h2><p><code>cudaMemcpyAsync()</code> 用于在 <strong>主机（Host）</strong> 和 <strong>设备（Device）</strong> 之间进行 <strong>异步</strong> 数据拷贝，与 <code>cudaMemcpy()</code> 不同，它不会阻塞 CPU，而是将拷贝任务放入指定的 <strong>CUDA 流（Stream）</strong> 中，从而实现 <strong>数据传输与计算的重叠</strong>，提高 GPU 计算效率。</p>
+<hr>
+<h2 id="2-语法-3"><a href="#2-语法-3" class="headerlink" title="2. 语法"></a><strong>2. 语法</strong></h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cudaError_t <span class="title">cudaMemcpyAsync</span><span class="params">(<span class="type">void</span>* dst, <span class="type">const</span> <span class="type">void</span>* src, <span class="type">size_t</span> count, cudaMemcpyKind kind, cudaStream_t stream)</span></span>;</span><br></pre></td></tr></table></figure>
+<h3 id="参数-2"><a href="#参数-2" class="headerlink" title="参数"></a><strong>参数</strong></h3><ul>
+<li><code>dst</code>：目标地址（可以是主机或设备内存）。</li>
+<li><code>src</code>：源地址（可以是主机或设备内存）。</li>
+<li><code>count</code>：拷贝的数据大小（以字节为单位）。</li>
+<li><code>kind</code>：数据拷贝的方向，<code>cudaMemcpyKind</code> 枚举值：<ul>
+<li><code>cudaMemcpyHostToDevice</code>（H→D）：从主机拷贝到设备</li>
+<li><code>cudaMemcpyDeviceToHost</code>（D→H）：从设备拷贝到主机</li>
+<li><code>cudaMemcpyDeviceToDevice</code>（D→D）：在设备内存之间拷贝</li>
+<li><code>cudaMemcpyHostToHost</code>（H→H）：在主机内存之间拷贝</li>
+</ul>
+</li>
+<li><code>stream</code>：指定 CUDA <strong>流</strong>，数据拷贝任务将在该流中执行（可使用 <code>0</code> 代表 <strong>默认流</strong>）。</li>
+</ul>
+<h3 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li>**<code>cudaSuccess</code>**：拷贝成功。</li>
+<li>其他 <code>cudaError_t</code> 错误码：如 <code>cudaErrorInvalidValue</code>（参数无效）。</li>
+</ul>
+<hr>
+<h2 id="3-代码示例"><a href="#3-代码示例" class="headerlink" title="3. 代码示例"></a><strong>3. 代码示例</strong></h2><h3 id="1-基本使用"><a href="#1-基本使用" class="headerlink" title="(1) 基本使用"></a><strong>(1) 基本使用</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cuda_runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cudaStream_t stream;</span><br><span class="line">    <span class="built_in">cudaStreamCreate</span>(&amp;stream);  <span class="comment">// 创建 CUDA 流</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> h_data[<span class="number">100</span>], h_result[<span class="number">100</span>];  <span class="comment">// 主机数据</span></span><br><span class="line">    <span class="type">int</span>* d_data;  <span class="comment">// 设备指针</span></span><br><span class="line">    <span class="type">size_t</span> size = <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配设备内存</span></span><br><span class="line">    <span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_data, size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步拷贝数据到设备</span></span><br><span class="line">    <span class="built_in">cudaMemcpyAsync</span>(d_data, h_data, size, cudaMemcpyHostToDevice, stream);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步拷贝数据回主机</span></span><br><span class="line">    <span class="built_in">cudaMemcpyAsync</span>(h_result, d_data, size, cudaMemcpyDeviceToHost, stream);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待流中任务完成</span></span><br><span class="line">    <span class="built_in">cudaStreamSynchronize</span>(stream);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放资源</span></span><br><span class="line">    <span class="built_in">cudaFree</span>(d_data);</span><br><span class="line">    <span class="built_in">cudaStreamDestroy</span>(stream);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Async memcpy completed!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 <code>cudaMemcpyAsync()</code> 执行时，CPU <strong>不会等待</strong> 数据拷贝完成，而是继续执行后续代码。只有当 <code>cudaStreamSynchronize()</code> 被调用时，才会阻塞 CPU 直到流中的任务完成。</p>
+<hr>
+<h2 id="4-cudaMemcpyAsync-与-cudaMemcpy-的区别"><a href="#4-cudaMemcpyAsync-与-cudaMemcpy-的区别" class="headerlink" title="4. cudaMemcpyAsync() 与 cudaMemcpy() 的区别"></a><strong>4. <code>cudaMemcpyAsync()</code> 与 <code>cudaMemcpy()</code> 的区别</strong></h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th><code>cudaMemcpy()</code></th>
+<th><code>cudaMemcpyAsync()</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>同步&#x2F;异步</strong></td>
+<td><strong>同步</strong>（阻塞 CPU）</td>
+<td><strong>异步</strong>（不阻塞 CPU）</td>
+</tr>
+<tr>
+<td><strong>默认流</strong></td>
+<td>使用默认流 <code>0</code></td>
+<td>可以指定流</td>
+</tr>
+<tr>
+<td><strong>计算与拷贝重叠</strong></td>
+<td>❌ <strong>不支持</strong></td>
+<td>✅ <strong>支持</strong>（需要 <code>cudaMemcpyAsync()</code> + <code>cudaStreamSynchronize()</code>）</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>简单数据拷贝</td>
+<td>需要 <strong>并行执行计算 &amp; 传输</strong> 的情况</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-cudaMemcpyAsync-的高级应用"><a href="#5-cudaMemcpyAsync-的高级应用" class="headerlink" title="5. cudaMemcpyAsync() 的高级应用"></a><strong>5. <code>cudaMemcpyAsync()</code> 的高级应用</strong></h2><h3 id="1-计算与数据拷贝重叠"><a href="#1-计算与数据拷贝重叠" class="headerlink" title="(1) 计算与数据拷贝重叠"></a><strong>(1) 计算与数据拷贝重叠</strong></h3><p><code>cudaMemcpyAsync()</code> 的主要优势是 <strong>可以与 Kernel 并行执行</strong>，提高 GPU 计算吞吐量。例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cuda_runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">kernel</span><span class="params">(<span class="type">int</span>* d_data)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> idx = threadIdx.x + blockIdx.x * blockDim.x;</span><br><span class="line">    d_data[idx] *= <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cudaStream_t stream;</span><br><span class="line">    <span class="built_in">cudaStreamCreate</span>(&amp;stream);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> h_data[<span class="number">100</span>], h_result[<span class="number">100</span>];</span><br><span class="line">    <span class="type">int</span>* d_data;</span><br><span class="line">    <span class="type">size_t</span> size = <span class="number">100</span> * <span class="built_in">sizeof</span>(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cudaMalloc</span>((<span class="type">void</span>**)&amp;d_data, size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步拷贝数据到 GPU</span></span><br><span class="line">    <span class="built_in">cudaMemcpyAsync</span>(d_data, h_data, size, cudaMemcpyHostToDevice, stream);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在同一流中启动 Kernel（异步执行）</span></span><br><span class="line">    kernel&lt;&lt;&lt;<span class="number">1</span>, <span class="number">100</span>, <span class="number">0</span>, stream&gt;&gt;&gt;(d_data);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步拷贝结果回主机</span></span><br><span class="line">    <span class="built_in">cudaMemcpyAsync</span>(h_result, d_data, size, cudaMemcpyDeviceToHost, stream);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待流完成</span></span><br><span class="line">    <span class="built_in">cudaStreamSynchronize</span>(stream);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cudaFree</span>(d_data);</span><br><span class="line">    <span class="built_in">cudaStreamDestroy</span>(stream);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里：</p>
+<ol>
+<li><strong>数据拷贝</strong>（<code>cudaMemcpyAsync()</code>）</li>
+<li><strong>计算 Kernel 执行</strong>（<code>kernel&lt;&lt;&lt;&gt;&gt;&gt;</code>）</li>
+<li><strong>拷贝结果回主机</strong>（<code>cudaMemcpyAsync()</code>）<br>都在 <strong>同一流</strong>（<code>stream</code>）中执行，CPU <strong>不会等待</strong>，而是继续执行后续代码，最终 <code>cudaStreamSynchronize()</code> 才会阻塞 CPU，等待所有任务完成。</li>
+</ol>
+<hr>
+<h3 id="2-使用多个流并行执行任务"><a href="#2-使用多个流并行执行任务" class="headerlink" title="(2) 使用多个流并行执行任务"></a><strong>(2) 使用多个流并行执行任务</strong></h3><p>在多流（Multi-stream）环境下，多个 <code>cudaMemcpyAsync()</code> 可用于 <strong>并行数据传输</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cudaStream_t stream1, stream2;</span><br><span class="line"><span class="built_in">cudaStreamCreate</span>(&amp;stream1);</span><br><span class="line"><span class="built_in">cudaStreamCreate</span>(&amp;stream2);</span><br><span class="line"></span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_data1, h_data1, size, cudaMemcpyHostToDevice, stream1);</span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_data2, h_data2, size, cudaMemcpyHostToDevice, stream2);</span><br><span class="line"></span><br><span class="line"><span class="built_in">cudaStreamSynchronize</span>(stream1);</span><br><span class="line"><span class="built_in">cudaStreamSynchronize</span>(stream2);</span><br><span class="line"></span><br><span class="line"><span class="built_in">cudaStreamDestroy</span>(stream1);</span><br><span class="line"><span class="built_in">cudaStreamDestroy</span>(stream2);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>流 <code>stream1</code> 传输 <code>d_data1</code>，流 <code>stream2</code> 传输 <code>d_data2</code>，两个拷贝任务可同时进行。</strong></li>
+<li><strong>如果不使用流，CUDA 任务将会串行执行，不能充分利用 GPU 带宽。</strong></li>
+</ul>
+<hr>
+<h2 id="6-cudaMemcpyAsync-可能的错误"><a href="#6-cudaMemcpyAsync-可能的错误" class="headerlink" title="6. cudaMemcpyAsync() 可能的错误"></a><strong>6. <code>cudaMemcpyAsync()</code> 可能的错误</strong></h2><table>
+<thead>
+<tr>
+<th>错误代码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cudaErrorInvalidValue</code></td>
+<td>参数无效（如 <code>dst</code> 或 <code>src</code> 为空指针）</td>
+</tr>
+<tr>
+<td><code>cudaErrorInvalidMemcpyDirection</code></td>
+<td><code>cudaMemcpyKind</code> 不匹配（如 <code>cudaMemcpyDeviceToHost</code> 但 <code>dst</code> 是设备指针）</td>
+</tr>
+<tr>
+<td><code>cudaErrorMemoryAllocation</code></td>
+<td>设备内存不足</td>
+</tr>
+<tr>
+<td><code>cudaErrorIllegalAddress</code></td>
+<td>访问了未分配或非法的 GPU 地址</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="7-cudaMemcpyAsync-适用场景"><a href="#7-cudaMemcpyAsync-适用场景" class="headerlink" title="7. cudaMemcpyAsync() 适用场景"></a><strong>7. <code>cudaMemcpyAsync()</code> 适用场景</strong></h2><table>
+<thead>
+<tr>
+<th>应用场景</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>数据传输与计算并行</strong></td>
+<td>异步拷贝 + Kernel 计算，减少 CPU&#x2F;GPU 等待时间</td>
+</tr>
+<tr>
+<td><strong>多流任务调度</strong></td>
+<td>在不同流中执行不同的任务，提高 GPU 利用率</td>
+</tr>
+<tr>
+<td><strong>批量数据处理</strong></td>
+<td>预加载数据，提高数据吞吐量</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="8-总结-1"><a href="#8-总结-1" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h2><ul>
+<li><code>cudaMemcpyAsync()</code> <strong>异步</strong> 进行数据拷贝，不会阻塞 CPU。</li>
+<li>需要 <strong>指定 CUDA 流</strong>，否则默认使用 <code>0</code>（默认流）。</li>
+<li>需要 <strong>配合 <code>cudaStreamSynchronize()</code></strong> 确保数据正确性。</li>
+<li>适用于 <strong>数据传输 + 计算并行执行</strong>，提高 GPU 计算吞吐量。</li>
+</ul>
+<p>合理使用 <code>cudaMemcpyAsync()</code> 可以 <strong>提升 CUDA 应用的性能</strong>，尤其在 <strong>深度学习、科学计算、大规模数据处理</strong> 等场景下表现突出！🚀</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CUDA/" rel="tag"># CUDA</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/16/notes/Projects/2025-02-16--LNG%E7%A2%B0%E9%92%89-%E8%A3%85%E6%9D%BF%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%B3%BB%E7%BB%9F/" rel="prev" title="LNG碰钉-装板机器人系统">
+      <i class="fa fa-chevron-left"></i> LNG碰钉-装板机器人系统
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/18/notes/NVIDIA/TensorRT/2025-02-18--%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="next" title="TensorRT 常用函数">
+      TensorRT 常用函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cudaSetDevice-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">cudaSetDevice() 函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cudaSetDevice-%E5%87%BD%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.1.</span> <span class="nav-text">cudaSetDevice() 函数详解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%BD%9C%E7%94%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%AF%AD%E6%B3%95"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E7%9B%B8%E5%85%B3%E8%AF%B4%E6%98%8E"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 相关说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.1.4.</span> <span class="nav-text">4. 代码示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E8%AE%BE%E5%A4%87"><span class="nav-number">2.1.5.</span> <span class="nav-text">5. 获取当前设备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%AE%BE%E5%A4%87%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.1.6.</span> <span class="nav-text">6. 线程与设备的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-%E5%8F%AF%E8%83%BD%E7%9A%84%E9%94%99%E8%AF%AF"><span class="nav-number">2.1.7.</span> <span class="nav-text">7. 可能的错误</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-%E7%BB%93%E5%90%88-cudaGetDeviceCount"><span class="nav-number">2.1.8.</span> <span class="nav-text">8. 结合 cudaGetDeviceCount()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-%E6%80%BB%E7%BB%93"><span class="nav-number">2.1.9.</span> <span class="nav-text">9. 总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cudaMalloc-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">cudaMalloc() 函数 详解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cudaMalloc-%E5%87%BD%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number"></span> <span class="nav-text">cudaMalloc() 函数详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BD%9C%E7%94%A8-1"><span class="nav-number">1.</span> <span class="nav-text">1. 作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%AF%AD%E6%B3%95-1"><span class="nav-number">2.</span> <span class="nav-text">2. 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0"><span class="nav-number">2.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">2.2.</span> <span class="nav-text">返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.</span> <span class="nav-text">3. 使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%9C%A8-GPU-%E8%AE%BE%E5%A4%87%E4%B8%8A%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98"><span class="nav-number">3.1.</span> <span class="nav-text">(1) 在 GPU 设备上分配内存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%9B%B8%E5%85%B3%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">4.</span> <span class="nav-text">4. 相关注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%AE%BE%E5%A4%87%E6%8C%87%E9%92%88%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E5%9C%A8%E4%B8%BB%E6%9C%BA%EF%BC%88CPU%EF%BC%89%E7%AB%AF%E8%AE%BF%E9%97%AE"><span class="nav-number">4.1.</span> <span class="nav-text">(1) 设备指针不能直接在主机（CPU）端访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%AE%BE%E5%A4%87%E5%86%85%E5%AD%98%E9%9C%80%E8%A6%81%E6%89%8B%E5%8A%A8%E9%87%8A%E6%94%BE"><span class="nav-number">4.2.</span> <span class="nav-text">(2) 设备内存需要手动释放</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%A3%80%E6%9F%A5-cudaMalloc-%E6%98%AF%E5%90%A6%E6%88%90%E5%8A%9F"><span class="nav-number">4.3.</span> <span class="nav-text">(3) 检查 cudaMalloc() 是否成功</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%AE%A1%E7%AE%97%E8%AE%BE%E5%A4%87%E5%86%85%E5%AD%98%E7%9A%84%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5"><span class="nav-number">4.4.</span> <span class="nav-text">(4) 计算设备内存的使用情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%A4%9A-GPU-%E7%8E%AF%E5%A2%83"><span class="nav-number">4.5.</span> <span class="nav-text">(5) 多 GPU 环境</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-cudaMalloc-%E4%B8%8E%E5%85%B6%E4%BB%96-CUDA-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%87%BD%E6%95%B0%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">5.</span> <span class="nav-text">5. cudaMalloc() 与其他 CUDA 内存管理函数的比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">6. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cudaStreamCreate-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">cudaStreamCreate() 函数 详解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cudaStreamCreate-%E5%87%BD%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number"></span> <span class="nav-text">cudaStreamCreate() 函数详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BD%9C%E7%94%A8-2"><span class="nav-number">1.</span> <span class="nav-text">1. 作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%AF%AD%E6%B3%95-2"><span class="nav-number">2.</span> <span class="nav-text">2. 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0-1"><span class="nav-number">2.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-1"><span class="nav-number">2.2.</span> <span class="nav-text">返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">3.</span> <span class="nav-text">3. 使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8-CUDA-%E6%B5%81"><span class="nav-number">3.1.</span> <span class="nav-text">(1) 创建并使用 CUDA 流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">4. 相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-cudaStreamDestroy-%E9%94%80%E6%AF%81-CUDA-%E6%B5%81"><span class="nav-number">4.1.</span> <span class="nav-text">(1) cudaStreamDestroy() - 销毁 CUDA 流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-cudaMemcpyAsync-%E5%BC%82%E6%AD%A5%E6%8B%B7%E8%B4%9D"><span class="nav-number">4.2.</span> <span class="nav-text">(2) cudaMemcpyAsync() - 异步拷贝</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-cudaStreamSynchronize-%E7%AD%89%E5%BE%85%E6%B5%81%E5%AE%8C%E6%88%90"><span class="nav-number">4.3.</span> <span class="nav-text">(3) cudaStreamSynchronize() - 等待流完成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-CUDA-%E6%B5%81%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text">5. CUDA 流的特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E9%BB%98%E8%AE%A4%E6%B5%81%EF%BC%88cudaStream-t-0-%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">(1) 默认流（cudaStream_t(0)）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%94%A8%E6%88%B7%E5%AE%9A%E4%B9%89%E6%B5%81%EF%BC%88%E5%BC%82%E6%AD%A5%E6%89%A7%E8%A1%8C%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">(2) 用户定义流（异步执行）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA-CUDA-%E6%B5%81%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">6.</span> <span class="nav-text">6. 使用多个 CUDA 流的应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-cudaStreamCreate-%E5%8F%AF%E8%83%BD%E7%9A%84%E9%94%99%E8%AF%AF"><span class="nav-number">7.</span> <span class="nav-text">7. cudaStreamCreate() 可能的错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">8. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cudaMemcpyAsync-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">cudaMemcpyAsync() 函数 详解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cudaMemcpyAsync-%E5%87%BD%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number"></span> <span class="nav-text">cudaMemcpyAsync() 函数详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BD%9C%E7%94%A8-3"><span class="nav-number">1.</span> <span class="nav-text">1. 作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%AF%AD%E6%B3%95-3"><span class="nav-number">2.</span> <span class="nav-text">2. 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0-2"><span class="nav-number">2.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-2"><span class="nav-number">2.2.</span> <span class="nav-text">返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.</span> <span class="nav-text">3. 代码示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">(1) 基本使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-cudaMemcpyAsync-%E4%B8%8E-cudaMemcpy-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.</span> <span class="nav-text">4. cudaMemcpyAsync() 与 cudaMemcpy() 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-cudaMemcpyAsync-%E7%9A%84%E9%AB%98%E7%BA%A7%E5%BA%94%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">5. cudaMemcpyAsync() 的高级应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%AE%A1%E7%AE%97%E4%B8%8E%E6%95%B0%E6%8D%AE%E6%8B%B7%E8%B4%9D%E9%87%8D%E5%8F%A0"><span class="nav-number">5.1.</span> <span class="nav-text">(1) 计算与数据拷贝重叠</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA%E6%B5%81%E5%B9%B6%E8%A1%8C%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1"><span class="nav-number">5.2.</span> <span class="nav-text">(2) 使用多个流并行执行任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-cudaMemcpyAsync-%E5%8F%AF%E8%83%BD%E7%9A%84%E9%94%99%E8%AF%AF"><span class="nav-number">6.</span> <span class="nav-text">6. cudaMemcpyAsync() 可能的错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-cudaMemcpyAsync-%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">7.</span> <span class="nav-text">7. cudaMemcpyAsync() 适用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93-1"><span class="nav-number">8.</span> <span class="nav-text">8. 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">628</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">96</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
