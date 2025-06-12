@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 cuda相关的理论基础  cuda安装 从NVIDIA官网CUDA下载页面: https:&#x2F;&#x2F;developer.nvidia.com&#x2F;cuda-toolkit-archive 点击CUDA Toolkit 11.0.2下载相应版本的CUDA11.0.2。  依次选择 Linux， x86_64, Ubuntu, 20.04。然后弹出三种安装方法，根据安装经验，推荐采用runfile(loc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cuda_1_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/NVIDIA/CUDA/2024-05-22-cuda_1_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 cuda相关的理论基础  cuda安装 从NVIDIA官网CUDA下载页面: https:&#x2F;&#x2F;developer.nvidia.com&#x2F;cuda-toolkit-archive 点击CUDA Toolkit 11.0.2下载相应版本的CUDA11.0.2。  依次选择 Linux， x86_64, Ubuntu, 20.04。然后弹出三种安装方法，根据安装经验，推荐采用runfile(loc">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.414Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Cuda">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/NVIDIA/CUDA/2024-05-22-cuda_1_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>cuda_1_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/NVIDIA/CUDA/2024-05-22-cuda_1_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          cuda_1_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cuda/" itemprop="url" rel="index"><span itemprop="name">Cuda</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>cuda相关的理论基础</li>
+</ul>
+<h2 id="cuda安装"><a href="#cuda安装" class="headerlink" title="cuda安装"></a>cuda安装</h2><ul>
+<li><p>从NVIDIA官网CUDA下载页面: <a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-toolkit-archive">https://developer.nvidia.com/cuda-toolkit-archive</a> 点击CUDA Toolkit 11.0.2下载相应版本的CUDA11.0.2。</p>
+</li>
+<li><p>依次选择 Linux， x86_64, Ubuntu, 20.04。然后弹出三种安装方法，根据安装经验，推荐采用runfile(local)方法。这是由于CUDA的安装过程中需要很多依赖库文件，CUDA的run文件虽然比另外两种安装方法的文件大，但是他包含了所有的依赖库文件，所以相对来说很容易安装成功。</p>
+</li>
+<li><p>在安装CUDA之前需要先安装一些相互依赖的库文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install freeglut3-dev build-essential libx11-dev libxmu-dev libxi-dev libgl1-mesa-glx libglu1-mesa libglu1-mesa-dev</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下面为安装CUDA11.0.2的Ubuntu安装指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run</span><br><span class="line"><span class="built_in">sudo</span> sh cuda_11.0.2_450.51.05_linux.run</span><br></pre></td></tr></table></figure></li>
+<li><p>运行上面指令后，会弹出如下界面，点击Continue，然后再输入accept</p>
+</li>
+<li><p>接着，如下图所示，在弹出的界面中通过Enter键，取消Driver和450.51.05的安装，然后点击Install，等待</p>
+</li>
+<li><p>配置CUDA的环境变量</p>
+<ul>
+<li>CUDA安装完成之后，需要配置变量环境才能正常使用，在.bashrc文件的最后添加以下CUDA环境变量配置信息<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/usr/local/cuda/bin  </span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="variable">$LD_LIBRARY_PATH</span>:/usr/local/cuda/lib64  </span><br><span class="line"><span class="built_in">export</span> LIBRARY_PATH=<span class="variable">$LIBRARY_PATH</span>:/usr/local/cuda/lib64</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="cudnn安装"><a href="#cudnn安装" class="headerlink" title="cudnn安装"></a>cudnn安装</h2><ul>
+<li>安装CUDA对应的cudnn 网址: <a target="_blank" rel="noopener" href="https://developer.nvidia.com/rdp/cudnn-download">https://developer.nvidia.com/rdp/cudnn-download</a></li>
+<li>对下载的 cudnn-11.0-linux-x64-v8.0.5.39.tgz 进行解压操作，得到一个文件夹cuda，命令为<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf cudnn-11.0-linux-x64-v8.0.5.39.tgz</span><br></pre></td></tr></table></figure></li>
+<li>然后，使用下面两条指令复制cuda文件下的文件到 &#x2F;usr&#x2F;local&#x2F;cuda&#x2F;lib64和 &#x2F;usr&#x2F;local&#x2F;cuda&#x2F;include&#x2F; 中<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> lib/* /usr/local/cuda/lib64/</span><br><span class="line"><span class="built_in">cp</span> include/* /usr/local/cuda/include/</span><br></pre></td></tr></table></figure></li>
+<li>拷贝完成之后，我们可以使用如下的命令查看cuDNN的信息<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /usr/local/cuda-11.0/include/cudnn_version.h | grep CUDNN_MAJOR -A 2</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="cuda-C-编程"><a href="#cuda-C-编程" class="headerlink" title="cuda C 编程"></a>cuda C 编程</h2><ul>
+<li><p>CPU编程和GPU编程的主要区别是程序员对GPU架构的熟悉程度。用并行思维进行思考并对GPU架构有了基本的了解，会使你编写规模达到成百上千个核的并行程序，如同写穿行程序一样简单</p>
+</li>
+<li><p>CUDA中有内存层次和线程层次的概念，使用如下结构有助于你对线程进行更高层次的控制和调度</p>
+<ul>
+<li>内存层次结构</li>
+<li>线程层次结构</li>
+</ul>
+</li>
+<li><p>CUDA抽象了硬件细节，且不需要将应用程序映射到传统图形API上。CUDA核中有三个关键抽象</p>
+<ul>
+<li>线程组的层次结构</li>
+<li>内存的层次结构</li>
+<li>障碍同步</li>
+</ul>
+</li>
+<li><p>目标应该是学习GPU架构的基础及掌握CUDA开发工具和环境</p>
+</li>
+<li><p>CUDA开发环境。NVIDIA为C和C++开发人员提供了综合的开发环境以创建GPU加速应用程序，包括以下几种</p>
+<ul>
+<li>NVIDIA Nsight集成开发环境</li>
+<li>CUDA—GDB命令行调试器</li>
+<li>用于性能分析的可视化和命令行分析器</li>
+<li>CUDA—MEMCHECK内存分析其</li>
+<li>GPU设备管理工具</li>
+</ul>
+</li>
+</ul>
+<h2 id="cuda编程结构"><a href="#cuda编程结构" class="headerlink" title="cuda编程结构"></a>cuda编程结构</h2><ul>
+<li><p>一个典型的CUDA编程结构包括五个主要步骤</p>
+<ul>
+<li>分配GPU内存</li>
+<li>从CPU内存拷贝数据到GPU内存</li>
+<li>调用CUDA内核函数来完成程序指定的运算</li>
+<li>将数据从GPU拷回CPU内存</li>
+<li>释放GPU内存空间</li>
+</ul>
+</li>
+<li><p>CUDA编程模型使用由C语言扩展生成的主时代码在异构计算系统中执行应用程序。</p>
+</li>
+<li><p>在一个异构环境中包含多个CPU和GPU，每个GPU和CPU的内存都由一条PCI-Express总线分隔开。因此需要注意区分以下内容</p>
+<ul>
+<li>主机: CPU及其内存(主机内存)</li>
+<li>设备: GPU及其内存(设备内存)</li>
+</ul>
+</li>
+<li><p>从CUDA6.0开始，NVIDIA提出了名为”统一寻址(Unified Memory)”的编程模型的改进，它连接了主机内存和设备内存空间，可使用单个指针访问CPU和GPU内存，无序彼此之间手动拷贝数据。</p>
+</li>
+<li><p>现在，主要的是应学会如何为主机和设备分配内存空间以及如何在CPU和GPU之间拷贝共享数据。这种程序员管理模式控制下的内存和数据可以优化应用程序并实现硬件系统利用率的最大化</p>
+</li>
+<li><p>内核(kernel)是CUDA编程模型的一个重要组成部分，其代码在GPU上运行。作为一个开发人员，你可以串行执行核函数。在此背景下，CUDA的调度管理程序员在GPU线程上编写核函数。在主机上，基于应用程序数据以及GPU的性能定义如何让设备实现算法功能。这样做的目的是使你专注于算法的逻辑(通过编写串行代码)，且在创建和管理大量的GPU线程时不必拘泥于细节。</p>
+</li>
+<li><p>CUDA编程模型主要是异步的，因此在GPU上进行的运算可以与主机-设备通讯重叠。一个典型的CUDA程序包括由并行代码互补的串行代码。</p>
+<ul>
+<li>串行代码(及任务并行代码)在主机CPU上执行，而并行代码在GPU上执行。</li>
+<li>主机代码按照ANSI C 标准进行编写，而设备代码使用CUDA C进行编写</li>
+<li>你可以将所有的代码统一放在一个源文件中，也可以使用多个源文件来构建应用程序和库</li>
+<li>NVIDIA的C编译器(nvcc)为主机和设备生成可执行代码</li>
+</ul>
+</li>
+</ul>
+<h2 id="cuda-内存管理"><a href="#cuda-内存管理" class="headerlink" title="cuda 内存管理"></a>cuda 内存管理</h2><ul>
+<li><p>CUDA编程模型假设系统是由一个主机和一个设备组成的，而且各自拥有独立的内存。核函数是在设备上运行的。为使你拥有充分的控制权并使系统达到最佳性能，CUDA运行时负责分配和释放设备内存，并且在主机内存和设备内存之间传输数据</p>
+</li>
+<li><p>用于执行GPU内存分配的是cudaMalloc函数，其函数原型为:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cudaError_t <span class="title function_">cudaMalloc</span><span class="params">(<span class="type">void</span>** devPtr, <span class="type">size_t</span> size)</span></span><br></pre></td></tr></table></figure></li>
+<li><p>该函数负责向设备分配一定字节的线性内存，并以devPtr的形式返回指向锁分配内存的指针。</p>
+</li>
+<li><p>cudaMalloc与标准C语言中的malloc函数几乎一样，只是次函数在GPU的内存里分配内存。</p>
+</li>
+<li><p>cudaMemcpy函数负责主机和设备之间的数据传输，其函数原型为:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cudaError_t <span class="title function_">cudaMemcpy</span><span class="params">(<span class="type">void</span>* dst, <span class="type">const</span> <span class="type">void</span>* src, <span class="type">size_t</span> count, cudaMemcpyKind kind)</span></span><br></pre></td></tr></table></figure></li>
+<li><p>次函数从src指向的源存储区复制一定数量的字节到dst指向的目标存储区。复制方向由kind指定，其中的kind有以下几种</p>
+<ul>
+<li>cudaMemcpyHostToHost</li>
+<li>cudaMemcpyHostToDevice</li>
+<li>cudaMemcpyDeviceToHost</li>
+<li>cudaMemcpyDeviceToDevice</li>
+</ul>
+</li>
+<li><p>这个函数以同步方式执行，因为在cudaMemcpy函数返回以及传输操作完成之前主机应用程序是阻塞的</p>
+</li>
+<li><p>除了内核启动之外的CUDA调用都会返回一个错误的枚举类型cudaError_t</p>
+<ul>
+<li>如果GPU内存分配成功，函数返回cudaSuccess</li>
+<li>否则返回cudaErrorMemoryAllocation</li>
+</ul>
+</li>
+<li><p>可以使用CUDA运行时函数将错误代码转化为可读的错误消息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">cudaGetErrorString</span><span class="params">(cudaError_t error)</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在GPU内存层次结构中，最主要的两种内存是全局内存和共享内存。</p>
+<ul>
+<li>全局内存类似于CPU的系统内存</li>
+<li>共享内存类似于CPU的缓存</li>
+</ul>
+</li>
+<li><p>GPU的共享内存可以由CUDA C的内核直接控制</p>
+</li>
+</ul>
+<h2 id="cuda-线程管理"><a href="#cuda-线程管理" class="headerlink" title="cuda 线程管理"></a>cuda 线程管理</h2><ul>
+<li><p>当核函数在主机端启动时，它的执行会移动到设备上，此时设备中会产生大量的线程并且每个线程都执行由核函数指定的语句。</p>
+</li>
+<li><p>由一个内核启动所产生的所有线程统称为一个网格。同一网格中的所有线程共享相同的全局内存空间。</p>
+</li>
+<li><p>一个网格由多个线程块构成，一个线程块包含一组线程，同一线程快内的线程写作可以通过以下方式来实现</p>
+<ul>
+<li>同步</li>
+<li>共享内存</li>
+</ul>
+</li>
+<li><p>不同块内的线程不能协作</p>
+</li>
+<li><p>线程依靠以下两个坐标变量来区分彼此</p>
+<ul>
+<li>blockIdx(线程块在线程格内的索引)</li>
+<li>threadIdx(块内的线程索引)</li>
+</ul>
+</li>
+<li><p>这些变量是核函数中需要预初始化的内置变量。当执行一个核函数时，CUDA运行时为每个线程分配坐标变量blockIdx和threadIdx。基于这些坐标，你可以将部分数据分配给不同的线程</p>
+</li>
+</ul>
+<h2 id="启动一个CUDA核函数"><a href="#启动一个CUDA核函数" class="headerlink" title="启动一个CUDA核函数"></a>启动一个CUDA核函数</h2><ul>
+<li><p>CUDA内核调用是对C语言函数调用语句的延伸，<code>&lt;&lt;&lt;&gt;&gt;&gt;</code>运算符内是核函数的执行配置</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel_name &lt;&lt;&lt;grid, block&gt;&gt;&gt;(argument <span class="built_in">list</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>利用执行配置可以指定线程在GPU上调度运行的方式。执行配置的第一个值是网格维度，也就是启动块的数目。第二个值是块维度，也就是每个块中线程的数目。通过指定网格和块的维度，你可以进行以下配置:</p>
+<ul>
+<li>内核中线程的数目</li>
+<li>内核中使用的线程布局</li>
+</ul>
+</li>
+<li><p>同一个块中的线程之间可以相互协作，不同块内的线程不能协作。</p>
+</li>
+<li><p>核函数的调用与主机线程是异步的。核函数调用结束后，控制权立刻返回给主机端。你可以调用以下函数来强制主机端程序等待所有的核函数执行结束</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cudaError_t <span class="title function_">cudaDeviceSynchronize</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一些cuda运行时API在主机和设备之间是隐式同步的。当使用cudaMemory函数在主机和设备之间拷贝数据时，主机端隐式同步，即主机端程序必须等待数据拷贝完成后才能继续执行程序。</p>
+</li>
+<li><p>不同于C语言的函数调用，所有的CUDA核函数的启动都是异步的。CUDA内核调用完成后，控制权立刻返回给CPU</p>
+</li>
+</ul>
+<h2 id="编写核函数"><a href="#编写核函数" class="headerlink" title="编写核函数"></a>编写核函数</h2><ul>
+<li><p>核函数是在设备端执行的代码。在核函数中，需要为一个线程规定要进行的计算以及要进行的数据访问。当核函数被调用时，许多不同的CUDA线程并行执行同一个计算任务。以下是用__global__声明定义核函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__global__ <span class="type">void</span> <span class="title function_">kernel_name</span><span class="params">(argument <span class="built_in">list</span>)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>函数类型限定符指定一个函数在主机上执行还是在设备上执行，以及可被主机调用还是被设备调用</p>
+<ul>
+<li><strong>global</strong> : 在设备端执行 可从主机端调用,也可以从计算能力为3的设备中调用 必须有一个void返回类型</li>
+<li><strong>device</strong> : 在设备段执行 仅能从设备端调用</li>
+<li><strong>host</strong>   : 在主机端执行 仅能从主机端调用</li>
+</ul>
+</li>
+<li><p>__device__和__host__限定符可以一起使用，这样函数可以同时在主机和设备端进行编译</p>
+</li>
+<li><p>CUDA核函数的限制</p>
+<ul>
+<li>只能访问设备内存</li>
+<li>必须具有void返回类型</li>
+<li>不支持可变数量的参数</li>
+<li>不支持静态变量</li>
+<li>显示异步行为</li>
+</ul>
+</li>
+</ul>
+<h2 id="CUDA-处理错误"><a href="#CUDA-处理错误" class="headerlink" title="CUDA 处理错误"></a>CUDA 处理错误</h2><ul>
+<li><p>由于许多CUDA调用是异步的，所以有时可能很难确定某个错误是由哪一步程序引起的。使用宏可以检查核函数的错误</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CHECK(cudaMemory(d_c, gpuRef, nBytes, cudaMemcpyHostToDevice));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果内存拷贝或之前的异步操作产生了错误，这个宏会报告错误代码并输出一个可读信息，然后停止程序。</p>
+</li>
+<li><p>也可以用下述方法，在核函数调用后检查核函数错误</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kernel_function&lt;&lt;&lt;grid, block&gt;&gt;&gt;(argument <span class="built_in">list</span>);</span><br><span class="line">CHECK(cudaDeviceSynchronize());</span><br></pre></td></tr></table></figure></li>
+<li><p>CHECK(cudaDeviceSynchronize())会阻塞主机端线程的运行，直到设备端所有的请求任务都结束，并确保最后的核函数启动部分不会出错。</p>
+</li>
+</ul>
+<h2 id="用nvprof工具计时"><a href="#用nvprof工具计时" class="headerlink" title="用nvprof工具计时"></a>用nvprof工具计时</h2><ul>
+<li>自CUDA5.0以来，NVIDIA提供了一个名为nvprof的命令行分析工具，可以帮助从应用程序的CPU核GPU活动情况中获取时间线信息，其包括内核执行，内存传输以及CUDA API的调用，其用法如下<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvprof [nvprof_args] &lt;application&gt; [application_args]</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="设备管理"><a href="#设备管理" class="headerlink" title="设备管理"></a>设备管理</h2><ul>
+<li><p>NVIDIA提供了几个查询和管理GPU设备的方法。学会如何查询GPU设备信息是很重要的，因为在运行时你可以使用它来帮助设置内核执行配置</p>
+</li>
+<li><p>两种方法学习查询和管理GPU设备</p>
+<ul>
+<li>CUDA运行时API函数</li>
+<li>NVIDIA系统管理界面(nvidia-smi)命令行程序</li>
+</ul>
+</li>
+<li><p>使用以下函数查询关于GPU设备的所有信息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cudaError_t <span class="title function_">cudaGetDeviceProperties</span><span class="params">(cudaDeviceProp* prop, <span class="type">int</span> device)</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>cudaDeviceProp结构体返回GPU设备的属性。</p>
+</li>
+<li><p>使用nvidia-smi查询GPU信息</p>
+<ul>
+<li>要确定系统中安装了多少个GPU以及每个GPU的设备ID，可以使用以下命令<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvidia-smi -L</span><br></pre></td></tr></table></figure></li>
+<li>使用以下命令获取GPU 0的详细信息<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvidia-smi -q -i 0</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="cuda-cudnn-tensorrt-之间存在什么关系"><a href="#cuda-cudnn-tensorrt-之间存在什么关系" class="headerlink" title="cuda cudnn tensorrt 之间存在什么关系"></a>cuda cudnn tensorrt 之间存在什么关系</h2><p>CUDA（Compute Unified Device Architecture）、cuDNN（CUDA Deep Neural Network）、和TensorRT（TensorRT）都是与GPU计算和深度学习相关的 NVIDIA 技术。</p>
+<ol>
+<li><p><strong>CUDA（Compute Unified Device Architecture）</strong>:</p>
+<ul>
+<li>CUDA 是 NVIDIA 提供的并行计算平台和编程模型，允许开发者使用通用编程语言（如C&#x2F;C++和Fortran）来编写支持GPU加速的程序。</li>
+<li>CUDA 提供了 GPU 计算的基础设施，包括 GPU 内核函数、内存管理、线程调度等。</li>
+</ul>
+</li>
+<li><p><strong>cuDNN（CUDA Deep Neural Network）</strong>:</p>
+<ul>
+<li>cuDNN 是 NVIDIA 提供的深度学习库，专门用于 GPU 加速的深度神经网络训练和推理。</li>
+<li>它优化了深度学习算法的实现，提供了高性能的 GPU 实现，包括卷积、池化、归一化等操作，以加速深度学习模型的训练和推理过程。</li>
+</ul>
+</li>
+<li><p><strong>TensorRT（Tensor Runtime）</strong>:</p>
+<ul>
+<li>TensorRT 是 NVIDIA 提供的用于高性能深度学习推理的库。它通过对模型进行优化和精简，以减少推理时的延迟和提高推理性能。</li>
+<li>TensorRT 可以与 cuDNN 结合使用，对深度学习模型进行加速，同时还支持 INT8 等低精度推理。</li>
+</ul>
+</li>
+</ol>
+<p>关系：</p>
+<ul>
+<li>CUDA 提供了底层的 GPU 计算基础架构，cuDNN 利用 CUDA 提供的加速功能实现深度学习操作的高性能实现。</li>
+<li>TensorRT 则建立在 CUDA 和 cuDNN 的基础上，专注于优化深度学习模型的推理过程，通过减少模型的计算负载和内存占用来提高推理性能。 TensorRT 还可以与 cuDNN 配合使用，以进一步优化深度学习模型的推理。</li>
+</ul>
+<p>总体而言，CUDA 提供了底层的 GPU 编程能力，cuDNN 是在 CUDA 上构建的深度学习库，而 TensorRT 是专注于优化深度学习推理的高性能库。</p>
+<h2 id="C-cuda库是什么"><a href="#C-cuda库是什么" class="headerlink" title="C++ cuda库是什么"></a>C++ cuda库是什么</h2><p>在C++中，”CUDA库”通常指的是NVIDIA提供的CUDA（Compute Unified Device Architecture）工具包，它是用于并行计算的一组工具和API。CUDA库使得开发人员能够在NVIDIA GPU上进行通用目的的并行计算。</p>
+<p>CUDA库包括以下主要组件：</p>
+<ol>
+<li><p><strong>CUDA Runtime库：</strong> 提供了一系列C语言风格的API，允许在CUDA设备（GPU）上执行并行计算。开发人员使用这些API来管理设备内存、启动GPU内核函数等。</p>
+</li>
+<li><p><strong>CUDA Driver库：</strong> 提供了与硬件交互的低级别接口，允许对GPU进行更直接的控制。一般情况下，开发人员更常用CUDA Runtime库，而不是直接使用Driver库。</p>
+</li>
+<li><p><strong>cuBLAS：</strong> 针对线性代数运算的CUDA库，提供了一组高性能的基本线性代数子程序（BLAS）。</p>
+</li>
+<li><p><strong>cuFFT：</strong> 针对快速傅里叶变换（FFT）的CUDA库，用于高性能的FFT计算。</p>
+</li>
+<li><p><strong>cuDNN：</strong> 深度神经网络库，提供了一组高性能的深度学习基本操作和算法，用于在GPU上进行深度学习推理和训练。</p>
+</li>
+<li><p><strong>NVRTC（NVIDIA Runtime Compiler）：</strong> 允许在运行时将CUDA C源代码编译为GPU代码的库。</p>
+</li>
+</ol>
+<p>在使用CUDA库进行开发时，通常需要安装NVIDIA的GPU驱动、CUDA工具包以及适当版本的cuBLAS、cuFFT等库。开发人员可以使用CUDA C&#x2F;C++编写GPU内核函数，并通过调用CUDA库中的API来执行并行计算任务。</p>
+<p>以下是一个简单的示例，展示了在C++中使用CUDA Runtime库执行向量加法的基本步骤：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// CUDA kernel函数，执行向量加法</span></span><br><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">vectorAddition</span><span class="params">(<span class="type">float</span>* a, <span class="type">float</span>* b, <span class="type">float</span>* result, <span class="type">int</span> size)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> idx = threadIdx.x + blockIdx.x * blockDim.x;</span><br><span class="line">    <span class="keyword">if</span> (idx &lt; size) &#123;</span><br><span class="line">        result[idx] = a[idx] + b[idx];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> size = <span class="number">1024</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> blockSize = <span class="number">256</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配主机内存</span></span><br><span class="line">    <span class="type">float</span>* hostA = <span class="keyword">new</span> <span class="type">float</span>[size];</span><br><span class="line">    <span class="type">float</span>* hostB = <span class="keyword">new</span> <span class="type">float</span>[size];</span><br><span class="line">    <span class="type">float</span>* hostResult = <span class="keyword">new</span> <span class="type">float</span>[size];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化输入数据</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        hostA[i] = i;</span><br><span class="line">        hostB[i] = <span class="number">2</span> * i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配设备内存</span></span><br><span class="line">    <span class="type">float</span>* deviceA, *deviceB, *deviceResult;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;deviceA, size * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;deviceB, size * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;deviceResult, size * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将输入数据从主机复制到设备</span></span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(deviceA, hostA, size * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyHostToDevice);</span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(deviceB, hostB, size * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyHostToDevice);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 启动CUDA kernel</span></span><br><span class="line">    vectorAddition&lt;&lt;&lt;(size + blockSize - <span class="number">1</span>) / blockSize, blockSize&gt;&gt;&gt;(deviceA, deviceB, deviceResult, size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将结果从设备复制到主机</span></span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(hostResult, deviceResult, size * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyDeviceToHost);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印结果</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        std::cout &lt;&lt; hostResult[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放内存</span></span><br><span class="line">    <span class="keyword">delete</span>[] hostA;</span><br><span class="line">    <span class="keyword">delete</span>[] hostB;</span><br><span class="line">    <span class="keyword">delete</span>[] hostResult;</span><br><span class="line">    <span class="built_in">cudaFree</span>(deviceA);</span><br><span class="line">    <span class="built_in">cudaFree</span>(deviceB);</span><br><span class="line">    <span class="built_in">cudaFree</span>(deviceResult);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述示例使用CUDA Runtime库执行向量加法，其中CUDA kernel函数在GPU上并行执行。请注意，CUDA开发涉及到更多的细节和概念，这里只是一个简单的入门示例。</p>
+<h2 id="C-cuda库-详解"><a href="#C-cuda库-详解" class="headerlink" title="C++ cuda库 详解"></a>C++ cuda库 详解</h2><p>CUDA（Compute Unified Device Architecture）是由NVIDIA提供的用于通用目的的并行计算框架。它允许开发人员使用C++或CUDA C等编程语言在NVIDIA GPU上执行并行计算任务。以下是关于CUDA库的一些详细信息：</p>
+<h3 id="主要组件："><a href="#主要组件：" class="headerlink" title="主要组件："></a>主要组件：</h3><ol>
+<li><p><strong>CUDA Runtime库：</strong> 提供了一系列C语言风格的API，用于在CUDA设备上执行并行计算。这包括设备管理、内存分配和释放、CUDA核函数的启动等功能。开发人员通常使用这些API进行CUDA编程。</p>
+</li>
+<li><p><strong>CUDA Driver库：</strong> 提供了更低级别的接口，允许直接与硬件进行交互。一般情况下，开发人员更多地使用CUDA Runtime库，而不是直接使用Driver库。</p>
+</li>
+<li><p><strong>cuBLAS（CUDA Basic Linear Algebra Subroutines）：</strong> 面向线性代数操作的库，提供高性能的基本线性代数子程序（BLAS）。</p>
+</li>
+<li><p><strong>cuFFT（CUDA Fast Fourier Transform）：</strong> 针对快速傅立叶变换（FFT）的库，用于高性能的FFT计算。</p>
+</li>
+<li><p><strong>cuRAND：</strong> 提供随机数生成功能的库，包括伪随机数生成器、分布等。</p>
+</li>
+<li><p><strong>cuSPARSE：</strong> 面向稀疏矩阵操作的库，提供高性能的稀疏矩阵运算。</p>
+</li>
+<li><p><strong>NVRTC（NVIDIA Runtime Compiler）：</strong> 允许在运行时将CUDA C源代码编译为GPU代码的库。这对于动态生成GPU核函数是有用的。</p>
+</li>
+</ol>
+<h3 id="CUDA编程模型："><a href="#CUDA编程模型：" class="headerlink" title="CUDA编程模型："></a>CUDA编程模型：</h3><p>CUDA编程模型涉及在主机（CPU）和设备（GPU）之间进行数据传输，以及在GPU上并行执行核函数。以下是CUDA编程的一般步骤：</p>
+<ol>
+<li><p><strong>分配设备内存：</strong> 使用<code>cudaMalloc</code>等CUDA Runtime函数在GPU上分配内存。</p>
+</li>
+<li><p><strong>将数据从主机复制到设备：</strong> 使用<code>cudaMemcpy</code>将数据从主机复制到GPU。</p>
+</li>
+<li><p><strong>定义并启动CUDA核函数：</strong> 使用<code>__global__</code>修饰符定义CUDA核函数，并使用<code>&lt;&lt;&lt;...&gt;&gt;&gt;</code>语法启动并行执行。</p>
+</li>
+<li><p><strong>将数据从设备复制回主机：</strong> 使用<code>cudaMemcpy</code>将计算结果从GPU复制回主机。</p>
+</li>
+<li><p><strong>释放设备内存：</strong> 使用<code>cudaFree</code>等函数释放在GPU上分配的内存。</p>
+</li>
+</ol>
+<h3 id="示例代码："><a href="#示例代码：" class="headerlink" title="示例代码："></a>示例代码：</h3><p>以下是一个简单的示例代码，展示了在CUDA中执行向量加法的基本步骤：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">vectorAddition</span><span class="params">(<span class="type">float</span>* a, <span class="type">float</span>* b, <span class="type">float</span>* result, <span class="type">int</span> size)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> idx = threadIdx.x + blockIdx.x * blockDim.x;</span><br><span class="line">    <span class="keyword">if</span> (idx &lt; size) &#123;</span><br><span class="line">        result[idx] = a[idx] + b[idx];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> size = <span class="number">1024</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> blockSize = <span class="number">256</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span>* hostA = <span class="keyword">new</span> <span class="type">float</span>[size];</span><br><span class="line">    <span class="type">float</span>* hostB = <span class="keyword">new</span> <span class="type">float</span>[size];</span><br><span class="line">    <span class="type">float</span>* hostResult = <span class="keyword">new</span> <span class="type">float</span>[size];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化输入数据...</span></span><br><span class="line"></span><br><span class="line">    <span class="type">float</span>* deviceA, *deviceB, *deviceResult;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;deviceA, size * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;deviceB, size * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;deviceResult, size * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(deviceA, hostA, size * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyHostToDevice);</span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(deviceB, hostB, size * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyHostToDevice);</span><br><span class="line"></span><br><span class="line">    vectorAddition&lt;&lt;&lt;(size + blockSize - <span class="number">1</span>) / blockSize, blockSize&gt;&gt;&gt;(deviceA, deviceB, deviceResult, size);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(hostResult, deviceResult, size * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyDeviceToHost);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 处理结果...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span>[] hostA;</span><br><span class="line">    <span class="keyword">delete</span>[] hostB;</span><br><span class="line">    <span class="keyword">delete</span>[] hostResult;</span><br><span class="line">    <span class="built_in">cudaFree</span>(deviceA);</span><br><span class="line">    <span class="built_in">cudaFree</span>(deviceB);</span><br><span class="line">    <span class="built_in">cudaFree</span>(deviceResult);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述示例演示了在GPU上使用CUDA执行向量加法的步骤。这只是一个简单的入门示例，实际情况中可能涉及更复杂的计算任务和数据管理。确保参考CUDA文档和示例以获取更多详细信息。</p>
+<h2 id="C-cuda库-编译和链接"><a href="#C-cuda库-编译和链接" class="headerlink" title="C++ cuda库 编译和链接"></a>C++ cuda库 编译和链接</h2><p>编译和链接使用CUDA库的C++代码通常需要遵循以下步骤。以下示例假设你已经安装了NVIDIA的GPU驱动、CUDA工具包和相应版本的cuBLAS、cuFFT等库。</p>
+<h3 id="编写CUDA-C-代码"><a href="#编写CUDA-C-代码" class="headerlink" title="编写CUDA C++代码"></a>编写CUDA C++代码</h3><p>首先，编写包含CUDA核函数的C++源代码。在CUDA C++代码中，通常使用<code>__global__</code>修饰符定义在GPU上执行的核函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// vectorAdd.cu</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">vectorAddition</span><span class="params">(<span class="type">float</span>* a, <span class="type">float</span>* b, <span class="type">float</span>* result, <span class="type">int</span> size)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> idx = threadIdx.x + blockIdx.x * blockDim.x;</span><br><span class="line">    <span class="keyword">if</span> (idx &lt; size) &#123;</span><br><span class="line">        result[idx] = a[idx] + b[idx];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> size = <span class="number">1024</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> blockSize = <span class="number">256</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ... 与上述示例相同的主机代码 ...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在主机上调用 CUDA 核函数</span></span><br><span class="line">    vectorAddition&lt;&lt;&lt;(size + blockSize - <span class="number">1</span>) / blockSize, blockSize&gt;&gt;&gt;(deviceA, deviceB, deviceResult, size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ... 处理结果及释放内存 ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="编译CUDA-C-代码"><a href="#编译CUDA-C-代码" class="headerlink" title="编译CUDA C++代码"></a>编译CUDA C++代码</h3><p>使用<code>nvcc</code>命令来编译CUDA C++代码。<code>nvcc</code>是NVIDIA CUDA Compiler的命令行工具。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvcc -o your_executable vectorAdd.cu</span><br></pre></td></tr></table></figure>
+
+<p>此命令将源文件<code>vectorAdd.cu</code>编译为可执行文件<code>your_executable</code>。<code>nvcc</code>会负责将CUDA核函数编译为GPU二进制代码，并链接CUDA运行时库。</p>
+<h3 id="编译和链接其他C-文件"><a href="#编译和链接其他C-文件" class="headerlink" title="编译和链接其他C++文件"></a>编译和链接其他C++文件</h3><p>如果你的项目包含其他C++源文件，你可以使用常规的C++编译器（例如<code>g++</code>）来编译和链接这些文件。确保将CUDA头文件和库的路径包含到编译过程中，并链接相应的CUDA库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -o your_executable your_main.cpp -I/path/to/cuda/include -L/path/to/cuda/lib -lcudart -lcublas -lculibos -lcufft</span><br></pre></td></tr></table></figure>
+
+<p>在上述命令中，<code>/path/to/cuda/include</code>和<code>/path/to/cuda/lib</code>需要替换为你系统中实际的CUDA头文件和库文件的路径。</p>
+<h3 id="运行可执行文件"><a href="#运行可执行文件" class="headerlink" title="运行可执行文件"></a>运行可执行文件</h3><p>最后，运行生成的可执行文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./your_executable</span><br></pre></td></tr></table></figure>
+
+<p>请注意，确保CUDA库和头文件的路径正确设置，并且使用了正确的编译选项。在实际项目中，可能需要更详细的配置和管理依赖项。</p>
+<h2 id="课程笔记"><a href="#课程笔记" class="headerlink" title="课程笔记"></a>课程笔记</h2><ul>
+<li><p>超标量，Superschalar</p>
+</li>
+<li><p>指令调度，Scheduling</p>
+</li>
+<li><p>寄存器重命名，Register Renaming   </p>
+</li>
+<li><p>乱序执行，Out-of-Order(OoO)Execution</p>
+<ul>
+<li>重排指令，获得最大的吞吐率</li>
+<li>重排缓冲区</li>
+</ul>
+</li>
+<li><p>存储器架构&#x2F;层次，Memory Hierarchy</p>
+<ul>
+<li>存储器越大越慢</li>
+<li>粗略的估计<ul>
+<li>SRAM(L1, L2, L3)</li>
+<li>DRAM(memory)</li>
+<li>Flash(disk)</li>
+<li>HDD(disk)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>缓存,Caching</p>
+<ul>
+<li>将数据放在尽可能接近的位置</li>
+<li>利用<ul>
+<li>时间临近性，刚刚使用过的数据很可能会被再次使用</li>
+<li>空间临近性，倾向于使用周围的临近的数据</li>
+</ul>
+</li>
+<li>缓存层次，Cache Hierarchy<ul>
+<li>硬件管理<ul>
+<li>L1 Instruction&#x2F;Data caches</li>
+<li>L2 unified cache</li>
+<li>L3 unified cache</li>
+</ul>
+</li>
+<li>软件管理<ul>
+<li>Main memory</li>
+<li>Disk</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>存储器的另外设计考虑</p>
+<ul>
+<li>分区Banking  –  避免多端口</li>
+<li>一致性  Coherency</li>
+<li>控制器  Memory Controller</li>
+</ul>
+</li>
+<li><p>CPU内部的并行性</p>
+<ul>
+<li>指令级并行<ul>
+<li>超标量</li>
+<li>乱序执行</li>
+</ul>
+</li>
+<li>数据级并行<ul>
+<li>矢量计算</li>
+</ul>
+</li>
+<li>线程级并行<ul>
+<li>同步多线程</li>
+<li>多核</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>向量运算,Vectors Motivation</p>
+</li>
+<li><p>数据级并行 Data&#x3D;level Parallelism</p>
+<ul>
+<li>单指令多数据 Single Instruction Multiple Data(SIMD)<ul>
+<li>执行单元(ALU)很宽</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>线程级并行  Thread-Level-Parallelism</p>
+</li>
+<li><p>多核 Multicore</p>
+<ul>
+<li>将流水线完整复制</li>
+</ul>
+</li>
+<li><p>锁存，一致性和同一性</p>
+<ul>
+<li>问题：多线程读写同一块数据<ul>
+<li>解决办法：加锁</li>
+</ul>
+</li>
+<li>问题：谁的数据是正确的？<ul>
+<li>解决办法：缓存一致性协议Coherence</li>
+</ul>
+</li>
+<li>问题：什么样的数据是正确的Consistency<ul>
+<li>解决方法：存储器同一性模型</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>现实的困境：能量墙 Power Wall</p>
+</li>
+<li><p>新时代的计算计数：并行计算</p>
+<ul>
+<li>常规传统单核处理器遇到物理约束，时钟频率(perf&#x2F;clock)无法保持线性增长</li>
+</ul>
+</li>
+<li><p>新摩尔定律</p>
+<ul>
+<li>处理器越来越胖</li>
+<li>单核的性能不会大幅度提升</li>
+</ul>
+</li>
+<li><p>另外一堵墙：存储器墙</p>
+<ul>
+<li>处理器的存储器带宽无法满足处理能力的提升</li>
+</ul>
+</li>
+<li><p>结论</p>
+<ul>
+<li>CPU，为串行程序优化<ul>
+<li>Pipelines, branch prediction, superscalaer, OoO</li>
+<li>Reduce execution time with high clock speeds and high utilization</li>
+</ul>
+</li>
+<li>缓慢的内存带宽(存储器带宽)将会是大问题</li>
+<li>并行处理是方向</li>
+</ul>
+</li>
+</ul>
+<h2 id="并行技术的概述"><a href="#并行技术的概述" class="headerlink" title="并行技术的概述"></a>并行技术的概述</h2><ul>
+<li><p>(数据)并行处理方法</p>
+</li>
+<li><p>串行计算模式</p>
+<ul>
+<li>常规软件是串行的<ul>
+<li>设计运行于一个中央处理器上(CPU)</li>
+<li>通过离散的指令序列完成一个问题的解决</li>
+<li>一条一条指令的执行</li>
+<li>同时只有一条指令在执行</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>并行计算模式</p>
+<ul>
+<li>一句话：并行计算是同时应用多个计算资源解决一个计算问题<ul>
+<li>设计多个计算资源或处理器</li>
+<li>问题被分解为多个离散的部分，可以同时处理(并行)</li>
+<li>每个部分可以由一系列指令完成</li>
+</ul>
+</li>
+<li>每个部分的指令在不同的处理器上执行</li>
+</ul>
+</li>
+<li><p>概念和名词</p>
+<ul>
+<li>Flynn 矩阵， The matrix below defines the 4 possible classifications according to Flynn<ul>
+<li>SISD, Single Instruction, Single Data</li>
+<li>SIMD, Single Instruction, Multiple Data</li>
+<li>MISD, Multiple Instruction, Single Data</li>
+<li>MIMD, Multiple Instruction, Multiple Data</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>常见名词</p>
+<ul>
+<li>Task，任务  –  可以得到完整结果的一个过程，一个或多个代码段</li>
+<li>Parallel Task , 并行任务</li>
+<li>Serial Execution， 串行执行</li>
+<li>Parallel Execution Execution，并行执行</li>
+<li>Shared Memory，共享存储</li>
+<li>Distributed Memory，分布式存储  –  存储的东西放在不同的地方</li>
+<li>Communications，通信</li>
+<li>Synchronization，同步  –  </li>
+<li>Granularity，粒度  –  划分任务的大小</li>
+<li>Observed Speedup，加速比  – 对比一个标志物，获得性能的提升</li>
+<li>Parallel Overhead，并行开销  –  最主要是通讯的问题</li>
+<li>Scalability，可扩展性  –</li>
+</ul>
+</li>
+<li><p>存储器架构</p>
+<ul>
+<li>共享存储(Shared Memory)</li>
+<li>分布式存储(Distributed Memory)</li>
+<li>混合分布式-共享式存储(Hybrid Distributed-Shared Memory)</li>
+</ul>
+</li>
+<li><p>并行编程模型</p>
+<ul>
+<li>共享存储模型(Shared Memory Model)</li>
+<li>线程模型(Threads Model)</li>
+<li>消息传递模型(Message Passing Model)</li>
+<li>数据并行模型(Data Parallel Model)</li>
+</ul>
+</li>
+<li><p>具体实例</p>
+<ul>
+<li>OpenMP</li>
+<li>MPI</li>
+<li>Single Program Multiple Data(SPMD)</li>
+<li>Multiple Program Multiple Data(MPMD)</li>
+</ul>
+</li>
+<li><p>设计并行处理程序和系统</p>
+<ul>
+<li>自动和手动并行</li>
+<li>理解问题和程序</li>
+<li>分块分割</li>
+<li>通信<ul>
+<li>broadcast，广播</li>
+<li>scatter，发散</li>
+<li>gather，汇集</li>
+<li>reduction，整合</li>
+</ul>
+</li>
+<li>同步</li>
+<li>负载均衡  –  一核有难，七核围观 </li>
+<li>粒度</li>
+<li>I&#x2F;O</li>
+<li>成本</li>
+<li>性能分析和优化</li>
+</ul>
+</li>
+<li><p>加速比：</p>
+<ul>
+<li>speedup &#x3D; 1&#x2F;(p&#x2F;N + S)<ul>
+<li>P &#x3D; 并行部分</li>
+<li>N &#x3D; 处理器数码</li>
+<li>S &#x3D; 串行部分</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="搭建并行编程环境"><a href="#搭建并行编程环境" class="headerlink" title="搭建并行编程环境"></a>搭建并行编程环境</h2><ul>
+<li><p>cuda zone</p>
+</li>
+<li><p>sample&#x2F;devicequery</p>
+</li>
+</ul>
+<h3 id="五"><a href="#五" class="headerlink" title="五"></a>五</h3><ul>
+<li><p>名词解释</p>
+<ul>
+<li>FLOPS  –  FLoating -point OPerations per Second</li>
+<li>GFLOPS  –  One billion FLOPS</li>
+<li>TFLOPS  –  1000 GFLOPS</li>
+</ul>
+</li>
+<li><p>为什么需要GPU？</p>
+<ul>
+<li>应用的需求越来越高</li>
+<li>计算机技术由应用推动</li>
+</ul>
+</li>
+<li><p>GPU(Graphic Processing Unit),是一个异构的多处理器芯片，为图形图像处理优化</p>
+</li>
+<li><p>三种方法提升GPU的处理速度</p>
+</li>
+<li><p>GPU的存储器</p>
+</li>
+<li><p>停滞</p>
+<ul>
+<li>大量的独立片元相互切换</li>
+<li>通过片元切换掩藏延迟</li>
+</ul>
+</li>
+<li><p>上下文存储空间, Storing contexts</p>
+<ul>
+<li>上下文存储池</li>
+</ul>
+</li>
+<li><p>上下文呢也可以软件也可以硬件管理</p>
+</li>
+<li><p>如果只是一个ALU，只能称为一个计算单元，</p>
+</li>
+<li><p>ALU＋存储，是一个计算核心，简称核</p>
+</li>
+<li><p>Fermi架构细节</p>
+<ul>
+<li>480 stream processors(“CUDA cores”)<ul>
+<li>一个stream processor，流处理器，理解上可以等同为一个ALU，计算单元</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>存储和数据访问 –  访存</p>
+<ul>
+<li>Recall:”CPU-style” core<ul>
+<li>memory hierarchy, 多级缓存</li>
+</ul>
+</li>
+<li>GPU型的吞吐处理核<ul>
+<li>将存储器放在了外面</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>访存带宽，是非常宝贵的资源</p>
+</li>
+<li><p>带宽测试  –  </p>
+</li>
+<li><p>带宽受限</p>
+<ul>
+<li>减少带宽需求</li>
+</ul>
+</li>
+<li><p>GPU，是异构 众核 处理器，针对吞吐优化</p>
+</li>
+<li><p>高效的GPU任务具备的条件</p>
+<ul>
+<li>具有成千上万的独立工作<ul>
+<li>尽量利用大量的ALU单元</li>
+<li>大量的片元切换掩藏延迟</li>
+</ul>
+</li>
+<li>可以共享指令流<ul>
+<li>适用于SIMD处理</li>
+</ul>
+</li>
+<li>最好是计算密集的任务<ul>
+<li>通信和计算开销比例合适</li>
+<li>不要受制于访问带宽</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="六"><a href="#六" class="headerlink" title="六"></a>六</h3><ul>
+<li><p>CPU-GPU交互</p>
+<ul>
+<li>各自的物理内存空间</li>
+<li>通过PCIE总线互连</li>
+<li>交互开销较大</li>
+</ul>
+</li>
+<li><p>访存速度</p>
+<ul>
+<li>Register</li>
+<li>Shared Memory</li>
+<li>Local Memory</li>
+<li>Global Memory</li>
+<li>Constant Memory</li>
+<li>Texture Memory</li>
+<li>Instruction Memory</li>
+</ul>
+</li>
+<li><p>线程组织架构说明</p>
+<ul>
+<li>一个Kernel具有大量线程</li>
+<li>线程被划分成线程块 blocks</li>
+<li>Kernel启动一个grid，包含若干线程块</li>
+<li>线程和线程块具有唯一的标识</li>
+</ul>
+</li>
+<li><p>编程模型：</p>
+<ul>
+<li>常规意义的GPU用于处理图形图像</li>
+<li>操作于像素，每个像素的操作都类似</li>
+<li>可以应用SIMD，也可以认为是数据并行分割</li>
+</ul>
+</li>
+<li><p>CUDA编程模式：Extended C              </p>
+</li>
+<li><p>CUDA函数声明</p>
+<ul>
+<li>__global__定义一个kernel函数：入口函数，CPU上调用，GPU上执行，必须返回void</li>
+</ul>
+</li>
+</ul>
+<h3 id="7"><a href="#7" class="headerlink" title="7"></a>7</h3><ul>
+<li><p>2007 – NVIDIA发布CUDA</p>
+<ul>
+<li>CUDA  –  全称 Compute Uniform Device  Architecture，统一计算设备架构</li>
+</ul>
+</li>
+<li><p>CUDA术语</p>
+<ul>
+<li>Host  –  即主机端，通常指CPU。采用ANSI标准C语言编程</li>
+<li>Device –  即设备端，通常指GPU（数据可并行）。采用ANSI 标准C的扩展语言编程</li>
+<li>Host和Device拥有各自的存储器</li>
+<li>CUDA编程：包括主机端和设备端两部分代码</li>
+<li>Kernel  –  数据并行处理函数。通过调用kernel函数在设备端创建轻量级线程，线程由硬件负责创建并进行管理</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Cuda/" rel="tag"># Cuda</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/NVIDIA/CUDA/2024-05-22-nvidia_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="nvidia_1_理论基础">
+      <i class="fa fa-chevron-left"></i> nvidia_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/NVIDIA/CUDA/2024-05-22-nvcc_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="nvcc_1_理论基础">
+      nvcc_1_理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">cuda安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cudnn%E5%AE%89%E8%A3%85"><span class="nav-number">3.</span> <span class="nav-text">cudnn安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda-C-%E7%BC%96%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">cuda C 编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda%E7%BC%96%E7%A8%8B%E7%BB%93%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">cuda编程结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">cuda 内存管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda-%E7%BA%BF%E7%A8%8B%E7%AE%A1%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">cuda 线程管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AACUDA%E6%A0%B8%E5%87%BD%E6%95%B0"><span class="nav-number">8.</span> <span class="nav-text">启动一个CUDA核函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E6%A0%B8%E5%87%BD%E6%95%B0"><span class="nav-number">9.</span> <span class="nav-text">编写核函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CUDA-%E5%A4%84%E7%90%86%E9%94%99%E8%AF%AF"><span class="nav-number">10.</span> <span class="nav-text">CUDA 处理错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8nvprof%E5%B7%A5%E5%85%B7%E8%AE%A1%E6%97%B6"><span class="nav-number">11.</span> <span class="nav-text">用nvprof工具计时</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E7%AE%A1%E7%90%86"><span class="nav-number">12.</span> <span class="nav-text">设备管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda-cudnn-tensorrt-%E4%B9%8B%E9%97%B4%E5%AD%98%E5%9C%A8%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB"><span class="nav-number">13.</span> <span class="nav-text">cuda cudnn tensorrt 之间存在什么关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-cuda%E5%BA%93%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">14.</span> <span class="nav-text">C++ cuda库是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-cuda%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">15.</span> <span class="nav-text">C++ cuda库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%BB%84%E4%BB%B6%EF%BC%9A"><span class="nav-number">15.1.</span> <span class="nav-text">主要组件：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CUDA%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%EF%BC%9A"><span class="nav-number">15.2.</span> <span class="nav-text">CUDA编程模型：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="nav-number">15.3.</span> <span class="nav-text">示例代码：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-cuda%E5%BA%93-%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5"><span class="nav-number">16.</span> <span class="nav-text">C++ cuda库 编译和链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99CUDA-C-%E4%BB%A3%E7%A0%81"><span class="nav-number">16.1.</span> <span class="nav-text">编写CUDA C++代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91CUDA-C-%E4%BB%A3%E7%A0%81"><span class="nav-number">16.2.</span> <span class="nav-text">编译CUDA C++代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5%E5%85%B6%E4%BB%96C-%E6%96%87%E4%BB%B6"><span class="nav-number">16.3.</span> <span class="nav-text">编译和链接其他C++文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6"><span class="nav-number">16.4.</span> <span class="nav-text">运行可执行文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0"><span class="nav-number">17.</span> <span class="nav-text">课程笔记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E6%8A%80%E6%9C%AF%E7%9A%84%E6%A6%82%E8%BF%B0"><span class="nav-number">18.</span> <span class="nav-text">并行技术的概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B%E7%8E%AF%E5%A2%83"><span class="nav-number">19.</span> <span class="nav-text">搭建并行编程环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94"><span class="nav-number">19.1.</span> <span class="nav-text">五</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD"><span class="nav-number">19.2.</span> <span class="nav-text">六</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7"><span class="nav-number">19.3.</span> <span class="nav-text">7</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 zabbix工具相关笔记  Zabbix是什么Zabbix 是一个开源的企业级监控解决方案，旨在监控和跟踪 IT 基础设施的健康和性能。它提供了多种功能来帮助管理员监控网络、服务器、应用程序、云服务等。以下是 Zabbix 的一些主要特点：  全面的监控：Zabbix 能够监控各种类型的网络设备、服务器、虚拟机、云服务和应用程序。它支持多种协议，如 SNMP、IPMI、JMX、HTTP、SS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix">
+<meta property="og:url" content="https://junyiha.github.io/2024/07/16/notebook/Tools/2024-07-16-Zabbix/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 zabbix工具相关笔记  Zabbix是什么Zabbix 是一个开源的企业级监控解决方案，旨在监控和跟踪 IT 基础设施的健康和性能。它提供了多种功能来帮助管理员监控网络、服务器、应用程序、云服务等。以下是 Zabbix 的一些主要特点：  全面的监控：Zabbix 能够监控各种类型的网络设备、服务器、虚拟机、云服务和应用程序。它支持多种协议，如 SNMP、IPMI、JMX、HTTP、SS">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-07-16T03:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.557Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Tools">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/07/16/notebook/Tools/2024-07-16-Zabbix/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Zabbix | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/16/notebook/Tools/2024-07-16-Zabbix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zabbix
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-07-16 11:00:00" itemprop="dateCreated datePublished" datetime="2024-07-16T11:00:00+08:00">2024-07-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>zabbix工具相关笔记</li>
+</ul>
+<h2 id="Zabbix是什么"><a href="#Zabbix是什么" class="headerlink" title="Zabbix是什么"></a>Zabbix是什么</h2><p>Zabbix 是一个开源的企业级监控解决方案，旨在监控和跟踪 IT 基础设施的健康和性能。它提供了多种功能来帮助管理员监控网络、服务器、应用程序、云服务等。以下是 Zabbix 的一些主要特点：</p>
+<ol>
+<li><p><strong>全面的监控</strong>：Zabbix 能够监控各种类型的网络设备、服务器、虚拟机、云服务和应用程序。它支持多种协议，如 SNMP、IPMI、JMX、HTTP、SSH、Telnet 等。</p>
+</li>
+<li><p><strong>数据收集和分析</strong>：Zabbix 可以收集大量的性能和可用性数据，并对这些数据进行存储和分析。它提供了强大的数据可视化工具，如图表、仪表盘和报告。</p>
+</li>
+<li><p><strong>告警和通知</strong>：Zabbix 支持复杂的告警机制，可以根据预定义的条件触发告警，并通过多种渠道（如邮件、短信、Slack、Telegram 等）发送通知。</p>
+</li>
+<li><p><strong>自动化和自愈</strong>：Zabbix 提供了自动化功能，可以在检测到问题时自动执行预定义的操作，如重启服务或执行脚本，以实现自愈。</p>
+</li>
+<li><p><strong>高扩展性</strong>：Zabbix 设计为高扩展性，可以支持从小型环境到大型企业环境的监控需求。它支持分布式监控和代理模式，能够轻松扩展。</p>
+</li>
+<li><p><strong>开源和社区支持</strong>：Zabbix 是开源软件，拥有活跃的社区和广泛的用户基础。社区提供了大量的插件、模板和文档，帮助用户快速上手和扩展功能。</p>
+</li>
+</ol>
+<p>Zabbix 的灵活性和强大的功能使其成为许多企业和组织选择的监控解决方案。无论是用于监控网络设备、服务器性能，还是应用程序健康，Zabbix 都能提供可靠的支持。</p>
+<h2 id="zabbix-详解"><a href="#zabbix-详解" class="headerlink" title="zabbix 详解"></a>zabbix 详解</h2><h3 id="什么是-Zabbix？"><a href="#什么是-Zabbix？" class="headerlink" title="什么是 Zabbix？"></a>什么是 Zabbix？</h3><p>Zabbix 是一个开源的监控软件工具，旨在监控和跟踪 IT 基础设施、网络、服务器、虚拟机、应用程序和云服务的健康状况和性能。它提供了一整套功能，从数据收集、存储、分析到告警和自动化操作。由于其高扩展性和灵活性，Zabbix 可以满足从小型组织到大型企业的不同需求。</p>
+<h3 id="主要功能和特点"><a href="#主要功能和特点" class="headerlink" title="主要功能和特点"></a>主要功能和特点</h3><h4 id="1-数据收集和监控"><a href="#1-数据收集和监控" class="headerlink" title="1. 数据收集和监控"></a>1. <strong>数据收集和监控</strong></h4><ul>
+<li><strong>广泛的支持</strong>：支持多种协议和技术，如 SNMP、IPMI、JMX、HTTP、SSH、Telnet 等，可以监控各种设备和应用程序。</li>
+<li><strong>主动监控</strong>：通过代理（Agent）和代理代理（Proxy）模式，支持分布式监控，能够在网络的不同部分进行监控。</li>
+<li><strong>被动监控</strong>：支持从设备和应用程序中获取数据，适用于需要从设备中获取状态和性能信息的场景。</li>
+</ul>
+<h4 id="2-数据存储和处理"><a href="#2-数据存储和处理" class="headerlink" title="2. 数据存储和处理"></a>2. <strong>数据存储和处理</strong></h4><ul>
+<li><strong>历史数据存储</strong>：Zabbix 可以存储大量的历史数据，支持长期的数据保留和分析。</li>
+<li><strong>灵活的数据处理</strong>：通过自定义的触发器和阈值，能够对监控数据进行实时处理和分析。</li>
+</ul>
+<h4 id="3-告警和通知"><a href="#3-告警和通知" class="headerlink" title="3. 告警和通知"></a>3. <strong>告警和通知</strong></h4><ul>
+<li><strong>复杂的告警机制</strong>：支持根据预定义的条件和阈值触发告警，告警可以基于多个条件进行组合和过滤。</li>
+<li><strong>多渠道通知</strong>：支持通过邮件、短信、IM（如 Slack、Telegram 等）和脚本发送通知，确保管理员能够及时收到告警信息。</li>
+<li><strong>告警升级</strong>：支持告警的升级和降级，确保重要问题能够及时得到关注和处理。</li>
+</ul>
+<h4 id="4-数据可视化"><a href="#4-数据可视化" class="headerlink" title="4. 数据可视化"></a>4. <strong>数据可视化</strong></h4><ul>
+<li><strong>图表和仪表盘</strong>：提供强大的图表和仪表盘功能，能够直观地展示监控数据和趋势。</li>
+<li><strong>报告和分析</strong>：支持生成各种报告，帮助管理员了解系统的健康状况和性能。</li>
+</ul>
+<h4 id="5-自动化和自愈"><a href="#5-自动化和自愈" class="headerlink" title="5. 自动化和自愈"></a>5. <strong>自动化和自愈</strong></h4><ul>
+<li><strong>自动操作</strong>：支持在检测到问题时自动执行预定义的操作，如重启服务、执行脚本等。</li>
+<li><strong>自愈功能</strong>：通过自动化操作实现系统的自愈，减少人为干预，提高系统的可靠性。</li>
+</ul>
+<h4 id="6-高扩展性"><a href="#6-高扩展性" class="headerlink" title="6. 高扩展性"></a>6. <strong>高扩展性</strong></h4><ul>
+<li><strong>分布式监控</strong>：支持代理和代理代理模式，能够扩展到大规模的分布式环境中进行监控。</li>
+<li><strong>高可用性</strong>：通过集群和冗余设计，确保监控系统的高可用性和可靠性。</li>
+</ul>
+<h4 id="7-开源和社区支持"><a href="#7-开源和社区支持" class="headerlink" title="7. 开源和社区支持"></a>7. <strong>开源和社区支持</strong></h4><ul>
+<li><strong>开源许可</strong>：Zabbix 是开源软件，拥有 GPL 许可，用户可以自由使用、修改和分发。</li>
+<li><strong>活跃的社区</strong>：拥有庞大且活跃的用户和开发者社区，提供丰富的插件、模板和文档资源，用户可以从社区中获取支持和帮助。</li>
+</ul>
+<h3 id="典型应用场景"><a href="#典型应用场景" class="headerlink" title="典型应用场景"></a>典型应用场景</h3><ul>
+<li><strong>网络监控</strong>：监控路由器、交换机、防火墙等网络设备的性能和状态。</li>
+<li><strong>服务器监控</strong>：监控物理服务器和虚拟机的 CPU、内存、磁盘等资源的使用情况。</li>
+<li><strong>应用程序监控</strong>：监控数据库、Web 服务器、邮件服务器等应用程序的性能和健康状况。</li>
+<li><strong>云服务监控</strong>：监控 AWS、Azure 等云服务的资源使用情况和性能。</li>
+</ul>
+<h3 id="安装与配置"><a href="#安装与配置" class="headerlink" title="安装与配置"></a>安装与配置</h3><h4 id="1-系统要求"><a href="#1-系统要求" class="headerlink" title="1. 系统要求"></a>1. <strong>系统要求</strong></h4><ul>
+<li><strong>操作系统</strong>：支持多种操作系统，如 Linux、Windows 等。</li>
+<li><strong>数据库</strong>：需要一个数据库来存储监控数据，支持 MySQL、PostgreSQL、Oracle 等。</li>
+<li><strong>Web 服务器</strong>：需要一个 Web 服务器来运行 Zabbix 的前端界面，支持 Apache、Nginx 等。</li>
+</ul>
+<h4 id="2-安装步骤"><a href="#2-安装步骤" class="headerlink" title="2. 安装步骤"></a>2. <strong>安装步骤</strong></h4><ul>
+<li><strong>数据库安装和配置</strong>：安装并配置所需的数据库。</li>
+<li><strong>Zabbix 服务器安装</strong>：安装 Zabbix 服务器组件。</li>
+<li><strong>Zabbix 前端安装</strong>：安装并配置 Web 服务器和 Zabbix 前端。</li>
+<li><strong>Zabbix 代理安装</strong>：在需要监控的设备上安装 Zabbix 代理。</li>
+</ul>
+<h4 id="3-配置"><a href="#3-配置" class="headerlink" title="3. 配置"></a>3. <strong>配置</strong></h4><ul>
+<li><strong>添加主机和模板</strong>：在 Zabbix 前端界面中添加需要监控的主机，并应用相应的监控模板。</li>
+<li><strong>设置触发器和告警</strong>：配置触发器和告警规则，定义告警条件和通知方式。</li>
+<li><strong>创建图表和仪表盘</strong>：根据监控需求创建图表和仪表盘，直观展示监控数据。</li>
+</ul>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>Zabbix 是一个功能强大且灵活的监控解决方案，适用于各种 IT 环境。从网络设备和服务器的监控，到应用程序和云服务的监控，Zabbix 都能提供可靠的支持。通过其全面的数据收集、分析、告警和自动化功能，Zabbix 帮助企业提高 IT 基础设施的可见性和可靠性，从而更好地保障业务的连续性和性能。</p>
+<h2 id="zabbix-使用-示例"><a href="#zabbix-使用-示例" class="headerlink" title="zabbix 使用 示例"></a>zabbix 使用 示例</h2><p>以下是一个简单的 Zabbix 使用示例，展示如何安装、配置和使用 Zabbix 来监控一台服务器的基本性能指标。</p>
+<h3 id="示例环境"><a href="#示例环境" class="headerlink" title="示例环境"></a>示例环境</h3><ul>
+<li><strong>Zabbix Server</strong>：Ubuntu 20.04</li>
+<li><strong>监控对象</strong>：一台运行 Ubuntu 20.04 的服务器</li>
+</ul>
+<h3 id="步骤-1：安装-Zabbix-Server"><a href="#步骤-1：安装-Zabbix-Server" class="headerlink" title="步骤 1：安装 Zabbix Server"></a>步骤 1：安装 Zabbix Server</h3><ol>
+<li><p><strong>更新系统包</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt upgrade -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安装 Zabbix 存储库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> dpkg -i zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> apt update</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安装 Zabbix Server、前端和数据库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-agent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安装并配置 MySQL 数据库</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install mysql-server</span><br><span class="line"><span class="built_in">sudo</span> mysql_secure_installation</span><br></pre></td></tr></table></figure>
+
+<p>进入 MySQL 命令行，创建数据库和用户：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE zabbix <span class="keyword">CHARACTER SET</span> utf8 <span class="keyword">COLLATE</span> utf8_bin;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">&#x27;zabbix&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;password&#x27;</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> zabbix.<span class="operator">*</span> <span class="keyword">TO</span> <span class="string">&#x27;zabbix&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span>;</span><br><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>导入初始架构和数据</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -p zabbix</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>配置 Zabbix Server 连接到数据库</strong></p>
+<p>编辑配置文件 <code>/etc/zabbix/zabbix_server.conf</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DBPassword=password</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>启动 Zabbix Server 和代理</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart zabbix-server zabbix-agent apache2</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> zabbix-server zabbix-agent apache2</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="步骤-2：安装和配置-Zabbix-Agent-在被监控服务器上"><a href="#步骤-2：安装和配置-Zabbix-Agent-在被监控服务器上" class="headerlink" title="步骤 2：安装和配置 Zabbix Agent 在被监控服务器上"></a>步骤 2：安装和配置 Zabbix Agent 在被监控服务器上</h3><ol>
+<li><p><strong>在被监控服务器上安装 Zabbix Agent</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> dpkg -i zabbix-release_6.0-2+ubuntu20.04_all.deb</span><br><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install zabbix-agent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>配置 Zabbix Agent</strong></p>
+<p>编辑配置文件 <code>/etc/zabbix/zabbix_agentd.conf</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Server=&lt;Zabbix Server IP&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>启动 Zabbix Agent</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart zabbix-agent</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> zabbix-agent</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="步骤-3：在-Zabbix-前端配置监控"><a href="#步骤-3：在-Zabbix-前端配置监控" class="headerlink" title="步骤 3：在 Zabbix 前端配置监控"></a>步骤 3：在 Zabbix 前端配置监控</h3><ol>
+<li><p><strong>访问 Zabbix 前端</strong></p>
+<p>在浏览器中访问 <code>http://&lt;Zabbix Server IP&gt;/zabbix</code>，按照提示完成初始设置。</p>
+</li>
+<li><p><strong>登录 Zabbix 前端</strong></p>
+<p>使用默认用户名 <code>Admin</code> 和密码 <code>zabbix</code> 登录。</p>
+</li>
+<li><p><strong>添加主机</strong></p>
+<ul>
+<li>导航到 <code>Configuration</code> -&gt; <code>Hosts</code> -&gt; <code>Create host</code>。</li>
+<li>填写主机名、组和 IP 地址。</li>
+<li>在 <code>Templates</code> 标签中，选择 <code>Template OS Linux</code> 模板。</li>
+</ul>
+</li>
+<li><p><strong>检查监控数据</strong></p>
+<ul>
+<li>导航到 <code>Monitoring</code> -&gt; <code>Latest data</code>。</li>
+<li>选择刚刚添加的主机，查看收集到的监控数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过以上步骤，你已经成功安装并配置了 Zabbix 服务器和代理，并添加了一台被监控的服务器。你可以通过 Zabbix 前端界面查看监控数据，设置告警规则，以及创建图表和仪表盘来直观展示数据。</p>
+<p>Zabbix 提供了强大的功能和灵活性，可以监控各种类型的 IT 资源和服务。根据实际需求，你可以进一步定制 Zabbix 的配置和功能，以满足特定的监控需求。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Tools/" rel="tag"># Tools</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/07/13/notebook/Video/2024-07-13-%E6%B5%81%E5%AA%92%E4%BD%93%E5%9F%BA%E7%A1%80/" rel="prev" title="流媒体基础">
+      <i class="fa fa-chevron-left"></i> 流媒体基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/07/17/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-07-17-linux_2_97_strace/" rel="next" title="linux_2_96_strace">
+      linux_2_96_strace <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zabbix%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">Zabbix是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zabbix-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">zabbix 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Zabbix%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">什么是 Zabbix？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD%E5%92%8C%E7%89%B9%E7%82%B9"><span class="nav-number">3.2.</span> <span class="nav-text">主要功能和特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E5%92%8C%E7%9B%91%E6%8E%A7"><span class="nav-number">3.2.1.</span> <span class="nav-text">1. 数据收集和监控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E5%92%8C%E5%A4%84%E7%90%86"><span class="nav-number">3.2.2.</span> <span class="nav-text">2. 数据存储和处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%91%8A%E8%AD%A6%E5%92%8C%E9%80%9A%E7%9F%A5"><span class="nav-number">3.2.3.</span> <span class="nav-text">3. 告警和通知</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="nav-number">3.2.4.</span> <span class="nav-text">4. 数据可视化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E8%87%AA%E5%8A%A8%E5%8C%96%E5%92%8C%E8%87%AA%E6%84%88"><span class="nav-number">3.2.5.</span> <span class="nav-text">5. 自动化和自愈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E9%AB%98%E6%89%A9%E5%B1%95%E6%80%A7"><span class="nav-number">3.2.6.</span> <span class="nav-text">6. 高扩展性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-%E5%BC%80%E6%BA%90%E5%92%8C%E7%A4%BE%E5%8C%BA%E6%94%AF%E6%8C%81"><span class="nav-number">3.2.7.</span> <span class="nav-text">7. 开源和社区支持</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.3.</span> <span class="nav-text">典型应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE"><span class="nav-number">3.4.</span> <span class="nav-text">安装与配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%B3%BB%E7%BB%9F%E8%A6%81%E6%B1%82"><span class="nav-number">3.4.1.</span> <span class="nav-text">1. 系统要求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.4.2.</span> <span class="nav-text">2. 安装步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E9%85%8D%E7%BD%AE"><span class="nav-number">3.4.3.</span> <span class="nav-text">3. 配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">3.5.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zabbix-%E4%BD%BF%E7%94%A8-%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">zabbix 使用 示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%8E%AF%E5%A2%83"><span class="nav-number">4.1.</span> <span class="nav-text">示例环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E5%AE%89%E8%A3%85-Zabbix-Server"><span class="nav-number">4.2.</span> <span class="nav-text">步骤 1：安装 Zabbix Server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE-Zabbix-Agent-%E5%9C%A8%E8%A2%AB%E7%9B%91%E6%8E%A7%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A"><span class="nav-number">4.3.</span> <span class="nav-text">步骤 2：安装和配置 Zabbix Agent 在被监控服务器上</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E5%9C%A8-Zabbix-%E5%89%8D%E7%AB%AF%E9%85%8D%E7%BD%AE%E7%9B%91%E6%8E%A7"><span class="nav-number">4.4.</span> <span class="nav-text">步骤 3：在 Zabbix 前端配置监控</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

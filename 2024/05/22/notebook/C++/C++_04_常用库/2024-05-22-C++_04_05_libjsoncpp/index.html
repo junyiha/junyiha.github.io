@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 libjsoncpp库  C++ libjsoncpp库 详解libjsoncpp 是一个用于处理 JSON 数据的 C++ 库。它提供了一组功能强大的 API，使得在 C++ 应用程序中解析、生成和操作 JSON 数据变得简单而高效。 以下是关于 libjsoncpp 的详解：  JSON 数据处理：libjsoncpp 提供了一套 API，使得在 C++ 应用程序中处理 JSON 数据变">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_04_05_libjsoncpp">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-05-22-C++_04_05_libjsoncpp/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 libjsoncpp库  C++ libjsoncpp库 详解libjsoncpp 是一个用于处理 JSON 数据的 C++ 库。它提供了一组功能强大的 API，使得在 C++ 应用程序中解析、生成和操作 JSON 数据变得简单而高效。 以下是关于 libjsoncpp 的详解：  JSON 数据处理：libjsoncpp 提供了一套 API，使得在 C++ 应用程序中处理 JSON 数据变">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.160Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppLibrary">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-05-22-C++_04_05_libjsoncpp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_04_05_libjsoncpp | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-05-22-C++_04_05_libjsoncpp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_04_05_libjsoncpp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>libjsoncpp库</li>
+</ul>
+<h2 id="C-libjsoncpp库-详解"><a href="#C-libjsoncpp库-详解" class="headerlink" title="C++ libjsoncpp库 详解"></a>C++ libjsoncpp库 详解</h2><p>libjsoncpp 是一个用于处理 JSON 数据的 C++ 库。它提供了一组功能强大的 API，使得在 C++ 应用程序中解析、生成和操作 JSON 数据变得简单而高效。</p>
+<p>以下是关于 libjsoncpp 的详解：</p>
+<ol>
+<li><p><strong>JSON 数据处理</strong>：libjsoncpp 提供了一套 API，使得在 C++ 应用程序中处理 JSON 数据变得简单。它可以解析 JSON 字符串，将 JSON 对象转换为 C++ 对象，以及将 C++ 对象转换为 JSON 字符串。</p>
+</li>
+<li><p><strong>易于使用</strong>：libjsoncpp 的 API 设计简单直观，易于理解和使用。它提供了类似于标准容器的接口，使得对 JSON 对象进行操作就像操作标准容器一样方便。</p>
+</li>
+<li><p><strong>跨平台性</strong>：libjsoncpp 可以在各种平台上运行，包括 Windows、Linux、macOS 等。这使得它适用于各种不同的开发环境和应用场景。</p>
+</li>
+<li><p><strong>开源</strong>：libjsoncpp 是开源的，采用 MIT 许可证。这意味着您可以自由地使用、修改和分发该库，而无需担心版权问题。</p>
+</li>
+<li><p><strong>高性能</strong>：libjsoncpp 在设计上注重了性能，并且采用了一些优化策略来提高解析和生成 JSON 数据的速度。这使得它在处理大量 JSON 数据时表现出色。</p>
+</li>
+<li><p><strong>灵活性</strong>：libjsoncpp 提供了丰富的功能，可以满足不同应用场景的需求。您可以使用它来处理各种类型的 JSON 数据，包括简单的键值对、嵌套对象、数组等等。</p>
+</li>
+<li><p><strong>与标准库兼容</strong>：libjsoncpp 的设计与 C++ 标准库兼容，并且尽量遵循 C++ 的最佳实践和惯例。这使得它可以与其他 C++ 库和框架无缝集成。</p>
+</li>
+<li><p><strong>持续维护</strong>：libjsoncpp 是一个活跃维护的项目，开发团队不断更新和改进库的功能，并及时修复可能存在的 bug 和问题。</p>
+</li>
+</ol>
+<p>总的来说，libjsoncpp 是一个功能强大、易于使用、高性能的 C++ JSON 库，适用于各种类型的 C++ 应用程序，包括网络服务、移动应用、游戏开发等。</p>
+<h2 id="jsoncpp"><a href="#jsoncpp" class="headerlink" title="jsoncpp"></a>jsoncpp</h2><h3 id="json-概述"><a href="#json-概述" class="headerlink" title="json 概述"></a>json 概述</h3><ul>
+<li><p>JSON(<code>JavaScript Object Notation</code>, JavaScript 对象表示法) 是一种轻量级的数据交换格式。 </p>
+</li>
+<li><p>JSON是存储和交换文本信息的语法，类似于XML。但它比XML更小，更快，更易解析，易于人阅读和编写。同时也易于机器解析和生成。 </p>
+</li>
+<li><p>它基于<code>JavaScript Programming Language, Standard ECMA-262 3rd Edition - December 1999</code>的一个子集。 </p>
+</li>
+<li><p>JSON采用完全独立于语言的文本格式，但是也使用了类似于C语言家族的习惯（包括<code>C, C++, C#, Java, JavaScript, Perl, Python</code>等）。 </p>
+</li>
+<li><p>这些特性使JSON成为理想的数据交换语言</p>
+</li>
+<li><p>要明白，JSON 是一种轻量级的文本数据交换格式而非编程语言，其语法只支持字符串，数值，布尔值及null以及在此基础上的对象和数组，</p>
+</li>
+<li><p>JSON建构于两种结构：</p>
+<ul>
+<li>“名称&#x2F;值”对的集合（<code>A collection of name/value pairs</code>）,不同的语言中，它被理解为对象（<code>object</code>），纪录（<code>record</code>），结构（<code>struct</code>），字典（<code>dictionary</code>），哈希表（<code>hash table</code>），有键列表（<code>keyed list</code>），或者关联数组 （<code>associative array</code>）。</li>
+<li>值的有序列表（An ordered list of values）,在大部分语言中，它被理解为数组（<code>array</code>）</li>
+</ul>
+</li>
+<li><p>JSON具有以下这些形式：</p>
+<ul>
+<li>对象是一个无序的“‘名称&#x2F;值’对”集合。一个对象以“{”（左括号）开始，“}”（右括号）结束。每个“名称”后跟一个“:”（冒号）；“‘名称&#x2F;值’ 对”之间使用“,”（逗号）分隔</li>
+</ul>
+</li>
+</ul>
+<h4 id="JSON语法规则"><a href="#JSON语法规则" class="headerlink" title="JSON语法规则"></a>JSON语法规则</h4><ul>
+<li><p>数据在 名称&#x2F;值对 里面</p>
+</li>
+<li><p>数据由逗号分隔</p>
+</li>
+<li><p>大括号保存对象</p>
+</li>
+<li><p>中括号保存数组</p>
+</li>
+<li><p>JSON名称&#x2F;值对</p>
+<ul>
+<li>JSON 数据的书写格式是：名称&#x2F;值对</li>
+<li>名称&#x2F;值对 包括字段名称（在双引号中），后面写一个冒号，然后是值： <code>&quot;name&quot;:&quot;hello world&quot;</code></li>
+</ul>
+</li>
+<li><p>JSON名称（键）必须是字符串</p>
+</li>
+<li><p>JSON值可以是：</p>
+<ul>
+<li>数字（整数或浮点数）</li>
+<li>字符串（在双引号中）</li>
+<li>逻辑值（true 或 false）</li>
+<li>数组（在中括号中）</li>
+<li>对象（在大括号中）</li>
+<li>null</li>
+</ul>
+</li>
+<li><p>JSON对象</p>
+<ul>
+<li>JSON 对象在大括号（{}）中书写</li>
+<li>对象可以包含多个名称&#x2F;值对：   <code>&#123;&quot;name&quot;:&quot;hello world&quot;, &quot;url&quot;:&quot;www&quot;&#125;</code></li>
+</ul>
+</li>
+<li><p>JSON数组</p>
+<ul>
+<li>JSON 数组在中括号中书写</li>
+<li>数组可包含多个对象：<code>&quot;sites&quot;:[&#123;&quot;name&quot;:&quot;hello&quot;, &quot;url&quot;:&quot;www&quot;&#125;, &#123;&quot;name&quot;:&quot;world&quot;, &quot;url&quot;:&quot;www&quot;&#125;]</code><ul>
+<li>对象sites是包含两个对象的数组，每个对象代表一条关于网站(name, url)的记录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>访问对象值</p>
+<ul>
+<li>可以使用点号来访问对象的值<code>var myobj,x; myobj = &#123;&quot;name&quot;:&quot;json&quot;, &quot;alex&quot;:1111, &quot;site&quot;:&quot;www&quot;&#125;; x = myobj.name;</code></li>
+<li>可以使用中括号来访问对象的值<code>var myobj,x; myobj = &#123;&quot;name&quot;:&quot;json&quot;, &quot;alex&quot;:1111, &quot;site&quot;:&quot;www&quot;&#125;; x = myobj[&quot;name&quot;];</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="JSON-parse"><a href="#JSON-parse" class="headerlink" title="JSON.parse()"></a>JSON.parse()</h4><ul>
+<li><p>JSON通常用于与服务端交换数据</p>
+</li>
+<li><p>在接收服务器数据时，一般是字符串，可以使用JSON.parse()方法将数据交换为JavaScript对象</p>
+</li>
+<li><p>语法：<code>JSON.parse(text, reviver);</code></p>
+</li>
+<li><p>参数说明：</p>
+<ul>
+<li><code>text</code>  – 一个有效的JSON字符串</li>
+<li><code>reviver</code> – 一个转换结果的函数，将为对象的每个成员调用此函数</li>
+</ul>
+</li>
+</ul>
+<h4 id="JSON-stringify"><a href="#JSON-stringify" class="headerlink" title="JSON.stringify()"></a>JSON.stringify()</h4><ul>
+<li><p>JSON 通常用于与服务端交换数据。</p>
+</li>
+<li><p>在向服务器发送数据时一般是字符串。</p>
+</li>
+<li><p>我们可以使用 JSON.stringify() 方法将 JavaScript 对象转换为字符串。</p>
+</li>
+<li><p>语法：<code>JSON.stringify(value[, replacer[, space]])</code></p>
+</li>
+<li><p>参数说明：</p>
+<ul>
+<li><code>value</code>  –  要转换的 JavaScript 值（通常为对象或数组）。</li>
+<li><code>replacer</code> – 用于转换结果的函数或数组</li>
+<li><code>space</code>  –  文本添加缩进、空格和换行符</li>
+</ul>
+</li>
+</ul>
+<h3 id="jsoncpp-详解"><a href="#jsoncpp-详解" class="headerlink" title="jsoncpp 详解"></a>jsoncpp 详解</h3><ul>
+<li><p>开源程序：<code>libjsoncpp</code></p>
+</li>
+<li><p>地址：<code>https://github.com/open-source-parsers/jsoncpp</code></p>
+</li>
+<li><p>将仓库克隆到本地，cmake编译完成之后，当做第三方库的方式为：</p>
+<ul>
+<li>头文件：jsoncpp&#x2F;include&#x2F;json</li>
+<li>静态库和动态库文件：build&#x2F;lib&#x2F;</li>
+</ul>
+</li>
+</ul>
+<h3 id="jsoncpp-基本用法"><a href="#jsoncpp-基本用法" class="headerlink" title="jsoncpp 基本用法"></a>jsoncpp 基本用法</h3><ul>
+<li><p>jsonCpp主要包含三种类型的<code>class</code>：<code>value</code>、<code>reader</code>、<code>write</code>。</p>
+</li>
+<li><p>jsonCpp总所有对象、类名都在namespace json中</p>
+</li>
+<li><p><code>Json::Value</code></p>
+<ul>
+<li>Json::Value时jsonCpp中最基本、最重要的类，用于表示各种类型的对象，jsoncpp 支持的对象类型可见 <code>Json::ValueType</code> 枚举值。</li>
+<li>在把value插入值后再输出来，输出的值是按字母表的顺序排列。<ul>
+<li><code>Json::Value root;</code></li>
+<li><code>root[&quot;status&quot;] = 1;			//新建一个key为status，赋予数值1</code></li>
+<li><code>root[&quot;message&quot;] = &quot;OK&quot;;		//新建一个key为message，赋予字符串OK</code></li>
+<li><code>root[&quot;array&quot;].append(&quot;arr&quot;); //新建一个key为array，类型为数组，对第一个元素赋值为字符串“arr”</code></li>
+<li><code>root[&quot;array&quot;].append(1234);  // 为数组 key_array 赋值，对第二个元素赋值为：1234。</code></li>
+<li><code>Json::ValueType type = root.type();	//获得root的类型</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>Json::Writer</code></p>
+<ul>
+<li><code>Json::Writer</code>负责将内存中的<code>Value</code>对象转换成<code>JSON</code>文档，输出到文件或者是字符串中</li>
+<li>Json::Writer是一个纯虚类，不能直接使用，一般使用<code>Json::Writer</code>的子类：<code>Json::FasterWriter</code>, <code>Json::StyledWriter</code>、<code>Json::StyledStreamWriter</code></li>
+<li>注：在新版中<code>Json::FasterWriter</code>, <code>Json::StyledWriter</code>、<code>Json::Reader</code>都被弃用，替代的是<code>Json::StreamWriterBuilder</code>、<code>Json::CharReaderBuilder</code><ul>
+<li><code>Json::FasterWriter</code>：速度最快</li>
+<li><code>Json::StyledWriter</code>：格式化后的json</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>Json::Reader</code></p>
+<ul>
+<li>用于读取，准确说是用于将字符串或者文件输入流转换为Json::Value对象的</li>
+<li><code>parse()</code></li>
+<li>使用<code>Json::Reader</code>对<code>json</code>文件进行解析<ul>
+<li>声明：<code>bool parse(const std::string&amp; document, Value&amp; root, bool collectComments = true);</code></li>
+<li>参数：<ul>
+<li><code>root</code>:（输出）Json::Value的对象</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>使用Json::Reader对json输入流（文件）进行解析<ul>
+<li>声明：<code>bool parse(std:stream&amp; is, Value&amp; root, bool collectComment = true);</code></li>
+</ul>
+</li>
+<li>使用Json::Reader对字符串进行解析<ul>
+<li>声明：<code>bool parse(const char* beginDoc, const char* ednDoc, Value&amp; root, bool collectComment = true);</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="JsonCpp其他操作"><a href="#JsonCpp其他操作" class="headerlink" title="JsonCpp其他操作"></a>JsonCpp其他操作</h3><ul>
+<li><p>判断key是否存在</p>
+<ul>
+<li>声明：<code>bool Json::Value::isMember ( const char * key) const；</code></li>
+<li>存在返回1，否则返回0</li>
+</ul>
+</li>
+<li><p>判断是否为null成员函数</p>
+</li>
+<li><p>注：Json::Value和C++中的map有一个共同的特点，就是当你尝试访问一个不存在的 key 时，会自动生成这样一个key-value默认为null的值对。</p>
+</li>
+<li><p>得到所有成员</p>
+<ul>
+<li><code>typedef std::vectorstd::string Json::Value::Members;</code></li>
+<li><code>Value::Members Json::Value::getMemberNames ( ) const;</code></li>
+<li>该函数的类型为一个string的vector。</li>
+</ul>
+</li>
+<li><p>删除成员</p>
+<ul>
+<li><code>Value Json::Value::removeMember( const char* key)</code></li>
+<li>返回删除的值，或者null</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppLibrary/" rel="tag"># CppLibrary</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-05-22-C++_04_07_cryptopp/" rel="prev" title="C++_04_07_cryptopp">
+      <i class="fa fa-chevron-left"></i> C++_04_07_cryptopp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-05-22-C++_04_08_httplib/" rel="next" title="C++_04_08_httplib">
+      C++_04_08_httplib <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-libjsoncpp%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">C++ libjsoncpp库 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jsoncpp"><span class="nav-number">3.</span> <span class="nav-text">jsoncpp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#json-%E6%A6%82%E8%BF%B0"><span class="nav-number">3.1.</span> <span class="nav-text">json 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JSON%E8%AF%AD%E6%B3%95%E8%A7%84%E5%88%99"><span class="nav-number">3.1.1.</span> <span class="nav-text">JSON语法规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JSON-parse"><span class="nav-number">3.1.2.</span> <span class="nav-text">JSON.parse()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JSON-stringify"><span class="nav-number">3.1.3.</span> <span class="nav-text">JSON.stringify()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jsoncpp-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.2.</span> <span class="nav-text">jsoncpp 详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jsoncpp-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">3.3.</span> <span class="nav-text">jsoncpp 基本用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JsonCpp%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C"><span class="nav-number">3.4.</span> <span class="nav-text">JsonCpp其他操作</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

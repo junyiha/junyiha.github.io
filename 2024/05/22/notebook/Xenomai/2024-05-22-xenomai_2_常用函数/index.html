@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 xenomai常用函数或数据结构  RT_TASK在 Xenomai 中，RT_TASK 是用于创建和管理实时任务的关键数据结构。它提供了一种有效的方式来定义和控制实时任务的属性、优先级、状态和行为。下面是对 Xenomai 的 RT_TASK 结构的详细解释：  任务标识符（Task Identifier）：RT_TASK 结构包含一个唯一标识符，用于标识特定的实时任务。每个实时任务都有一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xenomai_2_常用函数">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Xenomai/2024-05-22-xenomai_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 xenomai常用函数或数据结构  RT_TASK在 Xenomai 中，RT_TASK 是用于创建和管理实时任务的关键数据结构。它提供了一种有效的方式来定义和控制实时任务的属性、优先级、状态和行为。下面是对 Xenomai 的 RT_TASK 结构的详细解释：  任务标识符（Task Identifier）：RT_TASK 结构包含一个唯一标识符，用于标识特定的实时任务。每个实时任务都有一">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.584Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Xenomai">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Xenomai/2024-05-22-xenomai_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>xenomai_2_常用函数 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Xenomai/2024-05-22-xenomai_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          xenomai_2_常用函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Xenomai/" itemprop="url" rel="index"><span itemprop="name">Xenomai</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>xenomai常用函数或数据结构</li>
+</ul>
+<h2 id="RT-TASK"><a href="#RT-TASK" class="headerlink" title="RT_TASK"></a>RT_TASK</h2><p>在 Xenomai 中，RT_TASK 是用于创建和管理实时任务的关键数据结构。它提供了一种有效的方式来定义和控制实时任务的属性、优先级、状态和行为。下面是对 Xenomai 的 RT_TASK 结构的详细解释：</p>
+<ol>
+<li><p><strong>任务标识符（Task Identifier）</strong>：RT_TASK 结构包含一个唯一标识符，用于标识特定的实时任务。每个实时任务都有一个唯一的标识符，可以使用该标识符来引用和操作特定的任务。</p>
+</li>
+<li><p><strong>任务名称（Task Name）</strong>：RT_TASK 结构还包含一个任务名称字段，用于指定实时任务的名称。任务名称是可选的，但它可以帮助开发人员标识和调试任务。</p>
+</li>
+<li><p><strong>任务状态（Task State）</strong>：RT_TASK 结构维护了实时任务的当前状态。任务可以处于几种不同的状态，例如就绪状态（ready）、运行状态（running）、暂停状态（suspended）等。任务的状态可以通过 Xenomai 的 API 进行查询和修改。</p>
+</li>
+<li><p><strong>任务优先级（Task Priority）</strong>：每个实时任务都有一个指定的优先级，用于确定任务在调度时的相对重要性。较高优先级的任务将在较低优先级的任务之前得到调度。RT_TASK 结构中包含了任务的优先级字段。</p>
+</li>
+<li><p><strong>任务入口点（Task Entry Point）</strong>：RT_TASK 结构存储了实时任务的入口点，即任务要执行的函数或方法。开发人员可以将自定义的函数指定为任务的入口点，并在其中编写实时任务的逻辑。</p>
+</li>
+<li><p><strong>任务堆栈（Task Stack）</strong>：每个实时任务都需要一个用于执行函数调用和保存局部变量的堆栈空间。RT_TASK 结构中包含了任务堆栈的信息，包括堆栈的大小和指针。</p>
+</li>
+<li><p><strong>任务控制块（Task Control Block）</strong>：RT_TASK 结构还包含一个任务控制块指针，用于管理实时任务的内部状态和资源。任务控制块包含了任务的上下文信息，包括寄存器状态、调度参数等。</p>
+</li>
+</ol>
+<p>通过使用 RT_TASK 结构，开发人员可以使用 Xenomai 的 API 创建和管理实时任务。可以使用 API 函数如 <code>rt_task_create()</code> 创建任务，并通过设置任务的属性、优先级和堆栈等来定义任务的行为。任务可以在需要时启动、暂停、恢复和终止。开发人员还可以使用 RT_TASK 结构中的字段来查询和修改任务的状态和属性。</p>
+<p>总之，RT_TASK 结构在 Xenomai 中扮演着关键的角色，允许开发人员创建、配置和控制实时任务，并通过任务标识符进行引用和操作。这种结构提供了对实时任务的灵活</p>
+<p>性和可控性，帮助开发人员构建高效、可预测的实时应用程序。</p>
+<hr>
+<h2 id="rt-print-auto-init"><a href="#rt-print-auto-init" class="headerlink" title="rt_print_auto_init"></a>rt_print_auto_init</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>rt_print_auto_init() 是一个函数，用于初始化实时打印功能</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">rt_print_auto_init</span><span class="params">(<span class="type">int</span> mode)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>mode：指定实时打印模式的选项。可以是以下值之一<ul>
+<li>0：禁用实时打印功能。</li>
+<li>1：启用实时打印功能</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>rt_print_auto_init() 函数用于控制 Xenomai 的实时打印功能的初始化和启用</li>
+<li>实时打印功能允许实时任务在运行时向终端或系统日志输出信息，用于调试和跟踪应用程序的运行</li>
+<li>当 mode 参数设置为非零值时，实时打印功能将被启用，并且实时任务可以使用实时打印函数（如 rt_printf()）输出信息</li>
+<li>当 mode 参数设置为零时，实时打印功能将被禁用，实时任务将无法使用实时打印函数输出信息</li>
+<li>通常在应用程序初始化时调用 rt_print_auto_init() 函数，以便在后续的实时任务中使用实时打印功能</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>需要注意的是，使用实时打印功能可能会对实时性能产生一定的影响。因此，在实时应用程序中使用实时打印功能时，应谨慎使用，避免过多的打印输出，以确保实时性能不受影响</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="rt-printf"><a href="#rt-printf" class="headerlink" title="rt_printf"></a>rt_printf</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>rt_printf() 是一个函数，用于在实时任务中进行格式化的输出。它类似于标准库函数 printf()，但是 rt_printf() 是 Xenomai 提供的特定实时打印函数。下面是对 rt_printf()</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">rt_printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* format, ...)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>format：一个字符串，指定输出的格式，类似于 printf() 函数中的格式字符串。</li>
+<li>…：可变数量的参数，用于根据格式字符串进行格式化输出</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功时，返回实际输出的字符数（不包括终止符）</li>
+<li>失败时，返回一个负值</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>rt_printf() 函数用于在实时任务中进行格式化的输出，方便进行调试和跟踪实时应用程序的执行</li>
+<li>rt_printf() 函数与标准库函数 printf() 的使用方式相似，支持使用格式化字符串和可变数量的参数进行输出</li>
+<li>在实时任务中调用 rt_printf() 函数会将输出信息发送到控制台或系统日志，具体输出位置取决于实时打印功能的配置</li>
+<li>实时任务中使用 rt_printf() 函数进行输出时，需要确保已启用实时打印功能（通过调用 rt_print_auto_init() 函数）</li>
+<li>与标准库函数 printf() 不同，rt_printf() 是一个实时安全的函数，可以在 Xenomai 实时任务的上下文中使用，而不会引起不可预测的行为或破坏实时性能</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>需要注意的是，使用实时打印功能可能会对实时性能产生一定的影响。因此，在实时应用程序中使用 rt_printf() 函数时，应谨慎使用，并避免过多的打印输出，以确保实时性能不受明显的影响</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="rt-task-create"><a href="#rt-task-create" class="headerlink" title="rt_task_create"></a>rt_task_create</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>rt_task_create() 是用于创建实时任务的函数。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">rt_task_create</span><span class="params">(RT_TASK* task, <span class="type">const</span> <span class="type">char</span>* name, <span class="type">int</span> stack_size, <span class="type">int</span> priority, <span class="type">int</span> mode)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>task：指向 RT_TASK 结构的指针，用于存储创建的任务。</li>
+<li>name：字符串，表示任务的名称。</li>
+<li>stack_size：整数，表示任务堆栈的大小（以字节为单位）。</li>
+<li>priority：整数，表示任务的优先级。</li>
+<li>mode：整数，表示任务的标志。可以是以下值之一<ul>
+<li>T_JOINABLE：指示任务可以被其他任务等待和回收资源。</li>
+<li>T_FPU：指示任务需要使用浮点运算单元（FPU）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功时，返回 0。</li>
+<li>失败时，返回一个负数表示错误码</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>rt_task_create() 函数用于创建实时任务，创建的任务可以在 Xenomai 实时环境中执行</li>
+<li>函数通过提供任务名称、堆栈大小、优先级和其他选项来定义任务的属性</li>
+<li>创建任务后，可以使用 task 指针引用该任务，并使用其他 Xenomai API 函数对其进行操作，如启动、暂停、恢复、设置优先级等。</li>
+<li>任务名称是可选的，但可以帮助开发人员标识和调试任务</li>
+<li>堆栈大小决定了任务可以使用的内存空间</li>
+<li>优先级决定了任务在调度时的相对重要性，较高优先级的任务将在较低优先级的任务之前得到调度</li>
+<li>通过设置 mode 参数，可以指定任务的附加标志，如可等待和使用 FPU</li>
+<li>创建任务时，需要确保已经初始化 Xenomai 实时环境</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>需要注意的是，rt_task_create() 函数只是创建实时任务的一部分。创建任务后，还需要使用其他 Xenomai API 函数来启动任务并执行实际的任务逻辑</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="rt-task-start"><a href="#rt-task-start" class="headerlink" title="rt_task_start"></a>rt_task_start</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>rt_task_start() 是用于启动实时任务的函数</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">rt_task_start</span><span class="params">(RT_TASK* task, <span class="type">void</span> (*entry)(<span class="type">void</span>*), <span class="type">void</span>* arg)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>task：指向 RT_TASK 结构的指针，表示要启动的任务。</li>
+<li>entry：函数指针，指向实时任务的入口函数。</li>
+<li>arg：指针，传递给实时任务入口函数的参数</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功时，返回 0。</li>
+<li>失败时，返回一个负数表示错误码</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>rt_task_start() 函数用于启动实时任务，使其开始执行实时任务的入口函数。</li>
+<li>函数通过指定任务指针、入口函数和参数来定义任务的执行。</li>
+<li>入口函数是实时任务的主要逻辑，当任务启动后，它将从入口函数开始执行。</li>
+<li>入口函数可以是任何符合特定签名 void (<em>)(void</em>) 的函数指针，接受一个 void* 类型的参数。</li>
+<li>通过 arg 参数，可以将参数传递给实时任务的入口函数。</li>
+<li>启动任务后，它将在 Xenomai 实时环境中被调度和执行</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>需要注意的是，启动任务前，必须先使用 rt_task_create() 函数创建任务，并确保已经初始化 Xenomai 实时环境。在任务执行期间，可以使用其他 Xenomai API 函数来控制任务的行为，如暂停、恢复、设置优先级等</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="rt-task-delete"><a href="#rt-task-delete" class="headerlink" title="rt_task_delete"></a>rt_task_delete</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>rt_task_delete() 是用于删除实时任务的函数</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">rt_task_delete</span><span class="params">(RT_TASK* task)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>task：指向要删除的实时任务的 RT_TASK 结构的指针</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功时，返回 0。</li>
+<li>失败时，返回一个负数表示错误码</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>rt_task_delete() 函数用于删除实时任务，并释放与该任务相关的资源。</li>
+<li>在删除任务之前，应确保该任务已经被停止，即不再处于活动状态。</li>
+<li>删除任务会释放任务所使用的堆栈内存和其他资源，使其可供其他任务使用。</li>
+<li>删除任务后，与该任务关联的 RT_TASK 结构不再有效，不应再使用指向它的指针</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>需要注意的是，删除任务可能会对其他正在使用该任务的代码产生影响，因此在删除任务之前，应确保不再有其他代码依赖该任务或与其进行通信。同时，为了避免资源泄漏，应确保在任务完成后及时删除不再需要的任务。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Xenomai/" rel="tag"># Xenomai</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Video/2024-05-22-video_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="video_1_理论基础">
+      <i class="fa fa-chevron-left"></i> video_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Windows/2024-05-22-windows_01_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="windows_01_理论基础">
+      windows_01_理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RT-TASK"><span class="nav-number">2.</span> <span class="nav-text">RT_TASK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rt-print-auto-init"><span class="nav-number">3.</span> <span class="nav-text">rt_print_auto_init</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rt-printf"><span class="nav-number">4.</span> <span class="nav-text">rt_printf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rt-task-create"><span class="nav-number">5.</span> <span class="nav-text">rt_task_create</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rt-task-start"><span class="nav-number">6.</span> <span class="nav-text">rt_task_start</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rt-task-delete"><span class="nav-number">7.</span> <span class="nav-text">rt_task_delete</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

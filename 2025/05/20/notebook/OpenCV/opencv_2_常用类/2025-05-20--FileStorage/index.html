@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 cv::FileStorage 类相关笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cv::FileStorage">
+<meta property="og:url" content="https://junyiha.github.io/2025/05/20/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-05-20--FileStorage/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 cv::FileStorage 类相关笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-20T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-20T08:23:23.817Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/05/20/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-05-20--FileStorage/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>cv::FileStorage | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/05/20/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-05-20--FileStorage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          cv::FileStorage
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2025-05-20 09:00:00 / Modified: 16:23:23" itemprop="dateCreated datePublished" datetime="2025-05-20T09:00:00+08:00">2025-05-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>cv::FileStorage 类相关笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="opencv-cv-FileStorage-详解"><a href="#opencv-cv-FileStorage-详解" class="headerlink" title="opencv cv::FileStorage 详解"></a>opencv cv::FileStorage 详解</h2><p><code>cv::FileStorage</code> 是 OpenCV 中用于读写结构化数据（XML、YAML、JSON 格式）的类，常用于保存配置参数、矩阵数据、标量值、自定义对象等。以下是对其功能的详细解析及用法示例：</p>
+<hr>
+<h3 id="核心功能"><a href="#核心功能" class="headerlink" title="核心功能"></a><strong>核心功能</strong></h3><ol>
+<li><strong>支持格式</strong>：XML、YAML、JSON（需 OpenCV 4.5+ 版本）。</li>
+<li><strong>数据类型</strong>：<ul>
+<li>基础类型：<code>int</code>, <code>float</code>, <code>double</code>, <code>string</code></li>
+<li>OpenCV 对象：<code>cv::Mat</code>, <code>cv::Point</code>, <code>cv::Rect</code>, <code>cv::Size</code>, <code>cv::Scalar</code> 等</li>
+<li>STL 容器：<code>std::vector</code>, <code>std::map</code></li>
+<li>自定义数据结构（需重载序列化接口）</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a><strong>基本用法</strong></h3><h4 id="1-打开文件"><a href="#1-打开文件" class="headerlink" title="1. 打开文件"></a><strong>1. 打开文件</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写入模式（WRITE）</span></span><br><span class="line"><span class="function">FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;data.yaml&quot;</span>, FileStorage::WRITE)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取模式（READ）</span></span><br><span class="line"><span class="function">FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;data.yaml&quot;</span>, FileStorage::READ)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 追加模式（APPEND，修改现有文件）</span></span><br><span class="line"><span class="function">FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;data.yaml&quot;</span>, FileStorage::APPEND)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-写入数据"><a href="#2-写入数据" class="headerlink" title="2. 写入数据"></a><strong>2. 写入数据</strong></h4><p>使用 <code>&lt;&lt;</code> 运算符写入键值对或序列：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">fs &lt;&lt; <span class="string">&quot;frame_count&quot;</span> &lt;&lt; <span class="number">5</span>;                <span class="comment">// 标量</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;camera_matrix&quot;</span> &lt;&lt; Mat::<span class="built_in">eye</span>(<span class="number">3</span>,<span class="number">3</span>, CV_64F); <span class="comment">// 矩阵</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;points&quot;</span> &lt;&lt; <span class="string">&quot;[&quot;</span>;                   <span class="comment">// 序列（列表）</span></span><br><span class="line">fs &lt;&lt; <span class="built_in">Point2f</span>(<span class="number">1</span>,<span class="number">2</span>) &lt;&lt; <span class="built_in">Point2f</span>(<span class="number">3</span>,<span class="number">4</span>);</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;]&quot;</span>;                               <span class="comment">// 结束序列</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 字典（映射）</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;config&quot;</span> &lt;&lt; <span class="string">&quot;&#123;&quot;</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;width&quot;</span> &lt;&lt; <span class="number">1280</span> &lt;&lt; <span class="string">&quot;height&quot;</span> &lt;&lt; <span class="number">720</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;fps&quot;</span> &lt;&lt; <span class="number">30.0</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;&#125;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-读取数据"><a href="#3-读取数据" class="headerlink" title="3. 读取数据"></a><strong>3. 读取数据</strong></h4><p>使用 <code>operator[]</code> 和 <code>&gt;&gt;</code> 读取数据：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> frameCount;</span><br><span class="line">Mat cameraMat;</span><br><span class="line">std::vector&lt;Point2f&gt; points;</span><br><span class="line"></span><br><span class="line">fs[<span class="string">&quot;frame_count&quot;</span>] &gt;&gt; frameCount;</span><br><span class="line">fs[<span class="string">&quot;camera_matrix&quot;</span>] &gt;&gt; cameraMat;</span><br><span class="line"></span><br><span class="line">FileNode node = fs[<span class="string">&quot;points&quot;</span>];</span><br><span class="line"><span class="keyword">for</span> (FileNodeIterator it = node.<span class="built_in">begin</span>(); it != node.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">    Point2f p;</span><br><span class="line">    *it &gt;&gt; p;</span><br><span class="line">    points.<span class="built_in">push_back</span>(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-关闭文件"><a href="#4-关闭文件" class="headerlink" title="4. 关闭文件"></a><strong>4. 关闭文件</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fs.<span class="built_in">release</span>();  <span class="comment">// 确保数据写入磁盘</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="高级用法"><a href="#高级用法" class="headerlink" title="高级用法"></a><strong>高级用法</strong></h3><h4 id="1-自定义对象的序列化"><a href="#1-自定义对象的序列化" class="headerlink" title="1. 自定义对象的序列化"></a><strong>1. 自定义对象的序列化</strong></h4><p>为自定义类型实现序列化接口：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">MyData</span> &#123;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line">    std::string name;</span><br><span class="line">    cv::Mat data;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写入函数重载</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">write</span><span class="params">(FileStorage&amp; fs, <span class="type">const</span> MyData&amp; x)</span> </span>&#123;</span><br><span class="line">    fs &lt;&lt; <span class="string">&quot;&#123;&quot;</span></span><br><span class="line">       &lt;&lt; <span class="string">&quot;id&quot;</span> &lt;&lt; x.id</span><br><span class="line">       &lt;&lt; <span class="string">&quot;name&quot;</span> &lt;&lt; x.name</span><br><span class="line">       &lt;&lt; <span class="string">&quot;data&quot;</span> &lt;&lt; x.data</span><br><span class="line">       &lt;&lt; <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取函数重载</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">read</span><span class="params">(<span class="type">const</span> FileNode&amp; node, MyData&amp; x, <span class="type">const</span> MyData&amp; default_val = MyData())</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (node.<span class="built_in">empty</span>()) x = default_val;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        node[<span class="string">&quot;id&quot;</span>] &gt;&gt; x.id;</span><br><span class="line">        node[<span class="string">&quot;name&quot;</span>] &gt;&gt; x.name;</span><br><span class="line">        node[<span class="string">&quot;data&quot;</span>] &gt;&gt; x.data;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用自定义对象</span></span><br><span class="line">MyData data;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;my_data&quot;</span> &lt;&lt; data;</span><br><span class="line">fs[<span class="string">&quot;my_data&quot;</span>] &gt;&gt; data;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-检查文件是否成功打开"><a href="#2-检查文件是否成功打开" class="headerlink" title="2. 检查文件是否成功打开"></a><strong>2. 检查文件是否成功打开</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!fs.<span class="built_in">isOpened</span>()) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Failed to open file!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-处理空节点"><a href="#3-处理空节点" class="headerlink" title="3. 处理空节点"></a><strong>3. 处理空节点</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FileNode node = fs[<span class="string">&quot;non_existing_key&quot;</span>];</span><br><span class="line"><span class="keyword">if</span> (node.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Key not found.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="文件格式示例（YAML）"><a href="#文件格式示例（YAML）" class="headerlink" title="文件格式示例（YAML）"></a><strong>文件格式示例（YAML）</strong></h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">%YAML:1.0</span></span><br><span class="line"><span class="attr">frame_count:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">camera_matrix:</span> <span class="type">!!opencv</span><span class="string">-matrix</span></span><br><span class="line">   <span class="attr">rows:</span> <span class="number">3</span></span><br><span class="line">   <span class="attr">cols:</span> <span class="number">3</span></span><br><span class="line">   <span class="attr">dt:</span> <span class="string">d</span></span><br><span class="line">   <span class="attr">data:</span> [ <span class="number">1</span><span class="string">.</span>, <span class="number">0</span><span class="string">.</span>, <span class="number">0</span><span class="string">.</span>, <span class="number">0</span><span class="string">.</span>, <span class="number">1</span><span class="string">.</span>, <span class="number">0</span><span class="string">.</span>, <span class="number">0</span><span class="string">.</span>, <span class="number">0</span><span class="string">.</span>, <span class="number">1</span><span class="string">.</span> ]</span><br><span class="line"><span class="attr">points:</span></span><br><span class="line">   <span class="bullet">-</span> [ <span class="number">1</span><span class="string">.</span>, <span class="number">2</span><span class="string">.</span> ]</span><br><span class="line">   <span class="bullet">-</span> [ <span class="number">3</span><span class="string">.</span>, <span class="number">4</span><span class="string">.</span> ]</span><br><span class="line"><span class="attr">config:</span></span><br><span class="line">   <span class="attr">width:</span> <span class="number">1280</span></span><br><span class="line">   <span class="attr">height:</span> <span class="number">720</span></span><br><span class="line">   <span class="attr">fps:</span> <span class="number">30</span><span class="string">.</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
+<li><strong>文件扩展名</strong>：<code>.xml</code>, <code>.yaml</code>, <code>.json</code> 决定输出格式。</li>
+<li><strong>JSON 支持</strong>：需 OpenCV 4.5+，且写入时需显式指定格式（如 <code>FileStorage::WRITE | FileStorage::FORMAT_JSON</code>）。</li>
+<li><strong>性能</strong>：频繁读写大文件时，优先考虑二进制格式（如 <code>.bin</code>）。</li>
+<li><strong>编码问题</strong>：非 ASCII 字符建议使用 UTF-8。</li>
+</ol>
+<hr>
+<p>通过 <code>cv::FileStorage</code>，可以高效管理结构化数据，适用于参数配置、模型持久化、实验结果保存等场景。</p>
+<h2 id="opencv-cv-FileStorage-常用函数-详解"><a href="#opencv-cv-FileStorage-常用函数-详解" class="headerlink" title="opencv cv::FileStorage 常用函数 详解"></a>opencv cv::FileStorage 常用函数 详解</h2><p><code>cv::FileStorage</code> 是 OpenCV 中用于读写 XML&#x2F;YAML&#x2F;JSON 格式文件的类，常用于存储和加载配置参数、矩阵数据、特征点等。以下是其常用函数及详细说明：</p>
+<hr>
+<h3 id="1-构造函数与基本操作"><a href="#1-构造函数与基本操作" class="headerlink" title="1. 构造函数与基本操作"></a><strong>1. 构造函数与基本操作</strong></h3><h4 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a><strong>构造函数</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::FileStorage::<span class="built_in">FileStorage</span>(); <span class="comment">// 默认构造函数</span></span><br><span class="line">cv::FileStorage::<span class="built_in">FileStorage</span>(<span class="type">const</span> String&amp; filename, <span class="type">int</span> flags, <span class="type">const</span> String&amp; encoding = <span class="built_in">String</span>());</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>功能</strong>：创建 <code>FileStorage</code> 对象。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>filename</code>: 文件名（如 <code>&quot;data.yml&quot;</code>）。</li>
+<li><code>flags</code>: 操作模式，可选：<ul>
+<li><code>FileStorage::READ</code>: 读取模式。</li>
+<li><code>FileStorage::WRITE</code>: 写入模式（覆盖现有文件）。</li>
+<li><code>FileStorage::APPEND</code>: 追加模式（在现有文件末尾添加数据）。</li>
+</ul>
+</li>
+<li><code>encoding</code>: 文件编码（通常默认即可）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="open"><a href="#open" class="headerlink" title="open()"></a><strong>open()</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> cv::FileStorage::<span class="built_in">open</span>(<span class="type">const</span> String&amp; filename, <span class="type">int</span> flags, <span class="type">const</span> String&amp; encoding = <span class="built_in">String</span>());</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>功能</strong>：打开文件。</li>
+<li><strong>返回值</strong>：成功返回 <code>true</code>，失败返回 <code>false</code>。</li>
+<li><strong>用途</strong>：配合默认构造函数使用。</li>
+</ul>
+<hr>
+<h4 id="isOpened"><a href="#isOpened" class="headerlink" title="isOpened()"></a><strong>isOpened()</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> cv::FileStorage::<span class="built_in">isOpened</span>() <span class="type">const</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>功能</strong>：检查文件是否成功打开。</li>
+</ul>
+<hr>
+<h4 id="release"><a href="#release" class="headerlink" title="release()"></a><strong>release()</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> cv::FileStorage::<span class="built_in">release</span>();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>功能</strong>：关闭文件并释放资源。写入模式下会自动调用，但建议显式调用。</li>
+</ul>
+<hr>
+<h3 id="2-写入数据-1"><a href="#2-写入数据-1" class="headerlink" title="2. 写入数据"></a><strong>2. 写入数据</strong></h3><h4 id="写入基本数据"><a href="#写入基本数据" class="headerlink" title="写入基本数据"></a><strong>写入基本数据</strong></h4><p>使用 <code>&lt;&lt;</code> 运算符写入键值对或序列：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;data.yml&quot;</span>, FileStorage::WRITE)</span></span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;key_int&quot;</span> &lt;&lt; <span class="number">42</span>;                <span class="comment">// 写入整数</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;key_float&quot;</span> &lt;&lt; <span class="number">3.14f</span>;           <span class="comment">// 写入浮点数</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;key_string&quot;</span> &lt;&lt; <span class="string">&quot;Hello&quot;</span>;        <span class="comment">// 写入字符串</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;key_vector&quot;</span> &lt;&lt; cv::<span class="built_in">Vec3i</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>); <span class="comment">// 写入向量</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;key_mat&quot;</span> &lt;&lt; cv::Mat::<span class="built_in">eye</span>(<span class="number">3</span>,<span class="number">3</span>, CV_32F); <span class="comment">// 写入矩阵</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="写入嵌套结构"><a href="#写入嵌套结构" class="headerlink" title="写入嵌套结构"></a><strong>写入嵌套结构</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 写入映射（类似字典）</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;config&quot;</span> &lt;&lt; <span class="string">&quot;&#123;&quot;</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;width&quot;</span> &lt;&lt; <span class="number">640</span> &lt;&lt; <span class="string">&quot;height&quot;</span> &lt;&lt; <span class="number">480</span> &lt;&lt; <span class="string">&quot;fps&quot;</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写入序列（类似数组）</span></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;points&quot;</span> &lt;&lt; <span class="string">&quot;[&quot;</span>;</span><br><span class="line">fs &lt;&lt; cv::<span class="built_in">Point2f</span>(<span class="number">1</span>, <span class="number">2</span>) &lt;&lt; cv::<span class="built_in">Point2f</span>(<span class="number">3</span>, <span class="number">4</span>);</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;]&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-读取数据-1"><a href="#3-读取数据-1" class="headerlink" title="3. 读取数据"></a><strong>3. 读取数据</strong></h3><h4 id="读取基本数据"><a href="#读取基本数据" class="headerlink" title="读取基本数据"></a><strong>读取基本数据</strong></h4><p>使用 <code>&gt;&gt;</code> 运算符或 <code>FileNode</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;data.yml&quot;</span>, FileStorage::READ)</span></span>;</span><br><span class="line"><span class="type">int</span> val;</span><br><span class="line">fs[<span class="string">&quot;key_int&quot;</span>] &gt;&gt; val; <span class="comment">// 直接读取</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 FileNode</span></span><br><span class="line">FileNode node = fs[<span class="string">&quot;key_mat&quot;</span>];</span><br><span class="line">cv::Mat mat;</span><br><span class="line">node &gt;&gt; mat;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="检查节点是否存在"><a href="#检查节点是否存在" class="headerlink" title="检查节点是否存在"></a><strong>检查节点是否存在</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!fs[<span class="string">&quot;non_existing_key&quot;</span>].<span class="built_in">empty</span>()) &#123;</span><br><span class="line">    <span class="comment">// 节点存在</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="遍历序列或映射"><a href="#遍历序列或映射" class="headerlink" title="遍历序列或映射"></a><strong>遍历序列或映射</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">FileNode pointsNode = fs[<span class="string">&quot;points&quot;</span>];</span><br><span class="line"><span class="keyword">if</span> (pointsNode.<span class="built_in">isSeq</span>()) &#123; <span class="comment">// 检查是否为序列</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; pointsNode.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        cv::Point2f pt;</span><br><span class="line">        pointsNode[i] &gt;&gt; pt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">FileNode configNode = fs[<span class="string">&quot;config&quot;</span>];</span><br><span class="line"><span class="keyword">if</span> (configNode.<span class="built_in">isMap</span>()) &#123; <span class="comment">// 检查是否为映射</span></span><br><span class="line">    <span class="type">int</span> width = (<span class="type">int</span>)configNode[<span class="string">&quot;width&quot;</span>];</span><br><span class="line">    <span class="type">int</span> height = (<span class="type">int</span>)configNode[<span class="string">&quot;height&quot;</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-其他实用函数"><a href="#4-其他实用函数" class="headerlink" title="4. 其他实用函数"></a><strong>4. 其他实用函数</strong></h3><h4 id="getFirstTopLevelNode"><a href="#getFirstTopLevelNode" class="headerlink" title="getFirstTopLevelNode()"></a><strong>getFirstTopLevelNode()</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FileNode cv::FileStorage::<span class="built_in">getFirstTopLevelNode</span>() <span class="type">const</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>功能</strong>：获取文件中的第一个顶层节点（通常用于遍历所有顶层节点）。</li>
+</ul>
+<hr>
+<h4 id="root"><a href="#root" class="headerlink" title="root()"></a><strong>root()</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FileNode cv::FileStorage::<span class="built_in">root</span>(<span class="type">int</span> streamIdx = <span class="number">0</span>) <span class="type">const</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>功能</strong>：获取根节点（可通过迭代器遍历子节点）。</li>
+</ul>
+<hr>
+<h4 id="FileNodeIterator"><a href="#FileNodeIterator" class="headerlink" title="FileNodeIterator"></a><strong>FileNodeIterator</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FileNodeIterator it = fs[<span class="string">&quot;points&quot;</span>].<span class="built_in">begin</span>();</span><br><span class="line">FileNodeIterator end = fs[<span class="string">&quot;points&quot;</span>].<span class="built_in">end</span>();</span><br><span class="line"><span class="keyword">for</span> (; it != end; ++it) &#123;</span><br><span class="line">    cv::Point2f pt;</span><br><span class="line">    *it &gt;&gt; pt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5-注意事项"><a href="#5-注意事项" class="headerlink" title="5. 注意事项"></a><strong>5. 注意事项</strong></h3><ol>
+<li><strong>文件扩展名</strong>：OpenCV 根据扩展名（<code>.xml</code>、<code>.yml</code>、<code>.json</code>）自动选择格式。</li>
+<li><strong>JSON 支持</strong>：需 OpenCV 4.5+ 并启用 <code>OPENCV_JSON</code> 编译选项。</li>
+<li><strong>类型检查</strong>：读取时需确保数据类型匹配，可用 <code>FileNode::type()</code> 检查类型。</li>
+<li><strong>错误处理</strong>：始终检查 <code>isOpened()</code> 和节点是否存在。</li>
+</ol>
+<hr>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a><strong>示例代码</strong></h3><h4 id="写入文件"><a href="#写入文件" class="headerlink" title="写入文件"></a><strong>写入文件</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cv::FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;config.yml&quot;</span>, cv::FileStorage::WRITE)</span></span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;camera_matrix&quot;</span> &lt;&lt; cv::Mat::<span class="built_in">eye</span>(<span class="number">3</span>, <span class="number">3</span>, CV_64F);</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;dist_coeffs&quot;</span> &lt;&lt; cv::Mat::<span class="built_in">zeros</span>(<span class="number">5</span>, <span class="number">1</span>, CV_64F);</span><br><span class="line">fs.<span class="built_in">release</span>();</span><br></pre></td></tr></table></figure>
+
+<h4 id="读取文件"><a href="#读取文件" class="headerlink" title="读取文件"></a><strong>读取文件</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cv::FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;config.yml&quot;</span>, cv::FileStorage::READ)</span></span>;</span><br><span class="line">cv::Mat camera_matrix, dist_coeffs;</span><br><span class="line">fs[<span class="string">&quot;camera_matrix&quot;</span>] &gt;&gt; camera_matrix;</span><br><span class="line">fs[<span class="string">&quot;dist_coeffs&quot;</span>] &gt;&gt; dist_coeffs;</span><br><span class="line">fs.<span class="built_in">release</span>();</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>通过 <code>cv::FileStorage</code>，可以方便地在 OpenCV 中实现结构化数据的持久化存储与加载。</p>
+<h2 id="opencv-cv-FileStorage-常用技巧"><a href="#opencv-cv-FileStorage-常用技巧" class="headerlink" title="opencv cv::FileStorage 常用技巧"></a>opencv cv::FileStorage 常用技巧</h2><p>以下是使用 OpenCV 中 <code>cv::FileStorage</code> 的一些常用技巧与注意事项，帮助你高效地读写配置文件（YAML&#x2F;XML&#x2F;JSON）以及矩阵、标量、结构化数据等。</p>
+<hr>
+<h2 id="1-打开与关闭文件"><a href="#1-打开与关闭文件" class="headerlink" title="1. 打开与关闭文件"></a>1. 打开与关闭文件</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以写模式打开（若文件存在则覆盖）</span></span><br><span class="line"><span class="function">cv::FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;config.yml&quot;</span>, cv::FileStorage::WRITE)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以读模式打开</span></span><br><span class="line"><span class="function">cv::FileStorage <span class="title">fs</span><span class="params">(<span class="string">&quot;config.yml&quot;</span>, cv::FileStorage::READ)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用完毕后一定要释放</span></span><br><span class="line">fs.<span class="built_in">release</span>();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>WRITE</strong>：创建或覆盖已有文件</li>
+<li><strong>APPEND</strong>：在已有文件后追加内容</li>
+<li><strong>READ</strong>：读取已有文件</li>
+</ul>
+<hr>
+<h2 id="2-基本读写操作"><a href="#2-基本读写操作" class="headerlink" title="2. 基本读写操作"></a>2. 基本读写操作</h2><h3 id="写入基本类型"><a href="#写入基本类型" class="headerlink" title="写入基本类型"></a>写入基本类型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fs &lt;&lt; <span class="string">&quot;threshold&quot;</span> &lt;&lt; <span class="number">128</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;camera_name&quot;</span> &lt;&lt; <span class="string">&quot;MyCamera&quot;</span>;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;use_gpu&quot;</span> &lt;&lt; <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="读取基本类型"><a href="#读取基本类型" class="headerlink" title="读取基本类型"></a>读取基本类型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> thresh;</span><br><span class="line">std::string cam;</span><br><span class="line"><span class="type">bool</span> gpu;</span><br><span class="line">fs[<span class="string">&quot;threshold&quot;</span>] &gt;&gt; thresh;</span><br><span class="line">fs[<span class="string">&quot;camera_name&quot;</span>] &gt;&gt; cam;</span><br><span class="line">fs[<span class="string">&quot;use_gpu&quot;</span>] &gt;&gt; gpu;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-矩阵、向量与图像"><a href="#3-矩阵、向量与图像" class="headerlink" title="3. 矩阵、向量与图像"></a>3. 矩阵、向量与图像</h2><h3 id="写入-cv-Mat、std-vector"><a href="#写入-cv-Mat、std-vector" class="headerlink" title="写入 cv::Mat、std::vector"></a>写入 <code>cv::Mat</code>、<code>std::vector</code></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat K = (cv::<span class="built_in">Mat_</span>&lt;<span class="type">double</span>&gt;(<span class="number">3</span>,<span class="number">3</span>) &lt;&lt; fx, <span class="number">0</span>, cx, <span class="number">0</span>, fy, cy, <span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>);</span><br><span class="line">std::vector&lt;<span class="type">int</span>&gt; v = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>&#125;;</span><br><span class="line"></span><br><span class="line">fs &lt;&lt; <span class="string">&quot;intrinsics&quot;</span> &lt;&lt; K;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;my_list&quot;</span> &lt;&lt; v;</span><br></pre></td></tr></table></figure>
+
+<h3 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat K_read;</span><br><span class="line">std::vector&lt;<span class="type">int</span>&gt; v_read;</span><br><span class="line"></span><br><span class="line">fs[<span class="string">&quot;intrinsics&quot;</span>] &gt;&gt; K_read;</span><br><span class="line">fs[<span class="string">&quot;my_list&quot;</span>] &gt;&gt; v_read;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-结构化数据：节点与序列"><a href="#4-结构化数据：节点与序列" class="headerlink" title="4. 结构化数据：节点与序列"></a>4. 结构化数据：节点与序列</h2><h3 id="写入结构化块"><a href="#写入结构化块" class="headerlink" title="写入结构化块"></a>写入结构化块</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fs &lt;&lt; <span class="string">&quot;people&quot;</span> &lt;&lt; <span class="string">&quot;[&quot;</span>;               <span class="comment">// 开始序列</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span>&amp; p : people) &#123;</span><br><span class="line">    fs &lt;&lt; <span class="string">&quot;&#123;:&quot;</span>                       <span class="comment">// 开始映射</span></span><br><span class="line">       &lt;&lt; <span class="string">&quot;name&quot;</span> &lt;&lt; p.name</span><br><span class="line">       &lt;&lt; <span class="string">&quot;age&quot;</span>  &lt;&lt; p.age</span><br><span class="line">       &lt;&lt; <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;]&quot;</span>;                           <span class="comment">// 结束序列</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="读取-1"><a href="#读取-1" class="headerlink" title="读取"></a>读取</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cv::FileNode peopleNode = fs[<span class="string">&quot;people&quot;</span>];</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> it = peopleNode.<span class="built_in">begin</span>(); it != peopleNode.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">    std::string name = (std::string)(*it)[<span class="string">&quot;name&quot;</span>];</span><br><span class="line">    <span class="type">int</span> age = (<span class="type">int</span>)(*it)[<span class="string">&quot;age&quot;</span>];</span><br><span class="line">    <span class="comment">// 处理...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-错误检查"><a href="#5-错误检查" class="headerlink" title="5. 错误检查"></a>5. 错误检查</h2><ul>
+<li><p><strong>检查文件是否成功打开</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!fs.<span class="built_in">isOpened</span>()) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;无法打开文件！&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>检查节点是否存在</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (fs[<span class="string">&quot;param&quot;</span>].<span class="built_in">empty</span>()) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;param 节点不存在！&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="6-自动序列化／反序列化自定义类型"><a href="#6-自动序列化／反序列化自定义类型" class="headerlink" title="6. 自动序列化／反序列化自定义类型"></a>6. 自动序列化／反序列化自定义类型</h2><p>可以通过重载 <code>write</code> 和 <code>read</code> 函数，将自定义结构与 <code>FileNode</code> 绑定。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Point3D</span> &#123; <span class="type">double</span> x,y,z; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">write</span><span class="params">(cv::FileStorage&amp; fs, <span class="type">const</span> std::string&amp;, <span class="type">const</span> Point3D&amp; p)</span> </span>&#123;</span><br><span class="line">    fs &lt;&lt; <span class="string">&quot;&#123;&quot;</span> &lt;&lt; <span class="string">&quot;x&quot;</span> &lt;&lt; p.x &lt;&lt; <span class="string">&quot;y&quot;</span> &lt;&lt; p.y &lt;&lt; <span class="string">&quot;z&quot;</span> &lt;&lt; p.z &lt;&lt; <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">read</span><span class="params">(<span class="type">const</span> cv::FileNode&amp; node, Point3D&amp; p, <span class="type">const</span> Point3D&amp; default_value = &#123;&#125;)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (node.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        p = default_value;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        node[<span class="string">&quot;x&quot;</span>] &gt;&gt; p.x;</span><br><span class="line">        node[<span class="string">&quot;y&quot;</span>] &gt;&gt; p.y;</span><br><span class="line">        node[<span class="string">&quot;z&quot;</span>] &gt;&gt; p.z;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用时即可直接写入／读取 <code>Point3D</code> 对象：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Point3D pt&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line">fs &lt;&lt; <span class="string">&quot;pt&quot;</span> &lt;&lt; pt;</span><br><span class="line"></span><br><span class="line">Point3D pt2;</span><br><span class="line">fs[<span class="string">&quot;pt&quot;</span>] &gt;&gt; pt2;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-多格式支持"><a href="#7-多格式支持" class="headerlink" title="7. 多格式支持"></a>7. 多格式支持</h2><ul>
+<li>默认后缀 <code>.yml</code>&#x2F;<code>.yaml</code> → YAML</li>
+<li>后缀 <code>.xml</code> → XML</li>
+<li>后缀 <code>.json</code> → JSON（OpenCV 4.5+ 支持）</li>
+</ul>
+<hr>
+<h2 id="8-其他小技巧"><a href="#8-其他小技巧" class="headerlink" title="8. 其他小技巧"></a>8. 其他小技巧</h2><ol>
+<li><strong>注释</strong>：YAML 文件支持注释，用 <code>#</code> 开头即可。</li>
+<li><strong>相对路径</strong>：<code>FileStorage</code> 支持相对与绝对路径，可根据需要指定不同目录。</li>
+<li><strong>控制缩进与格式</strong>：在写入时可以指定 <code>fs.release()</code> 之前修改全局参数，比如 <code>fs &lt;&lt; cv::FileStorage::FORMAT_YAML</code>。</li>
+<li><strong>FileStorageFlags</strong>：如 <code>cv::FileStorage::BASE64</code> 可以把二进制数据以 Base64 编码存储。</li>
+</ol>
+<hr>
+<p>通过以上技巧，你可以灵活地使用 OpenCV 的 <code>cv::FileStorage</code> 来管理各种配置文件和数据序列，极大提升工程的可维护性与可读性。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/20/notebook/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2025-05-20--%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B004/" rel="prev" title="常用函数">
+      <i class="fa fa-chevron-left"></i> 常用函数
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/05/24/notebook/DeepLearning/2025-05-24--%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="next" title="深度学习基本概念">
+      深度学习基本概念 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#opencv-cv-FileStorage-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">opencv cv::FileStorage 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="nav-number">2.1.</span> <span class="nav-text">核心功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">基本用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%89%93%E5%BC%80%E6%96%87%E4%BB%B6"><span class="nav-number">2.2.1.</span> <span class="nav-text">1. 打开文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">2.2.2.</span> <span class="nav-text">2. 写入数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="nav-number">2.2.3.</span> <span class="nav-text">3. 读取数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6"><span class="nav-number">2.2.4.</span> <span class="nav-text">4. 关闭文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">高级用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">2.3.1.</span> <span class="nav-text">1. 自定义对象的序列化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%A3%80%E6%9F%A5%E6%96%87%E4%BB%B6%E6%98%AF%E5%90%A6%E6%88%90%E5%8A%9F%E6%89%93%E5%BC%80"><span class="nav-number">2.3.2.</span> <span class="nav-text">2. 检查文件是否成功打开</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%A4%84%E7%90%86%E7%A9%BA%E8%8A%82%E7%82%B9"><span class="nav-number">2.3.3.</span> <span class="nav-text">3. 处理空节点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E7%A4%BA%E4%BE%8B%EF%BC%88YAML%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">文件格式示例（YAML）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.5.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#opencv-cv-FileStorage-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">opencv cv::FileStorage 常用函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%8E%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">1. 构造函数与基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">3.1.1.</span> <span class="nav-text">构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#open"><span class="nav-number">3.1.2.</span> <span class="nav-text">open()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#isOpened"><span class="nav-number">3.1.3.</span> <span class="nav-text">isOpened()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#release"><span class="nav-number">3.1.4.</span> <span class="nav-text">release()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE-1"><span class="nav-number">3.2.</span> <span class="nav-text">2. 写入数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE"><span class="nav-number">3.2.1.</span> <span class="nav-text">写入基本数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E5%B5%8C%E5%A5%97%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.2.</span> <span class="nav-text">写入嵌套结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE-1"><span class="nav-number">3.3.</span> <span class="nav-text">3. 读取数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE"><span class="nav-number">3.3.1.</span> <span class="nav-text">读取基本数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E8%8A%82%E7%82%B9%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8"><span class="nav-number">3.3.2.</span> <span class="nav-text">检查节点是否存在</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%81%8D%E5%8E%86%E5%BA%8F%E5%88%97%E6%88%96%E6%98%A0%E5%B0%84"><span class="nav-number">3.3.3.</span> <span class="nav-text">遍历序列或映射</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%85%B6%E4%BB%96%E5%AE%9E%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">3.4.</span> <span class="nav-text">4. 其他实用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#getFirstTopLevelNode"><span class="nav-number">3.4.1.</span> <span class="nav-text">getFirstTopLevelNode()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#root"><span class="nav-number">3.4.2.</span> <span class="nav-text">root()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FileNodeIterator"><span class="nav-number">3.4.3.</span> <span class="nav-text">FileNodeIterator</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">3.5.</span> <span class="nav-text">5. 注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">3.6.</span> <span class="nav-text">示例代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E6%96%87%E4%BB%B6"><span class="nav-number">3.6.1.</span> <span class="nav-text">写入文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E6%96%87%E4%BB%B6"><span class="nav-number">3.6.2.</span> <span class="nav-text">读取文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#opencv-cv-FileStorage-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">4.</span> <span class="nav-text">opencv cv::FileStorage 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%89%93%E5%BC%80%E4%B8%8E%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">1. 打开与关闭文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%9F%BA%E6%9C%AC%E8%AF%BB%E5%86%99%E6%93%8D%E4%BD%9C"><span class="nav-number">6.</span> <span class="nav-text">2. 基本读写操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.1.</span> <span class="nav-text">写入基本类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.2.</span> <span class="nav-text">读取基本类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%9F%A9%E9%98%B5%E3%80%81%E5%90%91%E9%87%8F%E4%B8%8E%E5%9B%BE%E5%83%8F"><span class="nav-number">7.</span> <span class="nav-text">3. 矩阵、向量与图像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%85%A5-cv-Mat%E3%80%81std-vector"><span class="nav-number">7.1.</span> <span class="nav-text">写入 cv::Mat、std::vector</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96"><span class="nav-number">7.2.</span> <span class="nav-text">读取</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%EF%BC%9A%E8%8A%82%E7%82%B9%E4%B8%8E%E5%BA%8F%E5%88%97"><span class="nav-number">8.</span> <span class="nav-text">4. 结构化数据：节点与序列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E7%BB%93%E6%9E%84%E5%8C%96%E5%9D%97"><span class="nav-number">8.1.</span> <span class="nav-text">写入结构化块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96-1"><span class="nav-number">8.2.</span> <span class="nav-text">读取</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%94%99%E8%AF%AF%E6%A3%80%E6%9F%A5"><span class="nav-number">9.</span> <span class="nav-text">5. 错误检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E8%87%AA%E5%8A%A8%E5%BA%8F%E5%88%97%E5%8C%96%EF%BC%8F%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B"><span class="nav-number">10.</span> <span class="nav-text">6. 自动序列化／反序列化自定义类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%A4%9A%E6%A0%BC%E5%BC%8F%E6%94%AF%E6%8C%81"><span class="nav-number">11.</span> <span class="nav-text">7. 多格式支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%85%B6%E4%BB%96%E5%B0%8F%E6%8A%80%E5%B7%A7"><span class="nav-number">12.</span> <span class="nav-text">8. 其他小技巧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

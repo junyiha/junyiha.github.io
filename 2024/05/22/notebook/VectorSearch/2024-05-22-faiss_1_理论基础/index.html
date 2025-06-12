@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 faiss工具的理论基础  faiss 基础Faiss 是一个用于高效相似向量搜索和聚类的库，由Facebook AI Research开发。它提供了一系列用于向量索引、相似度搜索和聚类的算法和工具。Faiss 在处理大规模向量数据时非常高效，适用于各种应用场景，例如图像搜索、文本检索、推荐系统等。 以下是 Faiss 的一些主要特性和功能：  向量索引：Faiss 提供了多种向量索引结构，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="faiss_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/VectorSearch/2024-05-22-faiss_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 faiss工具的理论基础  faiss 基础Faiss 是一个用于高效相似向量搜索和聚类的库，由Facebook AI Research开发。它提供了一系列用于向量索引、相似度搜索和聚类的算法和工具。Faiss 在处理大规模向量数据时非常高效，适用于各种应用场景，例如图像搜索、文本检索、推荐系统等。 以下是 Faiss 的一些主要特性和功能：  向量索引：Faiss 提供了多种向量索引结构，">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.569Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="VectorSearch">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/VectorSearch/2024-05-22-faiss_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>faiss_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/VectorSearch/2024-05-22-faiss_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          faiss_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/VectorSearch/" itemprop="url" rel="index"><span itemprop="name">VectorSearch</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>faiss工具的理论基础</li>
+</ul>
+<h2 id="faiss-基础"><a href="#faiss-基础" class="headerlink" title="faiss 基础"></a>faiss 基础</h2><p>Faiss 是一个用于高效相似向量搜索和聚类的库，由Facebook AI Research开发。它提供了一系列用于向量索引、相似度搜索和聚类的算法和工具。Faiss 在处理大规模向量数据时非常高效，适用于各种应用场景，例如图像搜索、文本检索、推荐系统等。</p>
+<p>以下是 Faiss 的一些主要特性和功能：</p>
+<ol>
+<li><p>向量索引：Faiss 提供了多种向量索引结构，包括平均哈希（IndexFlat），倒排文件（IndexIVF）等，可以在索引中快速存储和检索向量数据。</p>
+</li>
+<li><p>相似度搜索：Faiss 支持通过向量之间的相似度进行搜索，可以使用欧氏距离、内积等度量来计算相似度，并返回最相似的向量。</p>
+</li>
+<li><p>高效性能：Faiss 针对大规模向量数据进行了优化，使用了高度并行的算法和数据结构，以实现快速的搜索和检索操作。</p>
+</li>
+<li><p>GPU 支持：Faiss 提供了对 GPU 的支持，可以利用 GPU 的并行计算能力加速向量检索的速度。</p>
+</li>
+<li><p>多种距离度量：Faiss 支持多种距离度量方式，包括欧氏距离、内积、余弦相似度等，可以根据具体需求选择适当的度量方式。</p>
+</li>
+<li><p>扩展性：Faiss 具有良好的可扩展性，可以处理数百万或数十亿维度的向量数据，适用于大规模应用场景。</p>
+</li>
+</ol>
+<p>要使用 Faiss 进行向量检索，通常需要执行以下步骤：</p>
+<ol>
+<li><p>准备数据：将需要进行检索的向量数据准备好，可以是图像特征、文本向量或其他类型的向量。</p>
+</li>
+<li><p>创建索引：选择适当的索引结构，根据数据集合的大小和特性创建 Faiss 索引。可以选择不同的索引类型和配置参数。</p>
+</li>
+<li><p>添加向量：将向量数据添加到 Faiss 索引中，构建索引结构。</p>
+</li>
+<li><p>执行搜索：使用索引结构进行相似向量搜索，提供查询向量，Faiss 将返回最相似的向量结果。</p>
+</li>
+</ol>
+<p>Faiss 提供了多种编程语言的接口，包括 C++、Python 和其他语言的封装。你可以根据自己的需求选择适合的接口和编程语言进行使用。</p>
+<p>请注意，Faiss 是一个功能强大的库，需要一定的学习和使用成本。如果你有具体的问题或需要更详细的指导，可以提供更多具体的信息，我将尽力提供帮助。</p>
+<hr>
+<h2 id="faiss-详解"><a href="#faiss-详解" class="headerlink" title="faiss 详解"></a>faiss 详解</h2><p>Faiss（Facebook AI Similarity Search）是一个由Facebook AI Research开发的库，用于高效相似向量搜索和聚类。它主要用于处理大规模向量数据集，具有快速、可扩展和高效的特性。</p>
+<p>以下是对 Faiss 的一些详细解释：</p>
+<ol>
+<li><p>特点和功能：</p>
+<ul>
+<li>高效性能：Faiss 针对大规模向量数据进行了优化，使用了高度并行的算法和数据结构，以实现快速的搜索和检索操作。</li>
+<li>多种索引结构：Faiss 提供了多种索引结构，包括平均哈希（IndexFlat）、倒排文件（IndexIVF）等。每种结构适用于不同的数据集和搜索需求。</li>
+<li>相似度搜索：Faiss 支持通过向量之间的相似度进行搜索，可以使用欧氏距离、内积等度量来计算相似度，并返回最相似的向量结果。</li>
+<li>GPU 支持：Faiss 可以利用 GPU 的并行计算能力加速向量检索的速度，提供了与 GPU 相关的索引和搜索功能。</li>
+</ul>
+</li>
+<li><p>应用领域：</p>
+<ul>
+<li>图像搜索：Faiss 可以应用于图像特征向量的索引和搜索，用于快速的图像相似性匹配和检索。</li>
+<li>文本检索：Faiss 也可用于文本向量的索引和搜索，用于语义相似性搜索和相关性匹配。</li>
+<li>推荐系统：Faiss 在推荐系统中可以用于用户向量和商品向量的相似性匹配，以提供个性化推荐。</li>
+</ul>
+</li>
+<li><p>编程语言和接口：</p>
+<ul>
+<li>Faiss 提供了 C++ 和 Python 的接口，可以在这两种编程语言中使用 Faiss 进行向量索引和搜索。</li>
+<li>对于 Python 用户，Faiss 提供了 numpy 数组和 PyTorch 张量之间的无缝集成，方便数据的加载和处理。</li>
+</ul>
+</li>
+<li><p>文档和资源：</p>
+<ul>
+<li>Faiss 的官方文档提供了详细的使用指南、示例代码和API参考，可以帮助开发者快速上手并了解各种功能和配置选项。</li>
+<li>Faiss 的 GitHub 存储库包含了源代码、问题跟踪和社区讨论，开发者可以在其中获取更多的资源和支持。</li>
+</ul>
+</li>
+</ol>
+<p>总体而言，Faiss 是一个功能强大的向量检索库，被广泛应用于图像搜索、文本检索和推荐系统等领域。它的高性能、多样的索引结构和灵活的编程接口使得处理大规模向量数据变得高效且可扩展。</p>
+<hr>
+<h2 id="C-常用接口"><a href="#C-常用接口" class="headerlink" title="C++ 常用接口"></a>C++ 常用接口</h2><p>在 Faiss C++ 库中，以下是一些常用的接口：</p>
+<ol>
+<li><p>Index：Index 是 Faiss 中索引的基类，定义了向量索引和搜索的通用接口。各种具体的索引结构都派生自 Index 类。常用的派生类包括 IndexFlat、IndexIVF、IndexIVFPQ 等。</p>
+</li>
+<li><p>IndexFlat：IndexFlat 是 Faiss 中平坦索引的类，适用于小规模数据集。它提供了基于距离度量的搜索功能，例如欧氏距离或内积。</p>
+</li>
+<li><p>IndexIVF：IndexIVF 是 Faiss 中倒排文件索引的类，适用于大规模数据集。它使用倒排文件结构组织向量数据，并提供了高效的相似向量搜索。</p>
+</li>
+<li><p>IndexIVFPQ：IndexIVFPQ 是 Faiss 中倒排文件索引的量化版本。它通过对向量进行量化和编码来减小存储空间，并提供了高效的相似向量搜索。</p>
+</li>
+<li><p>IndexLSH：IndexLSH 是 Faiss 中局部敏感哈希索引的类，用于高维向量的近似搜索。它使用局部敏感哈希函数将向量映射到多个桶中，以实现高效的近似最近邻搜索。</p>
+</li>
+<li><p>IndexHNSW：IndexHNSW 是 Faiss 中基于 HNSW（Hierarchical Navigable Small World）算法的索引类。它构建了一个层次结构的近邻图，以提供快速的相似向量搜索。</p>
+</li>
+</ol>
+<p>这些是 Faiss C++ 库中的一些常用接口和类示例。每个索引类都提供了特定的功能和选项，可以根据应用需求选择适合的接口和类。在使用 Faiss C++ 库时，建议参考官方文档和示例代码，以了解更多详细的接口和类说明。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/VectorSearch/" rel="tag"># VectorSearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/VectorSearch/2024-05-22-vector_search_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="vector_search_1_理论基础">
+      <i class="fa fa-chevron-left"></i> vector_search_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/SQL/2024-05-22-sqlite3_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="next" title="sqlite3_2_常用函数">
+      sqlite3_2_常用函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#faiss-%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">faiss 基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#faiss-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">faiss 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E5%B8%B8%E7%94%A8%E6%8E%A5%E5%8F%A3"><span class="nav-number">4.</span> <span class="nav-text">C++ 常用接口</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

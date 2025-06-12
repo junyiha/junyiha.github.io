@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 OpenVino 相关学习笔记  ov::AnyMap 详解在 OpenVINO 的 C++ API 中，ov::AnyMap 是一个通用的键值对数据结构，用于设置和传递模型编译或推理时的配置参数。它允许用户通过简单的键值映射来定义特定配置，以便调整推理过程的行为。  1. ov::AnyMap 的基本概念 类型: std::map&lt;std::string, ov::Any&gt; 的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenVino">
+<meta property="og:url" content="https://junyiha.github.io/2024/12/30/notebook/DeepLearning/OpenVINO/2024-12-30-OpenVino/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 OpenVino 相关学习笔记  ov::AnyMap 详解在 OpenVINO 的 C++ API 中，ov::AnyMap 是一个通用的键值对数据结构，用于设置和传递模型编译或推理时的配置参数。它允许用户通过简单的键值映射来定义特定配置，以便调整推理过程的行为。  1. ov::AnyMap 的基本概念 类型: std::map&lt;std::string, ov::Any&gt; 的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-12-30T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.285Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="AI部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/12/30/notebook/DeepLearning/OpenVINO/2024-12-30-OpenVino/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>OpenVino | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notebook/DeepLearning/OpenVINO/2024-12-30-OpenVino/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenVino
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-30 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-30T09:00:00+08:00">2024-12-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>OpenVino 相关学习笔记</li>
+</ul>
+<h2 id="ov-AnyMap-详解"><a href="#ov-AnyMap-详解" class="headerlink" title="ov::AnyMap 详解"></a>ov::AnyMap 详解</h2><p>在 OpenVINO 的 C++ API 中，<code>ov::AnyMap</code> 是一个通用的键值对数据结构，用于设置和传递模型编译或推理时的配置参数。它允许用户通过简单的键值映射来定义特定配置，以便调整推理过程的行为。</p>
+<hr>
+<h2 id="1-ov-AnyMap-的基本概念"><a href="#1-ov-AnyMap-的基本概念" class="headerlink" title="1. ov::AnyMap 的基本概念"></a>1. <strong><code>ov::AnyMap</code> 的基本概念</strong></h2><ul>
+<li><strong>类型</strong>: <code>std::map&lt;std::string, ov::Any&gt;</code> 的别名。</li>
+<li><strong>功能</strong>: 存储键值对，其中键为配置参数的名称，值为 <code>ov::Any</code> 类型，用于支持不同类型的参数值。</li>
+<li><strong>用途</strong>:<ul>
+<li>配置推理设备的行为（如线程数、性能模式）。</li>
+<li>设置优化参数（如批处理大小、输入精度等）。</li>
+<li>传递插件特定的自定义配置。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-创建和使用"><a href="#2-创建和使用" class="headerlink" title="2. 创建和使用"></a>2. <strong>创建和使用</strong></h2><p><code>ov::AnyMap</code> 是可选配置的一部分，通常在调用 <code>ov::Core::compile_model</code> 或类似方法时使用。</p>
+<h3 id="创建一个-ov-AnyMap"><a href="#创建一个-ov-AnyMap" class="headerlink" title="创建一个 ov::AnyMap"></a><strong>创建一个 <code>ov::AnyMap</code></strong></h3><p>以下是创建和设置 <code>ov::AnyMap</code> 的示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个配置参数的 AnyMap</span></span><br><span class="line">    ov::AnyMap config;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置性能模式</span></span><br><span class="line">    config[ov::hint::performance_mode.<span class="built_in">name</span>()] = ov::hint::PerformanceMode::THROUGHPUT;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置线程数</span></span><br><span class="line">    config[ov::inference_num_threads.<span class="built_in">name</span>()] = <span class="number">8</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置流数量</span></span><br><span class="line">    config[ov::num_streams.<span class="built_in">name</span>()] = <span class="string">&quot;AUTO&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-ov-AnyMap"><a href="#使用-ov-AnyMap" class="headerlink" title="使用 ov::AnyMap"></a><strong>使用 <code>ov::AnyMap</code></strong></h3><p>通过 <code>ov::Core</code> 编译模型时传入 <code>ov::AnyMap</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载模型</span></span><br><span class="line"><span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用配置编译模型</span></span><br><span class="line"><span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>, config);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-ov-Any-的特性"><a href="#3-ov-Any-的特性" class="headerlink" title="3. ov::Any 的特性"></a>3. <strong><code>ov::Any</code> 的特性</strong></h2><p><code>ov::Any</code> 是一个多态类型，支持存储任意类型的值。常见的值类型包括：</p>
+<ul>
+<li>整数 (<code>int</code>)</li>
+<li>浮点数 (<code>float</code>, <code>double</code>)</li>
+<li>字符串 (<code>std::string</code>)</li>
+<li>枚举类型（如 <code>ov::hint::PerformanceMode</code>）</li>
+<li>布尔值 (<code>bool</code>)</li>
+</ul>
+<p>使用 <code>ov::Any</code> 时，自动处理值类型，例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置不同类型的值</span></span><br><span class="line">ov::AnyMap config;</span><br><span class="line">config[<span class="string">&quot;threads&quot;</span>] = <span class="number">4</span>; <span class="comment">// int</span></span><br><span class="line">config[<span class="string">&quot;enable_profiling&quot;</span>] = <span class="literal">true</span>; <span class="comment">// bool</span></span><br><span class="line">config[<span class="string">&quot;device&quot;</span>] = std::<span class="built_in">string</span>(<span class="string">&quot;CPU&quot;</span>); <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-常见配置参数"><a href="#4-常见配置参数" class="headerlink" title="4. 常见配置参数"></a>4. <strong>常见配置参数</strong></h2><p>以下是 OpenVINO 支持的一些常见配置参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>值类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ov::hint::performance_mode</code></td>
+<td><code>ov::hint::PerformanceMode</code></td>
+<td>性能优化模式，如延迟或吞吐量优化。</td>
+</tr>
+<tr>
+<td><code>ov::inference_num_threads</code></td>
+<td><code>int</code></td>
+<td>推理线程数。</td>
+</tr>
+<tr>
+<td><code>ov::num_streams</code></td>
+<td><code>std::string</code></td>
+<td>流数量，如 “AUTO”、”1”、”2” 等。</td>
+</tr>
+<tr>
+<td><code>ov::enable_profiling</code></td>
+<td><code>bool</code></td>
+<td>是否启用性能分析。</td>
+</tr>
+<tr>
+<td><code>ov::hint::model_priority</code></td>
+<td><code>ov::hint::Priority</code></td>
+<td>模型优先级设置。</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-如何读取配置"><a href="#5-如何读取配置" class="headerlink" title="5. 如何读取配置"></a>5. <strong>如何读取配置</strong></h2><p>使用 <code>ov::AnyMap</code> 设置参数后，可以通过以下方式访问参数值：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取配置值</span></span><br><span class="line"><span class="keyword">auto</span> threads = config[<span class="string">&quot;threads&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">int</span>&gt;(); <span class="comment">// 获取 int 类型的线程数</span></span><br><span class="line"><span class="keyword">auto</span> enable_profiling = config[<span class="string">&quot;enable_profiling&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">bool</span>&gt;(); <span class="comment">// 获取 bool 类型的值</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-错误处理"><a href="#6-错误处理" class="headerlink" title="6. 错误处理"></a>6. <strong>错误处理</strong></h2><ul>
+<li>如果尝试访问不存在的键，会抛出异常。</li>
+<li>如果类型转换失败（如尝试将 <code>bool</code> 转换为 <code>int</code>），会引发类型错误。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">auto</span> value = config[<span class="string">&quot;non_existing_key&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">int</span>&gt;();</span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line">    std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-结合设备插件"><a href="#7-结合设备插件" class="headerlink" title="7. 结合设备插件"></a>7. <strong>结合设备插件</strong></h2><p><code>ov::AnyMap</code> 可以传递设备插件特定的配置。例如，针对 GPU：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ov::AnyMap gpu_config = &#123;</span><br><span class="line">    &#123;<span class="string">&quot;CACHE_DIR&quot;</span>, <span class="string">&quot;/path/to/cache&quot;</span>&#125;, <span class="comment">// GPU 缓存目录</span></span><br><span class="line">    &#123;ov::hint::performance_mode.<span class="built_in">name</span>(), ov::hint::PerformanceMode::THROUGHPUT&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;GPU&quot;</span>, gpu_config);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>ov::AnyMap</code> 是 OpenVINO 中灵活且强大的配置工具，用户可以根据需要动态设置和调整推理的行为，优化性能。结合设备特性和推理场景，灵活使用 <code>ov::AnyMap</code> 是提升模型部署效率的重要手段。如果需要针对某个配置参数的具体说明，请进一步告知！</p>
+<h2 id="C-OpenVINO-ov-hint-performance-mode-详解"><a href="#C-OpenVINO-ov-hint-performance-mode-详解" class="headerlink" title="C++ OpenVINO ov::hint::performance_mode 详解"></a>C++ OpenVINO ov::hint::performance_mode 详解</h2><p>在 OpenVINO 的 C++ API 中，<code>ov::hint::performance_mode</code> 是一个用于优化推理性能的设置选项。它允许用户为推理过程选择不同的性能模式，以平衡吞吐量、延迟和设备资源利用率等方面的需求。</p>
+<p>以下是对 <code>ov::hint::performance_mode</code> 的详解：</p>
+<hr>
+<h2 id="1-性能模式的类型"><a href="#1-性能模式的类型" class="headerlink" title="1. 性能模式的类型"></a>1. <strong>性能模式的类型</strong></h2><p><code>ov::hint::performance_mode</code> 支持以下几种模式，每种模式都有其适用场景：</p>
+<h3 id="a-LATENCY"><a href="#a-LATENCY" class="headerlink" title="a. LATENCY"></a><strong>a. <code>LATENCY</code></strong></h3><ul>
+<li><strong>描述</strong>: 优化以降低单次推理的延迟。</li>
+<li><strong>应用场景</strong>:<ul>
+<li>实时应用，如视频分析和在线推理。</li>
+<li>延迟敏感的场景。</li>
+</ul>
+</li>
+</ul>
+<h3 id="b-THROUGHPUT"><a href="#b-THROUGHPUT" class="headerlink" title="b. THROUGHPUT"></a><strong>b. <code>THROUGHPUT</code></strong></h3><ul>
+<li><strong>描述</strong>: 优化以提高设备的整体吞吐量，通常通过增加批处理大小和并行化执行。</li>
+<li><strong>应用场景</strong>:<ul>
+<li>离线批量处理。</li>
+<li>批量推理任务，如图像分类。</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-CUMULATIVE-THROUGHPUT"><a href="#c-CUMULATIVE-THROUGHPUT" class="headerlink" title="c. CUMULATIVE_THROUGHPUT"></a><strong>c. <code>CUMULATIVE_THROUGHPUT</code></strong></h3><ul>
+<li><strong>描述</strong>: 专注于在多次推理任务中累积吞吐量的优化。</li>
+<li><strong>应用场景</strong>:<ul>
+<li>多模型部署。</li>
+<li>并发推理任务的优化。</li>
+</ul>
+</li>
+</ul>
+<h3 id="d-UNDEFINED"><a href="#d-UNDEFINED" class="headerlink" title="d. UNDEFINED"></a><strong>d. <code>UNDEFINED</code></strong></h3><ul>
+<li><strong>描述</strong>: 使用插件的默认性能配置，通常适用于简单场景或不确定优化需求时。</li>
+<li><strong>应用场景</strong>:<ul>
+<li>开发阶段。</li>
+<li>初始实验。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-设置方式"><a href="#2-设置方式" class="headerlink" title="2. 设置方式"></a>2. <strong>设置方式</strong></h2><p>通过 <code>ov::Core</code> 或 <code>ov::CompiledModel</code> 对象设置性能模式。以下是示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建 OpenVINO Core 对象</span></span><br><span class="line">    ov::Core core;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载模型</span></span><br><span class="line">    <span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 配置性能模式</span></span><br><span class="line">    ov::AnyMap config = &#123;</span><br><span class="line">        &#123;ov::hint::performance_mode, ov::hint::PerformanceMode::LATENCY&#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 编译模型并应用配置</span></span><br><span class="line">    <span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>, config);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行推理</span></span><br><span class="line">    <span class="keyword">auto</span> infer_request = compiled_model.<span class="built_in">create_infer_request</span>();</span><br><span class="line">    <span class="comment">// 推理逻辑...</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-性能模式的影响"><a href="#3-性能模式的影响" class="headerlink" title="3. 性能模式的影响"></a>3. <strong>性能模式的影响</strong></h2><p>性能模式主要通过以下方式影响推理行为：</p>
+<ul>
+<li><strong>线程优化</strong>: 调整计算线程数、绑定策略等。</li>
+<li><strong>批量处理</strong>: 增加或减少批处理大小。</li>
+<li><strong>并行化策略</strong>: 优化并行计算的粒度和线程分配。</li>
+</ul>
+<hr>
+<h2 id="4-最佳实践"><a href="#4-最佳实践" class="headerlink" title="4. 最佳实践"></a>4. <strong>最佳实践</strong></h2><ul>
+<li>在实时系统中，优先选择 <code>LATENCY</code>。</li>
+<li>离线任务或批量处理，选择 <code>THROUGHPUT</code>。</li>
+<li>如果部署多个模型，选择 <code>CUMULATIVE_THROUGHPUT</code>。</li>
+<li>开发和测试阶段，可以先使用 <code>UNDEFINED</code>，然后根据实际需求调整。</li>
+</ul>
+<hr>
+<h2 id="5-设备支持"><a href="#5-设备支持" class="headerlink" title="5. 设备支持"></a>5. <strong>设备支持</strong></h2><p>不同的设备插件（如 CPU、GPU、VPU 等）可能对性能模式的支持有细微差异。例如：</p>
+<ul>
+<li><strong>CPU</strong>: 支持所有性能模式，并提供多线程优化。</li>
+<li><strong>GPU</strong>: 注重吞吐量优化，但延迟模式下可能受到硬件约束。</li>
+<li><strong>VPU</strong>: 通常用于低功耗场景，优化吞吐量和延迟的权衡。</li>
+</ul>
+<p>了解设备特性和任务需求，有助于更好地选择性能模式。</p>
+<hr>
+<p>如果你有具体问题或需要针对某个场景的配置示例，请告诉我！</p>
+<h2 id="OpenVINO-windows下环境配置教程"><a href="#OpenVINO-windows下环境配置教程" class="headerlink" title="OpenVINO windows下环境配置教程"></a>OpenVINO windows下环境配置教程</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.openvino.ai/2024/get-started/install-openvino/install-openvino-archive-windows.html">OpenVINO 安装指南</a></li>
+</ul>
+<h2 id="OpenVino-是什么"><a href="#OpenVino-是什么" class="headerlink" title="OpenVino 是什么"></a>OpenVino 是什么</h2><p>OpenVINO（Open Visual Inference and Neural Network Optimization）是一个由 <strong>Intel</strong> 提供的开源工具包，旨在加速深度学习模型的推理和优化，特别是在 Intel 硬件（如 CPU、GPU、FPGA 和 VPU）上的性能表现。它主要用于计算机视觉应用，但也支持其他类型的 AI 工作负载。</p>
+<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><ol>
+<li><p><strong>模型优化</strong><br>OpenVINO 提供了模型优化器（Model Optimizer），可以将各种深度学习框架（如 TensorFlow、PyTorch、ONNX、Caffe 等）训练的模型转换为 OpenVINO 的中间表示格式（IR Format）。这可以帮助简化模型并提升推理效率。</p>
+</li>
+<li><p><strong>硬件加速</strong><br>支持在多种 Intel 硬件上运行，包括：  </p>
+<ul>
+<li>Intel CPU（尤其是使用了 AVX 和其他指令集优化）  </li>
+<li>Intel 集成显卡（GPU）  </li>
+<li>Intel Movidius VPU（视觉处理单元）  </li>
+<li>Intel FPGA（可编程逻辑门阵列）</li>
+</ul>
+</li>
+<li><p><strong>高效推理引擎</strong><br>OpenVINO 提供了推理引擎，可以通过异构计算同时利用多种硬件的优势，最大化推理性能。</p>
+</li>
+<li><p><strong>预训练模型和工具支持</strong><br>包括预训练的模型库（Open Model Zoo），以及一些便捷的 API 和开发工具，用于快速开发 AI 应用。</p>
+</li>
+<li><p><strong>跨平台支持</strong><br>OpenVINO 支持在各种操作系统上运行，包括 Linux、Windows 和 macOS。</p>
+</li>
+</ol>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
+<li><strong>计算机视觉</strong>：如目标检测、图像分类、语义分割、人脸识别等。</li>
+<li><strong>视频分析</strong>：如实时监控、行为分析、视频内容理解等。</li>
+<li><strong>自然语言处理（NLP）</strong>：尽管主要面向视觉任务，但 OpenVINO 也支持 NLP 模型的优化和推理。</li>
+<li><strong>嵌入式 AI</strong>：在资源受限的设备（如边缘设备）上运行优化的 AI 模型。</li>
+</ul>
+<h3 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h3><ol>
+<li>提高推理速度，降低延迟。</li>
+<li>支持多种硬件，灵活适应不同的部署需求。</li>
+<li>开源且有丰富的文档和社区支持。</li>
+<li>提供易用的 API，适合快速开发。</li>
+</ol>
+<p>如果你正在开发需要部署深度学习模型的应用，并且目标硬件是 Intel 平台，OpenVINO 是一个非常合适的选择。</p>
+<h2 id="OpenVino-推理框架-详解"><a href="#OpenVino-推理框架-详解" class="headerlink" title="OpenVino 推理框架 详解"></a>OpenVino 推理框架 详解</h2><p>OpenVINO 的推理框架（Inference Framework）是 OpenVINO 工具包的核心组件之一，它负责高效地执行优化后的深度学习模型推理。以下是 OpenVINO 推理框架的详细解析：</p>
+<hr>
+<h3 id="1-核心组件"><a href="#1-核心组件" class="headerlink" title="1. 核心组件"></a><strong>1. 核心组件</strong></h3><h4 id="1-模型优化器（Model-Optimizer）"><a href="#1-模型优化器（Model-Optimizer）" class="headerlink" title="(1) 模型优化器（Model Optimizer）"></a><strong>(1) 模型优化器（Model Optimizer）</strong></h4><ul>
+<li>将训练好的深度学习模型转换为 OpenVINO 的中间表示（Intermediate Representation，IR）格式。</li>
+<li><strong>输入支持：</strong><ul>
+<li>支持多种框架的模型，包括 TensorFlow、PyTorch、ONNX、Caffe 等。</li>
+</ul>
+</li>
+<li><strong>优化方式：</strong><ul>
+<li>图形优化（删除冗余运算节点）。</li>
+<li>数据类型精简（如 FP32 转换为 FP16）。</li>
+<li>插入专为 Intel 硬件设计的高效计算指令。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-推理引擎（Inference-Engine）"><a href="#2-推理引擎（Inference-Engine）" class="headerlink" title="(2) 推理引擎（Inference Engine）"></a><strong>(2) 推理引擎（Inference Engine）</strong></h4><ul>
+<li>核心执行模块，负责加载优化后的 IR 模型并在目标硬件上高效运行。</li>
+<li><strong>功能：</strong><ul>
+<li>提供统一的 API 接口，支持多种硬件。</li>
+<li>实现同步和异步推理（适用于实时和离线场景）。</li>
+<li>自动分配推理负载到多个设备（如 CPU 和 GPU 同时工作）。</li>
+</ul>
+</li>
+<li><strong>主要模块：</strong><ul>
+<li><strong>核心对象（Core API）：</strong> 用于加载模型和配置设备。</li>
+<li><strong>插件架构：</strong> 针对不同硬件有特定插件，如 CPU 插件、GPU 插件、VPU 插件。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-硬件支持层（Hardware-Abstraction-Layer）"><a href="#3-硬件支持层（Hardware-Abstraction-Layer）" class="headerlink" title="(3) 硬件支持层（Hardware Abstraction Layer）"></a><strong>(3) 硬件支持层（Hardware Abstraction Layer）</strong></h4><ul>
+<li>提供针对 Intel 硬件优化的指令集（如 AVX、VNNI）。</li>
+<li>支持的设备包括：<ul>
+<li>CPU（使用线程优化和向量化技术）。</li>
+<li>GPU（集成 GPU 的 OpenCL 加速）。</li>
+<li>VPU（Movidius 芯片）。</li>
+<li>FPGA（灵活可编程硬件）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-工作流程"><a href="#2-工作流程" class="headerlink" title="2. 工作流程"></a><strong>2. 工作流程</strong></h3><ol>
+<li><strong>模型准备</strong><ul>
+<li>从训练框架导出模型（如 <code>.pb</code>、<code>.onnx</code>、<code>.caffemodel</code>）。</li>
+<li>使用模型优化器将模型转换为 IR 格式（包括 <code>.xml</code> 和 <code>.bin</code> 文件）。</li>
+</ul>
+</li>
+<li><strong>加载模型</strong><ul>
+<li>使用推理引擎的 Core API 加载 IR 模型到指定设备。</li>
+</ul>
+</li>
+<li><strong>预处理</strong><ul>
+<li>调整输入数据的格式（如大小、数据类型、归一化等）。</li>
+</ul>
+</li>
+<li><strong>推理执行</strong><ul>
+<li>调用推理引擎执行推理操作（支持同步或异步）。</li>
+</ul>
+</li>
+<li><strong>后处理</strong><ul>
+<li>对推理结果进行解码或进一步处理（如 NMS、标签映射等）。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="3-编程接口"><a href="#3-编程接口" class="headerlink" title="3. 编程接口"></a><strong>3. 编程接口</strong></h3><h4 id="1-Python-API"><a href="#1-Python-API" class="headerlink" title="(1) Python API"></a><strong>(1) Python API</strong></h4><ul>
+<li>简单易用，适合快速开发和原型验证。</li>
+<li>样例代码：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> openvino.runtime <span class="keyword">import</span> Core</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Core</span></span><br><span class="line">core = Core()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载模型</span></span><br><span class="line">model = core.read_model(model=<span class="string">&quot;model.xml&quot;</span>)</span><br><span class="line">compiled_model = core.compile_model(model=model, device_name=<span class="string">&quot;CPU&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推理</span></span><br><span class="line">input_data = ...  <span class="comment"># 预处理后的输入数据</span></span><br><span class="line">results = compiled_model([input_data])</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-C-API"><a href="#2-C-API" class="headerlink" title="(2) C++ API"></a><strong>(2) C++ API</strong></h4><ul>
+<li>性能更高，适合生产级部署。</li>
+<li>样例代码：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openvino/openvino.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ov::Core core;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载模型</span></span><br><span class="line">    <span class="keyword">auto</span> model = core.<span class="built_in">read_model</span>(<span class="string">&quot;model.xml&quot;</span>);</span><br><span class="line">    <span class="keyword">auto</span> compiled_model = core.<span class="built_in">compile_model</span>(model, <span class="string">&quot;CPU&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 推理</span></span><br><span class="line">    ov::InferRequest infer_request = compiled_model.<span class="built_in">create_infer_request</span>();</span><br><span class="line">    infer_request.<span class="built_in">set_input_tensor</span>(...);  <span class="comment">// 设置输入</span></span><br><span class="line">    infer_request.<span class="built_in">infer</span>();</span><br><span class="line">    <span class="keyword">auto</span> output = infer_request.<span class="built_in">get_output_tensor</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="4-支持的推理模式"><a href="#4-支持的推理模式" class="headerlink" title="4. 支持的推理模式"></a><strong>4. 支持的推理模式</strong></h3><h4 id="1-同步推理"><a href="#1-同步推理" class="headerlink" title="(1) 同步推理"></a><strong>(1) 同步推理</strong></h4><ul>
+<li>简单、顺序执行推理。</li>
+<li>适合离线处理场景。</li>
+</ul>
+<h4 id="2-异步推理"><a href="#2-异步推理" class="headerlink" title="(2) 异步推理"></a><strong>(2) 异步推理</strong></h4><ul>
+<li>非阻塞模式，可以在等待推理结果时并行执行其他任务。</li>
+<li>适合实时场景，如视频流分析。</li>
+</ul>
+<hr>
+<h3 id="5-优化特性"><a href="#5-优化特性" class="headerlink" title="5. 优化特性"></a><strong>5. 优化特性</strong></h3><h4 id="1-混合精度推理"><a href="#1-混合精度推理" class="headerlink" title="(1) 混合精度推理"></a><strong>(1) 混合精度推理</strong></h4><ul>
+<li>支持 FP32、FP16 和 INT8 的混合精度计算。</li>
+<li>使用 INT8 精度进一步提升性能，同时减少计算和内存开销。</li>
+</ul>
+<h4 id="2-多设备推理"><a href="#2-多设备推理" class="headerlink" title="(2) 多设备推理"></a><strong>(2) 多设备推理</strong></h4><ul>
+<li>使用 Heterogeneous Plugin 实现负载均衡。</li>
+<li>自动调度任务到最佳设备。</li>
+</ul>
+<h4 id="3-自定义层扩展"><a href="#3-自定义层扩展" class="headerlink" title="(3) 自定义层扩展"></a><strong>(3) 自定义层扩展</strong></h4><ul>
+<li>支持用户定义的自定义操作，适配特定模型需求。</li>
+</ul>
+<hr>
+<h3 id="6-应用场景"><a href="#6-应用场景" class="headerlink" title="6. 应用场景"></a><strong>6. 应用场景</strong></h3><ol>
+<li><strong>实时视频分析</strong>（如安防监控、人流统计）。</li>
+<li><strong>工业自动化</strong>（如缺陷检测、机器人视觉）。</li>
+<li><strong>医疗影像处理</strong>（如肿瘤检测）。</li>
+<li><strong>嵌入式 AI</strong>（如无人机、智能家居设备）。</li>
+</ol>
+<hr>
+<h3 id="7-常用工具"><a href="#7-常用工具" class="headerlink" title="7. 常用工具"></a><strong>7. 常用工具</strong></h3><h4 id="1-Open-Model-Zoo"><a href="#1-Open-Model-Zoo" class="headerlink" title="(1) Open Model Zoo"></a><strong>(1) Open Model Zoo</strong></h4><ul>
+<li>提供大量预训练模型，如 ResNet、YOLO、SSD。</li>
+<li>方便快速测试和验证。</li>
+</ul>
+<h4 id="2-Benchmark-Tool"><a href="#2-Benchmark-Tool" class="headerlink" title="(2) Benchmark Tool"></a><strong>(2) Benchmark Tool</strong></h4><ul>
+<li>测试模型在目标硬件上的性能。</li>
+</ul>
+<h4 id="3-Post-Training-Optimization-Toolkit-POT"><a href="#3-Post-Training-Optimization-Toolkit-POT" class="headerlink" title="(3) Post-Training Optimization Toolkit (POT)"></a><strong>(3) Post-Training Optimization Toolkit (POT)</strong></h4><ul>
+<li>支持后量化（Post-training Quantization），提升推理性能。</li>
+</ul>
+<hr>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>OpenVINO 推理框架通过模型优化器和推理引擎，实现高效的深度学习模型推理。其支持多种硬件设备，并提供丰富的优化选项，适用于多种 AI 应用场景，是一个功能强大、灵活且高效的推理工具。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E9%83%A8%E7%BD%B2/" rel="tag"># AI部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/19/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-12-19-C++_10_43_system_error/" rel="prev" title="C++_10_43_system_error">
+      <i class="fa fa-chevron-left"></i> C++_10_43_system_error
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/30/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-12-30-onnxruntime/" rel="next" title="onnxruntime">
+      onnxruntime <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ov-AnyMap-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">ov::AnyMap 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ov-AnyMap-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">3.</span> <span class="nav-text">1. ov::AnyMap 的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%9B%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">2. 创建和使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA-ov-AnyMap"><span class="nav-number">4.1.</span> <span class="nav-text">创建一个 ov::AnyMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-ov-AnyMap"><span class="nav-number">4.2.</span> <span class="nav-text">使用 ov::AnyMap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-ov-Any-%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-number">5.</span> <span class="nav-text">3. ov::Any 的特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%B8%B8%E8%A7%81%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0"><span class="nav-number">6.</span> <span class="nav-text">4. 常见配置参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%A6%82%E4%BD%95%E8%AF%BB%E5%8F%96%E9%85%8D%E7%BD%AE"><span class="nav-number">7.</span> <span class="nav-text">5. 如何读取配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-number">8.</span> <span class="nav-text">6. 错误处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%BB%93%E5%90%88%E8%AE%BE%E5%A4%87%E6%8F%92%E4%BB%B6"><span class="nav-number">9.</span> <span class="nav-text">7. 结合设备插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.1.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-OpenVINO-ov-hint-performance-mode-%E8%AF%A6%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">C++ OpenVINO ov::hint::performance_mode 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%80%A7%E8%83%BD%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">11.</span> <span class="nav-text">1. 性能模式的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#a-LATENCY"><span class="nav-number">11.1.</span> <span class="nav-text">a. LATENCY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b-THROUGHPUT"><span class="nav-number">11.2.</span> <span class="nav-text">b. THROUGHPUT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-CUMULATIVE-THROUGHPUT"><span class="nav-number">11.3.</span> <span class="nav-text">c. CUMULATIVE_THROUGHPUT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#d-UNDEFINED"><span class="nav-number">11.4.</span> <span class="nav-text">d. UNDEFINED</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%AE%BE%E7%BD%AE%E6%96%B9%E5%BC%8F"><span class="nav-number">12.</span> <span class="nav-text">2. 设置方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%80%A7%E8%83%BD%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">13.</span> <span class="nav-text">3. 性能模式的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-number">14.</span> <span class="nav-text">4. 最佳实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%AE%BE%E5%A4%87%E6%94%AF%E6%8C%81"><span class="nav-number">15.</span> <span class="nav-text">5. 设备支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenVINO-windows%E4%B8%8B%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B"><span class="nav-number">16.</span> <span class="nav-text">OpenVINO windows下环境配置教程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenVino-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">17.</span> <span class="nav-text">OpenVino 是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="nav-number">17.1.</span> <span class="nav-text">主要功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">17.2.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">17.3.</span> <span class="nav-text">优势</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenVino-%E6%8E%A8%E7%90%86%E6%A1%86%E6%9E%B6-%E8%AF%A6%E8%A7%A3"><span class="nav-number">18.</span> <span class="nav-text">OpenVino 推理框架 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-number">18.1.</span> <span class="nav-text">1. 核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%A8%A1%E5%9E%8B%E4%BC%98%E5%8C%96%E5%99%A8%EF%BC%88Model-Optimizer%EF%BC%89"><span class="nav-number">18.1.1.</span> <span class="nav-text">(1) 模型优化器（Model Optimizer）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%8E%A8%E7%90%86%E5%BC%95%E6%93%8E%EF%BC%88Inference-Engine%EF%BC%89"><span class="nav-number">18.1.2.</span> <span class="nav-text">(2) 推理引擎（Inference Engine）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E7%A1%AC%E4%BB%B6%E6%94%AF%E6%8C%81%E5%B1%82%EF%BC%88Hardware-Abstraction-Layer%EF%BC%89"><span class="nav-number">18.1.3.</span> <span class="nav-text">(3) 硬件支持层（Hardware Abstraction Layer）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">18.2.</span> <span class="nav-text">2. 工作流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%BC%96%E7%A8%8B%E6%8E%A5%E5%8F%A3"><span class="nav-number">18.3.</span> <span class="nav-text">3. 编程接口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Python-API"><span class="nav-number">18.3.1.</span> <span class="nav-text">(1) Python API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-C-API"><span class="nav-number">18.3.2.</span> <span class="nav-text">(2) C++ API</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%94%AF%E6%8C%81%E7%9A%84%E6%8E%A8%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="nav-number">18.4.</span> <span class="nav-text">4. 支持的推理模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%90%8C%E6%AD%A5%E6%8E%A8%E7%90%86"><span class="nav-number">18.4.1.</span> <span class="nav-text">(1) 同步推理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%BC%82%E6%AD%A5%E6%8E%A8%E7%90%86"><span class="nav-number">18.4.2.</span> <span class="nav-text">(2) 异步推理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%BC%98%E5%8C%96%E7%89%B9%E6%80%A7"><span class="nav-number">18.5.</span> <span class="nav-text">5. 优化特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E6%8E%A8%E7%90%86"><span class="nav-number">18.5.1.</span> <span class="nav-text">(1) 混合精度推理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%A4%9A%E8%AE%BE%E5%A4%87%E6%8E%A8%E7%90%86"><span class="nav-number">18.5.2.</span> <span class="nav-text">(2) 多设备推理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%82%E6%89%A9%E5%B1%95"><span class="nav-number">18.5.3.</span> <span class="nav-text">(3) 自定义层扩展</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">18.6.</span> <span class="nav-text">6. 应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7"><span class="nav-number">18.7.</span> <span class="nav-text">7. 常用工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Open-Model-Zoo"><span class="nav-number">18.7.1.</span> <span class="nav-text">(1) Open Model Zoo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Benchmark-Tool"><span class="nav-number">18.7.2.</span> <span class="nav-text">(2) Benchmark Tool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Post-Training-Optimization-Toolkit-POT"><span class="nav-number">18.7.3.</span> <span class="nav-text">(3) Post-Training Optimization Toolkit (POT)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">18.8.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

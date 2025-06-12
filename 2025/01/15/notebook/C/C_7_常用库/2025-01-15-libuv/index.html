@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 libuv 库 相关学习笔记 libuv库是多平台C库，提供对基于事件循环的异步I&#x2F;O的支持。它支持epoll,kqueue,Windows的IOCP和Solaris的事件端口。它主要设计用于Node.js，但也可用于其他软件项目，例如Lua的Luvit，Julia和Python的uvloop。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="libuv库">
+<meta property="og:url" content="https://junyiha.github.io/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libuv/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 libuv 库 相关学习笔记 libuv库是多平台C库，提供对基于事件循环的异步I&#x2F;O的支持。它支持epoll,kqueue,Windows的IOCP和Solaris的事件端口。它主要设计用于Node.js，但也可用于其他软件项目，例如Lua的Luvit，Julia和Python的uvloop。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-01-15T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.255Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="C">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libuv/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>libuv库 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libuv/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          libuv库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-01-15 09:00:00" itemprop="dateCreated datePublished" datetime="2025-01-15T09:00:00+08:00">2025-01-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>libuv 库 相关学习笔记</li>
+<li>libuv库是多平台C库，提供对基于事件循环的异步I&#x2F;O的支持。它支持epoll,kqueue,Windows的IOCP和Solaris的事件端口。它主要设计用于Node.js，但也可用于其他软件项目，例如Lua的Luvit，Julia和Python的uvloop。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="libuv-库-详解"><a href="#libuv-库-详解" class="headerlink" title="libuv 库 详解"></a>libuv 库 详解</h2><p><code>libuv</code> 是一个跨平台的异步 I&#x2F;O 库，广泛用于实现事件驱动的应用程序，特别是在 Node.js 中，作为其核心的异步 I&#x2F;O 模型实现。它提供了事件循环、异步 I&#x2F;O 操作、线程池等功能，允许开发者以非阻塞的方式执行 I&#x2F;O 操作。<code>libuv</code> 库最初由 Node.js 团队开发，但它已经从 Node.js 中独立出来，成为一个独立的项目，可以用于其他 C 或 C++ 应用程序。</p>
+<p>以下是 <code>libuv</code> 的一些核心特性和实现细节：</p>
+<h3 id="1-事件循环-Event-Loop"><a href="#1-事件循环-Event-Loop" class="headerlink" title="1. 事件循环 (Event Loop)"></a>1. <strong>事件循环 (Event Loop)</strong></h3><ul>
+<li><code>libuv</code> 使用事件循环来处理异步任务。事件循环本质上是一个无限循环，负责检查和执行待处理的事件。</li>
+<li>事件循环分为多个阶段，每个阶段处理不同类型的任务。例如，文件 I&#x2F;O、定时器事件、网络请求等。</li>
+<li>事件循环的主要流程包括：<ol>
+<li>检查并执行定时器事件。</li>
+<li>执行 I&#x2F;O 回调函数（如网络连接、文件操作等）。</li>
+<li>执行闭包和回调任务。</li>
+<li>执行工作线程任务（例如，线程池中的任务）。</li>
+</ol>
+</li>
+</ul>
+<p>   每个阶段会尽可能地执行所有待处理的事件，直到没有待执行的任务。</p>
+<h3 id="2-跨平台支持"><a href="#2-跨平台支持" class="headerlink" title="2. 跨平台支持"></a>2. <strong>跨平台支持</strong></h3><ul>
+<li><code>libuv</code> 支持多种操作系统平台，包括 Linux、macOS、Windows 等。</li>
+<li>它隐藏了不同平台之间的差异，使得在不同操作系统上执行相同的代码不会受到底层实现差异的影响。</li>
+</ul>
+<h3 id="3-异步-I-O-操作"><a href="#3-异步-I-O-操作" class="headerlink" title="3. 异步 I&#x2F;O 操作"></a>3. <strong>异步 I&#x2F;O 操作</strong></h3><p>   <code>libuv</code> 提供了多种异步 I&#x2F;O 操作，例如文件 I&#x2F;O、网络 I&#x2F;O、信号处理等。异步操作不阻塞主线程，允许程序在等待 I&#x2F;O 操作完成时继续执行其他任务。</p>
+<ul>
+<li><strong>文件 I&#x2F;O</strong>：<code>libuv</code> 提供了异步的文件读写接口，文件操作不会阻塞主线程。支持读取和写入大文件、目录遍历、文件系统监控等。</li>
+<li><strong>网络 I&#x2F;O</strong>：<code>libuv</code> 提供了对 TCP 和 UDP 的支持，允许开发者通过非阻塞 I&#x2F;O 来处理网络通信。</li>
+<li>**管道 (Pipe)**：<code>libuv</code> 提供了跨平台的管道支持，用于进程间通信（IPC）。</li>
+</ul>
+<h3 id="4-线程池"><a href="#4-线程池" class="headerlink" title="4. 线程池"></a>4. <strong>线程池</strong></h3><ul>
+<li><code>libuv</code> 使用线程池来处理一些计算密集型的任务（例如文件系统操作）。这些任务会被分配到线程池中的空闲线程上，以避免阻塞主线程。</li>
+<li>默认情况下，<code>libuv</code> 创建了 4 个线程用于处理任务。你可以通过配置来改变线程池的大小。</li>
+</ul>
+<h3 id="5-定时器-Timers"><a href="#5-定时器-Timers" class="headerlink" title="5. 定时器 (Timers)"></a>5. <strong>定时器 (Timers)</strong></h3><ul>
+<li><code>libuv</code> 支持定时器事件，可以在一定时间后触发回调函数。定时器是基于事件循环实现的，因此不会阻塞其他任务。</li>
+<li>定时器的精度和调度方式可能会受到平台的限制，通常不会有非常高的精度，但对于大多数应用来说足够使用。</li>
+</ul>
+<h3 id="6-异步-DNS"><a href="#6-异步-DNS" class="headerlink" title="6. 异步 DNS"></a>6. <strong>异步 DNS</strong></h3><ul>
+<li><code>libuv</code> 提供了异步 DNS 查询的功能，它支持域名解析并通过回调通知结果。这个功能非常适用于需要进行大量 DNS 查询的应用程序。</li>
+</ul>
+<h3 id="7-信号处理"><a href="#7-信号处理" class="headerlink" title="7. 信号处理"></a>7. <strong>信号处理</strong></h3><ul>
+<li><code>libuv</code> 支持信号处理，可以注册对 UNIX 系统上的信号（如 <code>SIGINT</code>、<code>SIGTERM</code>）的处理程序。这使得程序可以响应操作系统发出的中断信号或终止信号。</li>
+</ul>
+<h3 id="8-线程和工作队列"><a href="#8-线程和工作队列" class="headerlink" title="8. 线程和工作队列"></a>8. <strong>线程和工作队列</strong></h3><ul>
+<li>通过 <code>uv_work_t</code> 结构，<code>libuv</code> 提供了一个机制来在工作线程中执行长时间运行的任务。这些任务会被分配给线程池中的线程来执行，执行完毕后会触发回调来通知任务完成。</li>
+</ul>
+<h3 id="9-应用场景"><a href="#9-应用场景" class="headerlink" title="9. 应用场景"></a>9. <strong>应用场景</strong></h3><p>   <code>libuv</code> 主要用于开发高并发、非阻塞的应用程序。以下是一些典型的应用场景：</p>
+<ul>
+<li><strong>网络服务器</strong>：如 Node.js 服务器，利用 <code>libuv</code> 提供的异步网络 I&#x2F;O 和事件循环机制，可以处理大量的并发连接。</li>
+<li><strong>文件服务器</strong>：利用异步文件 I&#x2F;O 操作可以提高文件系统访问的效率。</li>
+<li><strong>命令行工具</strong>：通过 <code>libuv</code> 可以实现高效的文件监控、定时任务等。</li>
+</ul>
+<h3 id="10-示例代码"><a href="#10-示例代码" class="headerlink" title="10. 示例代码"></a>10. <strong>示例代码</strong></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;uv.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">uv_loop_t</span> *loop;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">on_timer</span><span class="params">(<span class="type">uv_timer_t</span>* handle)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Timer triggered\n&quot;</span>);</span><br><span class="line">    uv_stop(loop); <span class="comment">// Stops the loop after the timer triggers</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    loop = uv_default_loop();</span><br><span class="line"></span><br><span class="line">    <span class="type">uv_timer_t</span> timer_req;</span><br><span class="line">    uv_timer_init(loop, &amp;timer_req);</span><br><span class="line">    uv_timer_start(&amp;timer_req, on_timer, <span class="number">1000</span>, <span class="number">0</span>); <span class="comment">// Trigger after 1000ms</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Starting event loop\n&quot;</span>);</span><br><span class="line">    uv_run(loop, UV_RUN_DEFAULT); <span class="comment">// Start the event loop</span></span><br><span class="line"></span><br><span class="line">    uv_loop_close(loop);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="11-与-Node-js-的关系"><a href="#11-与-Node-js-的关系" class="headerlink" title="11. 与 Node.js 的关系"></a>11. <strong>与 Node.js 的关系</strong></h3><ul>
+<li><code>libuv</code> 是 Node.js 的核心组件之一，它在 Node.js 中用于处理异步 I&#x2F;O、事件循环以及网络通信等任务。Node.js 依赖 <code>libuv</code> 来实现高效的异步 I&#x2F;O 模型。</li>
+<li>尽管 <code>libuv</code> 在 Node.js 中起到了关键作用，但它本身是一个独立的库，可以用于其他 C 或 C++ 项目的异步 I&#x2F;O 需求。</li>
+</ul>
+<h3 id="12-如何安装和使用-libuv"><a href="#12-如何安装和使用-libuv" class="headerlink" title="12. 如何安装和使用 libuv"></a>12. <strong>如何安装和使用 <code>libuv</code></strong></h3><ul>
+<li>安装 <code>libuv</code> 通常可以通过包管理器（如 <code>apt</code> 或 <code>brew</code>）来完成，也可以通过从源代码编译来安装。</li>
+<li>安装后，只需在 C 或 C++ 项目中链接 <code>libuv</code> 库，并调用其提供的 API 来实现异步 I&#x2F;O 操作。</li>
+</ul>
+<p>   <strong>安装示例（Linux）</strong>：<br>   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install libuv-dev</span><br></pre></td></tr></table></figure></p>
+<p>   <strong>编译示例</strong>：<br>   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -o my_program my_program.c -luv</span><br></pre></td></tr></table></figure></p>
+<p>通过上述方式，<code>libuv</code> 能帮助你实现高效、非阻塞的 I&#x2F;O 操作，从而提升应用程序的性能，特别是对于高并发、网络密集型的应用程序来说。</p>
+<p>如果你有任何具体问题或者想要进一步了解某个部分，可以继续提问！</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libevent/" rel="prev" title="libevent库">
+      <i class="fa fa-chevron-left"></i> libevent库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/16/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2025-01-16-webbrowser/" rel="next" title="webbrowser">
+      webbrowser <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libuv-%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">libuv 库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF-Event-Loop"><span class="nav-number">2.1.</span> <span class="nav-text">1. 事件循环 (Event Loop)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E6%94%AF%E6%8C%81"><span class="nav-number">2.2.</span> <span class="nav-text">2. 跨平台支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%BC%82%E6%AD%A5-I-O-%E6%93%8D%E4%BD%9C"><span class="nav-number">2.3.</span> <span class="nav-text">3. 异步 I&#x2F;O 操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">2.4.</span> <span class="nav-text">4. 线程池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%AE%9A%E6%97%B6%E5%99%A8-Timers"><span class="nav-number">2.5.</span> <span class="nav-text">5. 定时器 (Timers)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%BC%82%E6%AD%A5-DNS"><span class="nav-number">2.6.</span> <span class="nav-text">6. 异步 DNS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86"><span class="nav-number">2.7.</span> <span class="nav-text">7. 信号处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E7%BA%BF%E7%A8%8B%E5%92%8C%E5%B7%A5%E4%BD%9C%E9%98%9F%E5%88%97"><span class="nav-number">2.8.</span> <span class="nav-text">8. 线程和工作队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.9.</span> <span class="nav-text">9. 应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">2.10.</span> <span class="nav-text">10. 示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E4%B8%8E-Node-js-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.11.</span> <span class="nav-text">11. 与 Node.js 的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8-libuv"><span class="nav-number">2.12.</span> <span class="nav-text">12. 如何安装和使用 libuv</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

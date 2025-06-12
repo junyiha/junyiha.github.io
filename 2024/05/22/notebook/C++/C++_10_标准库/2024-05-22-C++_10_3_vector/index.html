@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 标准库相关笔记  C++ std::vector和C风格数据互相转换在C++中，std::vector 是一个动态数组，而C风格的数据通常是指使用指针和数组来管理数据。在实际开发中，有时需要在 std::vector 和 C 风格数组之间进行互相转换。下面是具体的转换方式： 1. 从 C 风格数组转换为 std::vector假设有一个C风格的数组： 1int c_array[] &#x3D; &amp;#1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_10_3_vector">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_3_vector/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 标准库相关笔记  C++ std::vector和C风格数据互相转换在C++中，std::vector 是一个动态数组，而C风格的数据通常是指使用指针和数组来管理数据。在实际开发中，有时需要在 std::vector 和 C 风格数组之间进行互相转换。下面是具体的转换方式： 1. 从 C 风格数组转换为 std::vector假设有一个C风格的数组： 1int c_array[] &#x3D; &amp;#1">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.191Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppSTL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_3_vector/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_10_3_vector | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_3_vector/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_10_3_vector
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><vector>标准库相关笔记</li>
+</ul>
+<h2 id="C-std-vector和C风格数据互相转换"><a href="#C-std-vector和C风格数据互相转换" class="headerlink" title="C++ std::vector和C风格数据互相转换"></a>C++ std::vector和C风格数据互相转换</h2><p>在C++中，<code>std::vector</code> 是一个动态数组，而C风格的数据通常是指使用指针和数组来管理数据。在实际开发中，有时需要在 <code>std::vector</code> 和 C 风格数组之间进行互相转换。下面是具体的转换方式：</p>
+<h3 id="1-从-C-风格数组转换为-std-vector"><a href="#1-从-C-风格数组转换为-std-vector" class="headerlink" title="1. 从 C 风格数组转换为 std::vector"></a>1. 从 C 风格数组转换为 <code>std::vector</code></h3><p>假设有一个C风格的数组：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> c_array[] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>要将它转换为 <code>std::vector</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">std::vector&lt;<span class="type">int</span>&gt; <span class="title">vec</span><span class="params">(std::begin(c_array), std::end(c_array))</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>说明：</strong></p>
+<ul>
+<li>使用 <code>std::begin()</code> 和 <code>std::end()</code> 来获取数组的首尾指针（或使用 <code>&amp;c_array[0]</code> 和 <code>&amp;c_array[size]</code>）。</li>
+<li>如果知道数组的长度，你可以直接指定长度：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> size = <span class="number">5</span>;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">int</span>&gt; <span class="title">vec</span><span class="params">(c_array, c_array + size)</span></span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="2-从-std-vector-转换为-C-风格数组"><a href="#2-从-std-vector-转换为-C-风格数组" class="headerlink" title="2. 从 std::vector 转换为 C 风格数组"></a>2. 从 <code>std::vector</code> 转换为 C 风格数组</h3><p>假设有一个 <code>std::vector</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>要将其转换为 C 风格的数组，你可以获取 <code>vector</code> 的内部数据指针：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>* c_array = vec.<span class="built_in">data</span>();</span><br></pre></td></tr></table></figure>
+
+<p><strong>说明：</strong></p>
+<ul>
+<li><code>vec.data()</code> 返回一个指向 <code>std::vector</code> 内部存储数据的指针，该数据是连续的，与C风格数组类似。</li>
+<li>注意：不要手动释放这个指针，因为它是由 <code>std::vector</code> 管理的。</li>
+</ul>
+<h3 id="3-完整示例"><a href="#3-完整示例" class="headerlink" title="3. 完整示例"></a>3. 完整示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 从C风格数组转换为std::vector</span></span><br><span class="line">    <span class="type">int</span> c_array[] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line">    <span class="function">std::vector&lt;<span class="type">int</span>&gt; <span class="title">vec</span><span class="params">(std::begin(c_array), std::end(c_array))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出std::vector的内容</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; elem : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; elem &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从std::vector转换为C风格数组</span></span><br><span class="line">    <span class="type">int</span>* c_array_from_vec = vec.<span class="built_in">data</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出C风格数组的内容</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;C array: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; vec.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        std::cout &lt;&lt; c_array_from_vec[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>当从 <code>std::vector</code> 获取到 C 风格的指针时，不要手动释放内存，因为 <code>std::vector</code> 会自动管理其内存。</li>
+<li>从 C 风格数组转换为 <code>std::vector</code> 时，尽量使用 <code>std::begin()</code> 和 <code>std::end()</code> 来避免出错。</li>
+</ul>
+<p>通过这些方法，你可以轻松地在C++的 <code>std::vector</code> 和C风格数据之间进行转换。</p>
+<h2 id="vector-内存分配方案"><a href="#vector-内存分配方案" class="headerlink" title="vector 内存分配方案"></a>vector 内存分配方案</h2><ul>
+<li>vector会自动分配内存来保存插入的元素。vector要求必须放在连续的内存中。由于不可能请求在当前的内存块的尾部添加内存，因此每次vector申请更多内存时，都一定要在另一个位置分配一块新的，更大的内存块，然后将所有元素复制&#x2F;移动到新的内存块。</li>
+<li>这个过程非常耗时，因此vector的实现在执行重分配时，会分配此次所需内存更多的内存，以尽量避免这个复制转移的过程。通过这种方式，vector可避免在每次插入元素时都重新重新分配内存。</li>
+</ul>
+<h2 id="C-标准库是什么"><a href="#C-标准库是什么" class="headerlink" title="C++ 标准库是什么"></a>C++ <vector>标准库是什么</h2><p><code>&lt;vector&gt;</code> 是 C++ 标准库提供的头文件之一，用于包含 C++ 标准库中的向量（<code>vector</code>）容器类的定义。向量是一个动态数组，它能够以连续的内存空间存储元素，并提供了灵活的大小调整和高效的随机访问。</p>
+<p><code>std::vector</code> 是一个模板类，可以存储任意类型的元素，并具有以下特性：</p>
+<ol>
+<li><strong>动态大小：</strong> 向量可以根据需要动态增长或缩小其大小，可以通过 <code>push_back</code>、<code>pop_back</code> 等方法在尾部添加或删除元素。</li>
+<li><strong>随机访问：</strong> 支持通过索引快速访问和修改元素，时间复杂度为 O(1)。</li>
+<li><strong>连续内存存储：</strong> 向量的元素在内存中是连续存储的，这有助于提高数据的访问速度。</li>
+<li><strong>尾部插入和删除的高效性：</strong> 在尾部插入或删除元素的操作通常是高效的，时间复杂度为平摊 O(1)。</li>
+</ol>
+<p>以下是一个简单的示例，演示了如何使用 <code>&lt;vector&gt;</code> 头文件中的 <code>std::vector</code> 类：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个整数向量</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在向量尾部添加元素</span></span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历输出向量中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector Elements: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>&lt;vector&gt;</code> 头文件中的 <code>std::vector</code> 类是 C++ 中常用的标准容器之一，它提供了方便的动态数组功能，并且在许多情况下都是一种方便且高效的数据结构选择。</p>
+<h2 id="C-标准库-详解"><a href="#C-标准库-详解" class="headerlink" title="C++ 标准库 详解"></a>C++ <vector>标准库 详解</h2><p><code>&lt;vector&gt;</code> 是 C++ 标准库提供的头文件之一，包含了 <code>std::vector</code> 类的定义，这是 C++ 中最常用的容器之一。</p>
+<h3 id="std-vector-类"><a href="#std-vector-类" class="headerlink" title="std::vector 类"></a><code>std::vector</code> 类</h3><p><code>std::vector</code> 是一个动态数组，它能够存储一系列同类型的元素，并且可以动态地调整其大小。以下是 <code>std::vector</code> 类的一些重要特性和函数：</p>
+<ol>
+<li><p><strong>动态大小：</strong> 向量的大小可以根据需要动态增长或缩小。通过 <code>push_back()</code> 在尾部添加元素、<code>pop_back()</code> 删除尾部元素，或者直接使用 <code>resize()</code> 调整大小。</p>
+</li>
+<li><p><strong>随机访问：</strong> 可以通过索引快速访问和修改向量中的元素，支持使用 <code>operator[]</code> 实现随机访问。</p>
+</li>
+<li><p><strong>连续内存存储：</strong> 向量中的元素在内存中是连续存储的，因此支持高效的随机访问，并且迭代器可用于遍历元素。</p>
+</li>
+<li><p><strong>内存管理：</strong> 向量会自动处理内存的分配和释放，使得在尾部插入或删除元素的操作通常是高效的。</p>
+</li>
+<li><p><strong>元素访问：</strong> 提供了 <code>at()</code> 方法和 <code>operator[]</code>，<code>front()</code> 和 <code>back()</code> 方法用于访问首尾元素。</p>
+</li>
+<li><p><strong>迭代器支持：</strong> 支持使用迭代器进行遍历，如 <code>begin()</code> 和 <code>end()</code> 返回的迭代器用于遍历容器元素。</p>
+</li>
+<li><p><strong>其他方法：</strong> 包括 <code>empty()</code>、<code>size()</code>、<code>clear()</code>、<code>erase()</code> 等方法用于检查空、获取大小、清空内容和删除元素等。</p>
+</li>
+</ol>
+<p>下面是一个简单示例，展示了如何使用 <code>&lt;vector&gt;</code> 中的 <code>std::vector</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个整数向量并初始化</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在向量尾部添加元素</span></span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用迭代器遍历输出向量中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector Elements: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = vec.<span class="built_in">begin</span>(); it != vec.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">        std::cout &lt;&lt; *it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>&lt;vector&gt;</code> 头文件提供了 <code>std::vector</code> 类，它是一个常用的容器，能够满足动态数组的需求，支持高效的元素访问、插入和删除操作，是 C++ 中非常实用的数据结构之一。</p>
+<h2 id="C-标准库中-std-vector模板类详解"><a href="#C-标准库中-std-vector模板类详解" class="headerlink" title="C++ 标准库中 std::vector模板类详解"></a>C++ <vector>标准库中 std::vector模板类详解</h2><p><code>std::vector</code> 是 C++ 标准库提供的动态数组容器，属于序列容器的一种。它以连续的内存空间存储元素，并支持动态增长和收缩。以下是 <code>std::vector</code> 的一些重要特性和使用方法：</p>
+<h3 id="特性："><a href="#特性：" class="headerlink" title="特性："></a>特性：</h3><ol>
+<li><p><strong>动态大小：</strong> <code>std::vector</code> 允许在运行时根据需要动态地增加或减少其大小。通过 <code>push_back()</code> 在尾部添加元素，<code>pop_back()</code> 删除尾部元素，或者直接使用 <code>resize()</code> 调整大小。</p>
+</li>
+<li><p><strong>随机访问：</strong> 可以通过索引快速访问和修改向量中的元素。支持使用 <code>operator[]</code> 实现随机访问，其时间复杂度为 O(1)。</p>
+</li>
+<li><p><strong>连续内存存储：</strong> 向量的元素在内存中是连续存储的，这有助于提高数据的访问速度，并且迭代器可用于遍历元素。</p>
+</li>
+<li><p><strong>尾部插入和删除的高效性：</strong> 在尾部插入或删除元素的操作通常是高效的，时间复杂度为平摊 O(1)。</p>
+</li>
+<li><p><strong>迭代器支持：</strong> 提供了迭代器，如 <code>begin()</code> 和 <code>end()</code> 返回的迭代器用于遍历容器元素。</p>
+</li>
+<li><p><strong>元素访问：</strong> 可以使用 <code>at()</code> 方法、<code>operator[]</code>、<code>front()</code> 和 <code>back()</code> 方法来访问元素。</p>
+</li>
+<li><p><strong>其他方法：</strong> 包括 <code>empty()</code>、<code>size()</code>、<code>clear()</code>、<code>erase()</code> 等方法，用于检查空、获取大小、清空内容和删除元素等。</p>
+</li>
+</ol>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个整数向量并初始化</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在向量尾部添加元素</span></span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用迭代器遍历输出向量中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector Elements: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = vec.<span class="built_in">begin</span>(); it != vec.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">        std::cout &lt;&lt; *it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码演示了 <code>std::vector</code> 的一些常见操作，包括初始化、在尾部添加元素、迭代器遍历输出元素等。<code>std::vector</code> 是 C++ 标准库中常用的容器之一，提供了便捷且高效的动态数组功能。</p>
+<h2 id="C-标准库中-std-vector模板类所有成员函数"><a href="#C-标准库中-std-vector模板类所有成员函数" class="headerlink" title="C++ 标准库中 std::vector模板类所有成员函数"></a>C++ <vector>标准库中 std::vector模板类所有成员函数</h2><p><code>std::vector</code> 类是 C++ 标准库中的动态数组容器，提供了许多成员函数用于管理其内部的元素。以下是 <code>std::vector</code> 类的一些主要成员函数：</p>
+<h3 id="容量相关操作："><a href="#容量相关操作：" class="headerlink" title="容量相关操作："></a>容量相关操作：</h3><ul>
+<li><strong><code>size()</code>：</strong> 返回向量中元素的个数。</li>
+<li><strong><code>capacity()</code>：</strong> 返回当前向量的容量（即分配的内存大小）。</li>
+<li><strong><code>empty()</code>：</strong> 检查向量是否为空。</li>
+<li><strong><code>reserve(size_type new_cap)</code>：</strong> 尝试预分配足够的内存以存储指定数量的元素。</li>
+</ul>
+<h3 id="访问元素操作："><a href="#访问元素操作：" class="headerlink" title="访问元素操作："></a>访问元素操作：</h3><ul>
+<li><strong><code>operator[]</code>：</strong> 通过索引访问向量中的元素。</li>
+<li><strong><code>at(size_type pos)</code>：</strong> 通过索引访问向量中的元素，提供了边界检查。</li>
+<li><strong><code>front()</code>：</strong> 返回向量中第一个元素的引用。</li>
+<li><strong><code>back()</code>：</strong> 返回向量中最后一个元素的引用。</li>
+<li><strong><code>data()</code>：</strong> 返回指向向量内部数组的指针。</li>
+</ul>
+<h3 id="修改容器内容操作："><a href="#修改容器内容操作：" class="headerlink" title="修改容器内容操作："></a>修改容器内容操作：</h3><ul>
+<li><strong><code>push_back(const T&amp; value)</code>：</strong> 在向量尾部添加一个元素。</li>
+<li><strong><code>pop_back()</code>：</strong> 删除向量中最后一个元素。</li>
+<li><strong><code>insert(iterator pos, const T&amp; value)</code>：</strong> 在指定位置插入一个元素。</li>
+<li><strong><code>erase(iterator pos)</code>：</strong> 删除指定位置的元素。</li>
+<li><strong><code>clear()</code>：</strong> 删除向量中的所有元素。</li>
+</ul>
+<h3 id="其他操作："><a href="#其他操作：" class="headerlink" title="其他操作："></a>其他操作：</h3><ul>
+<li><strong><code>swap(vector&amp; other)</code>：</strong> 交换两个向量的内容。</li>
+<li><strong><code>assign(count, value)</code>：</strong> 用新值替换向量的内容。</li>
+<li><strong><code>resize(size_type new_size)</code>：</strong> 改变向量的大小。</li>
+<li><strong><code>shrink_to_fit()</code>：</strong> 要求释放多余的容量。</li>
+</ul>
+<p>此外，<code>std::vector</code> 还具有迭代器相关的成员函数，如 <code>begin()</code>、<code>end()</code> 用于迭代访问容器的元素。以上列出的成员函数并非全部，但是是 <code>std::vector</code> 常用的一些成员函数，能够对向量的大小、容量、元素访问和修改等进行有效管理。</p>
+<h2 id="C-std-vector-swap-函数-详解"><a href="#C-std-vector-swap-函数-详解" class="headerlink" title="C++ std::vector::swap() 函数 详解"></a>C++ std::vector::swap() 函数 详解</h2><p><code>std::vector::swap()</code> 是 C++ 标准库中 <code>std::vector</code> 类的成员函数，用于交换两个 vector 的内容，即交换它们所包含的元素。</p>
+<h3 id="函数签名："><a href="#函数签名：" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(std::vector&amp; x)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数："><a href="#参数：" class="headerlink" title="参数："></a>参数：</h3><ul>
+<li><code>x</code>：另一个 <code>std::vector</code> 对象，其内容将与调用该函数的 vector 对象进行交换。</li>
+</ul>
+<h3 id="功能："><a href="#功能：" class="headerlink" title="功能："></a>功能：</h3><ul>
+<li><code>std::vector::swap()</code> 函数用于交换两个 vector 对象的元素内容，使得调用该函数的 vector 与参数 <code>x</code> 所包含的元素互换。</li>
+</ul>
+<h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec1 = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;</span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec2 = &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector 1: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : vec1) &#123;</span><br><span class="line">        std::cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector 2: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : vec2) &#123;</span><br><span class="line">        std::cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    vec<span class="number">1.</span><span class="built_in">swap</span>(vec2); <span class="comment">// 交换两个 vector 的内容</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nAfter Swap:&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector 1: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : vec1) &#123;</span><br><span class="line">        std::cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector 2: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : vec2) &#123;</span><br><span class="line">        std::cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>std::vector::swap()</code> 函数非常高效，因为它只是交换了两个 vector 内部的数据结构指针，而不是复制每个元素。</li>
+<li>交换后，两个 vector 对象的大小和容量可能会发生变化，但其所包含的元素会完全交换。</li>
+<li>该函数是 <code>std::vector</code> 类的成员函数，所以需要使用一个已经存在的 vector 对象来调用该函数。</li>
+</ul>
+<p><code>std::vector::swap()</code> 是一个很有用的函数，特别是在需要交换两个 vector 的元素内容时，可以避免进行元素的逐个复制。</p>
+<h2 id="std-vector-size"><a href="#std-vector-size" class="headerlink" title="std::vector::size()"></a>std::vector::size()</h2><p><code>std::vector::size()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于返回 <code>std::vector</code> 容器中当前存储元素的数量（大小）。</p>
+<p>在 C++ 中，<code>std::vector</code> 是一个动态数组，它能够自动调整大小，可以根据需要动态地增加或减少存储在其中的元素数量。<code>size()</code> 函数返回的是当前 <code>std::vector</code> 中的元素数量，即容器中元素的个数。</p>
+<p>下面是一个简单的示例演示了如何使用 <code>std::vector::size()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个空的 std::vector 容器</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 向容器中添加一些元素</span></span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">10</span>);</span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">20</span>);</span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">30</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取容器中元素的数量（大小）</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Vector的大小为：&quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>push_back</code> 方法向容器中添加了三个整数元素。</li>
+<li>通过 <code>vec.size()</code> 获取了 <code>vec</code> 容器中元素的数量，并将结果打印出来。</li>
+</ul>
+<p><code>std::vector::size()</code> 对于获取 <code>std::vector</code> 中元素数量非常方便，它可以帮助你确定容器中元素的个数，从而进行后续的操作或逻辑处理。</p>
+<h2 id="std-vector-capacity"><a href="#std-vector-capacity" class="headerlink" title="std::vector::capacity()"></a>std::vector::capacity()</h2><p><code>std::vector::capacity()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于返回当前 <code>std::vector</code> 容器的容量大小。</p>
+<p>在 C++ 中，<code>std::vector</code> 是一个动态数组，它能够自动调整大小，可以根据需要动态地增加或减少存储在其中的元素数量。<code>capacity()</code> 函数返回的是当前 <code>std::vector</code> 内部所分配内存空间的大小，即该容器在不分配新的内存的情况下能够容纳的元素数量。</p>
+<p>下面是一个简单的示例演示了如何使用 <code>std::vector::capacity()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个空的 std::vector 容器</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 向容器中添加一些元素</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        vec.<span class="built_in">push_back</span>(i);</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Size: &quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; <span class="string">&quot; Capacity: &quot;</span> &lt;&lt; vec.<span class="built_in">capacity</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>push_back</code> 方法向容器中循环添加了十个整数元素，并在每次添加后打印了当前容器的大小和容量。</li>
+</ul>
+<p><code>std::vector::capacity()</code> 是一个重要的函数，它可以用来观察 <code>std::vector</code> 容器当前的内存分配情况。当 <code>std::vector</code> 中的元素数量超过当前分配的容量时，<code>std::vector</code> 会自动重新分配更大的内存空间以容纳更多的元素，这个过程可能会导致容器大小和容量之间的不同步。</p>
+<h2 id="std-vector-empty"><a href="#std-vector-empty" class="headerlink" title="std::vector::empty()"></a>std::vector::empty()</h2><p><code>std::vector::empty()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于检查 <code>std::vector</code> 容器是否为空。</p>
+<p>当 <code>std::vector</code> 容器中不含有任何元素时，即容器的大小为零时，<code>empty()</code> 函数将返回 <code>true</code>；否则，如果容器中包含至少一个元素，则返回 <code>false</code>。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::empty()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个空的 std::vector 容器</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查容器是否为空</span></span><br><span class="line">    <span class="keyword">if</span> (vec.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;容器为空&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;容器不为空&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 向容器中添加一个元素</span></span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 再次检查容器是否为空</span></span><br><span class="line">    <span class="keyword">if</span> (vec.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;容器为空&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;容器不为空&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>vec.empty()</code> 检查容器是否为空，并根据返回结果打印相应的消息。</li>
+<li>使用 <code>push_back</code> 方法向容器中添加了一个整数元素。</li>
+<li>再次使用 <code>vec.empty()</code> 检查容器是否为空，并根据返回结果打印相应的消息。</li>
+</ul>
+<p><code>std::vector::empty()</code> 是一个简单而常用的函数，用于确定 <code>std::vector</code> 容器是否为空，可以在需要检查容器是否含有元素时使用。</p>
+<h2 id="std-vector-reserve"><a href="#std-vector-reserve" class="headerlink" title="std::vector::reserve()"></a>std::vector::reserve()</h2><p><code>std::vector::reserve()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于预留 <code>std::vector</code> 容器的存储空间，但不会改变容器中元素的数量。</p>
+<p>当你预先知道 <code>std::vector</code> 将要存储大量元素时，可以使用 <code>reserve()</code> 函数来预留足够的内存空间，避免多次重新分配内存，从而提高程序的性能。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::reserve()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个空的 std::vector 容器</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器当前的大小和容量</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;当前大小: &quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; <span class="string">&quot; 当前容量: &quot;</span> &lt;&lt; vec.<span class="built_in">capacity</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 预留容器存储空间为 10 个元素</span></span><br><span class="line">    vec.<span class="built_in">reserve</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印预留后的容器当前的大小和容量</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;预留后大小: &quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; <span class="string">&quot; 预留后容量: &quot;</span> &lt;&lt; vec.<span class="built_in">capacity</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>vec.reserve(10)</code> 预留了容器的存储空间为 10 个元素。</li>
+<li>打印了预留前后容器的大小和容量。</li>
+</ul>
+<p>需要注意的是，<code>reserve()</code> 函数只是预留了足够的存储空间，并没有改变容器的实际大小，容器的大小仍然是 0。容器的大小由实际插入的元素个数决定，而容器的容量则是实际分配的内存大小，<code>reserve()</code> 仅仅是为容器预留了更多的内存空间，以备将来的使用。</p>
+<p>这个函数通常在你已经知道将要存储大量元素的情况下使用，以减少因重新分配内存而引起的开销。</p>
+<h2 id="std-vector-at"><a href="#std-vector-at" class="headerlink" title="std::vector::at()"></a>std::vector::at()</h2><p><code>std::vector::at()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于访问 <code>std::vector</code> 容器中指定位置的元素，并提供了边界检查。</p>
+<p>与 <code>operator[]</code> 不同，<code>at()</code> 函数在访问容器元素时提供了边界检查，如果指定的位置超出了容器的范围，则会抛出 <code>std::out_of_range</code> 异常。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::at()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdexcept&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 使用 at() 访问容器中的元素</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;元素 at(2): &quot;</span> &lt;&lt; vec.<span class="built_in">at</span>(<span class="number">2</span>) &lt;&lt; std::endl; <span class="comment">// 访问索引为 2 的元素</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;元素 at(5): &quot;</span> &lt;&lt; vec.<span class="built_in">at</span>(<span class="number">5</span>) &lt;&lt; std::endl; <span class="comment">// 尝试访问超出范围的索引</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">catch</span> (<span class="type">const</span> std::out_of_range&amp; ex) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;发生异常: &quot;</span> &lt;&lt; ex.<span class="built_in">what</span>() &lt;&lt; std::endl; <span class="comment">// 捕获并打印 out_of_range 异常信息</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.at(2)</code> 获取了索引为 2 的元素值，并正常打印出来。</li>
+<li>然后尝试使用 <code>vec.at(5)</code> 访问超出容器范围的索引，这会导致 <code>std::out_of_range</code> 异常被抛出，并被 <code>catch</code> 语句捕获并处理。</li>
+</ul>
+<p>总的来说，<code>std::vector::at()</code> 是一个安全的访问元素的方法，可以在需要对访问进行边界检查的情况下使用，以防止意外访问超出容器范围的索引位置。</p>
+<h2 id="std-vector-front"><a href="#std-vector-front" class="headerlink" title="std::vector::front()"></a>std::vector::front()</h2><p><code>std::vector::front()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于返回 <code>std::vector</code> 容器中第一个元素的引用。</p>
+<p>它提供了对 <code>std::vector</code> 容器中第一个元素的访问，类似于数组的第一个元素。如果 <code>std::vector</code> 容器为空，则调用 <code>front()</code> 函数将会导致未定义行为。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::front()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 访问容器中的第一个元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;第一个元素是: &quot;</span> &lt;&lt; vec.<span class="built_in">front</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.front()</code> 获取了容器中的第一个元素值，并将其打印出来。</li>
+</ul>
+<p>需要注意的是，调用 <code>std::vector::front()</code> 函数时，应确保 <code>std::vector</code> 容器不为空，否则在空容器上调用 <code>front()</code> 将导致未定义行为。因此，在调用 <code>front()</code> 函数之前，最好先检查 <code>std::vector</code> 是否包含元素，可以通过 <code>empty()</code> 函数进行检查。</p>
+<h2 id="std-vector-back"><a href="#std-vector-back" class="headerlink" title="std::vector::back()"></a>std::vector::back()</h2><p><code>std::vector::back()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于返回 <code>std::vector</code> 容器中最后一个元素的引用。</p>
+<p>它提供了对 <code>std::vector</code> 容器中最后一个元素的访问。如果 <code>std::vector</code> 容器为空，则调用 <code>back()</code> 函数将会导致未定义行为。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::back()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 访问容器中的最后一个元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;最后一个元素是: &quot;</span> &lt;&lt; vec.<span class="built_in">back</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.back()</code> 获取了容器中的最后一个元素值，并将其打印出来。</li>
+</ul>
+<p>需要注意的是，调用 <code>std::vector::back()</code> 函数时，应确保 <code>std::vector</code> 容器不为空，否则在空容器上调用 <code>back()</code> 将导致未定义行为。因此，在调用 <code>back()</code> 函数之前，最好先检查 <code>std::vector</code> 是否包含元素，可以通过 <code>empty()</code> 函数进行检查。</p>
+<h2 id="std-vector-data"><a href="#std-vector-data" class="headerlink" title="std::vector::data()"></a>std::vector::data()</h2><p><code>std::vector::data()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于返回指向 <code>std::vector</code> 容器内部存储元素的指针。</p>
+<p>这个函数返回一个指向 <code>std::vector</code> 内部数据存储区的指针，该指针可以用于直接访问容器中的元素。如果 <code>std::vector</code> 容器为空，则返回的指针可能为空指针。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::data()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取指向容器数据的指针</span></span><br><span class="line">    <span class="type">int</span>* ptr = vec.<span class="built_in">data</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印指针指向的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;第一个元素是: &quot;</span> &lt;&lt; *ptr &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.data()</code> 获取了指向容器数据存储区的指针，并将其赋值给 <code>ptr</code>。</li>
+<li>打印了指针所指向的第一个元素的值。</li>
+</ul>
+<p>需要注意的是，<code>std::vector::data()</code> 返回的指针可以用于直接访问容器中的元素，但在修改容器中的元素时应格外小心，确保不会越界或者引起其它未定义的行为。此外，如果 <code>std::vector</code> 容器为空，则返回的指针可能为 <code>nullptr</code>。</p>
+<h2 id="std-vector-push-back"><a href="#std-vector-push-back" class="headerlink" title="std::vector::push_back()"></a>std::vector::push_back()</h2><p><code>std::vector::push_back()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于在 <code>std::vector</code> 容器的末尾添加一个新的元素。</p>
+<p>这个函数将新的元素添加到 <code>std::vector</code> 容器的末尾，并使容器的大小增加 1。如果 <code>std::vector</code> 的容量不足以容纳新元素，则会自动重新分配更大的内存空间以适应新的元素。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::push_back()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个空的 std::vector 容器</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 向容器中添加一些元素</span></span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">10</span>);</span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">20</span>);</span><br><span class="line">    vec.<span class="built_in">push_back</span>(<span class="number">30</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;容器中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>push_back()</code> 方法向容器中分别添加了三个整数元素。</li>
+<li>使用循环遍历容器中的元素，并将它们打印出来。</li>
+</ul>
+<p><code>std::vector::push_back()</code> 是一个常用的函数，用于向 <code>std::vector</code> 容器的末尾添加新的元素，非常方便实用。</p>
+<h2 id="std-vector-pop-back"><a href="#std-vector-pop-back" class="headerlink" title="std::vector::pop_back()"></a>std::vector::pop_back()</h2><p><code>std::vector::pop_back()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于移除 <code>std::vector</code> 容器中的最后一个元素。</p>
+<p>该函数会将 <code>std::vector</code> 容器中最后一个元素移除，并且减少容器的大小（size）1。如果 <code>std::vector</code> 容器为空，则调用 <code>pop_back()</code> 函数将导致未定义行为。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::pop_back()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移除容器中的最后一个元素</span></span><br><span class="line">    vec.<span class="built_in">pop_back</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;移除后的容器中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.pop_back()</code> 移除了容器中的最后一个元素。</li>
+<li>使用循环遍历容器中的元素，并将它们打印出来。</li>
+</ul>
+<p>需要注意的是，调用 <code>std::vector::pop_back()</code> 之前最好检查容器是否为空，以避免在空容器上调用该函数而导致的未定义行为。这个函数通常用于从 <code>std::vector</code> 容器的末尾删除元素，可以方便地实现栈（stack）等数据结构的功能。</p>
+<h2 id="std-vector-insert"><a href="#std-vector-insert" class="headerlink" title="std::vector::insert()"></a>std::vector::insert()</h2><p><code>std::vector::insert()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于在指定位置插入一个或多个元素到 <code>std::vector</code> 容器中。</p>
+<p>这个函数允许在指定位置插入一个元素或一组元素。插入操作可能会导致所有在指定位置之后的元素被移动，因为 <code>std::vector</code> 是一个连续存储的容器。</p>
+<p>下面是 <code>std::vector::insert()</code> 函数的基本语法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">insert</span> <span class="params">(iterator position, <span class="type">const</span> T&amp; val)</span></span>; <span class="comment">// 在 position 位置插入 val</span></span><br><span class="line"><span class="function">iterator <span class="title">insert</span> <span class="params">(iterator position, size_type n, <span class="type">const</span> T&amp; val)</span></span>; <span class="comment">// 在 position 位置插入 n 个 val</span></span><br><span class="line"><span class="function">iterator <span class="title">insert</span> <span class="params">(iterator position, InputIterator first, InputIterator last)</span></span>; <span class="comment">// 在 position 位置插入区间 [first, last) 内的元素</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>position</code> 参数是一个迭代器，指示了插入元素的位置。<code>val</code> 是要插入的元素值，<code>n</code> 是要插入的元素数量，<code>first</code> 和 <code>last</code> 是表示要插入的元素范围的迭代器。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::insert()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在容器的第二个位置插入一个元素 25</span></span><br><span class="line">    <span class="keyword">auto</span> it = vec.<span class="built_in">insert</span>(vec.<span class="built_in">begin</span>() + <span class="number">1</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在容器的末尾插入两个元素，值分别为 40 和 50</span></span><br><span class="line">    vec.<span class="built_in">insert</span>(vec.<span class="built_in">end</span>(), &#123;<span class="number">40</span>, <span class="number">50</span>&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;容器中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.insert(vec.begin() + 1, 25)</code> 在容器的第二个位置插入了一个值为 25 的元素。</li>
+<li>使用 <code>vec.insert(vec.end(), &#123;40, 50&#125;)</code> 在容器的末尾插入了两个值为 40 和 50 的元素。</li>
+<li>使用循环遍历容器中的元素，并将它们打印出来。</li>
+</ul>
+<p><code>std::vector::insert()</code> 函数允许在 <code>std::vector</code> 容器的指定位置插入一个或多个元素，提供了灵活且方便的插入操作。</p>
+<h2 id="std-vector-erase"><a href="#std-vector-erase" class="headerlink" title="std::vector::erase()"></a>std::vector::erase()</h2><p><code>std::vector::erase()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于从 <code>std::vector</code> 容器中移除一个或一段元素。</p>
+<p>这个函数有多种用法，它可以删除单个元素，也可以删除一个范围内的元素。删除操作可能会导致被移除元素后面的元素向前移动，因为 <code>std::vector</code> 是一个连续存储的容器。</p>
+<p>下面是 <code>std::vector::erase()</code> 函数的基本语法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">erase</span> <span class="params">(iterator position)</span></span>; <span class="comment">// 移除指定位置的元素</span></span><br><span class="line"><span class="function">iterator <span class="title">erase</span> <span class="params">(iterator first, iterator last)</span></span>; <span class="comment">// 移除位于 [first, last) 区间的元素</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>position</code> 是要移除的元素的位置的迭代器，<code>first</code> 和 <code>last</code> 表示一个范围，用来移除这个范围内的所有元素。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::erase()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移除容器中的第二个元素</span></span><br><span class="line">    vec.<span class="built_in">erase</span>(vec.<span class="built_in">begin</span>() + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移除容器中的第三个到第四个元素（迭代器范围 [vec.begin() + 2, vec.begin() + 4)）</span></span><br><span class="line">    vec.<span class="built_in">erase</span>(vec.<span class="built_in">begin</span>() + <span class="number">2</span>, vec.<span class="built_in">begin</span>() + <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;容器中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.erase(vec.begin() + 1)</code> 移除了容器中的第二个元素。</li>
+<li>使用 <code>vec.erase(vec.begin() + 2, vec.begin() + 4)</code> 移除了容器中的第三个到第四个元素。</li>
+<li>使用循环遍历容器中的元素，并将它们打印出来。</li>
+</ul>
+<p><code>std::vector::erase()</code> 函数允许从 <code>std::vector</code> 容器中移除指定位置或指定范围内的元素，提供了便捷的删除操作。</p>
+<h2 id="std-vector-clear"><a href="#std-vector-clear" class="headerlink" title="std::vector::clear()"></a>std::vector::clear()</h2><p><code>std::vector::clear()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于清空 <code>std::vector</code> 容器中的所有元素。</p>
+<p>当调用 <code>clear()</code> 函数时，<code>std::vector</code> 容器的大小变为零，即移除了容器中的所有元素。容器的内存空间不会被释放，但容器中的元素数量将变为零，即容器会变为空。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::clear()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印清空前容器中的元素数量</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;清空前容器的大小: &quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清空容器</span></span><br><span class="line">    vec.<span class="built_in">clear</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印清空后容器中的元素数量</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;清空后容器的大小: &quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec.size()</code> 打印了清空前容器中的元素数量。</li>
+<li>使用 <code>vec.clear()</code> 清空了容器中的所有元素。</li>
+<li>再次使用 <code>vec.size()</code> 打印了清空后容器中的元素数量，这时应该为 0。</li>
+</ul>
+<p><code>std::vector::clear()</code> 函数是一种快速清空 <code>std::vector</code> 容器中的元素的方法，但并不释放容器的内存空间，仅将容器的大小设置为零，使得容器变为空。</p>
+<h2 id="std-vector-swap"><a href="#std-vector-swap" class="headerlink" title="std::vector::swap()"></a>std::vector::swap()</h2><p><code>std::vector::swap()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于交换两个 <code>std::vector</code> 容器的内容。</p>
+<p>这个函数接受另一个 <code>std::vector</code> 容器作为参数，并将调用它的容器和传入的容器进行内容交换。交换操作将使得两个容器中的元素互相交换，但它们的内存空间不会发生改变。</p>
+<p>以下是 <code>std::vector::swap()</code> 函数的基本用法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(vector&amp; other)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>other</code> 是另一个 <code>std::vector</code> 容器，它的内容将与调用函数的容器进行交换。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::swap()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建两个 std::vector 容器，并分别向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec1 = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;</span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec2 = &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印交换前两个容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;交换前 vec1 中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec1) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;交换前 vec2 中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec2) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 swap() 函数交换两个容器的内容</span></span><br><span class="line">    vec<span class="number">1.</span><span class="built_in">swap</span>(vec2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印交换后两个容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;交换后 vec1 中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec1) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;交换后 vec2 中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec2) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了两个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec1</code> 和 <code>vec2</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>vec1.swap(vec2)</code> 对两个容器的内容进行了交换。</li>
+<li>分别打印了交换前后两个容器中的元素。</li>
+</ul>
+<p><code>std::vector::swap()</code> 函数提供了一种快速交换两个 <code>std::vector</code> 容器内容的方法，不需要复制元素，只需交换指针。这对于需要在两个容器间交换数据时非常有用。</p>
+<h2 id="std-vector-assign"><a href="#std-vector-assign" class="headerlink" title="std::vector::assign()"></a>std::vector::assign()</h2><p><code>std::vector::assign()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于重新分配 <code>std::vector</code> 容器的内容。</p>
+<p>这个函数可以使用多种方式重新设置 <code>std::vector</code> 容器的内容：可以用新值替换已有的内容，也可以设置容器中的元素数量，或者使用一个范围内的值替换容器中的元素。</p>
+<p>以下是 <code>std::vector::assign()</code> 函数的不同形式及其基本用法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">assign</span><span class="params">(size_type count, <span class="type">const</span> T&amp; value)</span></span>; <span class="comment">// 设置容器中元素的数量为 count，并用 value 值替换所有元素 (1)</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">assign</span><span class="params">(InputIterator first, InputIterator last)</span></span>; <span class="comment">// 使用区间 [first, last) 内的元素替换容器的内容 (2)</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">assign</span><span class="params">(std::initializer_list&lt;T&gt; il)</span></span>; <span class="comment">// 使用初始化列表 il 内的元素替换容器的内容 (3)</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>参数</p>
+<ul>
+<li>count - 容器的新大小</li>
+<li>value - 用以初始化容器元素的值</li>
+<li>first, last - 复制来源元素的范围</li>
+<li>ilist - 复制值来源的initializer_list</li>
+</ul>
+</li>
+<li><p>复杂度</p>
+<ul>
+<li>1 与count呈线性</li>
+<li>2 与first和last间的距离呈线性</li>
+<li>3 与il.size()呈线性</li>
+</ul>
+</li>
+</ul>
+<p>这里的 <code>count</code> 表示新的元素数量，<code>value</code> 是要赋给新元素的值。<code>first</code> 和 <code>last</code> 是迭代器，表示一个范围，用来替换容器的内容。<code>il</code> 是一个初始化列表，用来替换容器的内容。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::assign()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;<span class="type">char</span>&gt; characters;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">auto</span> print_list = [&amp;]()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> c : characters)</span><br><span class="line">            std::cout &lt;&lt; c &lt;&lt; <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;  </span><br><span class="line">    &#125;;</span><br><span class="line"> </span><br><span class="line">    characters.<span class="built_in">assign</span>(<span class="number">5</span>, <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">    <span class="built_in">print_list</span>();</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="type">const</span> std::string <span class="title">extra</span><span class="params">(<span class="number">6</span>, <span class="string">&#x27;b&#x27;</span>)</span></span>;</span><br><span class="line">    characters.<span class="built_in">assign</span>(extra.<span class="built_in">begin</span>(), extra.<span class="built_in">end</span>());</span><br><span class="line">    <span class="built_in">print_list</span>();</span><br><span class="line"> </span><br><span class="line">    characters.<span class="built_in">assign</span>(&#123;<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;+&#x27;</span>, <span class="string">&#x27;+&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;1&#x27;</span>&#125;);</span><br><span class="line">    <span class="built_in">print_list</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>vec.assign(5, 10)</code> 设置容器中的元素数量为 5，并用值 10 替换了所有元素。</li>
+<li>使用循环遍历容器中的元素，并将它们打印出来。</li>
+</ul>
+<p><code>std::vector::assign()</code> 函数提供了多种方式来重新设置 <code>std::vector</code> 容器的内容，使得容器可以被不同类型的数据重新填充。</p>
+<h2 id="std-vector-resize"><a href="#std-vector-resize" class="headerlink" title="std::vector::resize()"></a>std::vector::resize()</h2><p><code>std::vector::resize()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于改变 <code>std::vector</code> 容器中的元素数量。</p>
+<p>这个函数允许你改变 <code>std::vector</code> 容器中元素的数量。如果新的大小比当前大小大，将会增加元素数量并用默认构造函数的值初始化新的元素。如果新的大小比当前大小小，将会删除超出新大小的元素。</p>
+<p>以下是 <code>std::vector::resize()</code> 函数的基本语法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">resize</span><span class="params">(size_type count)</span></span>; <span class="comment">// 设置容器中的元素数量为 count</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">resize</span><span class="params">(size_type count, <span class="type">const</span> value_type&amp; value)</span></span>; <span class="comment">// 设置容器中的元素数量为 count，并用 value 值初始化新元素</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>count</code> 是指定的新的元素数量，<code>value</code> 是可选的值，用于初始化新添加的元素。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::resize()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个空的 std::vector 容器</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 resize() 设置容器中的元素数量为 5</span></span><br><span class="line">    vec.<span class="built_in">resize</span>(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;容器中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 resize() 设置容器中的元素数量为 8，并用值 100 初始化新添加的元素</span></span><br><span class="line">    vec.<span class="built_in">resize</span>(<span class="number">8</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 再次打印容器中的元素</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;调整大小后的容器中的元素: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; element : vec) &#123;</span><br><span class="line">        std::cout &lt;&lt; element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个空的 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>。</li>
+<li>使用 <code>vec.resize(5)</code> 设置容器中的元素数量为 5，默认使用默认构造函数进行初始化。</li>
+<li>使用 <code>vec.resize(8, 100)</code> 将容器中的元素数量增加到 8，并用值 100 初始化新添加的元素。</li>
+<li>分别使用循环遍历容器中的元素，并将它们打印出来。</li>
+</ul>
+<p><code>std::vector::resize()</code> 函数允许你在运行时动态调整 <code>std::vector</code> 容器的大小，并可以选择性地使用特定的值初始化新添加的元素。</p>
+<h2 id="std-vector-shrink-to-fit"><a href="#std-vector-shrink-to-fit" class="headerlink" title="std::vector::shrink_to_fit()"></a>std::vector::shrink_to_fit()</h2><p><code>std::vector::shrink_to_fit()</code> 是 C++ 标准库中 <code>std::vector</code> 类的一个成员函数，用于要求 <code>std::vector</code> 容器减小其容量，使其容量和大小相匹配。</p>
+<p><code>std::vector</code> 容器会根据需要分配更多的内存空间以容纳新的元素。然而，当一些元素被删除后，<code>std::vector</code> 容器的实际大小可能小于其容量。<code>shrink_to_fit()</code> 函数就是用来释放容器多余的内存空间，将容器的容量减小到与其大小相匹配。</p>
+<p>以下是 <code>std::vector::shrink_to_fit()</code> 函数的基本语法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">shrink_to_fit</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数没有参数，调用它将使 <code>std::vector</code> 容器的容量减小到和当前元素数量相匹配的大小。但并不保证一定会成功减小容器的容量，因为具体实现可能会有所不同。</p>
+<p>以下是一个简单的示例演示了如何使用 <code>std::vector::shrink_to_fit()</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::vector 容器，并向其中添加一些元素</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; vec = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移除容器中的最后两个元素</span></span><br><span class="line">    vec.<span class="built_in">pop_back</span>();</span><br><span class="line">    vec.<span class="built_in">pop_back</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用 shrink_to_fit() 函数将容器的容量减小到与其大小相匹配</span></span><br><span class="line">    vec.<span class="built_in">shrink_to_fit</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印容器的大小和容量</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;容器的大小: &quot;</span> &lt;&lt; vec.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;容器的容量: &quot;</span> &lt;&lt; vec.<span class="built_in">capacity</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>创建了一个 <code>std::vector&lt;int&gt;</code> 容器 <code>vec</code>，并初始化了一些整数元素。</li>
+<li>使用 <code>pop_back()</code> 移除了容器中的最后两个元素。</li>
+<li>使用 <code>shrink_to_fit()</code> 函数将容器的容量减小到与其大小相匹配。</li>
+<li>使用 <code>size()</code> 和 <code>capacity()</code> 分别打印了容器的大小和容量。</li>
+</ul>
+<p><code>std::vector::shrink_to_fit()</code> 函数提供了一种手段来释放 <code>std::vector</code> 容器内多余的内存空间，使得容器的实际容量与其大小相匹配。但并不保证一定会成功减小容器的容量，具体情况取决于实现。</p>
+<h2 id="std-vector-emplace-back-函数-详解"><a href="#std-vector-emplace-back-函数-详解" class="headerlink" title="std::vector::emplace_back() 函数 详解"></a>std::vector::emplace_back() 函数 详解</h2><p><code>std::vector::emplace_back()</code> 是 C++ 中 <code>std::vector</code> 容器提供的一个函数，用于在容器的末尾直接构造元素，而不是先创建一个临时对象再进行拷贝或移动操作。这个函数允许你在容器中就地构造对象，从而避免额外的拷贝或移动开销。</p>
+<p>以下是 <code>std::vector::emplace_back()</code> 的详细解释：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span>... Args&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">emplace_back</span><span class="params">(Args&amp;&amp;... args)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125; <span class="comment">// namespace std</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>emplace_back</code> 函数接受任意数量的参数，并将这些参数传递给容器中元素的构造函数，用于在容器的末尾直接构造一个新元素。</p>
+</li>
+<li><p>参数 <code>Args&amp;&amp;... args</code> 是一个可变参数模板，可以接受任意数量的参数。</p>
+</li>
+</ul>
+<p>使用 <code>emplace_back</code> 的典型用法是，直接在容器末尾构造一个元素，而不需要在代码中创建临时对象。这对于避免额外的拷贝或移动操作特别有用。</p>
+<p>以下是一个简单的示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">MyClass</span>(<span class="type">int</span> v) : <span class="built_in">value</span>(v) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Constructing MyClass with value: &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::vector&lt;MyClass&gt; myVector;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 emplace_back 直接在容器末尾构造元素</span></span><br><span class="line">    myVector.<span class="built_in">emplace_back</span>(<span class="number">42</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 emplace_back 可以避免额外的拷贝或移动操作</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>emplace_back</code> 直接在 <code>std::vector</code> 的末尾构造了一个 <code>MyClass</code> 对象，而不需要先创建一个临时对象再进行拷贝操作。这样可以提高效率，特别是对于那些不支持移动语义的类。</p>
+<h2 id="C-std-vector-拷贝构造函数-详解"><a href="#C-std-vector-拷贝构造函数-详解" class="headerlink" title="C++ std::vector 拷贝构造函数 详解"></a>C++ std::vector 拷贝构造函数 详解</h2><p>在 C++ 中，<code>std::vector</code> 是一个动态数组，它提供了在运行时大小可以动态变化的数组容器。拷贝构造函数是一种特殊的构造函数，用于创建一个对象的副本。<code>std::vector</code> 的拷贝构造函数用于创建一个新的 <code>std::vector</code> 对象，其元素与另一个 <code>std::vector</code> 对象完全相同。</p>
+<p>以下是 <code>std::vector</code> 的拷贝构造函数的详细解释：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 默认构造函数</span></span><br><span class="line"><span class="built_in">vector</span>(<span class="type">const</span> vector&amp; other);</span><br></pre></td></tr></table></figure>
+
+<p>拷贝构造函数采用另一个 <code>std::vector</code> 对象作为参数，并创建一个新的 <code>std::vector</code> 对象，其中包含与参数相同的元素。这个构造函数通过复制另一个 <code>std::vector</code> 对象的所有元素来构造新的对象。</p>
+<p>拷贝构造函数通常在以下情况下被调用：</p>
+<ol>
+<li>用一个 <code>std::vector</code> 对象初始化另一个 <code>std::vector</code> 对象。</li>
+<li>作为函数参数传递 <code>std::vector</code> 对象。</li>
+<li>从函数返回 <code>std::vector</code> 对象时。</li>
+</ol>
+<p>下面是一个简单的示例，展示了如何使用拷贝构造函数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个原始的 std::vector 对象</span></span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; originalVector = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用拷贝构造函数创建一个新的 std::vector 对象</span></span><br><span class="line">    <span class="function">std::vector&lt;<span class="type">int</span>&gt; <span class="title">copiedVector</span><span class="params">(originalVector)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出新的 std::vector 对象的元素</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i : copiedVector) &#123;</span><br><span class="line">        std::cout &lt;&lt; i &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中，<code>copiedVector</code> 对象使用了原始向量 <code>originalVector</code> 的拷贝构造函数创建了一个副本。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppSTL/" rel="tag"># CppSTL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_40_variant/" rel="prev" title="C++_10_40_variant">
+      <i class="fa fa-chevron-left"></i> C++_10_40_variant
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_38_unordered_map/" rel="next" title="C++_10_38_unordered_map">
+      C++_10_38_unordered_map <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-vector%E5%92%8CC%E9%A3%8E%E6%A0%BC%E6%95%B0%E6%8D%AE%E4%BA%92%E7%9B%B8%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.</span> <span class="nav-text">C++ std::vector和C风格数据互相转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BB%8E-C-%E9%A3%8E%E6%A0%BC%E6%95%B0%E7%BB%84%E8%BD%AC%E6%8D%A2%E4%B8%BA-std-vector"><span class="nav-number">2.1.</span> <span class="nav-text">1. 从 C 风格数组转换为 std::vector</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BB%8E-std-vector-%E8%BD%AC%E6%8D%A2%E4%B8%BA-C-%E9%A3%8E%E6%A0%BC%E6%95%B0%E7%BB%84"><span class="nav-number">2.2.</span> <span class="nav-text">2. 从 std::vector 转换为 C 风格数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%8C%E6%95%B4%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.3.</span> <span class="nav-text">3. 完整示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.4.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vector-%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">vector 内存分配方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">4.</span> <span class="nav-text">C++ 标准库是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">C++ 标准库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#std-vector-%E7%B1%BB"><span class="nav-number">5.1.</span> <span class="nav-text">std::vector 类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%AD-std-vector%E6%A8%A1%E6%9D%BF%E7%B1%BB%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">C++ 标准库中 std::vector模板类详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%80%A7%EF%BC%9A"><span class="nav-number">6.1.</span> <span class="nav-text">特性：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">6.2.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%AD-std-vector%E6%A8%A1%E6%9D%BF%E7%B1%BB%E6%89%80%E6%9C%89%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0"><span class="nav-number">7.</span> <span class="nav-text">C++ 标准库中 std::vector模板类所有成员函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E9%87%8F%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">7.1.</span> <span class="nav-text">容量相关操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E5%85%83%E7%B4%A0%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">访问元素操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%AE%B9%E5%99%A8%E5%86%85%E5%AE%B9%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">7.3.</span> <span class="nav-text">修改容器内容操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">7.4.</span> <span class="nav-text">其他操作：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-vector-swap-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">C++ std::vector::swap() 函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A"><span class="nav-number">8.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%EF%BC%9A"><span class="nav-number">8.2.</span> <span class="nav-text">参数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%EF%BC%9A"><span class="nav-number">8.3.</span> <span class="nav-text">功能：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">8.4.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">8.5.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-size"><span class="nav-number">9.</span> <span class="nav-text">std::vector::size()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-capacity"><span class="nav-number">10.</span> <span class="nav-text">std::vector::capacity()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-empty"><span class="nav-number">11.</span> <span class="nav-text">std::vector::empty()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-reserve"><span class="nav-number">12.</span> <span class="nav-text">std::vector::reserve()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-at"><span class="nav-number">13.</span> <span class="nav-text">std::vector::at()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-front"><span class="nav-number">14.</span> <span class="nav-text">std::vector::front()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-back"><span class="nav-number">15.</span> <span class="nav-text">std::vector::back()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-data"><span class="nav-number">16.</span> <span class="nav-text">std::vector::data()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-push-back"><span class="nav-number">17.</span> <span class="nav-text">std::vector::push_back()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-pop-back"><span class="nav-number">18.</span> <span class="nav-text">std::vector::pop_back()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-insert"><span class="nav-number">19.</span> <span class="nav-text">std::vector::insert()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-erase"><span class="nav-number">20.</span> <span class="nav-text">std::vector::erase()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-clear"><span class="nav-number">21.</span> <span class="nav-text">std::vector::clear()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-swap"><span class="nav-number">22.</span> <span class="nav-text">std::vector::swap()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-assign"><span class="nav-number">23.</span> <span class="nav-text">std::vector::assign()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-resize"><span class="nav-number">24.</span> <span class="nav-text">std::vector::resize()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-shrink-to-fit"><span class="nav-number">25.</span> <span class="nav-text">std::vector::shrink_to_fit()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-vector-emplace-back-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">26.</span> <span class="nav-text">std::vector::emplace_back() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-vector-%E6%8B%B7%E8%B4%9D%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">27.</span> <span class="nav-text">C++ std::vector 拷贝构造函数 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

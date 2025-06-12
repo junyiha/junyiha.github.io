@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 深度学习基本概念 上采样 下采样 卷积 池化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度学习基本概念">
+<meta property="og:url" content="https://junyiha.github.io/2025/05/24/notebook/DeepLearning/2025-05-24--%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 深度学习基本概念 上采样 下采样 卷积 池化">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-24T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-04T01:07:53.049Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="AI部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/05/24/notebook/DeepLearning/2025-05-24--%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>深度学习基本概念 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/05/24/notebook/DeepLearning/2025-05-24--%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深度学习基本概念
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-05-24 09:00:00" itemprop="dateCreated datePublished" datetime="2025-05-24T09:00:00+08:00">2025-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-06-04 09:07:53" itemprop="dateModified" datetime="2025-06-04T09:07:53+08:00">2025-06-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>深度学习基本概念<ul>
+<li>上采样</li>
+<li>下采样</li>
+<li>卷积</li>
+<li>池化</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="上采样"><a href="#上采样" class="headerlink" title="上采样"></a>上采样</h2><ul>
+<li><p>上采样(upsampling)，又名放大图像，图像插值</p>
+</li>
+<li><p>主要目的是放大原图像，从而可以显示在更高分辨率的显示设备上</p>
+</li>
+<li><p>上采样有3中常见的方法：</p>
+<ul>
+<li>双线性插值(bilinear)</li>
+<li>反卷积(Transposed Convolution)</li>
+<li>反池化(Unpooling)</li>
+</ul>
+</li>
+<li><p>原理：</p>
+<ul>
+<li>图像放大几乎都是采用内插值方法，即在原有图像像素的基础上在像素点之间采用合适的差值算法插入新的元素。</li>
+<li>差值算法还包括了传统插值，基于边缘图像的插值，还有基于区域的图像插值</li>
+</ul>
+</li>
+</ul>
+<h2 id="下采样"><a href="#下采样" class="headerlink" title="下采样"></a>下采样</h2><ul>
+<li><p>下采样(subsampled)，又名降采样，缩小图像</p>
+</li>
+<li><p>主要目的有</p>
+<ul>
+<li>使得图像符合显示区域的大小</li>
+<li>生成对应图像的缩略图</li>
+</ul>
+</li>
+<li><p>其实下采样就是池化</p>
+</li>
+<li><p>原理</p>
+<ul>
+<li>对于一副图像I尺寸为M*N，对其进行s倍下采样，即得到(M&#x2F;s) * (N&#x2F;s)尺寸的分辨率，当然，s应该是M和N的公约数才可以</li>
+<li>如果考虑是矩阵形式的图像，就是把原始图像s * s窗口内的图像变成一个像素，这个像素点的值就是窗口内所有像素的均值或者最大值(也就是Pooling池化操作等)</li>
+<li>采样曾是使用pooling的相关技术来实现的，目的就是来降低特征的维度并保留有效信息，一定程度上避免过拟合</li>
+<li>但是pooling的目的不仅仅是这些，他的目的是保持旋转，平移，伸缩不变性等。采样有最大值采样，平均值采样，求和区域采样和随机区域采样等</li>
+<li>池化也是这样的，例如最大值池化，平均值池化，随机池化，求和区域池化等。</li>
+</ul>
+</li>
+</ul>
+<h2 id="卷积"><a href="#卷积" class="headerlink" title="卷积"></a>卷积</h2><ul>
+<li>一次卷积运算指的是：当我们有一个过滤器，又称卷积核，也是矩阵。</li>
+<li>移动卷积核，将这个放款对应要处理的输入矩阵的一部分，位置一一对应相乘，然后把结果在相加到一个数</li>
+</ul>
+<h2 id="池化"><a href="#池化" class="headerlink" title="池化"></a>池化</h2><ul>
+<li>池化最直观的作用便是降维，常见的池化有最大池化，平均池化和随机池化；池化层不需要训练参数<ul>
+<li>最大池化可以获取局部信息，可以更好保留纹理上的特征；如果不用观察物体在图片中的具体位置，只关心其是否出现，则使用最大池化效果较好</li>
+<li>平均池化往往能保留整体数据的特征，能凸出背景信息</li>
+<li>随机池化中元素值大的被选中的概率也大，但不是想最大池化总是取最大值，随机池化一方面最大化保证了Max值的取值，一方面又确保了不完全是max值起作用，造成过度失真；除此之外，其可以在一定程度上避免过拟合。</li>
+</ul>
+</li>
+</ul>
+<h2 id="卷积神经网络（CNN）基础"><a href="#卷积神经网络（CNN）基础" class="headerlink" title="卷积神经网络（CNN）基础"></a>卷积神经网络（CNN）基础</h2><p>下面从卷积运算原理、典型网络结构、常见组件与训练流程等方面，介绍卷积神经网络（CNN）的基础知识。</p>
+<hr>
+<h2 id="1-卷积运算（Convolution-Operation）"><a href="#1-卷积运算（Convolution-Operation）" class="headerlink" title="1. 卷积运算（Convolution Operation）"></a>1. 卷积运算（Convolution Operation）</h2><ol>
+<li><p><strong>定义与直观</strong></p>
+<ul>
+<li>卷积针对二维图像输入 $X$ 和一个可学习的卷积核（滤波器） $K$，通过在图像上滑动核窗口并做元素乘加，得到输出特征图（feature map） $Y$。</li>
+<li>数学上，对于输入 $X\in\mathbb{R}^{H\times W}$，卷积核 $K\in\mathbb{R}^{k\times k}$，输出 $Y(i,j) &#x3D; \sum_{u&#x3D;1}^{k}\sum_{v&#x3D;1}^{k} X(i+u-1,; j+v-1),\cdot K(u,v)$。</li>
+</ul>
+</li>
+<li><p><strong>多通道卷积</strong></p>
+<ul>
+<li><p>真实场景中输入往往有多个通道（如 RGB 图像有 3 个通道）。如果输入 $X\in\mathbb{R}^{C_{\text{in}}\times H\times W}$，卷积核 $K\in\mathbb{R}^{C_{\text{out}}\times C_{\text{in}}\times k\times k}$，则对每个输出通道 $c_{\text{out}}$ 做如下计算：</p>
+<p>$$<br>  Y_{c_{\text{out}}}(i,j)<br>  &#x3D; \sum_{c_{\text{in}}&#x3D;1}^{C_\text{in}} \sum_{u&#x3D;1}^{k} \sum_{v&#x3D;1}^{k}<br>X_{c_{\text{in}}}(i+u-1,;j+v-1);K_{c_{\text{out}},,c_{\text{in}}}(u,v).<br>$$</p>
+</li>
+<li><p>最终输出 $Y\in\mathbb{R}^{C_{\text{out}}\times H’\times W’}$，其中 $H’$、$W’$ 取决于步幅（stride）、填充（padding）等设置。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>步幅（Stride）与填充（Padding）</strong></p>
+<ul>
+<li><strong>步幅（stride）</strong>：卷积核在输入上每次移动的像素步长。若 stride&#x3D;1，则每次移动 1 像素，输出尺寸 $H’ &#x3D; H - k + 1$；若 stride&#x3D;2，则 $H’ &#x3D; \lfloor (H - k)&#x2F;2 \rfloor + 1$。</li>
+<li><strong>填充（padding）</strong>：为保留边缘信息，可在输入周围补 $p$ 圈零（zero-padding），此时 $H’ &#x3D; (H + 2p - k)&#x2F;\text{stride} + 1$。最常见的 “same” 填充 即令 $p &#x3D; \lfloor k&#x2F;2\rfloor$，使得输出与输入在高宽方向保持相同尺寸（当 stride&#x3D;1 时）。</li>
+</ul>
+</li>
+<li><p><strong>卷积的作用</strong></p>
+<ul>
+<li>每个卷积核负责提取输入图像中一种“局部特征”——比如某个边缘方向、某种纹理模式。网络后续层再在这些“基础特征”基础上组合、抽象，形成更高层次、更具判别力的语义特征。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="2-CNN-的典型结构与组件"><a href="#2-CNN-的典型结构与组件" class="headerlink" title="2. CNN 的典型结构与组件"></a>2. CNN 的典型结构与组件</h2><p>一个标准的 CNN 通常由以下几类层（Layer）依次串联而成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Input → [Conv → BatchNorm → Activation → (Pooling)] × N → (Fully Connected Layers) → Output</span><br></pre></td></tr></table></figure>
+
+<p>下面依次介绍常见组件。</p>
+<h3 id="2-1-卷积层（Convolutional-Layer）"><a href="#2-1-卷积层（Convolutional-Layer）" class="headerlink" title="2.1 卷积层（Convolutional Layer）"></a>2.1 卷积层（Convolutional Layer）</h3><ul>
+<li><p><strong>功能</strong>：学习若干组可训练的卷积核（filters），对输入特征图做卷积，得到多张二维输出特征图。</p>
+</li>
+<li><p><strong>超参数</strong>：</p>
+<ol>
+<li><strong>卷积核大小（kernel size）</strong>：常见 3×3、5×5；现代网络多推荐 3×3。</li>
+<li><strong>输出通道数（out_channels）</strong>：也就是该层生成多少张滤波后的特征图。</li>
+<li><strong>步幅（stride）</strong> 和 <strong>填充（padding）</strong>：控制输出空间分辨率。</li>
+</ol>
+</li>
+<li><p><strong>示例</strong>：“Conv2d(in_channels&#x3D;3, out_channels&#x3D;64, kernel_size&#x3D;3, stride&#x3D;1, padding&#x3D;1)” ——对 RGB 图像提取 64 个通道的 3×3 特征，保留原始空间大小。</p>
+</li>
+</ul>
+<h3 id="2-2-归一化层（BatchNorm-LayerNorm-等）"><a href="#2-2-归一化层（BatchNorm-LayerNorm-等）" class="headerlink" title="2.2 归一化层（BatchNorm &#x2F; LayerNorm 等）"></a>2.2 归一化层（BatchNorm &#x2F; LayerNorm 等）</h3><ul>
+<li><p><strong>Batch Normalization（BN）</strong>：在卷积后常接 BN，目的是对每一批（batch）内的同一通道激活值做“零均值、单位方差”归一化，再加上可学习的缩放系数 $\gamma$ 和偏移系数 $\beta$，提高训练稳定性并能加快收敛。</p>
+<p>$$<br>  \hat x &#x3D; \frac{x - \mu_\text{batch}}{\sqrt{\sigma_\text{batch}^2 + \epsilon}},\quad<br>  y &#x3D; \gamma \hat x + \beta.<br>$$</p>
+</li>
+<li><p><strong>作用</strong>：</p>
+<ol>
+<li>缓解内部协变量偏移（Internal Covariate Shift）；</li>
+<li>允许使用较大学习率；</li>
+<li>本质上对每个通道做了一次线性变换，兼具轻微正则化效果。</li>
+</ol>
+</li>
+</ul>
+<h3 id="2-3-激活函数（Activation）"><a href="#2-3-激活函数（Activation）" class="headerlink" title="2.3 激活函数（Activation）"></a>2.3 激活函数（Activation）</h3><ul>
+<li><strong>常见激活</strong>：ReLU、Leaky ReLU、SiLU&#x2F;Swish、ELU 等。</li>
+<li><strong>ReLU（Rectified Linear Unit）</strong>：$\text{ReLU}(x)&#x3D;\max(0,x)$。优点是简单、不容易饱和、计算效率高；缺点是存在“死神经元”问题。</li>
+<li><strong>Leaky ReLU</strong>：$\text{LeakyReLU}(x)&#x3D;\max(0,x) + \alpha\min(0,x)$，让负值部分按比例映射，减轻了死神经元风险。</li>
+<li><strong>SiLU&#x2F;Swish</strong>：$\text{SiLU}(x)&#x3D;x \cdot \sigma(x)$，在一定场景下能带来更好的收敛速度与精度。</li>
+</ul>
+<h3 id="2-4-池化层（Pooling）"><a href="#2-4-池化层（Pooling）" class="headerlink" title="2.4 池化层（Pooling）"></a>2.4 池化层（Pooling）</h3><ul>
+<li><p><strong>功能</strong>： 通过聚合邻域内的数值（如最大值或平均值），来压缩空间尺寸、保留显著特征并具有一定平移不变性。</p>
+</li>
+<li><p><strong>常见池化</strong>：</p>
+<ol>
+<li><strong>Max Pooling（最大池化）</strong>：取窗口内最大值；</li>
+<li><strong>Average Pooling（平均池化）</strong>：取窗口内平均值。</li>
+</ol>
+</li>
+<li><p><strong>示例</strong>：“MaxPool2d(kernel_size&#x3D;2, stride&#x3D;2)” 会把 $H\times W$ 特征图降采样为 $\frac{H}{2}\times\frac{W}{2}$。</p>
+</li>
+<li><p><strong>作用</strong>：</p>
+<ol>
+<li>降低特征图分辨率，减少计算量；</li>
+<li>提取最显著特征（最大池化）；</li>
+<li>缓解过拟合。</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>现代一些轻量化网络会用“步幅为 2 的卷积”替代池化，以让特征学习和下采样一并在卷积层内完成。</p>
+</blockquote>
+<h3 id="2-5-全连接层（Fully-Connected-Layer）"><a href="#2-5-全连接层（Fully-Connected-Layer）" class="headerlink" title="2.5 全连接层（Fully Connected Layer）"></a>2.5 全连接层（Fully Connected Layer）</h3><ul>
+<li><strong>用途</strong>：将卷积、池化后得到的高层特征展平（flatten）为一维向量，并通过一到多层全连接实现最终分类或回归。</li>
+<li><strong>缺点</strong>：参数量大，且无法保留空间信息。</li>
+<li><strong>实践中</strong>：在图像分类网络（如 AlexNet、VGG）经常使用；在目标检测、语义分割任务中，更常用全局平均池化（Global Average Pooling）后直接接一个或几个 FC，或者直接用卷积代替 FC。</li>
+</ul>
+<hr>
+<h2 id="3-网络堆叠与特征层级"><a href="#3-网络堆叠与特征层级" class="headerlink" title="3. 网络堆叠与特征层级"></a>3. 网络堆叠与特征层级</h2><ol>
+<li><p><strong>层级堆叠</strong></p>
+<ul>
+<li>一个典型 CNN由多组“Conv → BN → Activation”堆叠而成，每隔几层会有一个下采样（Pool 或 stride&#x3D;2 的卷积）。</li>
+<li>随着网络深度增加，空间分辨率逐渐降低、通道数逐渐增大，从而提取从“低级边缘”到“高级语义”不同粒度的特征。</li>
+</ul>
+</li>
+<li><p><strong>感受野（Receptive Field）</strong></p>
+<ul>
+<li>感受野指网络某一层单个神经元在输入图像上能“看到”的区域大小。卷积核越大、网络越深，感受野越大。</li>
+<li>在设计网络时，需要保证最后用于分类或检测的特征图，其感受野足够覆盖目标，否则无法学到足够的上下文信息。</li>
+</ul>
+</li>
+<li><p><strong>瓶颈结构（Bottleneck）与跨层连接（Residual Link）</strong></p>
+<ul>
+<li><strong>Bottleneck</strong> Block（如 ResNet）：通过先用 1×1 卷积减少通道，再用 3×3 卷积处理，最后再用 1×1 卷积恢复通道，减少参数和计算。</li>
+<li><strong>残差连接（Residual Connection）</strong>：把 Block 输入直接加到输出 $y &#x3D; F(x) + x$ ，可缓解梯度消失、加速训练。</li>
+</ul>
+</li>
+<li><p><strong>跨阶段部分（CSP）与分组卷积</strong></p>
+<ul>
+<li><strong>CSP（Cross Stage Partial）</strong>：把输入特征图在某个阶段分成两路，一路做连续卷积堆叠，另一路保留原始信息，最后把两路特征拼回。这种设计能减少模型重复梯度信息、减少计算开销。</li>
+<li><strong>分组卷积（Group Convolution）</strong>（如 ResNeXt、MobileNet）：将输入通道划分为 $g$ 组，分别做卷积再拼接，用更少的参数完成多通道特征提取。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="4-训练与前向-反向传播"><a href="#4-训练与前向-反向传播" class="headerlink" title="4. 训练与前向&#x2F;反向传播"></a>4. 训练与前向&#x2F;反向传播</h2><ol>
+<li><p><strong>前向传播（Forward）</strong></p>
+<ul>
+<li>输入图像 $X$ 进入卷积层，依次经过卷积、归一化、激活、池化……最后输出网络预测（分类概率、bounding box 回归值等）。</li>
+</ul>
+</li>
+<li><p><strong>损失函数（Loss Function）</strong></p>
+<ul>
+<li><strong>分类任务</strong>：常用交叉熵损失（Cross-Entropy Loss）；</li>
+<li><strong>检测任务</strong>：通常包含 “定位损失（如 IoU&#x2F;GIoU&#x2F;DIoU&#x2F;CIoU）”“置信度损失（Objectness）”“分类损失” 三部分；</li>
+<li><strong>回归任务（如人脸关键点）</strong>：常用 L1、L2 损失或 Smooth L1。</li>
+</ul>
+</li>
+<li><p><strong>反向传播（Backward）</strong></p>
+<ul>
+<li>通过链式法则计算损失对各层可训练参数的梯度，按照优化算法（如 SGD、Adam）更新权重。</li>
+<li><strong>学习率（learning rate）</strong>、<strong>动量（momentum）</strong>、<strong>权重衰减（weight decay）</strong> 等超参数需仔细调节，以保证收敛且不易陷入局部最优或震荡。</li>
+</ul>
+</li>
+<li><p><strong>批量训练（Mini-batch）与归一化</strong></p>
+<ul>
+<li>把训练样本分成若干 Batch，一次把 $B$ 张图输入网络，计算损失后再做一次参数更新。</li>
+<li>BatchNorm 正是在这种 Batch 训练机制下设计，保证同一批样本在同一通道上的激活被归一化，有利于更稳定更快地收敛。</li>
+</ul>
+</li>
+<li><p><strong>正则化（Regularization）与避免过拟合</strong></p>
+<ul>
+<li><strong>Dropout</strong>：训练时随机屏蔽部分神经元，迫使网络不要过度依赖某个神经元；在 CNN 里常用于全连接层。</li>
+<li><strong>数据增强（Data Augmentation）</strong>：对输入图像做随机翻转、裁剪、颜色扰动、旋转、Mosaic 等，让模型见到更多样化样本，提升泛化能力。</li>
+<li><strong>早停法（Early Stopping）</strong>：在验证集上监控性能，当验证损失或 mAP 在若干 epoch 内不再下降时，就提前停止训练。</li>
+<li><strong>权重衰减（Weight Decay）</strong>：在损失函数中加 $\lambda|\mathbf{w}|^2$ 项，抑制权重过大，减少过拟合风险。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-典型网络架构示例"><a href="#5-典型网络架构示例" class="headerlink" title="5. 典型网络架构示例"></a>5. 典型网络架构示例</h2><ol>
+<li><p><strong>LeNet-5（1998）</strong></p>
+<ul>
+<li>最早的 CNN 之一，用于手写数字识别，包含两层卷积池化、两层全连接，结构简单。</li>
+</ul>
+</li>
+<li><p><strong>AlexNet（2012）</strong></p>
+<ul>
+<li>重新点燃深度学习潮流的网络，包含 5 层卷积、3 层全连接，在 ImageNet 上大幅超越传统方法，引入 ReLU、Dropout、数据增强等关键技术。</li>
+</ul>
+</li>
+<li><p><strong>VGGNet（2014）</strong></p>
+<ul>
+<li>用连续多组 3×3 卷积堆叠（如13<del>19 层），再接 2</del>3 层全连接，证明“浅层大卷积＋多层小卷积”效果更好。</li>
+</ul>
+</li>
+<li><p><strong>ResNet（2015）</strong></p>
+<ul>
+<li>提出了残差连接（Residual Block），可训练到 50、101、152 层，突破了深度受限问题。</li>
+</ul>
+</li>
+<li><p><strong>MobileNet &#x2F; ShuffleNet &#x2F; EfficientNet（2017–2019）</strong></p>
+<ul>
+<li>通过深度可分离卷积（Depthwise + Pointwise）、分组卷积、搜索网络宽度&#x2F;深度&#x2F;分辨率等手段，实现轻量级网络，可在移动端和嵌入式设备上高效推理。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="6-应用场景与优势"><a href="#6-应用场景与优势" class="headerlink" title="6. 应用场景与优势"></a>6. 应用场景与优势</h2><ol>
+<li><strong>图像分类</strong>：从手写数字识别、物体分类到细粒度识别（如鸟类、车标）等广泛应用。</li>
+<li><strong>目标检测</strong>：基于特征金字塔、多尺度特征融合，将 CNN 用于 Faster R-CNN、SSD、YOLO 等检测框架；可实时检测物体位置与类别。</li>
+<li><strong>语义分割与实例分割</strong>：如 FCN、U-Net、Mask R-CNN，将卷积特征图上采样以恢复空间分辨率，实现像素级分类。</li>
+<li><strong>图像生成与风格迁移</strong>：GAN（生成对抗网络）常用卷积作为生成器和判别器的骨干。</li>
+<li><strong>视频分析、医学影像处理、无人驾驶 等领域</strong>：利用 CNN 提取关键特征，对视频帧做分类、分割、跟踪等。</li>
+</ol>
+<p><strong>CNN 的优势</strong></p>
+<ul>
+<li><strong>局部连接与权值共享</strong>：减少参数量，相较 FCN（全连接神经网络）更易训练；</li>
+<li><strong>平移不变性</strong>：具有一定平移、旋转、尺度鲁棒性；</li>
+<li><strong>层级特征学习</strong>：能够自动从原始像素提取从低级边缘到高级语义的抽象特征。</li>
+</ul>
+<hr>
+<h2 id="7-注意事项与实践建议"><a href="#7-注意事项与实践建议" class="headerlink" title="7. 注意事项与实践建议"></a>7. 注意事项与实践建议</h2><ol>
+<li><p><strong>选择合适的输入尺寸</strong></p>
+<ul>
+<li>对于大多数经典网络，输入尺寸常设为 224×224（分类）、512×512 或 640×640（检测）。过大会带来大量计算；过小会使微小目标难以区分。</li>
+</ul>
+</li>
+<li><p><strong>合理配置超参数</strong></p>
+<ul>
+<li><strong>学习率</strong>：初始学习率过大容易震荡，过小学习缓慢；可配合学习率调度器（如 Cosine Decay、OneCycle）使用。</li>
+<li><strong>Batch Size</strong>：批次过大占用显存，过小会导致 BN 统计不稳定；一般根据显存大小和任务复杂度作权衡。</li>
+</ul>
+</li>
+<li><p><strong>预训练与迁移学习</strong></p>
+<ul>
+<li>在 ImageNet 等大规模数据集上预训练的权重，常作为下游任务初始化，可显著加快收敛并提升泛化。尤其在数据量有限时，迁移学习（Fine-tune）能获得比从零开始训练更好的效果。</li>
+</ul>
+</li>
+<li><p><strong>监控训练曲线</strong></p>
+<ul>
+<li>实时观察训练集 loss、验证集 loss 以及准确率（或 mAP）曲线，若出现“验证集指标不再下降或开始上升”，则需考虑过拟合与早停。</li>
+</ul>
+</li>
+<li><p><strong>模型可视化</strong></p>
+<ul>
+<li>利用 Forward Hook 或者可视化工具（TensorBoard、Netron 等）检查中间特征图、梯度分布、模型结构，及时发现“某层输出异常”、“梯度消失&#x2F;爆炸”等问题。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>卷积神经网络（CNN）作为深度学习在计算机视觉领域的基石，其核心就在于“局部卷积操作”与“层级特征提取”。从卷积核大小、步幅与填充，到多层堆叠、残差连接、批量归一化，再到池化与全连接，每个组件都有其用意：既要提取足够丰富的空间特征，又要确保可训练、可收敛并获得良好泛化。结合正确的训练策略（合适的学习率调度、正则化、数据增强、预训练），就能让 CNN 在分类、检测、分割等任务上达到令人满意的效果。掌握上述基础后，再去学习更复杂的变种（如 MobileNet、ResNeXt、EfficientNet、YOLO 等），就能更快地理解它们在效率与精度之间的设计取舍。</p>
+<h2 id="推荐卷积神经网络（CNN）基础相关学习资料"><a href="#推荐卷积神经网络（CNN）基础相关学习资料" class="headerlink" title="推荐卷积神经网络（CNN）基础相关学习资料"></a>推荐卷积神经网络（CNN）基础相关学习资料</h2><p>以下内容列出了一些系统且易于上手的卷积神经网络（CNN）基础学习资料，涵盖书籍、在线课程、教程博客、开源代码和视频讲解等多个类别，供你根据兴趣和需求自由选择。</p>
+<hr>
+<h2 id="一、经典书籍"><a href="#一、经典书籍" class="headerlink" title="一、经典书籍"></a>一、经典书籍</h2><ol>
+<li><p><strong>《Deep Learning》 — Ian Goodfellow、Yoshua Bengio、Aaron Courville</strong></p>
+<ul>
+<li><p><strong>简介</strong>：被誉为深度学习领域“圣经”，系统讲解了神经网络基础、卷积网络原理、优化算法与正则化等内容。</p>
+</li>
+<li><p><strong>推荐章节</strong>：</p>
+<ul>
+<li>第9章 “卷积网络”：详细推导卷积运算、Pooling、深度可分离卷积等；</li>
+<li>第6章 “前馈深度网络”与第7章 “正则化”，帮助理解CNN训练时的技术细节。</li>
+</ul>
+</li>
+<li><p><strong>获取方式</strong>：官方网站免费下载 PDF（英文）：<a target="_blank" rel="noopener" href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a></p>
+</li>
+</ul>
+</li>
+<li><p><strong>《动手学深度学习（Dive into Deep Learning）》 — 张俊林、李沐、阿斯顿·张 等</strong></p>
+<ul>
+<li><strong>简介</strong>：使用 MXNet&#x2F;Gluon 和 PyTorch 两种实现方式，贯穿数学推导与动手实践。对 CNN 基础、卷积层实现、经典网络模型（LeNet、AlexNet、VGG、ResNet）的介绍都比较详细。</li>
+<li><strong>推荐理由</strong>：中文与英文双语版都有，读者可以边看理论边运行 Jupyter Notebook 示例，加深理解。</li>
+<li><strong>获取方式</strong>：在线阅读（中文&#x2F;英文）：<a target="_blank" rel="noopener" href="https://zh.diveintodeeplearning.org/">https://zh.diveintodeeplearning.org/</a>  或 <a target="_blank" rel="noopener" href="https://d2l.ai/">https://d2l.ai/</a></li>
+</ul>
+</li>
+<li><p><strong>《神经网络与深度学习》 — Michael Nielsen（译者：刘建平 等）</strong></p>
+<ul>
+<li><strong>简介</strong>：简明扼要地介绍了神经网络从感知机到卷积神经网络的演进，重点在“读懂代码”与“理解背后数学直觉”。</li>
+<li><strong>推荐章节</strong>：第 6 章“卷积神经网络”，用最少的公式展示卷积层、Pooling、经典网络结构。</li>
+<li><strong>获取方式</strong>：B 站&#x2F;博客上有中文翻译、在线阅读也可检索。</li>
+</ul>
+</li>
+<li><p><strong>《Python深度学习》 — Francois Chollet（译者：刘建平）</strong></p>
+<ul>
+<li><strong>简介</strong>：由 Keras 作者撰写，既有深度学习基础理论，也有 Keras 下动手实践示例，篇幅适中，覆盖 CNN 基础常见应用。</li>
+<li><strong>推荐理由</strong>：示例代码清晰易懂，适合快速上手用 Python 实现经典CNN模型。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="二、在线课程与讲义"><a href="#二、在线课程与讲义" class="headerlink" title="二、在线课程与讲义"></a>二、在线课程与讲义</h2><ol>
+<li><p><strong>Stanford CS231n: Convolutional Neural Networks for Visual Recognition</strong></p>
+<ul>
+<li><p><strong>主讲</strong>：Fei-Fei Li、Justin Johnson、Serena Yeung 等</p>
+</li>
+<li><p><strong>内容</strong>：从图像分类基础 (linear classifiers)→ 卷积运算原理 (ConvNet building blocks) → 各类经典网络架构 (AlexNet、VGG、ResNet) → 目标检测与分割（Faster R-CNN、Mask R-CNN）</p>
+</li>
+<li><p><strong>特点</strong>：</p>
+<ul>
+<li>讲义（Lecture Notes）和课程视频均免费开放；</li>
+<li>每一集配套编程作业（PyTorch &#x2F; TensorFlow），可以边学边实践。</li>
+</ul>
+</li>
+<li><p><strong>获取方式</strong>：</p>
+<ul>
+<li>课程官网（有 PPT、作业、参考代码）：<a target="_blank" rel="noopener" href="http://cs231n.stanford.edu/">http://cs231n.stanford.edu/</a></li>
+<li>YouTube 视频播放列表：搜索 “CS231n 2017”、“CS231n 2021”</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Andrew Ng Deep Learning Specialization（深度学习专项课程）</strong></p>
+<ul>
+<li><p><strong>平台</strong>：Coursera</p>
+</li>
+<li><p><strong>章节包含</strong>：</p>
+<ul>
+<li>第一门课“神经网络与深度学习”：介绍感知机、反向传播、梯度下降；</li>
+<li>第二门课“深度 CNN”：深入讲解卷积、Pooling、BatchNorm、Dropout、ResNet、Inception、MobileNet 等现代 CNN 技术；</li>
+<li>后续还包括序列模型、NLP 等，但针对 CNN 部分推荐重点学习第二门。</li>
+</ul>
+</li>
+<li><p><strong>特点</strong>：</p>
+<ul>
+<li>课程语言为英文，配有中文字幕；</li>
+<li>强调手工推导与编程实践（用 TensorFlow&#x2F;Keras 实现）。</li>
+</ul>
+</li>
+<li><p><strong>获取方式</strong>：Coursera 搜索 “Deep Learning Specialization”</p>
+</li>
+</ul>
+</li>
+<li><p><strong>MIT 6.S191: Machine Learning with TensorFlow</strong></p>
+<ul>
+<li><strong>内容</strong>：MIT 公开课，涵盖了机器学习与深度学习基础，其中关于卷积神经网络的内容由 TensorFlow 实现示例。</li>
+<li><strong>特点</strong>：结合 Python 代码与 Jupyter Notebook，适合有一定编程基础的同学快速上手。</li>
+<li><strong>获取方式</strong>：MIT OCW 网站搜索 “6.S191 TensorFlow” 或 B 站关键词 “6.S191 CNN”</li>
+</ul>
+</li>
+<li><p><strong>李宏毅《深度学习》系列课程</strong></p>
+<ul>
+<li><strong>主讲</strong>：李宏毅教授（台湾大学）</li>
+<li><strong>内容</strong>：从最基本的感知机、反向传播，到 CNN 细节、RNN、GAN 等技术全面覆盖。</li>
+<li><strong>特点</strong>：中文讲解，配合大量直观动图，比较适合中文听众。</li>
+<li><strong>获取方式</strong>：B 站搜索 “李宏毅 CNN” 或访问其个人主页获取课程 PPT&#x2F;视频。</li>
+</ul>
+</li>
+<li><p><strong>Bilibili “动手学深度学习” 系列视频</strong></p>
+<ul>
+<li><strong>内容</strong>：多位大牛在 B 站上将《动手学深度学习》里关于 CNN 章节的示例代码拆解演示，边写边讲，图文并茂。</li>
+<li><strong>获取方式</strong>：B 站搜索 “动手学深度学习 CNN 实战”。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="三、博客与在线教程"><a href="#三、博客与在线教程" class="headerlink" title="三、博客与在线教程"></a>三、博客与在线教程</h2><ol>
+<li><p><strong>CS231n 中文笔记 &#x2F; 翻译</strong></p>
+<ul>
+<li><p><strong>简介</strong>：各高校或个人整理的 CS231n 课程中文讲义，对 CNN 各个模块（卷积、Pooling、BatchNorm、ResNet 等）做了详细中文注释。</p>
+</li>
+<li><p><strong>推荐博文</strong>：</p>
+<ul>
+<li>多篇 GitHub 仓库托管，搜索“cs231n 中文”即可得到多份优质翻译；</li>
+<li>“CS231n 卷积神经网络详解”系列博客，配有动图，图文结合。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>PaperReadingClub &#x2F; 机器之心 等深度学习专栏</strong></p>
+<ul>
+<li><strong>内容</strong>：定期推送 CNN 相关论文解读与源码剖析，比如 VGG、ResNet、DenseNet、MobileNet、EfficientNet 等架构的详解。</li>
+<li><strong>推荐原因</strong>：能把理论与工程实践结合，了解每个经典网络设计背后的动机。</li>
+</ul>
+</li>
+<li><p><strong>「机器学习基石」与「机器学习技法」课程笔记</strong></p>
+<ul>
+<li><strong>主讲</strong>：林轩田教授（台湾大学）</li>
+<li><strong>内容</strong>：虽然主要偏向经典机器学习，但在卷积基础和模式识别的介绍部分也有帮助，对理解 CNN 基本概念很有启发。</li>
+<li><strong>获取方式</strong>：NTU OCW 网站或 GitHub 上存在众多中文翻译笔记。</li>
+</ul>
+</li>
+<li><p><strong>Spark AI 工作室 &#x2F; 极市平台</strong></p>
+<ul>
+<li><strong>内容</strong>：大量工程实践文章，从 PyTorch&#x2F;TF 中如何编写自己的 CNN、如何做 BatchNorm 调试，到如何在检测任务中进行多尺度训练、FPN 架构设计。</li>
+<li><strong>推荐理由</strong>：贴合国内开发者常见的疑惑，例如“为什么要用 3×3 卷积堆叠而非 5×5”、“如何诊断梯度消失&#x2F;爆炸”。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="四、开源代码与项目实战"><a href="#四、开源代码与项目实战" class="headerlink" title="四、开源代码与项目实战"></a>四、开源代码与项目实战</h2><ol>
+<li><p><strong>Official PyTorch Tutorials</strong></p>
+<ul>
+<li><strong>内容</strong>：包括“<a target="_blank" rel="noopener" href="https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html">60 分钟快速入门 PyTorch</a>”、“<a target="_blank" rel="noopener" href="https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">Transfer Learning for Computer Vision Tutorial</a>”等，完整展示如何定义、训练一个简单 CNN（例如 CIFAR-10 分类）。</li>
+<li><strong>推荐理由</strong>：由 PyTorch 官方维护，示例代码风格规范，适合入门和快速实践。</li>
+</ul>
+</li>
+<li><p><strong>Keras 官方示例（Keras Examples）</strong></p>
+<ul>
+<li><strong>内容</strong>：包含多个 CNN 相关示例，如 LeNet、AlexNet、ResNet、VGG、Inception、MobileNet 等，使用 Keras API 进行快速构建与训练。</li>
+<li><strong>获取方式</strong>：GitHub 上搜索 “keras&#x2F;examples” 或访问 <a target="_blank" rel="noopener" href="https://github.com/keras-team/keras/tree/master/examples">https://github.com/keras-team/keras/tree/master/examples</a>。</li>
+</ul>
+</li>
+<li><p><strong>MXNet&#x2F;GluonCV 官方教程</strong></p>
+<ul>
+<li><strong>内容</strong>：GluonCV 提供了多种经典网络（包括 LeNet、ResNet、MobileNet、DenseNet 等）以及演示如何在 Gluon 中快速搭建 CNN。</li>
+<li><strong>推荐理由</strong>：如果想了解除了 PyTorch&#x2F;TF 之外的深度学习框架实现，也可以看一看。</li>
+</ul>
+</li>
+<li><p><strong>《动手学深度学习》GitHub 仓库</strong></p>
+<ul>
+<li><strong>内容</strong>：书中所有示例都开源在 GitHub，包含 Jupyter Notebook 文件，演示如何用 PyTorch 或 MXNet 从头实现卷积层、Pooling、各种经典 CNN 架构。</li>
+<li><strong>获取方式</strong>：<a target="_blank" rel="noopener" href="https://github.com/d2l-ai/d2l-zh">https://github.com/d2l-ai/d2l-zh</a>（中文） &#x2F; <a target="_blank" rel="noopener" href="https://github.com/d2l-ai/d2l-en">https://github.com/d2l-ai/d2l-en</a>（英文）</li>
+</ul>
+</li>
+<li><p><strong>Yann LeCun 的 LeNet 实现示例</strong></p>
+<ul>
+<li><strong>内容</strong>：最早的 CNN 之一 LeNet-5，在许多框架（Matlab、Torch7、早期 Caffe）都有示例，适合回顾 CNN 最原始的思想。</li>
+<li><strong>推荐理由</strong>：从无到有地理解“用一个小网络完成手写数字识别”的思路，有助于把卷积和 Pooling 理解得更透彻。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="五、视频讲解与解说"><a href="#五、视频讲解与解说" class="headerlink" title="五、视频讲解与解说"></a>五、视频讲解与解说</h2><ol>
+<li><p><strong>B 站“李沐”直播&#x2F;录播课程</strong></p>
+<ul>
+<li><strong>内容</strong>：“动手学深度学习”作者李沐在 Bilibili 上有完整中文直播版，讲解从线性模型到卷积网络、RNN、Transformer 等。</li>
+<li><strong>重点</strong>：对 CNN 的“卷积原理”、“感受野”、“经典架构”都配有可视化动图与代码演示。</li>
+</ul>
+</li>
+<li><p><strong>B 站“吴恩达 Deep Learning Specialization 中文翻译”</strong></p>
+<ul>
+<li><strong>内容</strong>：Coursera 上 Andrew Ng 课程的国内翻译版，第二门课“深度 CNN”部分以中文讲解，配有 PPT 和代码示例。</li>
+<li><strong>推荐指数</strong>：4 &#x2F; 5，基础概念铺垫到位，但纯代码示例略少，可结合官方英文作业练手。</li>
+</ul>
+</li>
+<li><p><strong>B 站“杨士博”深度学习实战视频</strong></p>
+<ul>
+<li><strong>内容</strong>：从 PyTorch&#x2F;Caffe2 实现各种 CNN 模型（如 VGG、ResNet、DenseNet），包括如何修改预训练权重、自定义数据加载器等。</li>
+<li><strong>推荐理由</strong>：贴近工业场景，适合想快速把 CNN 应用于项目的同学。</li>
+</ul>
+</li>
+<li><p><strong>B 站“CVPR Tutorials”合集</strong></p>
+<ul>
+<li><strong>内容</strong>：CVPR 大会上的一些入门级 Tutorial（如 “Deep Learning for Computer Vision”），涵盖 CNN 基础、迁移学习、目标检测、分割等。</li>
+<li><strong>获取方式</strong>：B 站搜索 “CVPR 2019 Tutorial CNN” 等。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="六、实用学习建议"><a href="#六、实用学习建议" class="headerlink" title="六、实用学习建议"></a>六、实用学习建议</h2><ol>
+<li><p><strong>先做小项目，再逐步扩展</strong></p>
+<ul>
+<li>可以先在 MNIST、Fashion-MNIST 或 CIFAR-10 上实现一个简单的 LeNet&#x2F;ResNet，从最基础的“图像分类”切入，保证对卷积、Pooling、激活、BatchNorm 的基本原理有直观体会。</li>
+<li>再尝试在自己的小数据集（比如宠物照片、人脸数据）上微调一个预训练的 ResNet 或 VGG，感受“迁移学习”在 CNN 上的威力。</li>
+</ul>
+</li>
+<li><p><strong>阅读源码与动手实践结合</strong></p>
+<ul>
+<li>在看书和上网课的同时，务必打开 IDE、克隆一个开源项目，边看边跑通。比如跟着 PyTorch 官方 Tutorial 把一个 <code>torch.nn.Conv2d</code> 的前向与反向过程都打印出来，观察不同超参数对输出 shape、计算量的影响。</li>
+<li>常见练习：自己手写一个最基本的卷积算子（不用框架内置函数），做一次手写梯度检验（numerical gradient check），深刻理解反向传播是如何在卷积层中实现的。</li>
+</ul>
+</li>
+<li><p><strong>结合可视化工具进行调试</strong></p>
+<ul>
+<li>使用 <strong>TensorBoard</strong>、<strong>Weights &amp; Biases</strong> 等工具，把每个卷积层输出的 Feature Map、梯度直方图、Loss 曲线可视化，能帮助你快速排查“某层梯度消失”、“某层激活过饱和”等问题。</li>
+<li>利用 <strong>Netron</strong> 或者 <strong>TensorBoard Graph</strong> 功能，观察你训练完的模型结构，验证是否符合你设计时的预期（例如：下采样倍数、通道数变化是否正确）。</li>
+</ul>
+</li>
+<li><p><strong>关注最新论文与社区动态</strong></p>
+<ul>
+<li>即使只想学好 CNN 基础，也可以偶尔跟踪一些新进展，如“EfficientNet 如何通过复合缩放（Compound Scaling）来权衡网络深度、宽度和分辨率”，“MobileNetV3 如何通过搜索网络结构（NAS）+ 轻量化卷积模块来进一步压缩模型”。</li>
+<li>GitHub 上常见 Star 较高的 Repo，如 “awesome-deep-learning-papers”、“pytorch-cifar”，都值得定期刷一刷，及时了解新技术、新工具。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>通过上述书籍、课程、博客、开源代码和视频资源的结合学习，你将能够系统地掌握卷积神经网络的基本原理、常见组件、经典架构与训练实践。建议先从“概念＋动手”入手——看一小节原理后，立刻在 IDE 中跑通对应的代码示例，再结合可视化工具调试；待基础打牢后，再阅读更深入的论文与框架源码。祝学习顺利！</p>
+<h2 id="yolo预训练权重-cnn-torch-都是什么-有什么区别"><a href="#yolo预训练权重-cnn-torch-都是什么-有什么区别" class="headerlink" title="yolo预训练权重 cnn torch 都是什么 有什么区别"></a>yolo预训练权重 cnn torch 都是什么 有什么区别</h2><p>下面分别解释一下这几个概念，以及它们之间的区别和联系。</p>
+<hr>
+<h2 id="1-CNN（卷积神经网络，Convolutional-Neural-Network）"><a href="#1-CNN（卷积神经网络，Convolutional-Neural-Network）" class="headerlink" title="1. CNN（卷积神经网络，Convolutional Neural Network）"></a>1. CNN（卷积神经网络，Convolutional Neural Network）</h2><ol>
+<li><p><strong>定义与作用</strong></p>
+<ul>
+<li>CNN 是一种专门处理图像等网格化数据（如视频、语音谱图等）的深度学习模型。</li>
+<li>核心思想在于使用“卷积层”对输入数据进行局部感知、权值共享，从而高效地提取空间特征（如边缘、纹理、物体轮廓等），再通过池化（Pooling）、全连接层等进一步抽象，最终完成分类、检测、分割等任务。</li>
+</ul>
+</li>
+<li><p><strong>基本结构</strong></p>
+<ul>
+<li><strong>卷积层（Convolution）</strong>：用一组可学习的卷积核（filters）在输入特征图上做滑窗卷积，提取局部特征。</li>
+<li><strong>激活函数（Activation）</strong>：常见 ReLU、Leaky ReLU、SiLU 等，用于增加非线性表达能力。</li>
+<li><strong>池化层（Pooling）</strong>：如最大池化（Max Pooling）、平均池化（Avg Pooling），用于下采样，减少参数量和计算量，并具有一定的平移不变性。</li>
+<li><strong>全连接层（FC）</strong>：最后几层通常是全连接，将提取到的空间特征映射到最终输出（如类别概率）。</li>
+</ul>
+</li>
+<li><p><strong>典型应用</strong></p>
+<ul>
+<li>图像分类（如 CIFAR-10、ImageNet 等）</li>
+<li>目标检测（如 Faster R-CNN、YOLO、SSD）</li>
+<li>图像分割（如 U-Net、DeepLab）</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="2-Torch-PyTorch"><a href="#2-Torch-PyTorch" class="headerlink" title="2. Torch &#x2F; PyTorch"></a>2. Torch &#x2F; PyTorch</h2><ol>
+<li><p><strong>Torch vs. PyTorch 区别</strong></p>
+<ul>
+<li><strong>Torch</strong>：最初由 Facebook AI Research（FAIR）等社区研发的基于 Lua 语言的深度学习框架（2000 年代末期兴起），使用 LuaJIT 作为脚本语言，提供了科学计算、自动求导、GPU 加速等功能。</li>
+<li><strong>PyTorch</strong>：2016 年由 Facebook 发布的“下一代 Torch”框架，使用 Python 语言、底层依然调用 C&#x2F;CUDA，高度兼容 Torch 的动静态混合特性，但更贴合 Python 生态。PyTorch 具有动态图（Dynamic Computation Graph）机制，代码直观易调试，近几年已经成为深度学习领域最主流的框架之一。</li>
+</ul>
+</li>
+<li><p><strong>PyTorch 的核心组件</strong></p>
+<ul>
+<li>**<code>torch.Tensor</code>**：类似于 NumPy 的多维数组，但可在 CPU&#x2F;GPU 上高效计算，并支持自动求导。</li>
+<li>**<code>torch.nn</code>**：包含各种网络层（如 <code>Conv2d</code>、<code>BatchNorm2d</code>、<code>Linear</code>、<code>LSTM</code> 等）和常见损失函数（如 <code>CrossEntropyLoss</code>、<code>MSELoss</code> 等）。</li>
+<li>**<code>torch.optim</code>**：提供常用优化器（如 SGD、Adam、AdamW、RMSProp 等）。</li>
+<li>**<code>torch.autograd</code>**：在前向传播时动态构建计算图，反向传播时自动计算梯度，无需手动推导。</li>
+<li>**<code>torch.utils.data</code>**：Dataset 与 DataLoader，用于定义数据集与并行加载。</li>
+</ul>
+</li>
+<li><p><strong>为何使用 PyTorch</strong></p>
+<ul>
+<li><strong>动态图机制（Eager Execution）</strong>：每次前向传播都会立刻构建计算图，便于调试和灵活更改模型结构。</li>
+<li><strong>丰富的社区生态</strong>：包括 torchvision（图像处理常用组件）、torchtext、torchaudio 等，简化了常见任务的开发。</li>
+<li><strong>生态互通性</strong>：可与 NumPy、SciPy、scikit-learn 等库配合使用，也能导出为 ONNX 再拿到其他推理框架里去跑。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-YOLO-预训练权重（Pretrained-Weights）"><a href="#3-YOLO-预训练权重（Pretrained-Weights）" class="headerlink" title="3. YOLO 预训练权重（Pretrained Weights）"></a>3. YOLO 预训练权重（Pretrained Weights）</h2><ol>
+<li><p><strong>YOLO（You Only Look Once）概述</strong></p>
+<ul>
+<li>YOLO 是一类单阶段（one-stage）目标检测算法的统称，最早从 YOLOv1 演进到如今的 YOLOv8，强调端到端快速推理，同时兼顾精度。它的主干一般是基于 CNN（如 CSPDarknet、ConvNeXt、EfficientNet 等）来提取特征，然后再通过检测头（Detection Head）在不同尺度上输出边界框和类别置信度。</li>
+</ul>
+</li>
+<li><p><strong>什么是“预训练权重”</strong></p>
+<ul>
+<li><p><strong>预训练（Pretraining）</strong>：先在大规模数据集（最常见的是 ImageNet 分类数据集，约 1000 个类别、百万级图片）上训练好一个基于 CNN 的主干网络（Backbone），使得其能够学到丰富的“通用视觉特征”（如边缘、纹理、形状等）。</p>
+</li>
+<li><p><strong>权重（Weights）</strong>：指的是网络中可学习参数（卷积核权重、偏置、BN 层参数等）的数值。预训练权重把在大规模数据上的学习结果保存下来。</p>
+</li>
+<li><p><strong>YOLO 预训练权重</strong>：</p>
+<ul>
+<li>在 YOLO 模型里，通常把主干网络（Backbone）参数初始化为在 ImageNet（或 COCO）上预训练得到的权重，然后再去做下游的目标检测微调（Fine-tune）。</li>
+<li>这样做的好处是：在小规模数据集上训练时能显著降低收敛时间、提高精度，避免从随机初始化开始耗费大量时间学习低级特征。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>常见的几种情况</strong></p>
+<ul>
+<li><strong>ImageNet 预训练</strong>：仅对 Backbone 做分类预训练（通常对检测头不预训练）；下载下来的权重文件名称一般类似 <code>darknet53.conv.74</code>（老版 YOLOv3）或 <code>yolov5s_backbone.pt</code>（新版 YOLOv5&#x2F;YOLOv8）。</li>
+<li><strong>COCO 或 VOC 预训练</strong>：有些开源仓库会额外提供在 COCO 目标检测数据集上训练好的整网权重（包括主干 + 检测头）。这种权重可以直接拿来在同尺度目标检测任务上做迁移，通常效果更好，但灵活性略逊于只用 Backbone 预训练——因为 COCO 上类别、标签格式可能与下游数据集不完全一致。</li>
+<li><strong>自定义预训练</strong>：如果你有自己手头比较大、比较相关但标签不同的数据，也可以先在自己数据集上训练一遍 YOLO，得到权重后再把这个权重作为更小新数据集的预训练权重。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="4-它们之间的区别与联系"><a href="#4-它们之间的区别与联系" class="headerlink" title="4. 它们之间的区别与联系"></a>4. 它们之间的区别与联系</h2><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>类型</th>
+<th>作用&#x2F;特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CNN（卷积神经网络）</td>
+<td>模型架构</td>
+<td>一种网络结构，用来在图像上做特征提取，具备“局部感受野”“权值共享”等优势。</td>
+</tr>
+<tr>
+<td>Torch &#x2F; PyTorch</td>
+<td>框架（Framework）</td>
+<td>提供定义、训练 CNN 等神经网络的工具与接口，包括张量计算、自动求导、GPU 支持等。</td>
+</tr>
+<tr>
+<td>YOLO 预训练权重（Pretrained Weights）</td>
+<td>模型参数（Weights）</td>
+<td>指在大规模数据集（如 ImageNet、COCO）上训练得到的 CNN（Backbone）或整网权重，可用于下游检测任务的初始化。</td>
+</tr>
+</tbody></table>
+<ol>
+<li><p><strong>CNN vs. PyTorch</strong></p>
+<ul>
+<li><strong>CNN</strong> 是一种网络结构&#x2F;模型类型，可以用来做图像特征提取；</li>
+<li><strong>PyTorch</strong> 是一个开发框架，你用它来“搭建”CNN、训练 CNN、把 CNN 部署到 GPU 上等等。</li>
+<li>换句话说，“CNN” 是“你想训练什么样的网络”，“PyTorch” 是“你凭什么工具去写训练流程、保存模型、做推理”。</li>
+</ul>
+</li>
+<li><p><strong>CNN vs. 预训练权重</strong></p>
+<ul>
+<li>“CNN” 关注的是“网络结构（layers、参数）怎么设计”；</li>
+<li>“预训练权重” 关注的是“给定一个网络结构，它的参数初始值应该从哪里来”。</li>
+<li>通常我们先选好一个 CNN 架构（例如 ResNet、Darknet 等），然后下载对应的“<strong>预训练权重</strong>”，再把它们加载到网络里当作初始权重，进行下游任务的 fine-tune。</li>
+</ul>
+</li>
+<li><p><strong>PyTorch vs. 预训练权重</strong></p>
+<ul>
+<li>在 PyTorch 里，你可以直接用 <code>torch.hub</code> 或者 <code>torchvision.models</code> 加载官方提供的预训练权重（比如 <code>resnet50(pretrained=True)</code>）。</li>
+<li>对于 YOLO 系列，你会下载一个 <code>.pt</code> 或 <code>.pth</code> 文件，这个文件就是事先用 PyTorch 训练好的权重。你在 <code>model = torch.load(&#39;yolov8s.pt&#39;)</code> 后，网络里就已经填充好了那些“学到的参数值”；随后可以继续在你自己的数据集上做训练或直接拿它来做推理。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-小结"><a href="#5-小结" class="headerlink" title="5. 小结"></a>5. 小结</h2><ol>
+<li><p><strong>CNN</strong>：</p>
+<ul>
+<li>一种网络结构范式，用来搭建图像&#x2F;视觉任务模型。</li>
+</ul>
+</li>
+<li><p><strong>PyTorch（Torch）</strong>：</p>
+<ul>
+<li>一套深度学习编程框架，用它来“实现”CNN、定义损失、做反向传播、CUDA 加速等。</li>
+</ul>
+</li>
+<li><p><strong>预训练权重</strong>：</p>
+<ul>
+<li>已经在大数据集（如 ImageNet、COCO）上训练好的 CNN（或整网）参数，能用作下游训练的初始化，提升收敛速度与最终精度。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>在做 YOLO 目标检测时，我们常常：</p>
+<ol>
+<li>利用 PyTorch（或 Ultralytics 的 YOLO 库）来搭建 YOLO 这类<strong>CNN 结构</strong>。</li>
+<li>在初始化时加载“预训练权重”，让网络一开始就拥有从大规模数据中学到的通用视觉特征。</li>
+<li>在此基础上再用自己的标注数据做微调，从而在新任务上取得更好的效果。</li>
+</ol>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E9%83%A8%E7%BD%B2/" rel="tag"># AI部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/20/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-05-20--FileStorage/" rel="prev" title="cv::FileStorage">
+      <i class="fa fa-chevron-left"></i> cv::FileStorage
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/06/03/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-06-03--YOLO%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/" rel="next" title="图像标注">
+      图像标注 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E9%87%87%E6%A0%B7"><span class="nav-number">2.</span> <span class="nav-text">上采样</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E9%87%87%E6%A0%B7"><span class="nav-number">3.</span> <span class="nav-text">下采样</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF"><span class="nav-number">4.</span> <span class="nav-text">卷积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%A0%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">池化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88CNN%EF%BC%89%E5%9F%BA%E7%A1%80"><span class="nav-number">6.</span> <span class="nav-text">卷积神经网络（CNN）基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%8D%B7%E7%A7%AF%E8%BF%90%E7%AE%97%EF%BC%88Convolution-Operation%EF%BC%89"><span class="nav-number">7.</span> <span class="nav-text">1. 卷积运算（Convolution Operation）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-CNN-%E7%9A%84%E5%85%B8%E5%9E%8B%E7%BB%93%E6%9E%84%E4%B8%8E%E7%BB%84%E4%BB%B6"><span class="nav-number">8.</span> <span class="nav-text">2. CNN 的典型结构与组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%8D%B7%E7%A7%AF%E5%B1%82%EF%BC%88Convolutional-Layer%EF%BC%89"><span class="nav-number">8.1.</span> <span class="nav-text">2.1 卷积层（Convolutional Layer）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%BD%92%E4%B8%80%E5%8C%96%E5%B1%82%EF%BC%88BatchNorm-LayerNorm-%E7%AD%89%EF%BC%89"><span class="nav-number">8.2.</span> <span class="nav-text">2.2 归一化层（BatchNorm &#x2F; LayerNorm 等）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%EF%BC%88Activation%EF%BC%89"><span class="nav-number">8.3.</span> <span class="nav-text">2.3 激活函数（Activation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E6%B1%A0%E5%8C%96%E5%B1%82%EF%BC%88Pooling%EF%BC%89"><span class="nav-number">8.4.</span> <span class="nav-text">2.4 池化层（Pooling）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%EF%BC%88Fully-Connected-Layer%EF%BC%89"><span class="nav-number">8.5.</span> <span class="nav-text">2.5 全连接层（Fully Connected Layer）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BD%91%E7%BB%9C%E5%A0%86%E5%8F%A0%E4%B8%8E%E7%89%B9%E5%BE%81%E5%B1%82%E7%BA%A7"><span class="nav-number">9.</span> <span class="nav-text">3. 网络堆叠与特征层级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%AD%E7%BB%83%E4%B8%8E%E5%89%8D%E5%90%91-%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="nav-number">10.</span> <span class="nav-text">4. 训练与前向&#x2F;反向传播</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%85%B8%E5%9E%8B%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">11.</span> <span class="nav-text">5. 典型网络架构示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%8E%E4%BC%98%E5%8A%BF"><span class="nav-number">12.</span> <span class="nav-text">6. 应用场景与优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%E4%B8%8E%E5%AE%9E%E8%B7%B5%E5%BB%BA%E8%AE%AE"><span class="nav-number">13.</span> <span class="nav-text">7. 注意事项与实践建议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">13.1.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88CNN%EF%BC%89%E5%9F%BA%E7%A1%80%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99"><span class="nav-number">14.</span> <span class="nav-text">推荐卷积神经网络（CNN）基础相关学习资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%BB%8F%E5%85%B8%E4%B9%A6%E7%B1%8D"><span class="nav-number">15.</span> <span class="nav-text">一、经典书籍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%9C%A8%E7%BA%BF%E8%AF%BE%E7%A8%8B%E4%B8%8E%E8%AE%B2%E4%B9%89"><span class="nav-number">16.</span> <span class="nav-text">二、在线课程与讲义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8D%9A%E5%AE%A2%E4%B8%8E%E5%9C%A8%E7%BA%BF%E6%95%99%E7%A8%8B"><span class="nav-number">17.</span> <span class="nav-text">三、博客与在线教程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%BC%80%E6%BA%90%E4%BB%A3%E7%A0%81%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98"><span class="nav-number">18.</span> <span class="nav-text">四、开源代码与项目实战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%A7%86%E9%A2%91%E8%AE%B2%E8%A7%A3%E4%B8%8E%E8%A7%A3%E8%AF%B4"><span class="nav-number">19.</span> <span class="nav-text">五、视频讲解与解说</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%AE%9E%E7%94%A8%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">20.</span> <span class="nav-text">六、实用学习建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yolo%E9%A2%84%E8%AE%AD%E7%BB%83%E6%9D%83%E9%87%8D-cnn-torch-%E9%83%BD%E6%98%AF%E4%BB%80%E4%B9%88-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB"><span class="nav-number">21.</span> <span class="nav-text">yolo预训练权重 cnn torch 都是什么 有什么区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-CNN%EF%BC%88%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%8CConvolutional-Neural-Network%EF%BC%89"><span class="nav-number">22.</span> <span class="nav-text">1. CNN（卷积神经网络，Convolutional Neural Network）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Torch-PyTorch"><span class="nav-number">23.</span> <span class="nav-text">2. Torch &#x2F; PyTorch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-YOLO-%E9%A2%84%E8%AE%AD%E7%BB%83%E6%9D%83%E9%87%8D%EF%BC%88Pretrained-Weights%EF%BC%89"><span class="nav-number">24.</span> <span class="nav-text">3. YOLO 预训练权重（Pretrained Weights）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%AE%83%E4%BB%AC%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB%E4%B8%8E%E8%81%94%E7%B3%BB"><span class="nav-number">25.</span> <span class="nav-text">4. 它们之间的区别与联系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%B0%8F%E7%BB%93"><span class="nav-number">26.</span> <span class="nav-text">5. 小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

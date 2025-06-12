@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介一、视频解码编解码的一些基本概念数字图像的基本概念 数字图像的硬件介绍  图像输入设备：输入，采样量化，专用处理。（相机、摄像机、扫描仪等）   线阵相机和面阵相机 面阵相机：一次拍摄一个区域，视觉检测中绝大部分应用面阵相机 线阵相机：一次拍摄一行像素，通过移动以及拼接来获取图像，分辨率更高，成像质量更高，价格更贵     电脑：数字图像处理（PC机，服务器集群，硬件电路等） 图像输出设备：专">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ffmpeg_1_1_音视频理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/FFmpeg/ffmpeg_1_%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/2024-05-22-ffmpeg_1_1_%E9%9F%B3%E8%A7%86%E9%A2%91%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介一、视频解码编解码的一些基本概念数字图像的基本概念 数字图像的硬件介绍  图像输入设备：输入，采样量化，专用处理。（相机、摄像机、扫描仪等）   线阵相机和面阵相机 面阵相机：一次拍摄一个区域，视觉检测中绝大部分应用面阵相机 线阵相机：一次拍摄一行像素，通过移动以及拼接来获取图像，分辨率更高，成像质量更高，价格更贵     电脑：数字图像处理（PC机，服务器集群，硬件电路等） 图像输出设备：专">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.301Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="FFmpeg">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/FFmpeg/ffmpeg_1_%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/2024-05-22-ffmpeg_1_1_%E9%9F%B3%E8%A7%86%E9%A2%91%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ffmpeg_1_1_音视频理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/FFmpeg/ffmpeg_1_%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86/2024-05-22-ffmpeg_1_1_%E9%9F%B3%E8%A7%86%E9%A2%91%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ffmpeg_1_1_音视频理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/FFmpeg/" itemprop="url" rel="index"><span itemprop="name">FFmpeg</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h2 id="一、视频解码编解码的一些基本概念"><a href="#一、视频解码编解码的一些基本概念" class="headerlink" title="一、视频解码编解码的一些基本概念"></a>一、视频解码编解码的一些基本概念</h2><h3 id="数字图像的基本概念"><a href="#数字图像的基本概念" class="headerlink" title="数字图像的基本概念"></a>数字图像的基本概念</h3><ol>
+<li><p>数字图像的硬件介绍</p>
+<ol>
+<li>图像输入设备：输入，采样量化，专用处理。（相机、摄像机、扫描仪等）</li>
+</ol>
+<ul>
+<li>线阵相机和面阵相机<ul>
+<li>面阵相机：一次拍摄一个区域，视觉检测中绝大部分应用面阵相机</li>
+<li>线阵相机：一次拍摄一行像素，通过移动以及拼接来获取图像，分辨率更高，成像质量更高，价格更贵</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>电脑：数字图像处理（PC机，服务器集群，硬件电路等）</li>
+<li>图像输出设备：专用处理，D&#x2F;A转换，输出。（打印机、显示器等）</li>
+</ol>
+</li>
+<li><p>数字图像的几个基本概念</p>
+<ol>
+<li>图像的采样和量化<ul>
+<li>数字化坐标值称为采样</li>
+<li>数字化幅度值称为量化</li>
+</ul>
+</li>
+<li>图像的分辨率<ul>
+<li>采样的程度通常用采样率来表示，也就是通常所说的分辨率。分辨率160 × 128 的意思是水平像素数为160个，垂直像素数128个。分辨率越高，像素的数目越多，感受的图像越精密</li>
+</ul>
+</li>
+<li>图像的灰度级<ul>
+<li>最常见的图像为8位图像，灰度级为256级，即2的8次方。</li>
+<li>灰度级越多，可以展现的图像细节就越多，有时候也把灰度级称为灰度分辨率。</li>
+</ul>
+</li>
+<li>图像的坐标系<ul>
+<li>在图像中，如果要表示图像中的某一个像素，可以用它的坐标来表示</li>
+<li>图像原点为图像的左上角，坐标记做[0,0]</li>
+<li>一副M × N的图像可以用一个矩阵来表示</li>
+</ul>
+</li>
+<li>像素的空间关系：8-邻接和4-邻接</li>
+</ol>
+</li>
+<li><p>数字图像的种类和色彩模型</p>
+<ol>
+<li>图像的种类<ol>
+<li>二值图像：<ul>
+<li>像素取值仅为0和1，“0“代表黑色，”1“代表白色。通常用来表示状态，如区分图像中的前景和背景</li>
+</ul>
+</li>
+<li>灰度图像：<ul>
+<li>像素取值范围为[0,255]，”0”表示纯黑，“255”表示纯白色，一些图像算法中需要使用灰度图进行运算</li>
+</ul>
+</li>
+<li>彩色图像：<ul>
+<li>显示设备通常使用RGB格式的彩色图像，即红（red）绿（green）蓝（blue）三种颜色的组合叠加起来获得各种颜色。</li>
+<li>如果把RGB值看做是3个维度的坐标，构建的空间称为RGB色彩空间</li>
+<li>除了RGB外，常见的色彩模型还有HSV&#x2F;HSI（数字图像算法常用），CMYK（主要用于印刷），YUV（用于图像传输）</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>色彩模型：通过数学模型表示颜色，所用的数学模型即颜色模型。<ol>
+<li>CMYK色彩模型<ul>
+<li>印刷业通过青（C）、品（M）、黄（Y）三原色油墨的不同网点面积率的叠印来表现颜色，一般采用青（C）、品（M）、黄（Y）、黑（BK）四色印刷。</li>
+<li>CMYK可以看做是从黑色中减少颜色得到新的颜色，故可以称之为减色模型。而RGB是在白色上叠加颜色得到新的颜色，故称为加色模型。</li>
+</ul>
+</li>
+<li>HSV色彩模型<ul>
+<li>HSV即色相（Hue）、饱和度（Saturation）、明度（Value），又称HSI（I即intensity）。常用于图像算法中的色彩分析，对光照具有较强的鲁棒性。</li>
+<li>H：用角度表示，从红色开始按逆时针方向计算，红色为0度，绿色为120度，蓝色为240度，该值表示颜色接近于哪种纯色值</li>
+<li>S：通常取值范围为0%~100%。圆锥的中心为0，该值越大表示颜色越饱满，直观的说即颜色深而艳</li>
+<li>V：亮度，表示颜色的明亮程度</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>图像直方图</p>
+<ol>
+<li>图像的直方图<ul>
+<li>直方图（histogram）是图像处理中的一个非常重要工具，被广泛应用。直方图本质是概率分布的图形化，同时直方图也可以用来表示向量。</li>
+<li>直方图的作用<ul>
+<li>图像匹配：比较两幅图像的直方图，可以得到两幅图像的相似程度，其本质是对比灰度出现的概率是否相似  </li>
+<li>判断成像质量</li>
+<li>二值化阈值：所谓二值化即通过设置一个门限值，把灰度图像转换为二值化图像，通常的目的是分离前景和背景。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="视频数据的一些基本概念"><a href="#视频数据的一些基本概念" class="headerlink" title="视频数据的一些基本概念"></a>视频数据的一些基本概念</h3><ol>
+<li>音视频领域早起采用模拟化技术，目前已发展为数字化技术。数字化后，音视频处理就进入了计算机技术领域，<strong>音视频处理本质上就是对计算机数据的处理</strong></li>
+<li>帧内编码：帧内编码是<strong>空间域编码</strong>，利用图像空间冗余度进行图像压缩，处理的是一副独立的图像，不会跨越多幅图像。空间域编码依赖于一幅图像中<strong>相邻像素间的相似性和图案区的主要空间域频率</strong>。（JPEG标准用于静止图像，即图片，只是用了空间域压缩，只是用帧内编码。）<ul>
+<li>熵与冗余<ul>
+<li>在所有的实际节目素材中，存在这两种类型的信号分量：即异常的、不可预见的信号分量和可以预见的信号分量。</li>
+<li>异常分量称为<strong>熵</strong>，它是信号中的<em>真正信息</em></li>
+<li>其余部分称为<strong>冗余</strong>，因为它不是必须的信息。<ul>
+<li>冗余可以是空间性的，例如在图像的大片区域中，邻近像素几乎具有相同的数值。</li>
+<li>冗余也可以是时间性的，例如连续图像之间的相似部分。</li>
+</ul>
+</li>
+<li>在所有的压缩系统<em>编码器</em>中都是将熵与冗余分离，只有熵被编码和传输，而在<em>解码器</em>中再从编码器的发送的信号中计算出冗余。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>帧间编码，是<strong>时间域编码</strong>，利用一组连续图像间的时间性冗余度进行图像压缩。如果某帧图像可被解码器使用，那么解码器只需利用两帧图像的差异即可得到下一阵图像。<ul>
+<li>比如运动平缓的几帧图像的相似性大，差异性小，而运动剧烈的几幅图像则相似性小，差异性大。当得到一帧完整的图像信息后，可以利用与后一帧图像的差异值推算得到后一帧图像，这样就实现了数据量的压缩。<strong>时间域编码依赖于连续图像帧间的相似性</strong>，尽可能利用已接受的图像来“预测”生成当前图像。（MPEG标准用于运动图像，即视频，会使用空间域编码和时间域编码，因此是帧内编码和帧间编码结合使用）</li>
+</ul>
+</li>
+<li>I帧：I帧（Intra-coded picture,帧内编码帧，常称为<strong>关键帧</strong>）包含一副完整的图像信息，属于帧内编码图像，不含运动矢量，在解码时不需要参考其他帧图像。因此，在I帧图像出可以切换频道，而不会导致图像丢失或无法解码。I帧图像用于组织误差的累计和扩散。在闭合式GOP中，每个GOP的第一个帧一定是I帧，且当前GOP的数据不会参考前后GOP的数据。<ul>
+<li>运动矢量：一组连续图像记录了目标的运动。运动矢量用于衡量两帧图像间目标的<strong>运动程度</strong>，<em>运动矢量由水平位移和垂直位移二者构成</em>。</li>
+<li>闭合式GOP：<ul>
+<li>GOP(Group Of Pictures,图像组)是一组连续的图像，由一个I帧和多个B&#x2F;P帧组成，是编解码存取的基本单位。GOP结构常用的两个参数M和N：M指定GOP中两个anhor frame（anchor frame指可被其他帧参考的帧，即I帧或P帧）之间的距离；N指定一个GOP的大小，例如M&#x3D;2，N&#x3D;13，GOP结构为：IBBPBBPBBPBB</li>
+<li>B帧：（Bi-directionally predicted picture,双向预测编码图像帧），是帧间编码帧，利用之前和（或）之后的I帧或P帧进行<em>双向预测编码</em>。<strong>B帧不可以作为参考帧。</strong>B帧具有更高的压缩率，但需要更多的缓冲时间以及更高的CPU占用率，因此B帧适合本地存储以及视频点播，而不是用对实时性要求较高的直播系统。<ul>
+<li>双向预测编码：<ul>
+<li>连续的三幅图像中，目标块有垂直位置上的移动，背景块无位置移动，考虑如何得到当前帧图像（画面N）：<ul>
+<li>画面N中，目标向上移动后，露出背景块</li>
+<li>画面N-1中，因为背景块被目标快遮挡住了，因此没有背景块相关信息。</li>
+<li>画面N+1中，完整包含背景块的数据，因此画面N可以从画面N-1中取得背景块。</li>
+</ul>
+</li>
+<li>如何可以得到画面N？<ul>
+<li>解码器可以先解码得到画面N-1和画面N+1，通过画面N-1中的目标块数据结合运动矢量即可得到画面N中的目标块数据，通过画面N+1中的背景块数据则可得到画面N中的背景块数据。</li>
+<li>三幅画面的解码顺序为：N-1，N+1，N</li>
+<li>三幅画面的显示顺序为N-1，N，N+1</li>
+</ul>
+</li>
+<li><strong>画面N通过其前一幅画面N-1和后一副画面N+1推算（预测，predicted）得到，因此这种方式称为双向预测（或前向预测，双向参考）</strong>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>P帧：（Predictive-coded picture,预测编码图像帧），是帧间编码帧，利用之前的I帧或P帧进行预测编码。</li>
+<li>GOP有两种：闭合式GOP和开放式GOP<ul>
+<li>闭合式GOP：闭合式GOP只需要参考本GOP内的图像即可，不需要参考前后GOP的数据。这种模式决定了，<strong>闭合式GOP的显示顺序总是以I帧开始,以P帧结束。</strong>(闭合式GOP是否一定是以P帧结束？可能未必有此定义，有些视频文件GOP以B帧结束)</li>
+<li>开放式GOP：开放式GOP中的B帧解码时可能要用到其前一个GOP或后一个GOP的某些帧。码流里面包含B帧的时候才会出现开放式GOP。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>I帧,B帧,P帧的编码基本流程:</p>
+<ul>
+<li>I帧编码的基本流程:<ol>
+<li>进行帧内预测,决定所采用的帧内预测模式</li>
+<li>像素值减去预测值,得到残差</li>
+<li>对残差进行变换和量化</li>
+<li>变长编码和算数编码</li>
+<li>重构图像并滤波,得到的图像作为其它帧的参考帧</li>
+</ol>
+</li>
+<li>P帧和B帧编码的基本流程为:</li>
+</ul>
+<ol>
+<li>进行运动估计,计算采用帧间编码模式的率失真函数(节)值.P帧只参考前面的帧,B帧可参考后面的帧</li>
+<li>进行帧内预测,选取率失真函数值最小的帧内模式与帧间模式比较,确定采用哪种编码模式</li>
+<li>计算实际值和预测值的差值</li>
+<li>对残差进行变换和量化</li>
+<li>熵编码,如果是帧间编码模式,编码运动矢量</li>
+</ol>
+<p><strong>小结</strong></p>
+<ul>
+<li>I帧只需考虑本帧;</li>
+<li>P帧记录的是与前一帧的差别</li>
+<li>B帧记录的是前一帧及后一帧的差别,能节约更多的空间,视频文件小了,但是相对来说解码的时候就比较麻烦.因为在解码时,不仅要用之前缓存的画面,而且要知道下一个I或者P的画面,对于不支持B帧解码的播放器容易卡顿.</li>
+</ul>
+<h3 id="FFmpeg解码涉及的一些基本概念"><a href="#FFmpeg解码涉及的一些基本概念" class="headerlink" title="FFmpeg解码涉及的一些基本概念"></a>FFmpeg解码涉及的一些基本概念</h3><ol>
+<li>封装格式(container format)：可以看做是编码流（音频流、视频流等）数据的一层外壳，将编码后的数据存储于此封装格式的文件之内。<ul>
+<li>封装，又称容器，<strong>所谓容器，就是存放内容的器具</strong>。 容器的本质就是文件，是特定的视频文件，如mp4，mkv，flv等格式的音视频文件,其内部存放一帧帧的视频信息和音频信息。因此，视频文件内部尝尝包含不止一个信息流，而是包含一组信息流（若干视频流和若干音频流）<ul>
+<li>所谓信息流，就是随时间分布的信息，比如视频可以看成是一组随时间分布的图片。</li>
+<li>视频流中的一个数据元通常被称为一帧（frame），每一种视频流都有属于自己的编解码器（encoder&#x2F;decoder,在FFmpeg中被简写为coderc），用于说明该种视频流是如何编码和解码的。</li>
+<li>数据包（packets）则尝尝指从裸数据解析而来的数据片断。</li>
+</ul>
+</li>
+<li>容器的作用：容器中可以存放音频、视频、字幕流等信息，将这些信息整合在一起，按照特定规则放置在容器中。</li>
+</ul>
+</li>
+<li>编解码器(Codec)：数据帧（原始数据）与数据包（压缩数据）之间的转换工具<ul>
+<li>数据帧（原始数据）-&gt; 编解码器（编码）-&gt; 数据包（压缩数据）</li>
+<li>数据包（压缩数据）-&gt; 编解码器（解码）-&gt; 数据帧（原始数据）</li>
+</ul>
+</li>
+<li>媒体流(Stream)：时间上的一段连续数据。一段声音数据，称为音频流；一段视频数据，称为视频流；一段字母数据，称为字幕流</li>
+<li>数据帧(Data Frame)：媒体流，由若干数据帧构成；压缩格式中，数据帧是最小的处理单元。<ul>
+<li>在容器中，如果有多个数据流，那么视频帧、音频帧、字母信息、交错存储，以保证实时性</li>
+<li>数据帧是未压缩的原始数据，如：视频帧每一帧都是一张完整的YUV图片，音频帧是PCM格式的。</li>
+</ul>
+</li>
+<li>数据包(Data Packet)：将数据帧压缩后就是数据包，数据帧是未压缩的原始数据，数据包是压缩后的数据。</li>
+<li>复用（Mux）：将不同的媒体流，按照一定规则放入容器，复用的关键工具是：复用器（Muxer）</li>
+<li>解复用（Demux）：从容器中解析不通的流出来，解复用的关键工具是：解复用器（Demuxer）</li>
+</ol>
+<h3 id="FFmpeg开发环境构建"><a href="#FFmpeg开发环境构建" class="headerlink" title="FFmpeg开发环境构建"></a>FFmpeg开发环境构建</h3><ol>
+<li>ffmpeg官网：<a target="_blank" rel="noopener" href="https://www.ffmpeg.org/">https://www.ffmpeg.org/</a></li>
+<li>SDL（Simple DirectMedia Layer）：是一套开源的跨平台多媒体开发库。SDL提供了书中控制图像、声音、输出输入的函数，封装了复杂的音视频底层操作，简化了音视频处理的难度。目前SDL多用于开发游戏、模拟器、媒体播放器等多媒体应用领域。官网: <a target="_blank" rel="noopener" href="https://www.libsdl.org/">https://www.libsdl.org/</a></li>
+<li>yasm&#x2F;nasm<ul>
+<li>旧版ffmpeg及x264&#x2F;x265使用yasm汇编器</li>
+<li>新版ffmpeg及x264&#x2F;x265改用nasm汇编器<ul>
+<li>NASM（Netwide Assembler），是一款基于英特尔x86架构的汇编与反汇编工具。官网：<a target="_blank" rel="noopener" href="https://www.nasm.us/">https://www.nasm.us/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>x264：是开源的h264编码器，使用非常广泛。ffmpeg工程中实现了h264解码器，但是没有264编码器。因此需要安装第三方编码器x264。官网：<a target="_blank" rel="noopener" href="https://www.videolan.org/developers/x264.html">https://www.videolan.org/developers/x264.html</a></li>
+<li>x265：是开源的h265编码器。ffmpeg工程中实现了h265解码器，但是没有h265编码器，因此需要安装第三方编码器x265.官网：<a target="_blank" rel="noopener" href="https://www.x265.org/">https://www.x265.org/</a> 下载地址：<a target="_blank" rel="noopener" href="https://www.videolan.org/developers/x265.html">https://www.videolan.org/developers/x265.html</a></li>
+<li>libmp3lame：是开源的mp3编码器。官网：<a target="_blank" rel="noopener" href="https://lame.sourceforge.net/">https://lame.sourceforge.net/</a></li>
+<li>librtmp：RTMPDump Read-Time Messaging Protocol API，又成rtmpdump，是用于处理RTMP流的工具。支持所有形式的RTMP，文档：<a target="_blank" rel="noopener" href="https://rtmpdump.mplayerhq.hu/librtmp.3.html">https://rtmpdump.mplayerhq.hu/librtmp.3.html</a> 官网：<a target="_blank" rel="noopener" href="https://rtmpdump.mplayerhq.hu/">https://rtmpdump.mplayerhq.hu/</a></li>
+</ol>
+<h3 id="处理音视频流的一般过程："><a href="#处理音视频流的一般过程：" class="headerlink" title="处理音视频流的一般过程："></a>处理音视频流的一般过程：</h3><ol>
+<li>打开音视频文件，获取音视频流</li>
+<li>从数据流中读取数据帧</li>
+<li>如果数据帧不完整，就回到第二步</li>
+<li>处理数据帧</li>
+<li>回到第二步</li>
+</ol>
+<h2 id="二、FFmpeg视频解码过程"><a href="#二、FFmpeg视频解码过程" class="headerlink" title="二、FFmpeg视频解码过程"></a>二、FFmpeg视频解码过程</h2><ol>
+<li>注册所支持的所有的文件（容器）格式及其对应的Codec：<code>av_register_all()</code></li>
+<li>打开输入文件：<code>avformat_open_input()</code></li>
+<li>解封装，从文件中提取流信息：<code>avformat_find_stream_info()</code></li>
+<li>查找video stream相对应的解码器：<code>avcodec_find_decoder()</code></li>
+<li>给相应解码器的上下文容器分配内存：<code>avcodec_alloc_context3() avcode_parameters_to_context()</code></li>
+<li>打开解码器，并初始化解码器的上下文容器：<code>avcodec_open2()</code></li>
+<li>创建SwsContext对象，并初始化:<code>av_image_fill_arrays(),sws_getContext()</code></li>
+<li>为解码帧分配内存：<code>av_frame_alloc()</code></li>
+<li>从流中读取数据到Packet中：<code>av_read_fream()</code></li>
+<li>发送数据包到解码队列：<code>avcodec_send_packet()</code></li>
+<li>接受一帧解码数据，并解码：<code>avcodec_receive_frame()</code></li>
+<li>对视频帧（YUV）进行图像格式转换（RGB）:<code>sws_scale()</code></li>
+</ol>
+<h2 id="三、（用到的）结构体的功能和参数简要分析"><a href="#三、（用到的）结构体的功能和参数简要分析" class="headerlink" title="三、（用到的）结构体的功能和参数简要分析"></a>三、（用到的）结构体的功能和参数简要分析</h2><h3 id="关键的结构体分类："><a href="#关键的结构体分类：" class="headerlink" title="关键的结构体分类："></a>关键的结构体分类：</h3><ol>
+<li>解协议（http，rtsp，rtmp，mms）<ol>
+<li>AVIOContext</li>
+<li>URLProtocol<ol>
+<li>存储输入视音频使用的封装格式，每种协议都对应一个URLProtocol结构</li>
+<li>FFmpeg中文件也被当做一种协议“file”</li>
+</ol>
+</li>
+<li>URLContext<ol>
+<li>主要存储视音频使用的协议的类型</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>解封装（flv,avi,rmvb,mp4)<ol>
+<li>AVFormatContext<ol>
+<li>主要存储视音频封装格式中包含的信息</li>
+<li>几个主要变量（解码）：<ol>
+<li>AVIOContext * pb ： 输入数据的缓存</li>
+<li>unsigned int nb_streams : 视音频流的个数</li>
+<li>AVStream **streams：视音频流</li>
+<li>char filename[1024]：文件名</li>
+<li>int64_t duration：时长（单位：微秒）</li>
+<li>int bit_rate：比特率（单位：bps）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>AVInputFormat<ol>
+<li>存储输入视音频使用的封装格式</li>
+<li>每种视音频封装格式都对应一个AVInputFormat结构</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>解码（h264, mpeg2, aac, mp3）<ol>
+<li>AVStream：<ol>
+<li>每一个AVStream存储一个视频&#x2F;音频流的相关数据</li>
+</ol>
+</li>
+<li>AVCodecContext：<ol>
+<li>存储该视频&#x2F;音频流使用的解码方式的相关数据</li>
+<li>每个AVStream对应一个AVCodecContext</li>
+</ol>
+</li>
+<li>AVCodec：<ol>
+<li>包含视频&#x2F;音频对应的解码器,每种解码器都对应一个AVCodec结构</li>
+<li>每个AVCodecContext中对应一个AVCodec</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>存数据<ol>
+<li>视频：每个结构一般都是存一帧，音频可能是一帧，也可能是多帧</li>
+<li>解码前的数据格式：AVPacket</li>
+<li>解码后的数据格式：AVFrame</li>
+</ol>
+</li>
+</ol>
+<h3 id="一些相关的类及其参数"><a href="#一些相关的类及其参数" class="headerlink" title="一些相关的类及其参数"></a>一些相关的类及其参数</h3><ol>
+<li>int av_image_get_buffer_size(enum AVPixelFormat pix_fmt, int width, int height, int align);<ol>
+<li>函数的作用：通过指定像素格式、图像宽、图像高来计算所需要的内存大小</li>
+<li>重要参数：<ol>
+<li>“align：设定内存对齐的对齐数，也就是按多大的字节对齐”</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>int av_image_alloc(uint8_t* pointers[4], int linesize[4], int w, int h, enum AVPixelFormat pix_fmt, int align);<ol>
+<li>函数作用：按计算的内存大小申请所需要的内存</li>
+<li>参数：<ol>
+<li>pointers[4]：保存图像通道的地址。如果是RGB，则前三个指针分别指向R,G,B的内存地址，第四个保留不用</li>
+<li>linesize[4]：保存图像每个通道的内存对齐的<strong>步长</strong>,即一行的对齐内存的宽度，此值的大小等于图像的宽度</li>
+<li>w：要申请内存的图像宽度</li>
+<li>h：要申请内存的图像高度</li>
+<li>pix_fmt：要申请内存的图像的像素格式</li>
+<li>align：用于内存对齐的值</li>
+<li>@return：所申请的内存空间的总大小，如果为负值，申请失败</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>int av_image_fill_arrays(uint8_t ** dst_data[4], int dst_linesize[4], const uint8_t *src, enum AVPixelFormat pix_fmt, int width, int height, int align);<ol>
+<li>函数作用：<ol>
+<li>org: <ol>
+<li>Setup the data pointers and linesizes based on the specified image parameters and provided array.（根据指定的图像参数和提供的数据设置数据指针和行宽的大小）The fields of the given image are filled in by using the src address which points to the image data buffer. Depending on the specified pixel format, one or multiple image data pointers and line sizes will be set.（给定图像的字段是使用指向图像数据缓冲区的src地址填充的，根据指定的像素格式，将设置一个或多个图像数据指针和行宽大小）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>参数：<ol>
+<li>dst_data[4]：data pointers to be filled in.（要填充的数据指针）<del>对申请的内存格式分为三个通道后，分别保存其地址</del></li>
+<li>dst_linesize[4]：linesizes for the image in dst_data to be filled in.(dst_data中要填充的图像的行宽大小)<del>格式化的内存步长（即内存对齐后的宽度）</del></li>
+<li>src：buffer which will contain or contains the actual image data can be NULL.（将包含或包含实际图像数据的缓冲区）<del>av_alloc()函数申请的内存地址</del></li>
+<li>pix_fmt：the pixel format of the image.（图像的像素格式）<del>申请src内存时的像素格式</del></li>
+<li>width：the width of the image in pixels. （图像的宽度，以像素为单位）<del>申请src的宽度</del></li>
+<li>height：the height of the image in pixels. （图像的高度，以像素为单位）<del>申请src的高度</del></li>
+<li>align：the value use in src for linesize alignment.（src中用于行大小对齐的值）<del>用于内存对齐的值</del></li>
+<li>return：the size in bytes required for src.（src所需的大小，以字节为单位 ）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>int avcodec_send_packet(AVCodecContext* avctx, const AVPacket* avpkt);<ol>
+<li>函数功能：Supple raw packet data as input to a decoder.（提供原始数据包数据做为解码器的输入）Internally, this call will copy relevant AVCodecContext fields, which can influence decoding per-packet, and apply them when the packet is actually decoded.（在内部，此调用将复制相关的AVCodecContext字段，这些字段可能会影响到每个数据包的解码，并在数据包实际解码时应用这些字段）</li>
+</ol>
+</li>
+<li>int avcodec_receive_frame(AVCodecContext* acvtx, AVFrame* frame)<ol>
+<li>函数功能：Return decoded output data from a decoder.(从解码器返回解码数据)</li>
+<li>参数：<ol>
+<li>avctx: codec context.（编解码器上下文）</li>
+<li>frame: This will be set to a reference-counted video or audion frame(depending on the decoder type) allocated by the decoder.（这将被设置为解码器分配的参考计数视频或音频帧，取决于解码器类型）Note that the function will always call av_frame_unref(frame) before doing anything else.（在调用av_frame_unref函数之前，它可以做任何其他的事情。）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>int sws_scale(struct SwsContext* c, const uint8_t* const srcSlice[], const int srcStride[], int srcSliceY, int srcSliceH, uint8_t* const dst[], const int dstStride[]);<ol>
+<li>函数功能：Scale the image slice in srcSlice and put the resulting scaled slice in the image in dst.（在srcSlice中缩放图像切片，并将生成缩放切片放在dst中的图像）A slice is a sequence of consecutive rows in an image.（一个切片是图像中连续行的一个序列）Slice have to be provided in sequential order, either in top-bottom or bottom-top order. If slices are provided in non-sequential order the behavior of the function is undefined.（切片必须是按顺序提供的，可以是上下顺序，也可以是下上顺序。如果切片以非顺序提供，则函数的行为未定义）</li>
+<li>参数：<ol>
+<li>c:the scaling context previously created with sws_getContext</li>
+<li>srcSlice: the array containing the pointers to the planes of the source slice.（包含指向源切片平面的指针的数组）</li>
+<li>srcStride: the array containing the stride for each plane of the source image.（包含源图像的每个平面的步长的数组）</li>
+<li>srcSliceY: the position in the source image of the slice to process, that is the number(couted starting from zero) in the image of the first row of the slice.（要处理的切片的源图像的位置，即切片第一行图像张的数字（从零开始计数））</li>
+<li>srcSliceH: the height of the source slice, that is the number of rows in the slice.（源切片的高度，即切片中的行数）</li>
+<li>dst: the array containing the pointers to the planes of the destination image.（包含指向目标图像平面的指针的数组）</li>
+<li>dstStride : the array containing the strides for each plane of the destination image.（包含目标图像的每个平面的步长的数组）</li>
+<li>@return：the height of the output slice.（输出切片的高度）</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h5 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h5><ol>
+<li>字节对齐、内存对齐<ol>
+<li>现代计算机中内存空间都是按照byte划分的，从理论上将似乎对任何类型的变量额访问可以从任何地址开始，但是实际上的计算机系统对基本类型数据在内存中存放的位置有限制，它们会要求这些数据的首地址的值是某个数k（通常是4或者8）的背书，这就是所谓的内存对齐</li>
+<li>图像在存储或传输的过程中，一般一个行宽会是某个数的倍数，行宽一般是以字节为单位的，所以便有字节对齐。（例如：一个图像的行宽为1023，想向1024对齐，差的1个字节，就是字节对齐数）<ol>
+<li>行宽 &#x3D;  宽度 × 通道数</li>
+<li>高度 &#x3D; 就是行数，因为每一行是在高度上是1</li>
+<li>那么申请的内存大小为：height * width * channels</li>
+<li>图像在电脑里存储的是二维数据，也就是数字矩阵。（不管是1通道还是3通道，都是以数字矩阵（二维）方式存储，不通的是一个像素是对应一个值还是三个值）</li>
+<li>而现实中，对图像存储的描述，可以是立体的，例如三通道的图像，就是立方体，长是行宽，宽是高度，高是通道数。（<del>这样一说，好像更迷了哈哈哈，但它就是立方体，第三个坐标轴代表的是通道数</del>）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>AVFrame结构体中的几个参数：<ol>
+<li>width、height：Video dimensions. Video frames only. The coded dimensions(in pixels) of the video frame, i.e. the size of the rectangle that contains some well-defined values.（仅限视频帧，视频帧的编码尺寸（以像素为单位），即包含一些明确定义的值的矩形大小）</li>
+<li>linesize ：for video, size in bytes of each picture line.（对于视频，每条图片行的大小（以字节为单位））for video the linesizes should be multiples of the CPUs alignment preference, this is 16 or 32 for modern destop CPUs.（对于视频，线条大小应该是CPU对齐首选项的倍数，对于现代桌面CPU，这是16或32.）</li>
+</ol>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/FFmpeg/" rel="tag"># FFmpeg</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/FFmpeg/ffmpeg_5_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22-ffmpeg_5_01/" rel="prev" title="ffmpeg_5_01">
+      <i class="fa fa-chevron-left"></i> ffmpeg_5_01
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/FFmpeg/ffmpeg_4_%E5%B8%B8%E7%94%A8%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/2024-05-22-ffmpeg_4_1/" rel="next" title="ffmpeg_4_1">
+      ffmpeg_4_1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81%E7%BC%96%E8%A7%A3%E7%A0%81%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">一、视频解码编解码的一些基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E5%9B%BE%E5%83%8F%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">数字图像的基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E6%95%B0%E6%8D%AE%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.</span> <span class="nav-text">视频数据的一些基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FFmpeg%E8%A7%A3%E7%A0%81%E6%B6%89%E5%8F%8A%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.3.</span> <span class="nav-text">FFmpeg解码涉及的一些基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FFmpeg%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%9E%84%E5%BB%BA"><span class="nav-number">2.4.</span> <span class="nav-text">FFmpeg开发环境构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E9%9F%B3%E8%A7%86%E9%A2%91%E6%B5%81%E7%9A%84%E4%B8%80%E8%88%AC%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">处理音视频流的一般过程：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81FFmpeg%E8%A7%86%E9%A2%91%E8%A7%A3%E7%A0%81%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">二、FFmpeg视频解码过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%EF%BC%88%E7%94%A8%E5%88%B0%E7%9A%84%EF%BC%89%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%8A%9F%E8%83%BD%E5%92%8C%E5%8F%82%E6%95%B0%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">三、（用到的）结构体的功能和参数简要分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93%E5%88%86%E7%B1%BB%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">关键的结构体分类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E7%9B%B8%E5%85%B3%E7%9A%84%E7%B1%BB%E5%8F%8A%E5%85%B6%E5%8F%82%E6%95%B0"><span class="nav-number">4.2.</span> <span class="nav-text">一些相关的类及其参数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">4.2.0.1.</span> <span class="nav-text">补充</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

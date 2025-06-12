@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 openssh 相关工具的笔记  OpenSSH 详解OpenSSH（Open Secure Shell）是一个用于安全远程登录和文件传输的开源工具套件，提供了加密的网络通信协议和相关的命令行工具。它是SSH协议的实现之一，广泛用于Linux、Unix和其他类Unix系统上。 以下是OpenSSH的一些主要特点和功能：  安全远程登录：OpenSSH提供了ssh命令，可以通过安全的加密通道远">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_06_open_ssh">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_06_open_ssh/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 openssh 相关工具的笔记  OpenSSH 详解OpenSSH（Open Secure Shell）是一个用于安全远程登录和文件传输的开源工具套件，提供了加密的网络通信协议和相关的命令行工具。它是SSH协议的实现之一，广泛用于Linux、Unix和其他类Unix系统上。 以下是OpenSSH的一些主要特点和功能：  安全远程登录：OpenSSH提供了ssh命令，可以通过安全的加密通道远">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.326Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_06_open_ssh/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_06_open_ssh | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_06_open_ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_06_open_ssh
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>openssh 相关工具的笔记</li>
+</ul>
+<h2 id="OpenSSH-详解"><a href="#OpenSSH-详解" class="headerlink" title="OpenSSH 详解"></a>OpenSSH 详解</h2><p>OpenSSH（Open Secure Shell）是一个用于安全远程登录和文件传输的开源工具套件，提供了加密的网络通信协议和相关的命令行工具。它是SSH协议的实现之一，广泛用于Linux、Unix和其他类Unix系统上。</p>
+<p>以下是OpenSSH的一些主要特点和功能：</p>
+<ol>
+<li><p>安全远程登录：OpenSSH提供了ssh命令，可以通过安全的加密通道远程登录到其他计算机，并在远程终端上执行命令。这使得用户可以远程管理和访问远程服务器，而不必直接物理接触远程计算机。</p>
+</li>
+<li><p>文件传输：OpenSSH提供了scp和sftp命令，用于在本地计算机和远程服务器之间安全地传输文件和目录。这使得用户可以轻松地复制文件、上传和下载文件，以及进行远程文件管理。</p>
+</li>
+<li><p>SSH密钥认证：OpenSSH支持使用SSH密钥对进行身份认证，而不是传统的基于密码的认证方式。用户可以生成公钥和私钥，将公钥部署到服务器上，从而实现免密码登录。这提供了更高的安全性和方便性。</p>
+</li>
+<li><p>端口转发和隧道：OpenSSH支持本地和远程端口转发，以及创建安全的隧道连接。这使得用户可以安全地访问远程计算机上的服务，甚至通过防火墙和网络限制。</p>
+</li>
+<li><p>X11转发：OpenSSH支持X11转发，允许用户在远程计算机上运行图形化应用程序，并将其显示到本地计算机上。这使得用户可以远程访问图形界面应用程序，而不必直接在远程计算机上操作。</p>
+</li>
+<li><p>其他功能：OpenSSH还提供了许多其他功能，如代理转发、多因子认证、登录日志记录等，以增强安全性和用户管理能力。</p>
+</li>
+</ol>
+<p>总的来说，OpenSSH是一个功能强大、安全可靠的工具套件，为用户提供了远程访问和文件传输等功能，并通过加密通信和身份认证提供了强大的安全性保障。它在服务器管理、系统维护和远程协作等场景中得到广泛应用。</p>
+<h2 id="Linux和Windows互相拷贝"><a href="#Linux和Windows互相拷贝" class="headerlink" title="Linux和Windows互相拷贝"></a>Linux和Windows互相拷贝</h2><ul>
+<li>从Linux复制到Windows：<ul>
+<li><code>scp /home/user/data/tmp.txt user@192.169.4.16:/C:Users/user/Desktop</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="修改SSH配置文件"><a href="#修改SSH配置文件" class="headerlink" title="修改SSH配置文件"></a>修改SSH配置文件</h2><ul>
+<li><code>sudo vim /etc/ssh/sshd_config</code></li>
+<li>搜索<code>PermitRootLogin</code>，将一下配置：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">33 #LoginGraceTime 2m</span><br><span class="line">34 #PermitRootLogin prohibit-password</span><br><span class="line">35 #StrictModes yes</span><br><span class="line">36 #MaxAuthTries 6</span><br><span class="line">37 #MaxSessions 10</span><br></pre></td></tr></table></figure></li>
+<li>修改为：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LoginGraceTime 2m</span><br><span class="line">PermitRootLogin yes</span><br><span class="line">StrictModes yes</span><br><span class="line">#MaxAuthTries 6</span><br><span class="line">#MaxSessions 10</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="重启ssh，使配置生效"><a href="#重启ssh，使配置生效" class="headerlink" title="重启ssh，使配置生效"></a>重启ssh，使配置生效</h2><ul>
+<li><code>sudo service ssh restart</code></li>
+</ul>
+<h2 id="linux-openssh是什么"><a href="#linux-openssh是什么" class="headerlink" title="linux openssh是什么"></a>linux openssh是什么</h2><p>OpenSSH（Open Secure Shell）是一个用于提供加密的通信会话的免费开源实现，它包括SSH协议的实现和相关的工具。SSH（Secure Shell）是一种用于在网络上安全传输数据的协议，通常用于远程登录和执行命令，以及安全地传输文件。</p>
+<p>以下是 OpenSSH 的主要组件和功能：</p>
+<ol>
+<li><p><strong>SSH服务器 (<code>sshd</code>)：</strong> OpenSSH 包括一个 SSH 服务器，用于接受远程用户的连接，并提供安全的远程访问。通过 SSH 协议，用户可以在远程系统上执行命令或进行其他操作，而通信过程是经过加密的，确保数据的机密性和完整性。</p>
+</li>
+<li><p><strong>SSH客户端 (<code>ssh</code>)：</strong> OpenSSH 提供了一个 SSH 客户端，用于建立到远程服务器的加密连接。通过 SSH 客户端，用户可以远程登录到其他系统，执行命令，传输文件等。用户可以在命令行中使用 <code>ssh</code> 命令，也可以使用图形界面工具。</p>
+</li>
+<li><p><strong>SCP 和 SFTP：</strong> OpenSSH 提供了用于安全文件传输的工具，包括 SCP（Secure Copy Protocol）和 SFTP（Secure File Transfer Protocol）。SCP 允许在网络上安全地传输文件，而 SFTP 则提供了一个交互式的文件传输协议，类似于 FTP，但使用 SSH 进行加密。</p>
+</li>
+<li><p><strong>SSH密钥对：</strong> OpenSSH 支持使用密钥对进行身份验证，以替代传统的基于密码的身份验证方式。用户可以生成公钥和私钥，将公钥部署到远程服务器上，从而实现更安全的身份验证方式。</p>
+</li>
+<li><p><strong>端口转发：</strong> OpenSSH 支持端口转发，允许用户在加密的通道上传输其他网络流量，如通过 SSH 安全地访问远程数据库或内部网络服务。</p>
+</li>
+</ol>
+<p>OpenSSH 是许多操作系统中默认安装的标准 SSH 实现，包括许多 Linux 发行版和 BSD 系统。其开源性质使得用户可以审查和修改代码以满足特定需求，并且它广泛用于安全的远程系统管理和文件传输。</p>
+<h2 id="linux-openssh详解"><a href="#linux-openssh详解" class="headerlink" title="linux openssh详解"></a>linux openssh详解</h2><p>OpenSSH 是一个用于提供安全网络通信的开源实现，它主要实现了 SSH（Secure Shell）协议。SSH 是一种加密的协议，用于在不安全的网络中提供安全的远程访问、文件传输以及命令执行。以下是 OpenSSH 的一些详细信息：</p>
+<h3 id="组件和功能："><a href="#组件和功能：" class="headerlink" title="组件和功能："></a>组件和功能：</h3><ol>
+<li><p><strong>sshd（SSH 服务器）：</strong></p>
+<ul>
+<li><code>sshd</code> 是 OpenSSH 中的服务器端程序，用于接受来自客户端的连接请求。</li>
+<li>它负责验证用户身份、建立安全通道，并处理用户的远程命令或文件传输请求。</li>
+</ul>
+</li>
+<li><p><strong>ssh（SSH 客户端）：</strong></p>
+<ul>
+<li><code>ssh</code> 是 OpenSSH 中的客户端程序，用于建立到远程 SSH 服务器的加密连接。</li>
+<li>通过 <code>ssh</code> 命令，用户可以登录远程系统、执行命令、传输文件等。</li>
+</ul>
+</li>
+<li><p><strong>SCP 和 SFTP：</strong></p>
+<ul>
+<li>SCP（Secure Copy Protocol）和 SFTP（Secure File Transfer Protocol）是用于在网络上安全传输文件的工具。</li>
+<li>SCP 提供命令行方式的文件传输，而 SFTP 提供了一个类似于 FTP 的交互式文件传输协议。</li>
+</ul>
+</li>
+<li><p><strong>SSH 密钥对：</strong></p>
+<ul>
+<li>OpenSSH 支持基于密钥对的身份验证，其中用户生成公钥和私钥。</li>
+<li>用户将公钥部署到远程服务器，而私钥保留在本地。这样可以实现更安全的身份验证，避免传统密码登录的风险。</li>
+</ul>
+</li>
+<li><p><strong>端口转发：</strong></p>
+<ul>
+<li>OpenSSH 支持端口转发，使用户能够通过 SSH 通道安全地传输其他网络流量。</li>
+<li>通过端口转发，用户可以访问远程服务器上的本地服务，或者将远程服务映射到本地端口。</li>
+</ul>
+</li>
+</ol>
+<h3 id="配置文件："><a href="#配置文件：" class="headerlink" title="配置文件："></a>配置文件：</h3><p>OpenSSH 的配置文件通常是 <code>/etc/ssh/sshd_config</code>（服务器端）和 <code>~/.ssh/config</code>（客户端）。这些文件包含了各种配置选项，允许用户自定义 SSH 行为。</p>
+<h3 id="安全性："><a href="#安全性：" class="headerlink" title="安全性："></a>安全性：</h3><p>OpenSSH 通过使用加密技术，包括对称加密、非对称加密和哈希算法，提供了通信的机密性和完整性。这使得它成为安全远程管理和文件传输的首选工具之一。</p>
+<h3 id="使用案例："><a href="#使用案例：" class="headerlink" title="使用案例："></a>使用案例：</h3><ol>
+<li><p><strong>远程登录：</strong> 使用 <code>ssh</code> 客户端通过命令行或图形界面安全地登录到远程系统。</p>
+</li>
+<li><p><strong>文件传输：</strong> 使用 SCP 或 SFTP 完成文件传输，确保文件在传输过程中得到加密保护。</p>
+</li>
+<li><p><strong>远程命令执行：</strong> 使用 <code>ssh</code> 客户端执行远程系统上的命令，而不必直接登录到系统。</p>
+</li>
+<li><p><strong>安全传输其他服务：</strong> 使用端口转发，通过 SSH 通道安全地访问和传输其他网络服务，如数据库服务。</p>
+</li>
+</ol>
+<p>总体而言，OpenSSH 是一个功能强大、安全可靠的工具，被广泛用于各种 Linux 和 UNIX 系统上，以及其他操作系统中。</p>
+<h2 id="linux-ssh服务器详解"><a href="#linux-ssh服务器详解" class="headerlink" title="linux ssh服务器详解"></a>linux ssh服务器详解</h2><p>在 Linux 系统上，SSH（Secure Shell）服务器主要由 OpenSSH 软件包提供，它是一个用于提供加密的远程登录和文件传输服务的开源实现。下面详细介绍 Linux 上的 SSH 服务器的相关概念和配置：</p>
+<h3 id="OpenSSH-服务器-sshd-："><a href="#OpenSSH-服务器-sshd-：" class="headerlink" title="OpenSSH 服务器 (sshd)："></a>OpenSSH 服务器 (<code>sshd</code>)：</h3><ol>
+<li><p><strong>服务启动：</strong></p>
+<ul>
+<li><code>sshd</code> 是 OpenSSH 中的服务器端程序，负责监听 SSH 连接请求并处理用户的远程登录和文件传输。</li>
+<li>在大多数 Linux 发行版中，你可以通过以下命令启动或停止 SSH 服务：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> service ssh start  <span class="comment"># 启动服务</span></span><br><span class="line"><span class="built_in">sudo</span> service ssh stop   <span class="comment"># 停止服务</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>配置文件：</strong></p>
+<ul>
+<li>SSH 服务器的主要配置文件通常位于 <code>/etc/ssh/sshd_config</code>。这个文件包含了各种配置选项，用于定义服务器的行为、安全性设置和认证方式等。</li>
+<li>修改配置文件可能需要超级用户权限，你可以使用编辑器（如 <code>nano</code> 或 <code>vi</code>）来进行编辑：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/ssh/sshd_config</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>重要配置选项：</strong></p>
+<ul>
+<li>一些常见的配置选项包括：<ul>
+<li><code>Port</code>: 指定 SSH 服务器监听的端口，默认为 22。</li>
+<li><code>PermitRootLogin</code>: 允许或禁止 root 用户通过 SSH 登录。</li>
+<li><code>PasswordAuthentication</code>: 启用或禁用密码身份验证。</li>
+<li><code>PubkeyAuthentication</code>: 启用或禁用公钥身份验证。</li>
+<li><code>AllowUsers</code> 或 <code>AllowGroups</code>: 限制哪些用户或组可以登录。</li>
+<li><code>Protocol</code>: 指定使用的 SSH 协议版本。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>身份验证方式：</strong></p>
+<ul>
+<li>SSH 服务器支持多种身份验证方式，包括密码、公钥和基于主机的身份验证。管理员可以根据安全需求配置适当的身份验证方式。</li>
+</ul>
+</li>
+<li><p><strong>重启服务：</strong></p>
+<ul>
+<li>在修改了 <code>sshd_config</code> 文件后，需要重启 SSH 服务以使更改生效：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> service ssh restart</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>日志文件：</strong></p>
+<ul>
+<li>SSH 服务器的活动和错误信息通常记录在 <code>/var/log/auth.log</code> 或 <code>/var/log/secure</code> 文件中，可以通过这些日志文件来监视服务器的活动。</li>
+</ul>
+</li>
+<li><p><strong>安全性建议：</strong></p>
+<ul>
+<li>定期更新 SSH 服务器和操作系统，以确保安全性。</li>
+<li>禁用不安全的身份验证方式，如密码身份验证，而使用公钥身份验证。</li>
+<li>配置防火墙规则以限制对 SSH 服务器的访问。</li>
+</ul>
+</li>
+</ol>
+<h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><p>一个简单的 <code>sshd_config</code> 配置示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Port 22</span><br><span class="line">PermitRootLogin no</span><br><span class="line">PasswordAuthentication yes</span><br><span class="line">PubkeyAuthentication yes</span><br><span class="line">AllowUsers username</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，SSH 服务器监听默认端口 22，禁止 root 用户直接登录，启用密码和公钥身份验证，只允许特定的用户（<code>username</code>）登录。</p>
+<p>请注意，实际配置应根据具体的安全需求和网络环境进行调整。</p>
+<h2 id="linux-ssh客户端详解"><a href="#linux-ssh客户端详解" class="headerlink" title="linux ssh客户端详解"></a>linux ssh客户端详解</h2><p>在 Linux 系统上，SSH（Secure Shell）客户端通常由 OpenSSH 软件包提供。SSH 客户端允许用户建立加密连接到远程服务器，执行命令、传输文件以及进行其他远程操作。以下是关于 Linux 上 SSH 客户端的一些详细信息：</p>
+<h3 id="OpenSSH-客户端-ssh-："><a href="#OpenSSH-客户端-ssh-：" class="headerlink" title="OpenSSH 客户端 (ssh)："></a>OpenSSH 客户端 (<code>ssh</code>)：</h3><ol>
+<li><p><strong>连接远程服务器：</strong></p>
+<ul>
+<li>使用 <code>ssh</code> 命令可以轻松地建立到远程服务器的 SSH 连接。语法为：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh username@hostname</span><br></pre></td></tr></table></figure>
+其中，<code>username</code> 是目标服务器上的用户名，而 <code>hostname</code> 是目标服务器的主机名或 IP 地址。</li>
+</ul>
+</li>
+<li><p><strong>身份验证方式：</strong></p>
+<ul>
+<li>SSH 客户端支持多种身份验证方式，包括密码和公钥身份验证。当使用密码登录时，系统会要求用户输入密码。而在使用公钥身份验证时，客户端会使用预先生成的密钥对进行身份验证。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用密码身份验证</span></span><br><span class="line">ssh username@hostname</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用公钥身份验证</span></span><br><span class="line">ssh -i /path/to/private_key username@hostname</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>文件传输：</strong></p>
+<ul>
+<li>使用 <code>scp</code> 命令可以在本地系统和远程服务器之间传输文件。语法为：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 从本地到远程</span></span><br><span class="line">scp local_file username@hostname:/remote/path</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从远程到本地</span></span><br><span class="line">scp username@hostname:/remote/file /local/path</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>SSH 配置文件 (<code>~/.ssh/config</code>)：</strong></p>
+<ul>
+<li>用户可以在 <code>~/.ssh/config</code> 文件中配置 SSH 客户端的行为。这个文件允许你定义主机别名、身份验证方式、端口等设置，以简化 SSH 连接的管理。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 示例 ~/.ssh/config 文件</span></span><br><span class="line">Host myserver</span><br><span class="line">  HostName example.com</span><br><span class="line">  User username</span><br><span class="line">  Port 2222</span><br><span class="line">  IdentityFile ~/.ssh/private_key</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>端口转发：</strong></p>
+<ul>
+<li>SSH 客户端支持端口转发，允许用户安全地传输其他网络流量。这通常用于访问远程服务器上的本地服务。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -L local_port:remote_host:remote_port username@hostname</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>代理跳板：</strong></p>
+<ul>
+<li>通过 SSH 客户端，用户可以设置代理跳板，从而通过一个中间服务器访问目标服务器。这对于连接到内部网络的服务器很有用。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -J jumpbox_username@jumpbox_hostname username@target_hostname</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>执行远程命令：</strong></p>
+<ul>
+<li>通过在 <code>ssh</code> 命令后添加要执行的命令，可以在远程服务器上执行命令而不必手动登录。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh username@hostname <span class="string">&#x27;command_to_run&#x27;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>SSH Agent：</strong></p>
+<ul>
+<li>SSH 客户端可以与 SSH Agent 配合使用，以避免在每次连接时重新输入密码或解锁私钥。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 添加私钥到 SSH Agent</span></span><br><span class="line">ssh-add /path/to/private_key</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<p>以上是一些基本的 SSH 客户端使用方式和功能。SSH 客户端非常灵活，可以通过不同的选项和配置满足各种需求，提供安全的远程访问和文件传输。</p>
+<h2 id="linux-scp命令详解"><a href="#linux-scp命令详解" class="headerlink" title="linux scp命令详解"></a>linux scp命令详解</h2><p><code>scp</code>（Secure Copy Protocol）是一个用于在本地系统和远程系统之间进行安全文件传输的命令行工具。它使用 SSH 协议来提供加密的数据传输，确保传输的安全性。以下是关于 Linux 上 <code>scp</code> 命令的详解：</p>
+<h3 id="scp-语法："><a href="#scp-语法：" class="headerlink" title="scp 语法："></a><code>scp</code> 语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp [选项] <span class="built_in">source</span> destination</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>source：</strong> 要传输的文件或目录的路径。可以是本地文件或远程服务器上的文件。</li>
+<li><strong>destination：</strong> 文件或目录的目标位置。可以是本地路径或远程服务器的路径。</li>
+</ul>
+<h3 id="常用选项："><a href="#常用选项：" class="headerlink" title="常用选项："></a>常用选项：</h3><ol>
+<li><p><strong>-r：</strong></p>
+<ul>
+<li>递归复制，用于传输目录及其内容。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r local_directory username@remote_host:/remote/path</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>-P：</strong></p>
+<ul>
+<li>指定远程服务器的端口号，默认为 22。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -P 2222 local_file username@remote_host:/remote/path</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>-i：</strong></p>
+<ul>
+<li>指定用于身份验证的私钥文件。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -i /path/to/private_key local_file username@remote_host:/remote/path</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>-v：</strong></p>
+<ul>
+<li>启用详细模式，显示调试信息。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -v local_file username@remote_host:/remote/path</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h3 id="示例用法："><a href="#示例用法：" class="headerlink" title="示例用法："></a>示例用法：</h3><ol>
+<li><p><strong>从本地传输到远程：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp local_file username@remote_host:/remote/path</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>从远程传输到本地：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp username@remote_host:/remote/file /local/path</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>本地到远程目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r local_directory username@remote_host:/remote/path</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>从远程到本地目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r username@remote_host:/remote/directory /local/path</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>scp</code> 使用 SSH 协议，因此你需要在远程服务器上启用 SSH 服务。</li>
+<li>对于远程服务器路径，如果省略了用户名，则默认使用当前登录用户。</li>
+<li><code>scp</code> 的工作方式类似于 <code>cp</code> 命令，但它使用 SSH 进行加密传输，因此数据在传输过程中是安全的。</li>
+<li>在使用 <code>scp</code> 时，确保你有正确的权限来读取本地文件和写入远程目标路径。</li>
+</ul>
+<p><code>scp</code> 是一个非常实用的工具，能够在本地系统和远程服务器之间轻松传输文件，而且通过使用 SSH 进行加密，确保了数据的安全传输。</p>
+<h2 id="linux-sftp命令详解"><a href="#linux-sftp命令详解" class="headerlink" title="linux sftp命令详解"></a>linux sftp命令详解</h2><p><code>sftp</code>（Secure File Transfer Protocol）是一个基于 SSH 协议的安全文件传输工具，它允许用户通过命令行交互式地在本地系统和远程服务器之间传输文件。与传统的 FTP 不同，<code>sftp</code> 使用 SSH 进行加密，提供更安全的文件传输方式。以下是关于 Linux 上 <code>sftp</code> 命令的详细解释：</p>
+<h3 id="sftp-语法："><a href="#sftp-语法：" class="headerlink" title="sftp 语法："></a><code>sftp</code> 语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sftp [选项] [username@]host[:path]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>username：</strong> 远程服务器上的用户名，如果省略，则使用当前登录用户。</li>
+<li><strong>host：</strong> 远程服务器的主机名或 IP 地址。</li>
+<li><strong>path：</strong> 远程服务器上的路径，如果省略，则默认为用户的主目录。</li>
+</ul>
+<h3 id="sftp-命令："><a href="#sftp-命令：" class="headerlink" title="sftp 命令："></a><code>sftp</code> 命令：</h3><ol>
+<li><p><strong>连接到远程服务器：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sftp username@remote_host</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>退出 <code>sftp</code>：</strong></p>
+<ul>
+<li>在 <code>sftp</code> 交互式模式下，可以使用 <code>exit</code> 或 <code>quit</code> 命令退出。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>上传文件到远程服务器：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">put local_file</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>下载文件到本地系统：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get remote_file</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>列出远程目录内容：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>改变远程目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> remote_directory</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>删除远程文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rm</span> remote_file</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>创建远程目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> remote_directory</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>重命名远程文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rename old_name new_name</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="选项："><a href="#选项：" class="headerlink" title="选项："></a>选项：</h3><ul>
+<li><p><strong>-i：</strong> 指定用于身份验证的私钥文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sftp -i /path/to/private_key username@remote_host</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>-P：</strong> 指定远程服务器的端口号，默认为 22。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sftp -P 2222 username@remote_host</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="注意事项：-1"><a href="#注意事项：-1" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>sftp</code> 是一个交互式的命令行工具，用户可以在交互模式下输入命令。</li>
+<li>文件上传和下载时，文件的路径和名称可以在本地和远程之间指定。</li>
+<li><code>sftp</code> 提供了类似于 FTP 的命令，但是由于使用了 SSH 进行加密，传输过程更加安全。</li>
+<li>可以使用 <code>help</code> 命令在 <code>sftp</code> 中查看可用的命令。</li>
+</ul>
+<p><code>sftp</code> 是一个灵活且安全的文件传输工具，适用于需要通过 SSH 加密传输文件的场景。在使用 <code>sftp</code> 时，请确保你有正确的权限来读取本地文件和写入远程服务器上的目标路径。</p>
+<h2 id="linux-ssh密钥对详解"><a href="#linux-ssh密钥对详解" class="headerlink" title="linux ssh密钥对详解"></a>linux ssh密钥对详解</h2><p>在 Linux 系统中，SSH 密钥对是一种用于身份验证和安全传输的机制。密钥对包括公钥和私钥，这两者一起工作以确保安全的通信。以下是关于 Linux 中 SSH 密钥对的详细解释：</p>
+<h3 id="SSH-密钥对的组成："><a href="#SSH-密钥对的组成：" class="headerlink" title="SSH 密钥对的组成："></a>SSH 密钥对的组成：</h3><ol>
+<li><p><strong>公钥 (<code>id_rsa.pub</code>)：</strong></p>
+<ul>
+<li>公钥是可以公开分享的部分，用于验证与私钥配对的身份。它通常保存在用户的 <code>~/.ssh/</code> 目录下，文件名为 <code>id_rsa.pub</code>。</li>
+<li>公钥是一串文本，类似于以下示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+6czkGk...</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>私钥 (<code>id_rsa</code>)：</strong></p>
+<ul>
+<li>私钥是必须保持安全的部分，只有拥有私钥的用户可以使用它来进行身份验证。私钥通常保存在用户的 <code>~/.ssh/</code> 目录下，文件名为 <code>id_rsa</code>。</li>
+<li>私钥是二进制数据，通常不会直接以文本形式显示。</li>
+</ul>
+</li>
+</ol>
+<h3 id="生成-SSH-密钥对："><a href="#生成-SSH-密钥对：" class="headerlink" title="生成 SSH 密钥对："></a>生成 SSH 密钥对：</h3><p>可以使用 <code>ssh-keygen</code> 命令生成 SSH 密钥对。默认情况下，生成的密钥对将保存在用户的 <code>~/.ssh/</code> 目录下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -b 2048</span><br></pre></td></tr></table></figure>
+
+<p>上述命令将生成一个 RSA 类型的密钥对，位数为 2048。根据需要，可以选择其他密钥类型和位数。</p>
+<h3 id="将公钥部署到远程服务器："><a href="#将公钥部署到远程服务器：" class="headerlink" title="将公钥部署到远程服务器："></a>将公钥部署到远程服务器：</h3><ol>
+<li><p><strong>手动复制：</strong></p>
+<ul>
+<li>使用 <code>ssh-copy-id</code> 或手动将公钥内容复制到远程服务器的 <code>~/.ssh/authorized_keys</code> 文件中。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id username@remote_host</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>复制到剪贴板：</strong></p>
+<ul>
+<li>使用 <code>xclip</code> 或 <code>pbcopy</code> 将公钥复制到剪贴板，然后粘贴到远程服务器上的 <code>~/.ssh/authorized_keys</code> 文件中。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> ~/.ssh/id_rsa.pub | xclip -sel clip</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h3 id="使用-SSH-密钥对进行身份验证："><a href="#使用-SSH-密钥对进行身份验证：" class="headerlink" title="使用 SSH 密钥对进行身份验证："></a>使用 SSH 密钥对进行身份验证：</h3><ol>
+<li><p><strong>在登录时指定私钥：</strong></p>
+<ul>
+<li>在 <code>ssh</code> 命令中使用 <code>-i</code> 选项指定私钥文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -i /path/to/private_key username@remote_host</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>使用 SSH Agent：</strong></p>
+<ul>
+<li>将私钥添加到 SSH Agent 中，以免在每次连接时输入密码：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-add /path/to/private_key</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h3 id="注意事项：-2"><a href="#注意事项：-2" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><p><strong>私钥安全性：</strong></p>
+<ul>
+<li>私钥应该始终保持安全，不要与他人共享，以免被滥用。</li>
+<li>私钥文件的权限应设置为只有拥有者可读写 (<code>chmod 600 ~/.ssh/id_rsa</code>)。</li>
+</ul>
+</li>
+<li><p><strong>公钥部署：</strong></p>
+<ul>
+<li>将公钥部署到所有需要访问的远程服务器上，以实现无密码或密钥登录。</li>
+<li>在远程服务器上的 <code>~/.ssh/authorized_keys</code> 文件中可以包含多个公钥，每行一个。</li>
+</ul>
+</li>
+</ul>
+<p>SSH 密钥对提供了一种强大且安全的身份验证机制，适用于远程登录、文件传输等场景。密钥对的生成和使用都涉及到一些注意事项，确保密钥的安全和正确配置是使用 SSH 密钥对的关键。</p>
+<h2 id="Could-not-open-a-connection-to-your-authentication-agent-错误"><a href="#Could-not-open-a-connection-to-your-authentication-agent-错误" class="headerlink" title="Could not open a connection to your authentication agent 错误"></a>Could not open a connection to your authentication agent 错误</h2><p>如果您在执行 <code>ssh-add</code> 命令时收到 “Could not open a connection to your authentication agent” 错误，这通常意味着SSH Agent并未在当前的Shell会话中运行。以下是一些可能的原因和解决方法：</p>
+<ol>
+<li><p><strong>SSH Agent未启动：</strong> 请确保SSH Agent已经启动。您可以通过运行以下命令来启动SSH Agent：</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(ssh-agent -s)</span>&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Shell环境问题：</strong> 如果您在新的Shell窗口中运行 <code>ssh-add</code>，请确保您的SSH Agent环境变量已经被正确设置。您可以通过运行以下命令来检查：</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$SSH_AGENT_PID</span></span><br></pre></td></tr></table></figure>
+
+<p> 如果没有输出，或者输出为空，可能需要重新启动SSH Agent。</p>
+</li>
+<li><p><strong>SSH Agent自动启动问题：</strong> 如果您在每次登录时都遇到此问题，可能是因为SSH Agent没有在登录时自动启动。您可以将SSH Agent启动命令添加到您的shell配置文件中（例如，<code>.bashrc</code> 或 <code>.zshrc</code>）。</p>
+<p>在文件末尾添加以下行：</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> [ -z <span class="string">&quot;<span class="variable">$SSH_AUTH_SOCK</span>&quot;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(ssh-agent -s)</span>&quot;</span></span><br><span class="line">    ssh-add</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>这将在每次登录时检查SSH Agent是否运行，如果没有，则启动并添加私钥。</p>
+</li>
+<li><p><strong>重新启动SSH Agent：</strong> 如果以上步骤都没有解决问题，可以尝试重新启动SSH Agent。首先，停止当前运行的SSH Agent：</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-agent -k</span><br></pre></td></tr></table></figure>
+
+<p> 然后重新启动SSH Agent：</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(ssh-agent -s)</span>&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>尝试这些步骤后，您应该能够成功将私钥添加到SSH Agent中。如果问题仍然存在，请提供更多详细信息，以便我能够提供更具体的帮助。</p>
+<h2 id="Linux-openssh端口转发详解"><a href="#Linux-openssh端口转发详解" class="headerlink" title="Linux openssh端口转发详解"></a>Linux openssh端口转发详解</h2><p>在 Linux 下，OpenSSH 提供了强大的端口转发功能，可以通过 SSH 通道安全地传输其他网络流量。端口转发（Port Forwarding）允许你在本地计算机和远程服务器之间建立加密的通信通道，从而访问远程网络服务或将本地服务映射到远程服务器上。有两种主要类型的端口转发：本地端口转发（Local Port Forwarding）和远程端口转发（Remote Port Forwarding）。</p>
+<h3 id="1-本地端口转发（Local-Port-Forwarding）："><a href="#1-本地端口转发（Local-Port-Forwarding）：" class="headerlink" title="1. 本地端口转发（Local Port Forwarding）："></a>1. 本地端口转发（Local Port Forwarding）：</h3><p>本地端口转发允许你将本地计算机上的端口转发到远程服务器上。通常用于访问远程服务器上的服务，如数据库或内部网站。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -L local_port:remote_host:remote_port username@remote_server</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>local_port</code>：本地计算机上监听的端口。</li>
+<li><code>remote_host</code>：远程服务器上服务的主机名或 IP 地址。</li>
+<li><code>remote_port</code>：远程服务器上服务的端口。</li>
+</ul>
+<p>示例：将本地计算机的本地端口 8080 转发到远程服务器的 80 端口（Web 服务器）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -L 8080:localhost:80 username@remote_server</span><br></pre></td></tr></table></figure>
+
+<p>现在，可以在本地浏览器中访问 <code>http://localhost:8080</code> 来访问远程服务器上的 Web 服务。</p>
+<h3 id="2-远程端口转发（Remote-Port-Forwarding）："><a href="#2-远程端口转发（Remote-Port-Forwarding）：" class="headerlink" title="2. 远程端口转发（Remote Port Forwarding）："></a>2. 远程端口转发（Remote Port Forwarding）：</h3><p>远程端口转发允许你将远程服务器上的端口转发到本地计算机上。通常用于暴露本地服务，使其可以通过远程服务器访问。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -R remote_port:local_host:local_port username@remote_server</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>remote_port</code>：远程服务器上监听的端口。</li>
+<li><code>local_host</code>：本地计算机上服务的主机名或 IP 地址。</li>
+<li><code>local_port</code>：本地计算机上服务的端口。</li>
+</ul>
+<p>示例：将远程服务器的远程端口 8888 转发到本地计算机的 22 端口（SSH 服务）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -R 8888:localhost:22 username@remote_server</span><br></pre></td></tr></table></figure>
+
+<p>现在，可以在远程服务器上通过 <code>ssh -p 8888 localhost</code> 来访问本地计算机上的 SSH 服务。</p>
+<h3 id="注意事项：-3"><a href="#注意事项：-3" class="headerlink" title="注意事项："></a>注意事项：</h3><ol>
+<li><p><strong>防火墙设置：</strong></p>
+<ul>
+<li>确保本地计算机和远程服务器的防火墙允许相应的端口访问。</li>
+</ul>
+</li>
+<li><p><strong>SSH 服务器配置：</strong></p>
+<ul>
+<li>在远程服务器上，确保 SSH 服务器的配置文件允许相应的端口转发。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /etc/ssh/sshd_config</span></span><br><span class="line">AllowTcpForwarding <span class="built_in">yes</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>安全性：</strong></p>
+<ul>
+<li>使用端口转发时，务必注意安全性。不要将本地服务直接暴露到公共网络上，应仅限制访问到必要的主机。</li>
+</ul>
+</li>
+<li><p><strong>通道保持活跃：</strong></p>
+<ul>
+<li>添加 <code>-N</code> 选项可以防止 <code>ssh</code> 命令打开 shell，从而只建立端口转发通道而不登录到远程服务器。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -N -L local_port:remote_host:remote_port username@remote_server</span><br></pre></td></tr></table></figure>
+
+<p>端口转发是 SSH 功能中非常有用的一部分，它可以使你在不直接暴露服务的情况下安全地访问远程服务器上的服务。</p>
+<h2 id="OpenSSH-相关命令"><a href="#OpenSSH-相关命令" class="headerlink" title="OpenSSH 相关命令"></a>OpenSSH 相关命令</h2><p>OpenSSH是一个用于安全远程登录的开源工具套件，提供了一系列命令和协议用于远程访问和管理Linux系统。以下是一些常用的OpenSSH相关命令：</p>
+<ol>
+<li><p>ssh：远程登录到服务器或执行远程命令。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh user@hostname</span><br></pre></td></tr></table></figure>
+<p>其中，<code>user</code>是远程服务器的用户名，<code>hostname</code>是远程服务器的主机名或IP地址。</p>
+</li>
+<li><p>scp：安全地复制文件和目录到远程服务器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp source_file user@hostname:destination_path</span><br></pre></td></tr></table></figure>
+<p>其中，<code>source_file</code>是本地文件路径，<code>user</code>是远程服务器的用户名，<code>hostname</code>是远程服务器的主机名或IP地址，<code>destination_path</code>是远程服务器上的目标路径。</p>
+</li>
+<li><p>sftp：使用类似FTP的方式在本地系统和远程服务器之间传输文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sftp user@hostname</span><br></pre></td></tr></table></figure>
+<p>通过此命令进入sftp会话后，可以执行一系列文件传输操作。</p>
+</li>
+<li><p>ssh-keygen：生成和管理SSH密钥对。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
+<p>该命令用于生成RSA密钥对，可以使用其他选项指定密钥类型和文件名等。</p>
+</li>
+<li><p>ssh-agent：管理SSH代理，用于管理私钥并免密码登录。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval $(ssh-agent)</span><br></pre></td></tr></table></figure>
+<p>该命令启动ssh-agent代理，并将其相关环境变量设置为当前shell的环境变量。</p>
+</li>
+<li><p>ssh-add：将私钥添加到ssh-agent代理中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-add ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
+<p>该命令将指定的私钥添加到ssh-agent代理中，以便在进行SSH身份验证时使用。</p>
+</li>
+</ol>
+<p>这些命令是OpenSSH套件中的一部分，用于实现安全远程登录和文件传输等功能。请根据具体需求和情况选择适当的命令使用。</p>
+<hr>
+<h2 id="ssh-exchange-identification-read-Connection-reset-by-peer-错误"><a href="#ssh-exchange-identification-read-Connection-reset-by-peer-错误" class="headerlink" title="ssh_exchange_identification: read: Connection reset by peer 错误"></a>ssh_exchange_identification: read: Connection reset by peer 错误</h2><p>当你在使用SSH连接时，出现”ssh_exchange_identification: read: Connection reset by peer”错误，通常表示SSH连接被对方终止了。这可能是由于以下几个原因导致的：</p>
+<ol>
+<li><p>网络连接问题：这可能是由于网络中断、丢包或不稳定的连接导致的。请确保你的网络连接正常，并尝试重新连接。</p>
+</li>
+<li><p>SSH服务器配置问题：可能是SSH服务器配置有问题，导致连接被终止。你可以尝试重新启动SSH服务器或检查其配置文件以查找潜在的问题。</p>
+</li>
+<li><p>防火墙或安全设置：防火墙或其他安全设置可能会阻止SSH连接。确保你的防火墙设置允许SSH流量通过，并且服务器端没有任何限制。</p>
+</li>
+<li><p>SSH版本不匹配：如果你使用的SSH客户端和服务器端之间的SSH协议版本不匹配，可能会导致连接被重置。尝试使用兼容的SSH版本，或者更新SSH客户端和服务器端以确保版本一致。</p>
+</li>
+<li><p>SSH服务器负载过高：如果SSH服务器负载过高，可能无法处理新的连接请求，从而导致连接被重置。尝试在负载较低的时间重新连接。</p>
+</li>
+</ol>
+<p>如果以上方法都无效，你可以尝试使用其他SSH客户端或与SSH服务器管理员联系以获取更多支持和故障排除。</p>
+<hr>
+<h2 id="ssh-允许root登录"><a href="#ssh-允许root登录" class="headerlink" title="ssh 允许root登录"></a>ssh 允许root登录</h2><ul>
+<li>文件：&#x2F;etc&#x2F;ssh&#x2F;sshd_config<ul>
+<li><code>PermitRootLogin yes</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="ssh-安装与配置"><a href="#ssh-安装与配置" class="headerlink" title="ssh 安装与配置"></a>ssh 安装与配置</h2><ul>
+<li>一般ubuntu都会默认安装openssh-client,但是没有安装openssh-server</li>
+<li>安装ssh服务器:<ul>
+<li><code>sudo apt-get install openssh-server</code></li>
+</ul>
+</li>
+<li>安装ssh客户端:<ul>
+<li><code>sudo apt-get install openssh-client</code></li>
+</ul>
+</li>
+<li>查看端口:<ul>
+<li><code>netstat -tunpl | grep 22</code></li>
+</ul>
+</li>
+<li>查看ssh状态:<ul>
+<li><code>service sshd status</code></li>
+</ul>
+</li>
+<li>重启ssh服务:<ul>
+<li><code>service sshd restart</code> | <code>sudo /etc/init.d/ssh restart</code></li>
+</ul>
+</li>
+<li>ssh配置文件:<ul>
+<li><code>/etc/ssh/ssh_config</code> | <code>/etc/ssh/sshd_config</code></li>
+<li><code>PasswordAuthentication yes</code></li>
+<li><code>PermitRootLogin yes</code></li>
+<li><code># PermitRootLogin prohibit-password</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="SSH-基础知识"><a href="#SSH-基础知识" class="headerlink" title="SSH 基础知识"></a>SSH 基础知识</h2><ul>
+<li><p>SSH的全称为<code>Secure Shell</code>，即安全外壳协议，是一种加密的网络传输协议。它能够在公开的网络环境中提供安全的数据传输环境，通常用于登陆远程主机和推拉代码。</p>
+</li>
+<li><p>同样一个SSH公钥文件，如果添加至某一个代码仓库，则称为部署公钥，配置后默认拥有读项目的只读权限，支持新增读写权限；</p>
+</li>
+<li><p>如果添加至团队设置中心，则称为团队部署公钥，仅拥有只读权限；</p>
+</li>
+<li><p>如果添加至个人账户，称为账户SSH公钥，配置后拥有账户内所有代码仓库的读写权限。</p>
+</li>
+<li><p>同一个SSH公钥无法即作为部署公钥，又作为个人账户SSH公钥</p>
+</li>
+<li><p>生成公钥 – 使用<code>ssh-keygen</code>工具生成SSH公钥</p>
+<ul>
+<li>&#96;ssh-keygen -m PEM -t ed25519 -C “<a href="mailto:&#x79;&#111;&#x75;&#x72;&#x2e;&#x65;&#x6d;&#97;&#105;&#108;&#x40;&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#46;&#99;&#111;&#x6d;">&#x79;&#111;&#x75;&#x72;&#x2e;&#x65;&#x6d;&#97;&#105;&#108;&#x40;&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#46;&#99;&#111;&#x6d;</a>“  &#x2F;&#x2F; 创建新的SSH私钥和公钥对</li>
+</ul>
+</li>
+<li><p>添加至部署公钥</p>
+<ul>
+<li>打开生成的密钥对的地址，通常为<code>~/.ssh 文件夹</code> , 找到后缀为<code>pub</code>的文件</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="ssh-keygen"><a href="#ssh-keygen" class="headerlink" title="ssh-keygen"></a>ssh-keygen</h2><p><code>ssh-keygen</code>命令是Linux系统中用于生成SSH密钥对的工具。SSH密钥对由一对公钥和私钥组成，用于身份验证和安全通信。</p>
+<p>下面是<code>ssh-keygen</code>命令的一些常见选项和用法：</p>
+<ol>
+<li><p>生成RSA密钥对：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
+<p>这将生成一个RSA密钥对，默认情况下，公钥文件为<code>id_rsa.pub</code>，私钥文件为<code>id_rsa</code>。</p>
+</li>
+<li><p>生成DSA密钥对：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t dsa</span><br></pre></td></tr></table></figure>
+<p>这将生成一个DSA密钥对，默认情况下，公钥文件为<code>id_dsa.pub</code>，私钥文件为<code>id_dsa</code>。</p>
+</li>
+<li><p>生成ECDSA密钥对：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t ecdsa</span><br></pre></td></tr></table></figure>
+<p>这将生成一个ECDSA密钥对，默认情况下，公钥文件为<code>id_ecdsa.pub</code>，私钥文件为<code>id_ecdsa</code>。</p>
+</li>
+<li><p>生成ED25519密钥对：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t ed25519</span><br></pre></td></tr></table></figure>
+<p>这将生成一个ED25519密钥对，默认情况下，公钥文件为<code>id_ed25519.pub</code>，私钥文件为<code>id_ed25519</code>。</p>
+</li>
+<li><p>指定密钥文件名：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -f &lt;filename&gt;</span><br></pre></td></tr></table></figure>
+<p>使用<code>-f</code>选项可以指定生成的密钥文件的文件名。例如，<code>ssh-keygen -f mykey</code>将生成<code>mykey</code>作为文件名的密钥对。</p>
+</li>
+<li><p>设置密钥密码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -p</span><br></pre></td></tr></table></figure>
+<p>使用<code>-p</code>选项可以更改已有密钥文件的密码。</p>
+</li>
+<li><p>查看密钥指纹：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -lf &lt;public_key_file&gt;</span><br></pre></td></tr></table></figure>
+<p>使用<code>-lf</code>选项可以查看公钥文件的指纹。</p>
+</li>
+</ol>
+<p>以上是一些常见的<code>ssh-keygen</code>命令选项和用法。生成密钥对后，可以将公钥文件部署到服务器上，以便进行SSH身份验证。私钥文件应该妥善保管，不应与他人共享。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_13_free/" rel="prev" title="linux_2_13_free">
+      <i class="fa fa-chevron-left"></i> linux_2_13_free
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_10_tmux/" rel="next" title="linux_2_10_tmux">
+      linux_2_10_tmux <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenSSH-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">OpenSSH 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E5%92%8CWindows%E4%BA%92%E7%9B%B8%E6%8B%B7%E8%B4%9D"><span class="nav-number">3.</span> <span class="nav-text">Linux和Windows互相拷贝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9SSH%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">修改SSH配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%90%AFssh%EF%BC%8C%E4%BD%BF%E9%85%8D%E7%BD%AE%E7%94%9F%E6%95%88"><span class="nav-number">5.</span> <span class="nav-text">重启ssh，使配置生效</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-openssh%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">6.</span> <span class="nav-text">linux openssh是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-openssh%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">linux openssh详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E5%92%8C%E5%8A%9F%E8%83%BD%EF%BC%9A"><span class="nav-number">7.1.</span> <span class="nav-text">组件和功能：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">配置文件：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7%EF%BC%9A"><span class="nav-number">7.3.</span> <span class="nav-text">安全性：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%A1%88%E4%BE%8B%EF%BC%9A"><span class="nav-number">7.4.</span> <span class="nav-text">使用案例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ssh%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">linux ssh服务器详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenSSH-%E6%9C%8D%E5%8A%A1%E5%99%A8-sshd-%EF%BC%9A"><span class="nav-number">8.1.</span> <span class="nav-text">OpenSSH 服务器 (sshd)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A"><span class="nav-number">8.2.</span> <span class="nav-text">例子：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ssh%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">linux ssh客户端详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenSSH-%E5%AE%A2%E6%88%B7%E7%AB%AF-ssh-%EF%BC%9A"><span class="nav-number">9.1.</span> <span class="nav-text">OpenSSH 客户端 (ssh)：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-scp%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">linux scp命令详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scp-%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">10.1.</span> <span class="nav-text">scp 语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">10.2.</span> <span class="nav-text">常用选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">10.3.</span> <span class="nav-text">示例用法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">10.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-sftp%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3"><span class="nav-number">11.</span> <span class="nav-text">linux sftp命令详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sftp-%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">11.1.</span> <span class="nav-text">sftp 语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sftp-%E5%91%BD%E4%BB%A4%EF%BC%9A"><span class="nav-number">11.2.</span> <span class="nav-text">sftp 命令：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">11.3.</span> <span class="nav-text">选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-1"><span class="nav-number">11.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ssh%E5%AF%86%E9%92%A5%E5%AF%B9%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">linux ssh密钥对详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH-%E5%AF%86%E9%92%A5%E5%AF%B9%E7%9A%84%E7%BB%84%E6%88%90%EF%BC%9A"><span class="nav-number">12.1.</span> <span class="nav-text">SSH 密钥对的组成：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90-SSH-%E5%AF%86%E9%92%A5%E5%AF%B9%EF%BC%9A"><span class="nav-number">12.2.</span> <span class="nav-text">生成 SSH 密钥对：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E5%85%AC%E9%92%A5%E9%83%A8%E7%BD%B2%E5%88%B0%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%9A"><span class="nav-number">12.3.</span> <span class="nav-text">将公钥部署到远程服务器：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-SSH-%E5%AF%86%E9%92%A5%E5%AF%B9%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81%EF%BC%9A"><span class="nav-number">12.4.</span> <span class="nav-text">使用 SSH 密钥对进行身份验证：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-2"><span class="nav-number">12.5.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Could-not-open-a-connection-to-your-authentication-agent-%E9%94%99%E8%AF%AF"><span class="nav-number">13.</span> <span class="nav-text">Could not open a connection to your authentication agent 错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-openssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E8%AF%A6%E8%A7%A3"><span class="nav-number">14.</span> <span class="nav-text">Linux openssh端口转发详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%9C%AC%E5%9C%B0%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%EF%BC%88Local-Port-Forwarding%EF%BC%89%EF%BC%9A"><span class="nav-number">14.1.</span> <span class="nav-text">1. 本地端口转发（Local Port Forwarding）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BF%9C%E7%A8%8B%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%EF%BC%88Remote-Port-Forwarding%EF%BC%89%EF%BC%9A"><span class="nav-number">14.2.</span> <span class="nav-text">2. 远程端口转发（Remote Port Forwarding）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-3"><span class="nav-number">14.3.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenSSH-%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4"><span class="nav-number">15.</span> <span class="nav-text">OpenSSH 相关命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-exchange-identification-read-Connection-reset-by-peer-%E9%94%99%E8%AF%AF"><span class="nav-number">16.</span> <span class="nav-text">ssh_exchange_identification: read: Connection reset by peer 错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-%E5%85%81%E8%AE%B8root%E7%99%BB%E5%BD%95"><span class="nav-number">17.</span> <span class="nav-text">ssh 允许root登录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE"><span class="nav-number">18.</span> <span class="nav-text">ssh 安装与配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">19.</span> <span class="nav-text">SSH 基础知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-keygen"><span class="nav-number">20.</span> <span class="nav-text">ssh-keygen</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

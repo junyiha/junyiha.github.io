@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 手眼标定相关学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机械臂手眼标定">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/20/notebook/Robotics/2025-02-20--%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 手眼标定相关学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-20T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.506Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Robotics">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/20/notebook/Robotics/2025-02-20--%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>机械臂手眼标定 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/20/notebook/Robotics/2025-02-20--%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          机械臂手眼标定
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-20 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-20T09:00:00+08:00">2025-02-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Robotics/" itemprop="url" rel="index"><span itemprop="name">Robotics</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>手眼标定相关学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="机械臂手眼标定-详细解释"><a href="#机械臂手眼标定-详细解释" class="headerlink" title="机械臂手眼标定 详细解释"></a>机械臂手眼标定 详细解释</h2><h3 id="机械臂手眼标定（Hand-Eye-Calibration）详细解析"><a href="#机械臂手眼标定（Hand-Eye-Calibration）详细解析" class="headerlink" title="机械臂手眼标定（Hand-Eye Calibration）详细解析"></a><strong>机械臂手眼标定（Hand-Eye Calibration）详细解析</strong></h3><h4 id="1-什么是手眼标定？"><a href="#1-什么是手眼标定？" class="headerlink" title="1. 什么是手眼标定？"></a><strong>1. 什么是手眼标定？</strong></h4><p>手眼标定（Hand-Eye Calibration）是计算机视觉和机器人学中的关键技术，主要用于确定<strong>摄像头（Eye）与机械臂末端执行器（Hand）之间的空间变换关系</strong>。该标定过程的目标是计算<strong>相机坐标系与机械臂坐标系之间的变换矩阵</strong>，从而使得视觉信息能够准确地指导机械臂的运动。</p>
+<p>手眼标定通常用于：</p>
+<ul>
+<li><strong>视觉伺服</strong>（Visual Servoing）</li>
+<li><strong>目标抓取</strong>（Object Grasping）</li>
+<li><strong>机器人测量与检测</strong>（Robot Measurement &amp; Inspection）</li>
+<li><strong>精确装配</strong>（Precision Assembly）</li>
+</ul>
+<hr>
+<h4 id="2-手眼标定的基本原理"><a href="#2-手眼标定的基本原理" class="headerlink" title="2. 手眼标定的基本原理"></a><strong>2. 手眼标定的基本原理</strong></h4><p>手眼标定的核心是求解以下变换关系：</p>
+<p>[<br>AX &#x3D; XB<br>]</p>
+<p>其中：</p>
+<ul>
+<li>( A )：<strong>机械臂的运动变换矩阵</strong>（由机械臂的关节编码器提供）</li>
+<li>( B )：<strong>相机坐标系的运动变换矩阵</strong>（通过视觉标定计算）</li>
+<li>( X )：<strong>待求解的手眼变换矩阵</strong>，表示相机坐标系相对于机械臂末端坐标系的变换关系。</li>
+</ul>
+<p>[<br>X &#x3D; A^{-1} B X<br>]</p>
+<p>这意味着，给定多个不同的机械臂运动位置，我们可以通过这些已知的变换求解 (X)，进而确定摄像头相对于机械臂末端的位姿。</p>
+<hr>
+<h4 id="3-手眼标定的方法"><a href="#3-手眼标定的方法" class="headerlink" title="3. 手眼标定的方法"></a><strong>3. 手眼标定的方法</strong></h4><p>手眼标定方法主要分为两类：</p>
+<ul>
+<li><strong>固定相机（Eye-to-Hand）</strong></li>
+<li><strong>移动相机（Eye-in-Hand）</strong></li>
+</ul>
+<h5 id="3-1-固定相机（Eye-to-Hand）"><a href="#3-1-固定相机（Eye-to-Hand）" class="headerlink" title="3.1 固定相机（Eye-to-Hand）"></a><strong>3.1 固定相机（Eye-to-Hand）</strong></h5><p>在 Eye-to-Hand 结构中，相机是固定的（如安装在机器人工作空间的上方或侧面），它拍摄工作区域，并通过视觉计算目标的三维坐标，使机械臂进行抓取或操作。</p>
+<p><strong>坐标变换关系：</strong><br>[<br>X &#x3D; A^{-1} B<br>]</p>
+<p>其中：</p>
+<ul>
+<li>( X ) 是相机坐标系到机械臂基座坐标系的变换矩阵</li>
+<li>( A ) 是机械臂的运动变换</li>
+<li>( B ) 是相机观察到的目标的运动变换</li>
+</ul>
+<p><strong>优点：</strong></p>
+<ul>
+<li>视觉范围大，适用于大范围目标检测和抓取。</li>
+<li>机械臂的运动不会影响相机，系统稳定性较好。</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>由于相机是固定的，可能会出现遮挡问题。</li>
+<li>计算目标的深度信息通常需要额外的3D传感器（如深度相机或立体视觉）。</li>
+</ul>
+<hr>
+<h5 id="3-2-移动相机（Eye-in-Hand）"><a href="#3-2-移动相机（Eye-in-Hand）" class="headerlink" title="3.2 移动相机（Eye-in-Hand）"></a><strong>3.2 移动相机（Eye-in-Hand）</strong></h5><p>在 Eye-in-Hand 结构中，相机安装在机械臂的末端，并随机械臂移动。这样，机械臂可以主动改变视角进行观察，提高灵活性。</p>
+<p><strong>坐标变换关系：</strong><br>[<br>X &#x3D; A^{-1} B<br>]</p>
+<p>其中：</p>
+<ul>
+<li>( X ) 是相机坐标系相对于机械臂末端坐标系的变换矩阵</li>
+<li>( A ) 是机械臂的运动变换</li>
+<li>( B ) 是相机观察到的目标的运动变换</li>
+</ul>
+<p><strong>优点：</strong></p>
+<ul>
+<li>机械臂可以主动调整视角，避免遮挡问题。</li>
+<li>适用于机器人视觉伺服（Visual Servoing），实现更高精度的目标操作。</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>由于相机随机械臂运动，图像处理和计算的实时性要求更高。</li>
+<li>运动过程中可能会有抖动，影响视觉测量精度。</li>
+</ul>
+<hr>
+<h4 id="4-手眼标定的具体流程"><a href="#4-手眼标定的具体流程" class="headerlink" title="4. 手眼标定的具体流程"></a><strong>4. 手眼标定的具体流程</strong></h4><p>手眼标定通常包括以下步骤：</p>
+<h5 id="4-1-采集数据"><a href="#4-1-采集数据" class="headerlink" title="4.1 采集数据"></a><strong>4.1 采集数据</strong></h5><ol>
+<li>选择标定物（如棋盘格、圆点网格或特殊的标定板）。</li>
+<li>机械臂移动到不同的姿态（多个不同的位姿）。</li>
+<li>记录机械臂末端在各个姿态下的位姿（由机器人提供）。</li>
+<li>记录相机拍摄的标定板位姿（通过视觉算法计算）。</li>
+</ol>
+<h5 id="4-2-计算机械臂和相机的变换矩阵"><a href="#4-2-计算机械臂和相机的变换矩阵" class="headerlink" title="4.2 计算机械臂和相机的变换矩阵"></a><strong>4.2 计算机械臂和相机的变换矩阵</strong></h5><ul>
+<li>机械臂的运动可以得到<strong>机械臂的运动变换矩阵 A</strong>。</li>
+<li>通过视觉方法（如PnP算法）计算标定板在相机坐标系下的变换矩阵 ( B )。</li>
+</ul>
+<h5 id="4-3-求解手眼变换矩阵-X"><a href="#4-3-求解手眼变换矩阵-X" class="headerlink" title="4.3 求解手眼变换矩阵 ( X )"></a><strong>4.3 求解手眼变换矩阵 ( X )</strong></h5><ul>
+<li>通过多个位置的数据求解 ( X )，可采用<strong>线性方法、非线性优化方法或基于四元数的方法</strong>。</li>
+<li>例如：<ul>
+<li><strong>Tsai-Lenz算法</strong>（最常用）</li>
+<li><strong>Park 方法</strong></li>
+<li><strong>Andreff 方法</strong></li>
+</ul>
+</li>
+</ul>
+<h5 id="4-4-误差分析与优化"><a href="#4-4-误差分析与优化" class="headerlink" title="4.4 误差分析与优化"></a><strong>4.4 误差分析与优化</strong></h5><ul>
+<li>计算手眼变换的误差，并进行优化（如非线性最小二乘优化）。</li>
+<li>验证标定结果，调整机械臂位姿进行测试。</li>
+</ul>
+<hr>
+<h4 id="5-手眼标定的应用"><a href="#5-手眼标定的应用" class="headerlink" title="5. 手眼标定的应用"></a><strong>5. 手眼标定的应用</strong></h4><p>手眼标定广泛应用于多个领域，包括：</p>
+<ol>
+<li><strong>机器人自动化</strong>（如智能装配、自动抓取）</li>
+<li><strong>3D视觉检测</strong>（用于工业测量）</li>
+<li><strong>医疗机器人</strong>（如手术导航系统）</li>
+<li><strong>无人机与移动机器人</strong>（增强自主导航能力）</li>
+<li><strong>增强现实（AR）和虚拟现实（VR）</strong></li>
+</ol>
+<hr>
+<h4 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h4><p>手眼标定是机械臂视觉系统中的关键技术，核心目标是确定相机与机械臂之间的空间关系，使得视觉信息可以精确指导机械臂运动。主要分为<strong>Eye-in-Hand（移动相机）</strong>和<strong>Eye-to-Hand（固定相机）</strong>两种方式，常用算法包括<strong>Tsai-Lenz方法、四元数方法和最小二乘优化</strong>。通过手眼标定，机器人可以更加精准地执行任务，如抓取、测量和装配等。</p>
+<p>如果你有具体的需求（如使用哪种相机、机械臂型号、编程实现等），可以提供更详细的建议和代码示例！ 😊</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Robotics/" rel="tag"># Robotics</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/20/notebook/Tools/2025-02-20--%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" rel="prev" title="架构设计">
+      <i class="fa fa-chevron-left"></i> 架构设计
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/20/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-20--TIPC/" rel="next" title="Linux TIPC">
+      Linux TIPC <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">机械臂手眼标定 详细解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%EF%BC%88Hand-Eye-Calibration%EF%BC%89%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">机械臂手眼标定（Hand-Eye Calibration）详细解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%EF%BC%9F"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 什么是手眼标定？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 手眼标定的基本原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 手眼标定的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-%E5%9B%BA%E5%AE%9A%E7%9B%B8%E6%9C%BA%EF%BC%88Eye-to-Hand%EF%BC%89"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">3.1 固定相机（Eye-to-Hand）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-%E7%A7%BB%E5%8A%A8%E7%9B%B8%E6%9C%BA%EF%BC%88Eye-in-Hand%EF%BC%89"><span class="nav-number">2.1.3.2.</span> <span class="nav-text">3.2 移动相机（Eye-in-Hand）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%E7%9A%84%E5%85%B7%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="nav-number">2.1.4.</span> <span class="nav-text">4. 手眼标定的具体流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-%E9%87%87%E9%9B%86%E6%95%B0%E6%8D%AE"><span class="nav-number">2.1.4.1.</span> <span class="nav-text">4.1 采集数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%A2%B0%E8%87%82%E5%92%8C%E7%9B%B8%E6%9C%BA%E7%9A%84%E5%8F%98%E6%8D%A2%E7%9F%A9%E9%98%B5"><span class="nav-number">2.1.4.2.</span> <span class="nav-text">4.2 计算机械臂和相机的变换矩阵</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-3-%E6%B1%82%E8%A7%A3%E6%89%8B%E7%9C%BC%E5%8F%98%E6%8D%A2%E7%9F%A9%E9%98%B5-X"><span class="nav-number">2.1.4.3.</span> <span class="nav-text">4.3 求解手眼变换矩阵 ( X )</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-4-%E8%AF%AF%E5%B7%AE%E5%88%86%E6%9E%90%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">2.1.4.4.</span> <span class="nav-text">4.4 误差分析与优化</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">2.1.5.</span> <span class="nav-text">5. 手眼标定的应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">2.1.6.</span> <span class="nav-text">6. 总结</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 valgrind命令  linux valgrind命令 详解Valgrind 是一个用于内存调试、内存泄漏检测、性能分析等的开源工具。它可以用于 Linux 操作系统，并支持多种不同的编程语言，如C、C++。 以下是一些 Valgrind 命令的基本用法和解释： 1. 安装 Valgrind：在大多数 Linux 发行版中，可以使用包管理器安装 Valgrind。例如，在 Ubuntu 中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_77_valgrind">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_77_valgrind/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 valgrind命令  linux valgrind命令 详解Valgrind 是一个用于内存调试、内存泄漏检测、性能分析等的开源工具。它可以用于 Linux 操作系统，并支持多种不同的编程语言，如C、C++。 以下是一些 Valgrind 命令的基本用法和解释： 1. 安装 Valgrind：在大多数 Linux 发行版中，可以使用包管理器安装 Valgrind。例如，在 Ubuntu 中">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.374Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_77_valgrind/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_77_valgrind | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_77_valgrind/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_77_valgrind
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>valgrind命令</li>
+</ul>
+<h2 id="linux-valgrind命令-详解"><a href="#linux-valgrind命令-详解" class="headerlink" title="linux valgrind命令 详解"></a>linux valgrind命令 详解</h2><p><code>Valgrind</code> 是一个用于内存调试、内存泄漏检测、性能分析等的开源工具。它可以用于 Linux 操作系统，并支持多种不同的编程语言，如C、C++。</p>
+<p>以下是一些 <code>Valgrind</code> 命令的基本用法和解释：</p>
+<h3 id="1-安装-Valgrind："><a href="#1-安装-Valgrind：" class="headerlink" title="1. 安装 Valgrind："></a>1. <strong>安装 Valgrind：</strong></h3><p>在大多数 Linux 发行版中，可以使用包管理器安装 Valgrind。例如，在 Ubuntu 中可以使用以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install valgrind</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-检测内存泄漏："><a href="#2-检测内存泄漏：" class="headerlink" title="2. 检测内存泄漏："></a>2. <strong>检测内存泄漏：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --leak-check=full ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令运行你的程序，并对内存泄漏进行全面检查。<code>--leak-check=full</code> 选项会输出详细的泄漏信息。</p>
+<h3 id="3-检测内存错误："><a href="#3-检测内存错误：" class="headerlink" title="3. 检测内存错误："></a>3. <strong>检测内存错误：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令运行你的程序，并检查是否有内存错误。Valgrind 将会输出错误的详细信息。</p>
+<h3 id="4-检测特定函数的内存泄漏："><a href="#4-检测特定函数的内存泄漏：" class="headerlink" title="4. 检测特定函数的内存泄漏："></a>4. <strong>检测特定函数的内存泄漏：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --leak-check=full --show-leak-kinds=all --trace-children=<span class="built_in">yes</span> ./your_program arg1 arg2</span><br></pre></td></tr></table></figure>
+<p>这个命令在检测内存泄漏时，会显示详细的泄漏信息，包括泄漏的函数。</p>
+<h3 id="5-生成调用图："><a href="#5-生成调用图：" class="headerlink" title="5. 生成调用图："></a>5. <strong>生成调用图：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=callgrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令使用 Callgrind 工具，生成程序执行期间的函数调用图，用于性能分析。</p>
+<h3 id="6-检测缓存问题："><a href="#6-检测缓存问题：" class="headerlink" title="6. 检测缓存问题："></a>6. <strong>检测缓存问题：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=cachegrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令使用 Cachegrind 工具，用于检测程序中的缓存问题。</p>
+<h3 id="7-检测线程问题："><a href="#7-检测线程问题：" class="headerlink" title="7. 检测线程问题："></a>7. <strong>检测线程问题：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=helgrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令使用 Helgrind 工具，检测多线程程序中的竞争条件和死锁等问题。</p>
+<h3 id="8-检测指令错误："><a href="#8-检测指令错误：" class="headerlink" title="8. 检测指令错误："></a>8. <strong>检测指令错误：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=exp-sgcheck ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令使用 Exp-Sgcheck 工具，用于检测程序中的指令错误。</p>
+<h3 id="9-检测系统调用错误："><a href="#9-检测系统调用错误：" class="headerlink" title="9. 检测系统调用错误："></a>9. <strong>检测系统调用错误：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=memcheck --vgdb-error=0 ./your_program</span><br></pre></td></tr></table></figure>
+<p>这个命令使用 Memcheck 工具，并禁止 Valgrind 报告系统调用的错误。</p>
+<h3 id="10-显示版本信息："><a href="#10-显示版本信息：" class="headerlink" title="10. 显示版本信息："></a>10. <strong>显示版本信息：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --version</span><br></pre></td></tr></table></figure>
+<p>这个命令显示 Valgrind 工具的版本信息。</p>
+<p>这些命令只是 Valgrind 工具链的一部分，Valgrind 提供了多个工具用于不同类型的分析和调试任务。在使用 Valgrind 之前，确保你的程序已经编译为可调试版本，以便 Valgrind 能够提供更详细的信息。</p>
+<h2 id="linux-valgrind命令-常用技巧"><a href="#linux-valgrind命令-常用技巧" class="headerlink" title="linux valgrind命令 常用技巧"></a>linux valgrind命令 常用技巧</h2><p>在使用 Valgrind 进行内存调试和性能分析时，以下是一些常用的技巧和选项：</p>
+<h3 id="1-检测内存泄漏："><a href="#1-检测内存泄漏：" class="headerlink" title="1. 检测内存泄漏："></a>1. <strong>检测内存泄漏：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --leak-check=full ./your_program</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--leak-check=full</code> 选项启用详细的内存泄漏检查。这将显示泄漏的详细信息，包括泄漏的位置和大小。</p>
+<h3 id="2-检测特定函数的内存泄漏："><a href="#2-检测特定函数的内存泄漏：" class="headerlink" title="2. 检测特定函数的内存泄漏："></a>2. <strong>检测特定函数的内存泄漏：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --leak-check=full --show-leak-kinds=all --trace-children=<span class="built_in">yes</span> ./your_program arg1 arg2</span><br></pre></td></tr></table></figure>
+<p>通过结合 <code>--show-leak-kinds=all</code> 和 <code>--trace-children=yes</code> 选项，可以检测子进程中的内存泄漏，并显示泄漏的函数。</p>
+<h3 id="3-生成调用图："><a href="#3-生成调用图：" class="headerlink" title="3. 生成调用图："></a>3. <strong>生成调用图：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=callgrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>使用 Callgrind 工具生成程序执行期间的函数调用图。生成的数据文件可以使用 <code>kcachegrind</code> 查看。</p>
+<h3 id="4-检测缓存问题："><a href="#4-检测缓存问题：" class="headerlink" title="4. 检测缓存问题："></a>4. <strong>检测缓存问题：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=cachegrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>使用 Cachegrind 工具检测程序中的缓存问题。生成的数据文件可以使用 <code>cg_annotate</code> 或 <code>kcachegrind</code> 进行分析。</p>
+<h3 id="5-检测线程问题："><a href="#5-检测线程问题：" class="headerlink" title="5. 检测线程问题："></a>5. <strong>检测线程问题：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=helgrind ./your_program</span><br></pre></td></tr></table></figure>
+<p>使用 Helgrind 工具检测多线程程序中的竞争条件和死锁等问题。</p>
+<h3 id="6-检测指令错误："><a href="#6-检测指令错误：" class="headerlink" title="6. 检测指令错误："></a>6. <strong>检测指令错误：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=exp-sgcheck ./your_program</span><br></pre></td></tr></table></figure>
+<p>使用 Exp-Sgcheck 工具检测程序中的指令错误。</p>
+<h3 id="7-禁止报告系统调用错误："><a href="#7-禁止报告系统调用错误：" class="headerlink" title="7. 禁止报告系统调用错误："></a>7. <strong>禁止报告系统调用错误：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=memcheck --vgdb-error=0 ./your_program</span><br></pre></td></tr></table></figure>
+<p>通过添加 <code>--vgdb-error=0</code> 选项，禁止 Valgrind 报告系统调用的错误。</p>
+<h3 id="8-自定义内存分析选项："><a href="#8-自定义内存分析选项：" class="headerlink" title="8. 自定义内存分析选项："></a>8. <strong>自定义内存分析选项：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=memcheck --track-origins=<span class="built_in">yes</span> ./your_program</span><br></pre></td></tr></table></figure>
+<p>通过添加 <code>--track-origins=yes</code> 选项，可以追踪未初始化内存的来源，帮助找到相关问题。</p>
+<h3 id="9-执行内存分析并生成日志文件："><a href="#9-执行内存分析并生成日志文件：" class="headerlink" title="9. 执行内存分析并生成日志文件："></a>9. <strong>执行内存分析并生成日志文件：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --log-file=valgrind.log ./your_program</span><br></pre></td></tr></table></figure>
+<p>通过添加 <code>--log-file</code> 选项，将 Valgrind 的输出保存到指定的日志文件中。</p>
+<h3 id="10-排除指定的文件或函数："><a href="#10-排除指定的文件或函数：" class="headerlink" title="10. 排除指定的文件或函数："></a>10. <strong>排除指定的文件或函数：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --exclude-file=exclude_file.txt ./your_program</span><br></pre></td></tr></table></figure>
+<p>通过添加 <code>--exclude-file</code> 选项，可以排除特定的文件或函数不进行内存分析。</p>
+<h3 id="11-指定检查的范围："><a href="#11-指定检查的范围：" class="headerlink" title="11. 指定检查的范围："></a>11. <strong>指定检查的范围：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --track-origins=<span class="built_in">yes</span> --read-var-info=<span class="built_in">yes</span> ./your_program</span><br></pre></td></tr></table></figure>
+<p>通过添加 <code>--read-var-info=yes</code> 选项，可以指定检查的范围，以帮助找到内存问题。</p>
+<h3 id="12-显示-Valgrind-版本信息："><a href="#12-显示-Valgrind-版本信息：" class="headerlink" title="12. 显示 Valgrind 版本信息："></a>12. <strong>显示 Valgrind 版本信息：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --version</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--version</code> 选项可以显示 Valgrind 工具的版本信息。</p>
+<p>这些技巧和选项可以帮助你更有效地使用 Valgrind 工具进行内存调试和性能分析。请根据具体需求选择合适的选项，并查看 Valgrind 的文档以获取更多详细信息。</p>
+<h2 id="valgrind"><a href="#valgrind" class="headerlink" title="valgrind"></a>valgrind</h2><p>Valgrind 是一个开源的内存调试和性能分析工具，常用于 C 和 C++ 程序的调试和性能优化。它提供了一套强大的工具集，可以帮助开发者发现内存泄漏、内存错误、线程问题和性能瓶颈等问题。</p>
+<p>Valgrind 主要包含以下几个工具：</p>
+<ol>
+<li><p>Memcheck：用于检测程序的内存错误，如使用未初始化的变量、访问已释放内存、内存越界等问题。它可以跟踪每个分配和释放的内存块，并检查是否存在问题。</p>
+</li>
+<li><p>Cachegrind：用于分析程序的缓存使用情况和缓存命中率。它可以模拟处理器的缓存行行为，并提供详细的缓存访问统计信息，帮助开发者优化程序的缓存性能。</p>
+</li>
+<li><p>Callgrind：用于分析程序的函数调用关系和性能。它会记录程序的函数调用栈，并统计每个函数的执行次数、执行时间和调用关系，以便开发者识别热点函数和性能瓶颈。</p>
+</li>
+<li><p>Massif：用于分析程序的堆内存使用情况。它会跟踪程序的堆内存分配和释放，并生成堆内存使用的详细报告，帮助开发者识别内存泄漏和内存使用情况。</p>
+</li>
+</ol>
+<p>使用 Valgrind 的基本步骤如下：</p>
+<ol>
+<li><p>安装 Valgrind：根据你的操作系统，使用适当的方式安装 Valgrind。</p>
+</li>
+<li><p>编译程序：在编译程序时，使用 <code>-g</code> 选项开启调试符号，以便 Valgrind 能够提供更详细的调试信息。</p>
+</li>
+<li><p>运行程序：使用 <code>valgrind</code> 命令来运行程序，例如：<code>valgrind --tool=memcheck ./my_program</code>。</p>
+</li>
+<li><p>分析结果：Valgrind 会输出详细的调试信息和分析结果，包括内存错误、内存泄漏、性能统计等。开发者可以根据输出信息来识别和修复问题。</p>
+</li>
+</ol>
+<p>请注意，Valgrind 在运行时会对程序的性能产生一定的影响，并且在分析大型程序时可能会导致较长的运行时间。因此，建议在开发和测试阶段使用 Valgrind 进行调试和性能分析，而在发布版本时禁用 Valgrind。</p>
+<p>Valgrind 是一个功能强大且广泛使用的工具，但对于复杂的程序或多线程程序，可能需要更深入的了解和配置才能得到准确的分析结果。建议阅读 Valgrind 的官方文档和用户指南，以获得更详细</p>
+<p>的使用说明和技巧。</p>
+<hr>
+<h2 id="valgrind-常用选项"><a href="#valgrind-常用选项" class="headerlink" title="valgrind 常用选项"></a>valgrind 常用选项</h2><p>Valgrind 是一个功能强大的工具，提供了许多选项和参数来进行不同类型的代码分析。以下是一些 Valgrind 常用的选项：</p>
+<ol>
+<li><p><code>--tool=&lt;toolname&gt;</code>: 指定要使用的 Valgrind 工具。例如，<code>--tool=memcheck</code> 表示使用 Memcheck 工具进行内存错误检查。</p>
+</li>
+<li><p><code>--leak-check=&lt;yes|no&gt;</code>: 设置是否进行内存泄漏检查。<code>--leak-check=yes</code> 表示启用内存泄漏检查，<code>--leak-check=no</code> 表示禁用。</p>
+</li>
+<li><p><code>--show-leak-kinds=&lt;kinds&gt;</code>: 设置要显示的内存泄漏类型。例如，<code>--show-leak-kinds=definite</code> 表示只显示确定的内存泄漏。</p>
+</li>
+<li><p><code>--track-origins=&lt;yes|no&gt;</code>: 设置是否跟踪未初始化的值的来源。<code>--track-origins=yes</code> 表示启用跟踪，<code>--track-origins=no</code> 表示禁用。</p>
+</li>
+<li><p><code>--vgdb=&lt;yes|no&gt;</code>: 设置是否启用 Valgrind GDB 调试服务器。<code>--vgdb=yes</code> 表示启用，<code>--vgdb=no</code> 表示禁用。</p>
+</li>
+<li><p><code>--xml-file=&lt;filename&gt;</code>: 将分析结果以 XML 格式输出到指定文件。</p>
+</li>
+<li><p><code>--log-file=&lt;filename&gt;</code>: 将 Valgrind 的日志输出到指定文件。</p>
+</li>
+<li><p><code>--num-callers=&lt;num&gt;</code>: 设置要显示的函数调用堆栈的层数。</p>
+</li>
+<li><p><code>--suppressions=&lt;filename&gt;</code>: 指定要使用的抑制文件，用于屏蔽某些特定的错误报告。</p>
+</li>
+</ol>
+<p>这些只是 Valgrind 的一些常用选项，实际上 Valgrind 提供了更多的选项和参数，用于不同类型的分析和优化需求。你可以通过运行 <code>valgrind --help</code> 命令来查看完整的选项列表和说明。</p>
+<p>请注意，使用 Valgrind 进行代码分析时，要根据具体的需求选择合适的选项，并进行适当的调试和优化。不同的选项可能会对程序的性能和运行时间产生影响，因此需要综合考虑使用。</p>
+<hr>
+<h2 id="valgrind-memcheck-详解"><a href="#valgrind-memcheck-详解" class="headerlink" title="valgrind memcheck 详解"></a>valgrind memcheck 详解</h2><p>Valgrind Memcheck 是 Valgrind 工具集中的一个工具，用于检测程序中的内存错误和泄漏。它可以帮助开发者发现未初始化变量、内存越界访问、重复释放内存等问题。下面是一个简单的示例，展示如何使用 Valgrind Memcheck 进行内存错误检测。</p>
+<ol>
+<li><p>编译程序：<br>首先，使用编译器在调试模式下编译你的程序，并添加 <code>-g</code> 选项以生成调试符号。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -g -o my_program my_program.c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行程序：<br>使用 Valgrind Memcheck 工具运行你的程序。命令格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=memcheck ./my_program</span><br></pre></td></tr></table></figure>
+
+<p>运行以上命令后，Valgrind Memcheck 将会对 <code>my_program</code> 进行内存错误检测，并输出结果。</p>
+</li>
+<li><p>分析结果：<br>Valgrind Memcheck 将输出详细的检测结果，包括内存错误的类型、错误位置、堆栈跟踪等信息。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">==12345== Invalid read of size 4</span><br><span class="line">==12345==    at 0x12345678: some_function (my_program.c:10)</span><br><span class="line">==12345==    by 0x123456AB: main (my_program.c:20)</span><br><span class="line">==12345==  Address 0x0 is not stack&#x27;d, malloc&#x27;d or (recently) free&#x27;d</span><br></pre></td></tr></table></figure>
+
+<p>这个示例输出表示在 <code>my_program.c</code> 文件的第 10 行发生了一个无效的读取操作，导致程序访问了一个未分配的内存地址。</p>
+</li>
+</ol>
+<p>通过分析 Valgrind Memcheck 的输出结果，你可以定位和修复程序中的内存错误，并确保程序在运行时没有内存泄漏等问题。</p>
+<p>请注意，Valgrind Memcheck 可能会对程序的性能产生一定的影响，并且在分析大型程序时可能会导致较长的运行时间。因此，建议在开发和测试阶段使用 Valgrind Memcheck 进行内存错误检测，而在发布版本时禁用 Valgrind。</p>
+<hr>
+<h2 id="valgrind-cachegrind-详解"><a href="#valgrind-cachegrind-详解" class="headerlink" title="valgrind cachegrind 详解"></a>valgrind cachegrind 详解</h2><p>Valgrind Cachegrind 是 Valgrind 工具集中的一个工具，用于分析程序的缓存使用情况和缓存命中率。它可以帮助开发者了解程序的缓存访问模式，并优化程序的缓存性能。以下是一个简单的示例，展示如何使用 Valgrind Cachegrind 进行缓存分析。</p>
+<ol>
+<li><p>编译程序：<br>首先，使用编译器在调试模式下编译你的程序，并添加 <code>-g</code> 选项以生成调试符号。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -g -o my_program my_program.c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行程序：<br>使用 Valgrind Cachegrind 工具运行你的程序。命令格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=cachegrind ./my_program</span><br></pre></td></tr></table></figure>
+
+<p>运行以上命令后，Valgrind Cachegrind 将会运行你的程序，并收集缓存访问的统计信息。</p>
+</li>
+<li><p>分析结果：<br>Valgrind Cachegrind 将输出详细的缓存访问统计信息，包括缓存命中率、缓存行使用情况、缓存分支预测等。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">==12345== D   refs: 1,234,567</span><br><span class="line">==12345== I1  misses: 1,234</span><br><span class="line">==12345== L1  misses: 567</span><br><span class="line">==12345== LLi misses: 89</span><br><span class="line">==12345== LLd misses: 12</span><br></pre></td></tr></table></figure>
+
+<p>这个示例输出表示在运行程序期间，发生了一定数量的缓存访问和缓存未命中。根据这些统计信息，你可以了解程序的缓存访问情况，并针对性地进行性能优化。</p>
+</li>
+</ol>
+<p>通过分析 Valgrind Cachegrind 的输出结果，你可以发现程序的缓存使用模式，识别缓存未命中的原因，并采取相应的优化措施，以提高程序的缓存性能。</p>
+<p>请注意，Valgrind Cachegrind 对程序的性能有一定的影响，并且在分析大型程序时可能会导致较长的运行时间。因此，建议在开发和测试阶段使用 Valgrind Cachegrind 进行缓存分析，而在发布版本时禁用 Valgrind。</p>
+<hr>
+<h2 id="valgrind-callgrind-详解"><a href="#valgrind-callgrind-详解" class="headerlink" title="valgrind callgrind 详解"></a>valgrind callgrind 详解</h2><p>Valgrind Callgrind 是 Valgrind 工具集中的一个工具，用于分析程序的函数调用关系和性能。它可以帮助开发者了解程序的函数调用栈、函数执行次数、执行时间等信息，以便进行性能优化。以下是一个简单的示例，展示如何使用 Valgrind Callgrind 进行函数调用和性能分析。</p>
+<ol>
+<li><p>编译程序：<br>首先，使用编译器在调试模式下编译你的程序，并添加 <code>-g</code> 选项以生成调试符号。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -g -o my_program my_program.c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行程序：<br>使用 Valgrind Callgrind 工具运行你的程序。命令格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=callgrind ./my_program</span><br></pre></td></tr></table></figure>
+
+<p>运行以上命令后，Valgrind Callgrind 将会运行你的程序，并收集函数调用和性能信息。</p>
+</li>
+<li><p>分析结果：<br>Valgrind Callgrind 将输出详细的函数调用和性能信息，包括函数执行次数、执行时间、调用关系等。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">==12345== Profiling timer expired</span><br><span class="line">==12345==    Ir          I1mr          Dr          D1mr          Dw         D1mw       ILmr       DLmr      ILmw     DLmw       Ir_op</span><br><span class="line">==12345== 1,234,567    1,234,567  1,234,567    1,234,567  1,234,567    1,234,567  1,234,567  1,234,567  1,234,567  1,234,567  1,234,567</span><br></pre></td></tr></table></figure>
+
+<p>这个示例输出表示程序的函数执行次数、内存读写次数等信息。根据这些统计信息，你可以了解函数的执行频率和性能状况，找出热点函数和性能瓶颈。</p>
+</li>
+</ol>
+<p>通过分析 Valgrind Callgrind 的输出结果，你可以了解程序的函数调用关系和性能状况，进而进行性能优化。你可以根据函数的执行次数和执行时间，针对性地优化热点函数，减少函数调用次数，改进算法等。</p>
+<p>请注意，Valgrind Callgrind 对程序的性能有一定的影响，并且在分析大型程序时可能会导致较长的运行时间。因此，建议在开发和测试阶段使用 Valgrind Callgrind 进行函数调用和性能分析，而在发布版本时禁用 Valgrind。</p>
+<hr>
+<h2 id="valgrind-massif-详解"><a href="#valgrind-massif-详解" class="headerlink" title="valgrind massif 详解"></a>valgrind massif 详解</h2><p>Valgrind Massif 是 Valgrind 工具集中的一个工具，用于分析程序的堆内存分配情况和堆内存使用情况。它可以帮助开发者了解程序在不同时间点的内存分配情况，识别内存泄漏和高内存消耗的地方。以下是一个简单的示例，展示如何使用 Valgrind Massif 进行堆内存分析。</p>
+<ol>
+<li><p>编译程序：<br>首先，使用编译器在调试模式下编译你的程序，并添加 <code>-g</code> 选项以生成调试符号。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -g -o my_program my_program.c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行程序：<br>使用 Valgrind Massif 工具运行你的程序。命令格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valgrind --tool=massif ./my_program</span><br></pre></td></tr></table></figure>
+
+<p>运行以上命令后，Valgrind Massif 将会运行你的程序，并收集堆内存分配和使用的信息。</p>
+</li>
+<li><p>分析结果：<br>Valgrind Massif 将输出详细的堆内存分配和使用信息，包括内存堆栈、内存分配和释放时间等。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">==12345== Command: ./my_program</span><br><span class="line">==12345==</span><br><span class="line">==12345==   bytes          calls         time</span><br><span class="line">==12345==  1,234,567     1,234,567     1.234s</span><br></pre></td></tr></table></figure>
+
+<p>这个示例输出表示程序在运行过程中进行了一定数量的内存分配，总共分配了 1,234,567 字节的内存，并在 1.234 秒的时间内完成。</p>
+</li>
+</ol>
+<p>通过分析 Valgrind Massif 的输出结果，你可以了解程序的堆内存分配情况，发现内存泄漏和高内存消耗的地方。Valgrind Massif 还提供了可视化工具 <code>ms_print</code>，可以将 Massif 的输出结果以图形的形式展示，帮助你更直观地分析和优化程序的内存使用。</p>
+<p>请注意，Valgrind Massif 对程序的性能有一定的影响，并且在分析大型程序时可能会导致较长的运行时间和较大的内存开销。因此，建议在开发和测试阶段使用 Valgrind Massif 进行堆内存分析，而在发布版本时禁用 Valgrind。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_79_pidstat/" rel="prev" title="linux_2_79_pidstat">
+      <i class="fa fa-chevron-left"></i> linux_2_79_pidstat
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_80_sshpass/" rel="next" title="linux_2_80_sshpass">
+      linux_2_80_sshpass <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-valgrind%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux valgrind命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85-Valgrind%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">1. 安装 Valgrind：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%A3%80%E6%B5%8B%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">2. 检测内存泄漏：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%A3%80%E6%B5%8B%E5%86%85%E5%AD%98%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">3. 检测内存错误：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%A3%80%E6%B5%8B%E7%89%B9%E5%AE%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">4. 检测特定函数的内存泄漏：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%94%9F%E6%88%90%E8%B0%83%E7%94%A8%E5%9B%BE%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">5. 生成调用图：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%A3%80%E6%B5%8B%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">2.6.</span> <span class="nav-text">6. 检测缓存问题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%A3%80%E6%B5%8B%E7%BA%BF%E7%A8%8B%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">2.7.</span> <span class="nav-text">7. 检测线程问题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%A3%80%E6%B5%8B%E6%8C%87%E4%BB%A4%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">2.8.</span> <span class="nav-text">8. 检测指令错误：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E6%A3%80%E6%B5%8B%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">2.9.</span> <span class="nav-text">9. 检测系统调用错误：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E6%98%BE%E7%A4%BA%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">2.10.</span> <span class="nav-text">10. 显示版本信息：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-valgrind%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux valgrind命令 常用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A3%80%E6%B5%8B%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">1. 检测内存泄漏：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%A3%80%E6%B5%8B%E7%89%B9%E5%AE%9A%E5%87%BD%E6%95%B0%E7%9A%84%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">2. 检测特定函数的内存泄漏：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%94%9F%E6%88%90%E8%B0%83%E7%94%A8%E5%9B%BE%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">3. 生成调用图：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%A3%80%E6%B5%8B%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">3.4.</span> <span class="nav-text">4. 检测缓存问题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%A3%80%E6%B5%8B%E7%BA%BF%E7%A8%8B%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text">5. 检测线程问题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%A3%80%E6%B5%8B%E6%8C%87%E4%BB%A4%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">3.6.</span> <span class="nav-text">6. 检测指令错误：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E7%A6%81%E6%AD%A2%E6%8A%A5%E5%91%8A%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">3.7.</span> <span class="nav-text">7. 禁止报告系统调用错误：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">3.8.</span> <span class="nav-text">8. 自定义内存分析选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E6%89%A7%E8%A1%8C%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90%E5%B9%B6%E7%94%9F%E6%88%90%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-number">3.9.</span> <span class="nav-text">9. 执行内存分析并生成日志文件：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E6%8E%92%E9%99%A4%E6%8C%87%E5%AE%9A%E7%9A%84%E6%96%87%E4%BB%B6%E6%88%96%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">3.10.</span> <span class="nav-text">10. 排除指定的文件或函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E6%8C%87%E5%AE%9A%E6%A3%80%E6%9F%A5%E7%9A%84%E8%8C%83%E5%9B%B4%EF%BC%9A"><span class="nav-number">3.11.</span> <span class="nav-text">11. 指定检查的范围：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-%E6%98%BE%E7%A4%BA-Valgrind-%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">3.12.</span> <span class="nav-text">12. 显示 Valgrind 版本信息：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#valgrind"><span class="nav-number">4.</span> <span class="nav-text">valgrind</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#valgrind-%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9"><span class="nav-number">5.</span> <span class="nav-text">valgrind 常用选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#valgrind-memcheck-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">valgrind memcheck 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#valgrind-cachegrind-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">valgrind cachegrind 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#valgrind-callgrind-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">valgrind callgrind 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#valgrind-massif-%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">valgrind massif 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

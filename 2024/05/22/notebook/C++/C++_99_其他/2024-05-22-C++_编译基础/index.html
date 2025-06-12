@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 gcc和g++分别是GNU的C和C++编译器。gcc和g++在执行编译工作的时候，总共四步：  预处理，生成.i文件{预处理器  –  cpp} 将预处理后的文件转换成汇编语言，生成文件.s{编译器  –  egcs} 由汇编变为目标代码（机器代码）生成.o的文件{汇编器  –  as} 链接目标代码，生成可执行程序{链接器  –  ld}   参数：  -c：只激活预处理、编译和汇编，生成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_编译基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 gcc和g++分别是GNU的C和C++编译器。gcc和g++在执行编译工作的时候，总共四步：  预处理，生成.i文件{预处理器  –  cpp} 将预处理后的文件转换成汇编语言，生成文件.s{编译器  –  egcs} 由汇编变为目标代码（机器代码）生成.o的文件{汇编器  –  as} 链接目标代码，生成可执行程序{链接器  –  ld}   参数：  -c：只激活预处理、编译和汇编，生成">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.214Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppOthers">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_编译基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_编译基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><p><code>gcc</code>和<code>g++</code>分别是<code>GNU</code>的C和<code>C++</code>编译器。<code>gcc</code>和<code>g++</code>在执行编译工作的时候，总共四步：</p>
+<ul>
+<li>预处理，生成<code>.i</code>文件{预处理器  –  <code>cpp</code>}</li>
+<li>将预处理后的文件转换成汇编语言，生成文件.s{编译器  –  <code>egcs</code>}</li>
+<li>由汇编变为目标代码（机器代码）生成.o的文件{汇编器  –  <code>as</code>}</li>
+<li>链接目标代码，生成可执行程序{链接器  –  <code>ld</code>}</li>
+</ul>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>-c</code>：只激活预处理、编译和汇编，生成<code>obj</code>文件<code>.o</code></li>
+<li><code>-S</code>：只激活预处理和编译，生成汇编代码</li>
+<li><code>-I</code>：指定头文件所在路径</li>
+<li><code>-L</code>：指定库文件所在路径</li>
+<li><code>-l</code>：指定库的名字</li>
+</ul>
+</li>
+<li><p>注意：</p>
+<ul>
+<li><code>GCC</code>是一个驱动式的程序，它调用其他程序来依次进行编译、汇编和链接</li>
+<li><code>GCC</code>分析命令行参数，然后决定该调用哪一个子程序，哪些参数应该传递给子程序。所有这些行为都是由<code>SPEC</code>字符串（<code>spec strings</code>）来控制的。</li>
+<li>通常情况下，每一个<code>GCC</code>可以调用的子程序都对应着一个<code>SPEC</code>字符串，不过有少数的子程序需要多个<code>SPEC</code>字符串来控制他们的行为。</li>
+</ul>
+</li>
+<li><p>深入理解计算机操作系统 P109</p>
+<ul>
+<li>试图最大化一段关键代码性能的程序员,通常会尝试源代码的各种形式,每次编译并检查产生的汇编代码,从而了解程序将要运行的效率如何</li>
+<li>此外,有些时候,高级语言提供的抽象层会隐藏我们想要了解的程序的运行时行为</li>
+</ul>
+</li>
+</ul>
+<h2 id="GCC参数"><a href="#GCC参数" class="headerlink" title="GCC参数"></a>GCC参数</h2><ul>
+<li><p><code>-x language filename</code></p>
+<ul>
+<li>设定文件所使用的语言, 使后缀名无效, 对以后的多个有效。</li>
+<li>也就是根据约定 <code>C</code> 语言的后缀名称是 <code>.c</code> 的，而 <code>C++</code> 的后缀名是 <code>.C</code> 或者 <code>.cpp</code></li>
+<li>可以使用的参数：<ul>
+<li><code>c</code></li>
+<li><code>objective-c</code></li>
+<li><code>c-header</code></li>
+<li><code>c++</code></li>
+<li><code>cpp-output</code></li>
+<li><code>assembler</code></li>
+<li><code>assembler-with-cpp</code></li>
+</ul>
+</li>
+<li>例如：<code>gcc -x c hello.pig</code></li>
+</ul>
+</li>
+<li><p><code>-x none filename</code></p>
+<ul>
+<li>关掉上一个选项，也就是让gcc根据文件名后缀，自动识别文件类型 。</li>
+</ul>
+</li>
+<li><p><code>-pipe</code></p>
+<ul>
+<li>使用管道代替编译中临时文件, 在使用非 gnu 汇编工具的时候, 可能有些问题</li>
+<li>例如：<code>gcc -pipe -o hello.exe hello.c</code></li>
+</ul>
+</li>
+<li><p><code>-ansi</code></p>
+<ul>
+<li>关闭 <code>gnu c</code>中与 <code>ansi c</code> 不兼容的特性, 激活 <code>ansi c</code> 的专有特性（包括禁止一些 <code>asm</code> <code>inline</code> <code>typeof</code> 关键字, 以及 <code>UNIX</code>,<code>vax</code> 等预处理宏）</li>
+</ul>
+</li>
+<li><p><code>-fno-asm</code></p>
+<ul>
+<li>此选项实现 <code>ansi</code> 选项的功能的一部分，它禁止将 <code>asm</code>, <code>inline</code> 和 <code>typeof</code> 用作关键字。</li>
+</ul>
+</li>
+<li><p><code>-fno-strict-prototype</code></p>
+<ul>
+<li>只对 <code>g++</code> 起作用,</li>
+<li>使用这个选项, <code>g++</code> 将对不带参数的函数,都认为是没有显式的对参数的个数和类型说明,而不是没有参数</li>
+<li>而 <code>gcc</code> 无论是否使用这个参数, 都将对没有带参数的函数, 认为没有显式说明的类型</li>
+</ul>
+</li>
+<li><p><code>-fthis-is-varialble</code></p>
+<ul>
+<li>就是向传统 <code>c++</code> 看齐, 可以使用 <code>this</code> 当一般变量使用</li>
+</ul>
+</li>
+<li><p><code>-fcond-mismatch</code></p>
+<ul>
+<li>允许条件表达式的第二和第三参数类型不匹配, 表达式的值将为 <code>void</code> 类型</li>
+</ul>
+</li>
+<li><p><code>-funsigned-char</code> 、<code>-fno-signed-char</code>、<code>-fsigned-char</code> 、<code>-fno-unsigned-char</code></p>
+<ul>
+<li>这四个参数是对 <code>char</code> 类型进行设置, 决定将 <code>char</code> 类型设置成 unsigned char(前两个参数)或者 signed char(后两个参数)。</li>
+</ul>
+</li>
+<li><p><code>-include file</code></p>
+<ul>
+<li>包含某个代码,简单来说,就是便以某个文件,需要另一个文件的时候,就可以用它设定,</li>
+<li>功能就相当于在代码中使用 <code>#include&lt;filename&gt;</code></li>
+</ul>
+</li>
+<li><p><code>-imacros file</code></p>
+<ul>
+<li>将 file 文件的宏, 扩展到 gcc&#x2F;g++ 的输入文件, 宏定义本身并不出现在输入文件中</li>
+</ul>
+</li>
+<li><p><code>-Dmacro</code></p>
+<ul>
+<li>定义宏<code>macro</code></li>
+<li>相当于 <code>C</code> 语言中的 <code>#define macro</code></li>
+</ul>
+</li>
+<li><p><code>-Umacro</code></p>
+<ul>
+<li>相当于 <code>C</code> 语言中的 <code>#undef macro</code></li>
+</ul>
+</li>
+<li><p><code>-undef</code></p>
+<ul>
+<li>取消对任何非标准宏的定义</li>
+</ul>
+</li>
+<li><p><code>-Idir</code></p>
+<ul>
+<li>在你是用 <code>#include &quot;file&quot;</code> 的时候, <code>gcc/g++</code> 会先在当前目录查找你所制定的头文件, 如果没有找到, 他回到默认的头文件目录找, 如果使用 <code>-I</code> 制定了目录,他会先在你所制定的目录查找, 然后再按常规的顺序去找</li>
+<li>对于 <code>#include&lt;file&gt;</code>, <code>gcc/g++</code> 会到 <code>-I</code> 制定的目录查找, 查找不到, 然后将到系统的默认的头文件目录查找</li>
+</ul>
+</li>
+<li><p><code>-C</code></p>
+<ul>
+<li>在预处理的时候, 不删除注释信息, 一般和-E使用, 有时候分析程序，用这个很方便的</li>
+</ul>
+</li>
+<li><p><code>-Wa,option</code></p>
+<ul>
+<li>此选项传递 <code>option</code> 给汇编程序; 如果 <code>option</code> 中间有逗号, 就将 <code>option</code> 分成多个选项, 然 后传递给会汇编程序</li>
+</ul>
+</li>
+<li><p><code>-Wl.option</code></p>
+<ul>
+<li>此选项传递 <code>option</code> 给链接程序; 如果 <code>option</code> 中间有逗号, 就将 <code>option</code> 分成多个选项, 然后传递给会链接程序</li>
+</ul>
+</li>
+<li><p><code>-llibrary</code></p>
+<ul>
+<li>制定编译的时候使用的库</li>
+</ul>
+</li>
+<li><p><code>-Ldir</code></p>
+<ul>
+<li>制定编译的时候，搜索库的路径。比如你自己的库，可以用它制定目录，不然编译器将只在标准库的目录找。这个<code>dir</code>就是目录的名称</li>
+</ul>
+</li>
+<li><p><code>-O0 、-O1 、-O2 、-O3</code></p>
+<ul>
+<li>编译器的优化选项的 4 个级别，-O0 表示没有优化, -O1 为默认值，-O3 优化级别最高</li>
+</ul>
+</li>
+<li><p><code>-g</code></p>
+<ul>
+<li>只是编译器，在编译的时候，产生调试信息</li>
+</ul>
+</li>
+<li><p><code>-ggdb</code></p>
+<ul>
+<li>此选项将尽可能的生成 <code>gdb</code> 的可以使用的调试信息</li>
+</ul>
+</li>
+<li><p><code>-static</code></p>
+<ul>
+<li>此选项将禁止使用动态库，所以，编译出来的东西，一般都很大，也不需要什么动态连接库，就可以运行。</li>
+</ul>
+</li>
+<li><p><code>-share</code></p>
+<ul>
+<li>此选项将尽量使用动态库，所以生成文件比较小，但是需要系统有动态库。</li>
+</ul>
+</li>
+<li><p><code>-traditional</code></p>
+<ul>
+<li>试图让编译器支持传统的C语言特性。</li>
+<li><code>GCC</code> 是 <code>GNU</code> 的 <code>C</code> 和 <code>C++</code> 编译器。实际上，<code>GCC</code> 能够编译三种语言：<code>C</code>、<code>C++</code> 和 <code>Object C</code>（<code>C</code> 语言的一种面向对象扩展）。</li>
+<li>利用 <code>gcc</code> 命令可同时编译并连接 <code>C</code> 和 <code>C++</code> 源程序。</li>
+</ul>
+</li>
+</ul>
+<h2 id="编译器的工作过程"><a href="#编译器的工作过程" class="headerlink" title="编译器的工作过程"></a>编译器的工作过程</h2><h3 id="配置-configure"><a href="#配置-configure" class="headerlink" title="配置(configure)"></a>配置(configure)</h3><ul>
+<li>编译器在开始工作之前,需要知道当前的系统环境,比如标准库在哪里,软件的安装位置在哪里,需要安装那些组件等等.</li>
+<li>这是因为不同计算机的系统环境不一样,通过指定编译参数,编译器就可以灵活适应环境,编译出各种环境都能运行的机器码,<strong>这个确定编译参数的步骤,就叫做”配置(configure)”</strong></li>
+<li>这些配置信息保存在一个配置文件中,约定俗成是一个叫做<code>configure</code>的脚本文件.通常它是由<code>autoconf</code>工具生成的.编译器通过运行这个脚本,获得编译参数</li>
+</ul>
+<h3 id="确定标准库和头文件的位置"><a href="#确定标准库和头文件的位置" class="headerlink" title="确定标准库和头文件的位置"></a>确定标准库和头文件的位置</h3><ul>
+<li>源码肯定会用到标准库函数(standard library)和头文件(header).它们可以放在系统的任意目录中,编译器实际上没有办法自动检测它们的位置,只有通过配置文件才能知道</li>
+<li>编译的第二步,就是从配置文件中知道标准库和头文件的位置.一般来说,配置文件会给出一个清单,列出几个具体的目录.等到编译时,编译器就按顺序到这几个目录中,寻找目标</li>
+</ul>
+<h3 id="确定依赖关系"><a href="#确定依赖关系" class="headerlink" title="确定依赖关系"></a>确定依赖关系</h3><ul>
+<li>对于大型项目来说,源码之间往往存在依赖关系,编译器需要确定编译的先后顺序.假设A文件依赖于B文件,编译器应该保证做到:<strong>只有在B文件编译完成后,才开始编译A文件;当B文件发生变化时,A文件会被重新编译</strong></li>
+<li>编译顺序保存在一个叫做<code>makefile</code>的文件中,里面列出哪个文件先编译,哪个文件后编译.而<code>makefile</code>文件由<code>configure</code>脚本运行生成,这就是<strong>为什么编译时configure必须首先运行的原因</strong></li>
+</ul>
+<h3 id="头文件的预编译-precompilation"><a href="#头文件的预编译-precompilation" class="headerlink" title="头文件的预编译(precompilation)"></a>头文件的预编译(precompilation)</h3><ul>
+<li>不同的源码文件,可能引用同一个头文件,编译的时候,头文件也必须一起编译</li>
+<li>为了节省时间,编译器会在编译源码之前,先编译头文件.这保证了头文件只需编译一次,不必每次用到的时候都需要重新编译</li>
+<li>不过,并不是头文件的所有内容都会被预编译,用来声明宏的<code>#define</code>命令,就不会被预编译</li>
+</ul>
+<h3 id="预处理-preprocessing"><a href="#预处理-preprocessing" class="headerlink" title="预处理(preprocessing)"></a>预处理(preprocessing)</h3><ul>
+<li>预编译完成后,编译器就开始替换掉源码中bash的头文件和宏,编译器在这一步还会移除注释</li>
+</ul>
+<h3 id="编译-Compilation"><a href="#编译-Compilation" class="headerlink" title="编译(Compilation)"></a>编译(Compilation)</h3><ul>
+<li>预处理之后,编译器就开始生成机器码.</li>
+<li>对于某些编译器来说,还存在一个中间步骤,会先把源码转为汇编码(<code>assembly</code>),然后再把汇编码转为机器码</li>
+<li>这种转码后的文件称为对象文件(<code>object file</code>)</li>
+</ul>
+<h3 id="连接-Linking"><a href="#连接-Linking" class="headerlink" title="连接(Linking)"></a>连接(Linking)</h3><ul>
+<li>把外部函数的代码(通常是后缀名为<code>.lib</code>和<code>.a</code>的文件),添加到可执行文件中,这就叫做连接(linking).</li>
+<li>这种通过拷贝,将外部函数库添加到可执行文件的方式,叫做静态连接(static linking)</li>
+<li><code>make</code>命令的作用,就是<strong>从第四步头文件预编译开始,一直到做完这一步.</strong></li>
+</ul>
+<h3 id="安装-Installation"><a href="#安装-Installation" class="headerlink" title="安装(Installation)"></a>安装(Installation)</h3><ul>
+<li>上一步的连接是在<strong>内存</strong>中进行的,即编译器在内存中生成了可执行文件.下一步,必须将可执行文件保存到用户事先指定的安装目录</li>
+<li>表面上,这一步就是将可执行文件(连带相关的数据文件)拷贝过去,但是实际上,这一步还必须完成创建目录,保存文件,设置权限等步骤,这整个的过程就称为”安装(Installation)”</li>
+</ul>
+<h3 id="操作系统连接"><a href="#操作系统连接" class="headerlink" title="操作系统连接"></a>操作系统连接</h3><ul>
+<li>可执行文件安装后,必须以某种方式通知操作系统,让其知道可以使用这个程序了</li>
+<li>这就要求在操作系统中,登记这个程序的元数据:文件名,文件描述,关联后缀名等等.linux系统中,这些信息通常保存在<code>/usr/share/applications/</code>目录下的<code>.desktop</code>文件中.另外在windows操作系统中,还需要在start启动菜单中,建立一个快捷方式</li>
+<li>这些事情就叫做”操作系统连接”.<code>make install</code>命令,就用来完成”安装”和”操作系统连接”这两步</li>
+</ul>
+<h3 id="生成安装包"><a href="#生成安装包" class="headerlink" title="生成安装包"></a>生成安装包</h3><ul>
+<li>到这一步,源码编译的整个过程就基本完成了,但是事实上,如果只有源码可以交给用户,是不可行的,大部分用户要的是一个二进制的可执行程序,立刻就能运行.这就要求开发者,将上一步生成的可执行文件,做成可以分发的安装包</li>
+<li>所以,编译器还必须有生成安装包的功能,通常是将可执行文件(连带相关的数据文件),以某种目录结构,保存成压缩文件包,交给用户</li>
+</ul>
+<h3 id="动态连接-Dynamic-linking"><a href="#动态连接-Dynamic-linking" class="headerlink" title="动态连接(Dynamic linking)"></a>动态连接(Dynamic linking)</h3><ul>
+<li>静态连接就是把外部函数库,拷贝到可执行文件中,这样做的好处是:适用范围较广,不用担心用户机器缺少某个库文件;缺点是:安装包会比较大,而且多个应用程序之间,无法共享文件.</li>
+<li>动态连接的做法正好相反,外部函数库不进入安装包,只在运行时动态引用.这样做的好处是:安装包比较小,多个应用程序可以共享文件;缺点是:用户必须事先安装好库文件,而且版本和安装位置都必须符合要求,否则就不能正常运行</li>
+</ul>
+<h2 id="ld-–-GNU-linker（连接器）"><a href="#ld-–-GNU-linker（连接器）" class="headerlink" title="ld – GNU linker（连接器）"></a>ld – GNU linker（连接器）</h2><ul>
+<li>概述：<ul>
+<li>ld 合并一组目标文件(<code>object</code>)和库文件(<code>archive</code>),重定位数据部分,构建符号引用(<code>symbolreference</code>).</li>
+<li>一般说来,编译生成可执行文件的最后步骤就是调用<code>ld</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h3><ul>
+<li><p><code>-rpath directory</code></p>
+<ul>
+<li>增加一条对运行时(<code>runtime</code>)库的搜索路径. 这个选项用于连接<code>ELF</code>可执行文件和共享目标库</li>
+<li>所有<code>-rpath</code>选项的参数被合并,然后一起传递给运行时<code>linker</code>,运行时<code>linker</code>在运行的时候使用这些路径寻找共享目标库. </li>
+<li>如果连接<code>ELF</code>可执行文件时没有指定<code>-rpath</code>选项,<code>linker</code>就使用环境变量<code>LD_RUN_PATH</code>的内容,只要这个环境变量存在.</li>
+</ul>
+</li>
+<li><p><code>-Wl</code></p>
+<ul>
+<li>如果通过编译器驱动程序（例如 <code>gcc</code>）间接调用链接器，则所有链接器命令行选项都应以<code>-Wl</code>为前缀</li>
+<li>这很重要，因为否则编译器驱动程序可能会默默地删除链接器选项，从而导致链接错误</li>
+</ul>
+</li>
+<li><p><code>-s</code></p>
+<ul>
+<li>去掉输出文件中的全部符号信息</li>
+</ul>
+</li>
+<li><p><code>-g</code></p>
+<ul>
+<li>虚设项;用于兼容其他工具</li>
+</ul>
+</li>
+</ul>
+<h2 id="g"><a href="#g" class="headerlink" title="g++"></a>g++</h2><h3 id="选项-1"><a href="#选项-1" class="headerlink" title="选项"></a>选项</h3><ul>
+<li><p><code>-fPIC</code></p>
+<ul>
+<li>如果目标机器支持，则发出与位置无关的代码，适用于动态链接并避免对全局偏移表大小的任何限制</li>
+<li>与位置无关的代码需要特殊支持，因此仅适用于某些机器</li>
+<li>设置此标志时，宏“__pic__”和“__PIC__”被定义为 2</li>
+</ul>
+</li>
+<li><p><code>-Wno-unused-variable</code></p>
+<ul>
+<li>不显示未使用的变量告警</li>
+</ul>
+</li>
+<li><p><code>-Wno-unused-result</code></p>
+<ul>
+<li>不要警告标记了属性的函数的调用者是否使用它的返回值<code>warn_unused_result</code>（请参阅函数属性）。默认是<code>-Wunused-</code>结果</li>
+</ul>
+</li>
+<li><p><code>-Wno-deprecated-declarations</code></p>
+<ul>
+<li>不要警告使用属性标记为弃用的函数（请参阅函数属性），变量（请参阅变量属性）和类型（请参阅类型属性）<code>deprecated</code></li>
+</ul>
+</li>
+<li><p><code>-DMACRO</code></p>
+<ul>
+<li>以字符串”1”定义 <code>MACRO</code> 宏</li>
+</ul>
+</li>
+<li><p><code>-DMACRO=DEFN</code></p>
+<ul>
+<li>以字符串”DEFN”定义 <code>MACRO</code> 宏。</li>
+</ul>
+</li>
+<li><p><code>-DVERSION_MAJOR=$&#123;VERSION_MAJOR&#125;</code></p>
+<ul>
+<li>以变量 <code>VERSION_MAJOR</code> 定义 <code>VERSION_MAJOR</code> 宏</li>
+</ul>
+</li>
+<li><p><code>-funroll-loops</code></p>
+<ul>
+<li>循环展开，可以减少循环的次数，对程序的性能带了两方面的提高</li>
+<li>一是，减少了对循环没有直接贡献的计算，比如循环计数变量的计算，分支跳转指令的执行等</li>
+<li>二是，提供了进一步利用机器特性进行的优化的机会</li>
+</ul>
+</li>
+<li><p><code>-march=cpu-type</code></p>
+<ul>
+<li>优化选项。指定目标架构的名字，以及（可选的）一个或多个功能修饰符。 </li>
+<li>此选项的格式为: <code>-march = arch &#123;+ [no] feature&#125; *</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="编译优化"><a href="#编译优化" class="headerlink" title="编译优化"></a>编译优化</h2><h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><ul>
+<li><p>从运行时的依赖关系来看 ： </p>
+<ul>
+<li>对性能有较大影响的组件有 kernel 和 glibc ，虽然这严格说来这不属于本文的话题，但是经过精心选择、精心配置、精心编译的内核与C库将对提高系统的运行速度起着基础性的作用</li>
+</ul>
+</li>
+<li><p>从被编译的软件包来看 ： </p>
+<ul>
+<li>每个软件包的 configure 脚本都提供了许多配置选项，其中有许多选项是与性能息息相关的。比如，对于 Apache-2.2.6 而言，你可以使用 –enable-MODULE&#x3D;static 将模块静态编译进核心，使用 –disable-MODULE 禁用不需要的模块，使用 –with-mpm&#x3D;MPM 选择一个高效的多路处理模块，在不需要IPv6的情况下使用 –disable-ipv6 禁用IPv6支持，在不使用线程化的MPM时使用 –disable-threads 禁用线程支持，等等……这部分内容显然不可能在本文中进行完整的讲述，本文只能讲述与优化相关的通用选项。针对特定的软件包，请在编译前使用 configure –help 查看所有选项，并精心选择。</li>
+</ul>
+</li>
+<li><p>从编译过程自身来看 ： </p>
+<ul>
+<li>将源代码编译为二进制文件是在 Makefile 文件的指导下，由 make 程序调用一条条编译命令完成的。而将源代码编译为二进制文件又需要经过以下四个步骤：预处理(cpp) → 编译(gcc或g++) → 汇编(as) → 连接(ld) ；括号中表示每个阶段所使用的程序，它们分别属于 GCC 和 Binutils 软件包。显然的，优化应当从编译工具自身的选择以及控制编译工具的行为入手</li>
+</ul>
+</li>
+</ul>
+<h3 id="编译工具的选择"><a href="#编译工具的选择" class="headerlink" title="编译工具的选择"></a>编译工具的选择</h3><ul>
+<li>对于编译工具自身的选择，在假定使用 Binutils 和 GCC 以及 Make 的前提下，没什么好说的，基本上新版本都能带来性能提升，同时比老版本对新硬件的支持更好，所以应当尽量选用新版本。不过追新也可能带来系统的不稳定，这 就要针对实际情况进行权衡了</li>
+</ul>
+<h3 id="CC和CXX"><a href="#CC和CXX" class="headerlink" title="CC和CXX"></a>CC和CXX</h3><ul>
+<li>这是 C 与 C++ 编译器命令。默认值一般是 “gcc” 与 “g++”</li>
+</ul>
+<h3 id="CPPFLAGS"><a href="#CPPFLAGS" class="headerlink" title="CPPFLAGS"></a>CPPFLAGS</h3><ul>
+<li><p>这是用于预处理阶段的选项。不过能够用于此变量的选项，看不出有哪个与优化相关。如果你实在想设一个，那就使用下面这两个吧：</p>
+</li>
+<li><p><code>-DNDEBUG</code></p>
+<ul>
+<li>“NDEBUG”是一个标准的 ANSI 宏，表示不进行调试编译。</li>
+</ul>
+</li>
+<li><p><code>-D_FILE_OFFSET_BITS=64</code></p>
+<ul>
+<li>大多数包使用这个来提供大文件(&gt;2G)支持。</li>
+</ul>
+</li>
+</ul>
+<h3 id="CFLAGS-与-CXXFLAGS"><a href="#CFLAGS-与-CXXFLAGS" class="headerlink" title="CFLAGS 与 CXXFLAGS"></a>CFLAGS 与 CXXFLAGS</h3><ul>
+<li><p>CFLAGS 表示用于 C 编译器的选项；CXXFLAGS 表示用于 C++ 编译器的选项。这两个变量实际上涵盖了编译和汇编两个步骤</p>
+</li>
+<li><p>大多数程序和库在编译时默认的优化级别是”2”(使用”-O2”选项)并且带有调试符号来编译，也就是 CFLAGS&#x3D;”-O2 -g”, CXXFLAGS&#x3D;$CFLAGS 。</p>
+</li>
+<li><p>事实上，”-O2”已经启用绝大多数安全的优化选项了。另一方面，由于大部分选项可以同时用于这两个变量，所以仅在最后讲述只能用于其中一个变量的选 项。提醒：下面所列选项皆为非默认选项，你只要按需添加即可。</p>
+</li>
+<li><p>先说说”-O3”在”-O2”基础上增加的几项：</p>
+<ul>
+<li><code>-finline-functions</code> : 允许编译器选择某些简单的函数在其被调用处展开，比较安全的选项，特别是在CPU二级缓存较大时建议使用。</li>
+<li><code>-funswitch-loops</code> : 将循环体中不改变值的变量移动到循环体之外</li>
+<li><code>-fgcse-after-reload</code> : 为了清除多余的溢出，在重载之后执行一个额外的载入消除步骤。</li>
+</ul>
+</li>
+<li><p>参考链接：<code>https://sites.google.com/site/polarisnotme/linux/gcc</code></p>
+</li>
+</ul>
+<h3 id="LDFLAGS"><a href="#LDFLAGS" class="headerlink" title="LDFLAGS"></a>LDFLAGS</h3><ul>
+<li><p>LDFLAGS 是传递给连接器的选项。这是一个常被忽视的变量，事实上它对优化的影响也是很明显的。</p>
+</li>
+<li><p><code>-s</code> : 删除可执行程序中的所有符号表和所有重定位信息。其结果与运行命令 strip 所达到的效果相同，这个选项是比较安全的。</p>
+</li>
+<li><p><code>-Wl,options</code> : options是由一个或多个逗号分隔的传递给链接器的选项列表。其中的每一个选项均会作为命令行选项提供给链接器。</p>
+</li>
+<li><p><code>-Wl,-On</code> : 当n&gt;0时将会优化输出，但是会明显增加连接操作的时间，这个选项是比较安全的。</p>
+</li>
+<li><p><code>-Wl,--exclude-libs=ALL</code> : 不自动导出库中的符号，也就是默认将库中的符号隐藏。</p>
+</li>
+<li><p><code>-Wl,-m&lt;emulation&gt;</code> : 仿真<code>&lt;emulation&gt;</code>连接器，当前ld所有可用的仿真可以通过”ld -V”命令获取。默认值取决于ld的编译时配置</p>
+</li>
+<li><p><code>-Wl,--sort-common</code> : 把全局公共符号按照大小排序后放到适当的输出节，以防止符号间因为排布限制而出现间隙。</p>
+</li>
+<li><p><code>-Wl,-x</code> : 删除所有的本地符号。</p>
+</li>
+<li><p><code>-Wl,-X</code> : 删除所有的临时本地符号。对于大多数目标平台，就是所有的名字以’L’开头的本地符号。</p>
+</li>
+<li><p><code>-Wl,-zcomberloc</code> : 组合多个重定位节并重新排布它们，以便让动态符号可以被缓存。</p>
+</li>
+<li><p><code>-Wl,--enable-new-dtags</code> : 在ELF中创建新式的”dynamic tags”，但在老式的ELF系统上无法识别。</p>
+</li>
+<li><p><code>-Wl,--as-needed</code> : 移除不必要的符号引用，仅在实际需要的时候才连接，可以生成更高效的代码。</p>
+</li>
+<li><p><code>-Wl,--no-define-common</code> : 限制对普通符号的地址分配。该选项允许那些从共享库中引用的普通符号只在主程序中被分配地址。这会消除在共享库中的无用的副本的空间，同时也防止了在有多个指定了搜索路径的动态模块在进行运行时符号解析时引起的混乱。</p>
+</li>
+<li><p><code>-Wl,--hash-style=gnu</code> : 使用gnu风格的符号散列表格式。它的动态链接性能比传统的sysv风格(默认)有较大提升，但是它生成的可执行程序和库与旧的Glibc以及动态链接器不兼容。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppOthers/" rel="tag"># CppOthers</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" rel="prev" title="C++_智能指针">
+      <i class="fa fa-chevron-left"></i> C++_智能指针
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_8_exception/" rel="next" title="C++_10_8_exception">
+      C++_10_8_exception <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GCC%E5%8F%82%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">GCC参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">编译器的工作过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-configure"><span class="nav-number">3.1.</span> <span class="nav-text">配置(configure)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A1%AE%E5%AE%9A%E6%A0%87%E5%87%86%E5%BA%93%E5%92%8C%E5%A4%B4%E6%96%87%E4%BB%B6%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">3.2.</span> <span class="nav-text">确定标准库和头文件的位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A1%AE%E5%AE%9A%E4%BE%9D%E8%B5%96%E5%85%B3%E7%B3%BB"><span class="nav-number">3.3.</span> <span class="nav-text">确定依赖关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6%E7%9A%84%E9%A2%84%E7%BC%96%E8%AF%91-precompilation"><span class="nav-number">3.4.</span> <span class="nav-text">头文件的预编译(precompilation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86-preprocessing"><span class="nav-number">3.5.</span> <span class="nav-text">预处理(preprocessing)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91-Compilation"><span class="nav-number">3.6.</span> <span class="nav-text">编译(Compilation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5-Linking"><span class="nav-number">3.7.</span> <span class="nav-text">连接(Linking)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Installation"><span class="nav-number">3.8.</span> <span class="nav-text">安装(Installation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.9.</span> <span class="nav-text">操作系统连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%AE%89%E8%A3%85%E5%8C%85"><span class="nav-number">3.10.</span> <span class="nav-text">生成安装包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%BF%9E%E6%8E%A5-Dynamic-linking"><span class="nav-number">3.11.</span> <span class="nav-text">动态连接(Dynamic linking)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ld-%E2%80%93-GNU-linker%EF%BC%88%E8%BF%9E%E6%8E%A5%E5%99%A8%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">ld – GNU linker（连接器）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E9%A1%B9"><span class="nav-number">4.1.</span> <span class="nav-text">选项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#g"><span class="nav-number">5.</span> <span class="nav-text">g++</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-1"><span class="nav-number">5.1.</span> <span class="nav-text">选项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E4%BC%98%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">编译优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">6.1.</span> <span class="nav-text">基本原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">6.2.</span> <span class="nav-text">编译工具的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CC%E5%92%8CCXX"><span class="nav-number">6.3.</span> <span class="nav-text">CC和CXX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPPFLAGS"><span class="nav-number">6.4.</span> <span class="nav-text">CPPFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CFLAGS-%E4%B8%8E-CXXFLAGS"><span class="nav-number">6.5.</span> <span class="nav-text">CFLAGS 与 CXXFLAGS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LDFLAGS"><span class="nav-number">6.6.</span> <span class="nav-text">LDFLAGS</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

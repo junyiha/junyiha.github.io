@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 C++ 标准库  C++ 标准库&lt;memory&gt; 是 C++ 标准库中的头文件，提供了一些内存管理相关的类和函数，用于帮助管理动态分配的内存和智能指针等。 以下是 &lt;memory&gt; 标准库中一些重要的内容：  动态内存分配：  std::allocator：是用于分配和释放内存的默认分配器。 std::unique_ptr：一种独占指针，用于管理动态分配的对象，确保内">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_10_9_memory">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_9_memory/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 C++ 标准库  C++ 标准库&lt;memory&gt; 是 C++ 标准库中的头文件，提供了一些内存管理相关的类和函数，用于帮助管理动态分配的内存和智能指针等。 以下是 &lt;memory&gt; 标准库中一些重要的内容：  动态内存分配：  std::allocator：是用于分配和释放内存的默认分配器。 std::unique_ptr：一种独占指针，用于管理动态分配的对象，确保内">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.207Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppSTL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_9_memory/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_10_9_memory | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_9_memory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_10_9_memory
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>C++ <memory>标准库</li>
+</ul>
+<h2 id="C-标准库"><a href="#C-标准库" class="headerlink" title="C++ 标准库"></a>C++ <memory>标准库</h2><p><code>&lt;memory&gt;</code> 是 C++ 标准库中的头文件，提供了一些内存管理相关的类和函数，用于帮助管理动态分配的内存和智能指针等。</p>
+<p>以下是 <code>&lt;memory&gt;</code> 标准库中一些重要的内容：</p>
+<ol>
+<li><p><strong>动态内存分配：</strong></p>
+<ul>
+<li><code>std::allocator</code>：是用于分配和释放内存的默认分配器。</li>
+<li><code>std::unique_ptr</code>：一种独占指针，用于管理动态分配的对象，确保内存的释放。</li>
+<li><code>std::shared_ptr</code>：一种共享指针，多个指针可以共享对同一个对象的所有权，使用引用计数来管理内存释放。</li>
+<li><code>std::weak_ptr</code>：弱引用指针，用于解决 <code>std::shared_ptr</code> 可能导致的循环引用问题。</li>
+</ul>
+</li>
+<li><p><strong>智能指针相关函数和工具：</strong></p>
+<ul>
+<li><code>std::make_unique</code>：用于创建动态分配的对象并返回一个 <code>std::unique_ptr</code>。</li>
+<li><code>std::make_shared</code>：用于创建动态分配的对象并返回一个 <code>std::shared_ptr</code>。</li>
+</ul>
+</li>
+<li><p><strong>内存管理相关工具和函数：</strong></p>
+<ul>
+<li><code>std::addressof</code>：获取对象的地址。</li>
+<li><code>std::pointer_traits</code>：提供了对指针类型的通用操作。</li>
+<li><code>std::default_delete</code>：默认删除器，用于指定 <code>std::unique_ptr</code> 的删除策略。</li>
+</ul>
+</li>
+<li><p><strong>特定内存工具和操作：</strong></p>
+<ul>
+<li><code>std::align</code>：在给定地址处对齐内存。</li>
+<li><code>std::allocator_traits</code>：提供了对分配器的通用操作。</li>
+</ul>
+</li>
+</ol>
+<p>使用 <code>&lt;memory&gt;</code> 标准库，可以更安全地管理动态分配的内存，避免内存泄漏和悬挂指针等问题。智能指针类能够自动处理内存的释放，大大简化了内存管理的复杂性。</p>
+<h2 id="C-标准库-详解"><a href="#C-标准库-详解" class="headerlink" title="C++ 标准库 详解"></a>C++ <memory>标准库 详解</h2><p><code>&lt;memory&gt;</code> 标准库提供了许多功能，主要用于在 C++ 中管理内存和智能指针。以下是 <code>&lt;memory&gt;</code> 标准库中的一些重要组件和功能：</p>
+<ol>
+<li><p><strong>智能指针：</strong></p>
+<ul>
+<li><code>std::unique_ptr</code>：独占所有权的智能指针，确保只有一个指针可以管理一个对象。当 <code>std::unique_ptr</code> 被销毁时，它所管理的对象也会被自动释放。</li>
+<li><code>std::shared_ptr</code>：允许多个指针共享对同一对象的所有权，使用引用计数来管理对象的生命周期。当最后一个 <code>std::shared_ptr</code> 被销毁时，关联的对象才会被释放。</li>
+<li><code>std::weak_ptr</code>：弱引用指针，用于打破 <code>std::shared_ptr</code> 可能产生的循环引用问题。</li>
+</ul>
+</li>
+<li><p><strong>内存管理相关工具和函数：</strong></p>
+<ul>
+<li><code>std::make_unique</code>：用于创建动态分配的对象并返回一个 <code>std::unique_ptr</code>。</li>
+<li><code>std::make_shared</code>：用于创建动态分配的对象并返回一个 <code>std::shared_ptr</code>。</li>
+<li><code>std::allocator</code>：用于动态内存分配和释放的默认分配器。</li>
+<li><code>std::default_delete</code>：默认的删除器，通常与智能指针 <code>std::unique_ptr</code> 结合使用，指定对象的释放方式。</li>
+</ul>
+</li>
+<li><p><strong>工具和类型特征：</strong></p>
+<ul>
+<li><code>std::addressof</code>：获取对象的地址。</li>
+<li><code>std::pointer_traits</code>：提供了对指针类型的通用操作。</li>
+<li><code>std::allocator_traits</code>：提供了对分配器的通用操作。</li>
+</ul>
+</li>
+<li><p><strong>内存操作和指针工具：</strong></p>
+<ul>
+<li><code>std::align</code>：在给定地址处对齐内存。</li>
+<li><code>std::memcpy</code> 和 <code>std::memset</code>：用于内存复制和内存设置。</li>
+</ul>
+</li>
+</ol>
+<p><code>&lt;memory&gt;</code> 标准库提供了许多工具和类，使得在 C++ 中进行内存管理变得更加安全和方便。智能指针能够避免常见的内存管理问题，如悬挂指针、内存泄漏等，有助于提高代码的健壮性和可靠性。同时，这些功能也让程序员更加轻松地进行动态内存管理。</p>
+<h2 id="C-标准库-常用类和函数"><a href="#C-标准库-常用类和函数" class="headerlink" title="C++ 标准库 常用类和函数"></a>C++ <memory>标准库 常用类和函数</h2><p><code>&lt;memory&gt;</code> 标准库中有许多常用的类和函数，主要用于内存管理和智能指针。以下是一些常用的类和函数：</p>
+<h3 id="常用类："><a href="#常用类：" class="headerlink" title="常用类："></a>常用类：</h3><ol>
+<li><strong>智能指针类：</strong><ul>
+<li><code>std::unique_ptr&lt;T&gt;</code>：独占所有权的智能指针，确保只有一个指针可以管理一个对象。</li>
+<li><code>std::shared_ptr&lt;T&gt;</code>：允许多个指针共享对同一对象的所有权。</li>
+<li><code>std::weak_ptr&lt;T&gt;</code>：弱引用指针，用于打破 <code>std::shared_ptr</code> 可能产生的循环引用问题。</li>
+</ul>
+</li>
+</ol>
+<h3 id="常用函数："><a href="#常用函数：" class="headerlink" title="常用函数："></a>常用函数：</h3><ol>
+<li><p><strong>内存管理相关函数：</strong></p>
+<ul>
+<li><code>std::make_unique&lt;T&gt;()</code>：用于创建动态分配的对象并返回一个 <code>std::unique_ptr&lt;T&gt;</code>。</li>
+<li><code>std::make_shared&lt;T&gt;()</code>：用于创建动态分配的对象并返回一个 <code>std::shared_ptr&lt;T&gt;</code>。</li>
+<li><code>std::allocate_shared&lt;T&gt;()</code>：分配一个对象的共享内存。</li>
+<li><code>std::allocate_shared&lt;T, Args...&gt;()</code>：使用自定义分配器分配一个对象的共享内存。</li>
+</ul>
+</li>
+<li><p><strong>其他函数：</strong></p>
+<ul>
+<li><code>std::addressof()</code>：获取对象的地址。</li>
+<li><code>std::memcpy()</code> 和 <code>std::memset()</code>：用于内存复制和内存设置。</li>
+</ul>
+</li>
+</ol>
+<h3 id="类型特征和工具："><a href="#类型特征和工具：" class="headerlink" title="类型特征和工具："></a>类型特征和工具：</h3><ol>
+<li><p><strong>指针和分配器相关的类型特征：</strong></p>
+<ul>
+<li><code>std::pointer_traits&lt;T&gt;</code>：提供了对指针类型 <code>T</code> 的通用操作。</li>
+<li><code>std::allocator_traits&lt;Allocator&gt;</code>：提供了对分配器 <code>Allocator</code> 的通用操作。</li>
+</ul>
+</li>
+<li><p><strong>分配器相关类：</strong></p>
+<ul>
+<li><code>std::allocator&lt;T&gt;</code>：用于动态内存分配和释放的默认分配器。</li>
+</ul>
+</li>
+</ol>
+<p><code>&lt;memory&gt;</code> 标准库提供了强大的工具和类来管理动态分配的内存，帮助避免内存泄漏和悬挂指针等问题。智能指针类使得在 C++ 中进行内存管理变得更加方便和安全。</p>
+<h2 id="std-unique-ptr"><a href="#std-unique-ptr" class="headerlink" title="std::unique_ptr"></a>std::unique_ptr</h2><p><code>std::unique_ptr</code> 是 C++ 标准库 <code>&lt;memory&gt;</code> 中定义的智能指针类，用于管理动态分配的对象，并且在其生命周期结束时自动释放所管理的对象。</p>
+<p><code>std::unique_ptr</code> 具有独占所有权的特性，即同一时间只能有一个 <code>std::unique_ptr</code> 指向一个对象。当 <code>std::unique_ptr</code> 被销毁时（例如超出作用域、被赋予新值或者显式释放），它所管理的对象也会被自动释放，从而避免内存泄漏。</p>
+<p>以下是 <code>std::unique_ptr</code> 的主要特点和用法：</p>
+<ul>
+<li><p><strong>独占所有权：</strong> 一个 <code>std::unique_ptr</code> 实例是对象的唯一所有者，不能被复制，但可以被移动。</p>
+</li>
+<li><p><strong>创建 <code>std::unique_ptr</code>：</strong></p>
+<ul>
+<li>使用 <code>std::make_unique&lt;T&gt;()</code>：用于创建动态分配的对象并返回一个 <code>std::unique_ptr&lt;T&gt;</code>。</li>
+<li>直接声明：<code>std::unique_ptr&lt;T&gt; ptr(new T())</code>，但不推荐直接使用 <code>new</code>。</li>
+</ul>
+</li>
+<li><p><strong>移动语义：</strong> <code>std::unique_ptr</code> 支持移动语义，可以使用 <code>std::move</code> 来将所有权从一个 <code>std::unique_ptr</code> 转移到另一个。</p>
+</li>
+<li><p><strong>释放内存：</strong> 当 <code>std::unique_ptr</code> 超出作用域时，它所管理的对象会被自动释放。</p>
+</li>
+</ul>
+<p>示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; ptr = std::<span class="built_in">make_unique</span>&lt;<span class="type">int</span>&gt;(<span class="number">42</span>);</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Value: &quot;</span> &lt;&lt; *ptr &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// ptr 在此处超出作用域，触发自动释放所管理的对象</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">someFunction</span>();</span><br><span class="line">    <span class="comment">// 在此处无法访问 ptr，因为它已经超出了作用域</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>std::make_unique&lt;int&gt;(42)</code> 创建了一个动态分配的整数对象，并将其存储在 <code>std::unique_ptr&lt;int&gt;</code> 中。当 <code>ptr</code> 超出作用域时，所管理的对象会被自动释放。</p>
+<h2 id="std-shared-ptr"><a href="#std-shared-ptr" class="headerlink" title="std::shared_ptr"></a>std::shared_ptr</h2><p><code>std::shared_ptr</code> 是 C++ 标准库 <code>&lt;memory&gt;</code> 中定义的智能指针类，用于管理动态分配的对象，并且可以让多个指针共享对同一对象的所有权。</p>
+<p>与 <code>std::unique_ptr</code> 不同，<code>std::shared_ptr</code> 允许多个 <code>std::shared_ptr</code> 实例共享对同一对象的控制权。它使用引用计数机制来管理内存，当最后一个 <code>std::shared_ptr</code> 指向对象时，对象会被销毁。</p>
+<p>以下是 <code>std::shared_ptr</code> 的主要特点和用法：</p>
+<ul>
+<li><p><strong>共享所有权：</strong> 多个 <code>std::shared_ptr</code> 可以指向同一个对象，共享对该对象的所有权。</p>
+</li>
+<li><p><strong>引用计数：</strong> 使用引用计数来追踪对象的所有权，当最后一个 <code>std::shared_ptr</code> 被销毁时，才会释放对象。</p>
+</li>
+<li><p><strong>创建 <code>std::shared_ptr</code>：</strong></p>
+<ul>
+<li>使用 <code>std::make_shared&lt;T&gt;()</code>：用于创建动态分配的对象并返回一个 <code>std::shared_ptr&lt;T&gt;</code>。</li>
+<li>直接声明：<code>std::shared_ptr&lt;T&gt; ptr = std::shared_ptr&lt;T&gt;(new T())</code>，但不推荐直接使用 <code>new</code>。</li>
+</ul>
+</li>
+<li><p><strong>复制和移动语义：</strong> <code>std::shared_ptr</code> 支持复制和移动语义。复制 <code>std::shared_ptr</code> 会增加引用计数，移动 <code>std::shared_ptr</code> 会将所有权转移给另一个对象。</p>
+</li>
+<li><p><strong>释放内存：</strong> 当最后一个 <code>std::shared_ptr</code> 超出作用域时，所管理的对象会被释放。</p>
+</li>
+</ul>
+<p>示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; ptr1 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">42</span>);</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; ptr2 = ptr1; <span class="comment">// 共享指针 ptr1 的所有权</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Value of ptr1: &quot;</span> &lt;&lt; *ptr1 &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Value of ptr2: &quot;</span> &lt;&lt; *ptr2 &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// ptr1 和 ptr2 在此处超出作用域，引用计数减少，对象不会被释放</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">someFunction</span>();</span><br><span class="line">    <span class="comment">// 在此处无法访问 ptr1 和 ptr2，因为它们已经超出了作用域</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>ptr1</code> 和 <code>ptr2</code> 都指向同一个动态分配的整数对象。当函数结束时，引用计数减少，但由于 <code>ptr1</code> 和 <code>ptr2</code> 都超出作用域，所管理的对象最终会被释放。</p>
+<h2 id="std-weak-ptr"><a href="#std-weak-ptr" class="headerlink" title="std::weak_ptr"></a>std::weak_ptr</h2><p><code>std::weak_ptr</code> 是 C++ 标准库 <code>&lt;memory&gt;</code> 中定义的智能指针类，用于解决 <code>std::shared_ptr</code> 可能导致的循环引用问题，并且不影响所管理对象的生命周期。</p>
+<p><code>std::weak_ptr</code> 是一种弱引用指针，它可以指向由 <code>std::shared_ptr</code> 管理的对象，但并不拥有对象的所有权。它不会增加对象的引用计数，因此也不会阻止对象的销毁。通常用于观察或临时访问由 <code>std::shared_ptr</code> 管理的对象。</p>
+<p>以下是 <code>std::weak_ptr</code> 的主要特点和用法：</p>
+<ul>
+<li><p><strong>弱引用：</strong> 不持有对象的所有权，不会影响对象的生命周期。</p>
+</li>
+<li><p><strong>与 <code>std::shared_ptr</code> 搭配使用：</strong> <code>std::weak_ptr</code> 可以从 <code>std::shared_ptr</code> 创建，并通过 <code>std::lock()</code> 方法转换为 <code>std::shared_ptr</code>，以临时获取对象的所有权。</p>
+</li>
+<li><p><strong>检查对象是否存在：</strong> 可以使用 <code>expired()</code> 方法检查与 <code>std::weak_ptr</code> 关联的对象是否被销毁。</p>
+</li>
+<li><p><strong>安全地访问对象：</strong> 使用 <code>std::lock()</code> 方法可以安全地获取 <code>std::shared_ptr</code>，如果对象存在，则返回 <code>std::shared_ptr</code>，否则返回空的 <code>std::shared_ptr</code>。</p>
+</li>
+</ul>
+<p>示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">observe</span><span class="params">(std::weak_ptr&lt;<span class="type">int</span>&gt; weakPtr)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">auto</span> sharedPtr = weakPtr.<span class="built_in">lock</span>()) &#123; <span class="comment">// 尝试获取 shared_ptr</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Value observed: &quot;</span> &lt;&lt; *sharedPtr &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Object has been destroyed.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; sharedPtr = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">42</span>);</span><br><span class="line">    std::weak_ptr&lt;<span class="type">int</span>&gt; weakPtr = sharedPtr; <span class="comment">// 创建 weak_ptr</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">observe</span>(weakPtr); <span class="comment">// 观察对象</span></span><br><span class="line"></span><br><span class="line">    sharedPtr.<span class="built_in">reset</span>(); <span class="comment">// 销毁 shared_ptr</span></span><br><span class="line">    <span class="built_in">observe</span>(weakPtr); <span class="comment">// 再次观察对象</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>weakPtr</code> 弱引用指向 <code>sharedPtr</code> 所管理的整数对象。通过 <code>std::lock()</code> 方法，<code>weakPtr</code> 可以安全地转换为 <code>std::shared_ptr</code>，以临时获取对象的所有权。在 <code>observe()</code> 函数中，可以检查对象是否存在，并安全地访问对象。当 <code>sharedPtr</code> 被销毁后，通过 <code>weakPtr</code> 观察对象时，将得到对象已被销毁的信息。</p>
+<h2 id="std-make-unique"><a href="#std-make-unique" class="headerlink" title="std::make_unique"></a>std::make_unique</h2><p><code>std::make_unique</code> 是 C++11 标准引入的一个函数模板，用于创建动态分配的对象并返回一个 <code>std::unique_ptr</code> 智能指针。它是用于创建 <code>std::unique_ptr</code> 的首选方式，具有安全和简洁的特性。</p>
+<p>与直接使用 <code>new</code> 来分配内存并创建 <code>std::unique_ptr</code> 不同，<code>std::make_unique</code> 提供了更加安全和简洁的方式，它在分配对象的同时将其封装到 <code>std::unique_ptr</code> 中。</p>
+<p>基本用法示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::unique_ptr，管理一个动态分配的整数对象</span></span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; ptr = std::<span class="built_in">make_unique</span>&lt;<span class="type">int</span>&gt;(<span class="number">42</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Value: &quot;</span> &lt;&lt; *ptr &lt;&lt; std::endl; <span class="comment">// 访问所管理的整数对象</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>std::make_unique&lt;int&gt;(42)</code> 创建了一个动态分配的整数对象，并将其封装到 <code>std::unique_ptr&lt;int&gt;</code> 中。这种方式简洁、安全，并且避免了手动管理内存，提高了代码的可读性和健壮性。</p>
+<p>需要注意的是，<code>std::make_unique</code> 在 C++11 中引入，但用于创建 <code>std::unique_ptr</code>。而对于 <code>std::shared_ptr</code>，C++11 并没有提供 <code>std::make_shared</code>，但在 C++14 中引入了这个功能。所以在 C++14 中，可以使用 <code>std::make_shared</code> 来创建 <code>std::shared_ptr</code>。</p>
+<h2 id="std-make-shared"><a href="#std-make-shared" class="headerlink" title="std::make_shared"></a>std::make_shared</h2><p><code>std::make_shared</code> 是 C++11 引入的函数模板，用于创建动态分配的对象并返回一个 <code>std::shared_ptr</code> 智能指针。它是创建 <code>std::shared_ptr</code> 的推荐方式，提供了安全和高效的对象分配和管理。</p>
+<p>基本用法示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个 std::shared_ptr，管理一个动态分配的整数对象</span></span><br><span class="line">    <span class="keyword">auto</span> ptr = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">42</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Value: &quot;</span> &lt;&lt; *ptr &lt;&lt; std::endl; <span class="comment">// 访问所管理的整数对象</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>std::make_shared&lt;int&gt;(42)</code> 创建了一个动态分配的整数对象，并将其封装到 <code>std::shared_ptr&lt;int&gt;</code> 中。<code>std::make_shared</code> 可以接收参数并直接传递给对象的构造函数。</p>
+<p>与直接使用 <code>new</code> 来分配内存并创建 <code>std::shared_ptr</code> 不同，<code>std::make_shared</code> 提供了更高效的内存分配，因为它会分配一个单一的内存块用于存储对象和控制块（用于跟踪引用计数等信息）。这种方式可以减少额外的开销，并且可以更有效地使用内存。</p>
+<p>需要注意的是，<code>std::make_shared</code> 是 C++11 引入的，在 C++11 之前，可以使用 <code>std::shared_ptr&lt;T&gt;(new T(args))</code> 的方式创建 <code>std::shared_ptr</code>，但这种方式可能导致额外的内存分配和性能损耗。</p>
+<h2 id="std-allocate-shared"><a href="#std-allocate-shared" class="headerlink" title="std::allocate_shared"></a>std::allocate_shared</h2><p><code>std::allocate_shared</code> 是 C++11 引入的函数模板，用于创建动态分配的对象并返回一个 <code>std::shared_ptr</code> 智能指针。与 <code>std::make_shared</code> 类似，<code>std::allocate_shared</code> 也用于动态分配对象，但允许指定自定义的分配器。</p>
+<p>基本用法示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">MyStruct</span> &#123;</span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">MyStruct</span>(<span class="type">int</span> val) : <span class="built_in">value</span>(val) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用自定义分配器创建一个 std::shared_ptr，管理一个动态分配的 MyStruct 对象</span></span><br><span class="line">    std::allocator&lt;MyStruct&gt; alloc;</span><br><span class="line">    <span class="keyword">auto</span> ptr = std::<span class="built_in">allocate_shared</span>&lt;MyStruct&gt;(alloc, <span class="number">42</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Value: &quot;</span> &lt;&lt; ptr-&gt;value &lt;&lt; std::endl; <span class="comment">// 访问所管理的对象的成员</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>std::allocate_shared&lt;MyStruct&gt;(alloc, 42)</code> 使用自定义的分配器 <code>std::allocator&lt;MyStruct&gt;</code> 创建了一个动态分配的 <code>MyStruct</code> 对象，并将其封装到 <code>std::shared_ptr&lt;MyStruct&gt;</code> 中。第一个参数是分配器对象，第二个参数是传递给对象构造函数的参数。</p>
+<p>相较于 <code>std::shared_ptr</code> 的其他构造函数和 <code>std::make_shared</code>，<code>std::allocate_shared</code> 允许程序员提供自定义的分配器，以满足特定的内存管理需求。这个函数在一些特殊情况下可以提供更大的灵活性。</p>
+<h2 id="std-addressof"><a href="#std-addressof" class="headerlink" title="std::addressof"></a>std::addressof</h2><p><code>std::addressof</code> 是 C++ 标准库 <code>&lt;memory&gt;</code> 中定义的函数模板，用于获取对象的地址。</p>
+<p>与 C++ 内置的取地址运算符 <code>&amp;</code> 不同，<code>std::addressof</code> 能够确保即使重载了取地址运算符的类，也能获得对象的真实地址。</p>
+<p><code>std::addressof</code> 的基本用法如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> num = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span>* ptr = std::<span class="built_in">addressof</span>(num); <span class="comment">// 获取变量 num 的地址</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Address of num: &quot;</span> &lt;&lt; ptr &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::addressof</code> 获取了变量 <code>num</code> 的地址，并将其存储在指针 <code>ptr</code> 中。使用 <code>std::cout</code> 打印出 <code>num</code> 的地址。</p>
+<p>通常情况下，直接使用取地址运算符 <code>&amp;</code> 可以获取对象的地址。但是，如果类重载了取地址运算符（<code>operator&amp;</code>），可能会导致取到重载后的地址。在这种情况下，使用 <code>std::addressof</code> 可以确保获取到对象的真实地址。</p>
+<h2 id="std-allocator"><a href="#std-allocator" class="headerlink" title="std::allocator"></a>std::allocator</h2><p><code>std::allocator</code> 是 C++ 标准库 <code>&lt;memory&gt;</code> 头文件中定义的默认分配器类模板。它是 C++ 中动态内存分配和释放的接口之一，用于管理内存的分配和释放。</p>
+<p><code>std::allocator</code> 作为内存分配器，提供了用于分配和释放内存的一组操作，其中包括 <code>allocate()</code>、<code>deallocate()</code>、<code>construct()</code> 和 <code>destroy()</code> 等函数。</p>
+<p>以下是 <code>std::allocator</code> 的主要操作：</p>
+<ul>
+<li><code>allocate()</code>：分配指定数量的未初始化内存块。</li>
+<li><code>deallocate()</code>：释放之前分配的内存块。</li>
+<li><code>construct()</code>：在分配的内存中构造一个对象。</li>
+<li><code>destroy()</code>：在分配的内存中销毁一个对象。</li>
+</ul>
+<p>它是 C++ 标准库提供的默认分配器，并且也是许多容器（如 <code>std::vector</code>、<code>std::list</code> 等）的默认分配器。</p>
+<p>通常情况下，如果不提供自定义的分配器，标准库的容器会默认使用 <code>std::allocator</code> 进行内存管理。当然，如果需要更多的定制或特定的内存管理方式，可以通过定义自己的分配器类并符合特定的接口来实现。</p>
+<p>以下是一个简单示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::allocator&lt;<span class="type">int</span>&gt; myAllocator;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配内存来存储 5 个整数</span></span><br><span class="line">    <span class="type">int</span>* ptr = myAllocator.<span class="built_in">allocate</span>(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">        myAllocator.<span class="built_in">construct</span>(&amp;ptr[i], i); <span class="comment">// 构造对象</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出分配的整数</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">        std::cout &lt;&lt; ptr[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 销毁对象并释放内存</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">        myAllocator.<span class="built_in">destroy</span>(&amp;ptr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    myAllocator.<span class="built_in">deallocate</span>(ptr, <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::allocator</code> 被用来分配和释放一块存储整数的内存，然后构造并输出这些整数，最后销毁并释放分配的内存。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppSTL/" rel="tag"># CppSTL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_6_cctype/" rel="prev" title="C++_10_6_cctype">
+      <i class="fa fa-chevron-left"></i> C++_10_6_cctype
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_5_string/" rel="next" title="C++_10_5_string">
+      C++_10_5_string <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">C++ 标准库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">C++ 标准库 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E5%B8%B8%E7%94%A8%E7%B1%BB%E5%92%8C%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">C++ 标准库 常用类和函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%B1%BB%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">常用类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">常用函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E7%89%B9%E5%BE%81%E5%92%8C%E5%B7%A5%E5%85%B7%EF%BC%9A"><span class="nav-number">4.3.</span> <span class="nav-text">类型特征和工具：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-unique-ptr"><span class="nav-number">5.</span> <span class="nav-text">std::unique_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-shared-ptr"><span class="nav-number">6.</span> <span class="nav-text">std::shared_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-weak-ptr"><span class="nav-number">7.</span> <span class="nav-text">std::weak_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-make-unique"><span class="nav-number">8.</span> <span class="nav-text">std::make_unique</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-make-shared"><span class="nav-number">9.</span> <span class="nav-text">std::make_shared</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-allocate-shared"><span class="nav-number">10.</span> <span class="nav-text">std::allocate_shared</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-addressof"><span class="nav-number">11.</span> <span class="nav-text">std::addressof</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-allocator"><span class="nav-number">12.</span> <span class="nav-text">std::allocator</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

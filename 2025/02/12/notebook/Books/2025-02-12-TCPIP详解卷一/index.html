@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 阅读TCP&#x2F;IP详解卷一：协议的学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP&#x2F;IP详解卷一：协议">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/12/notebook/Books/2025-02-12-TCPIP%E8%AF%A6%E8%A7%A3%E5%8D%B7%E4%B8%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 阅读TCP&#x2F;IP详解卷一：协议的学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.2.1-OSI%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.3--%E5%B0%81%E8%A3%85.png">
+<meta property="og:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.5--ARPANET.png">
+<meta property="article:published_time" content="2025-02-12T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.144Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="book">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://junyiha.github.io/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.2.1-OSI%E6%A8%A1%E5%9E%8B.png">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/12/notebook/Books/2025-02-12-TCPIP%E8%AF%A6%E8%A7%A3%E5%8D%B7%E4%B8%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>TCP/IP详解卷一：协议 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/12/notebook/Books/2025-02-12-TCPIP%E8%AF%A6%E8%A7%A3%E5%8D%B7%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TCP/IP详解卷一：协议
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-12 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-12T09:00:00+08:00">2025-02-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Books/" itemprop="url" rel="index"><span itemprop="name">Books</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><ul>
+<li>阅读TCP&#x2F;IP详解卷一：协议的学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="第一章-概述"><a href="#第一章-概述" class="headerlink" title="第一章 概述"></a>第一章 概述</h1><ul>
+<li>当一种语言用于一组行为时，需要使用一种协议。一系列相关协议的集合称为一个协议族。指定一个协议族中的各种协议之间的相互关系并划分需要完成的任务的设计，称为协议族的体系结构或参考模型。</li>
+<li>TCP&#x2F;IP是一个实现Internet体系结构的协议族，它来源于ARPANET参考模型（ARM）。</li>
+</ul>
+<h2 id="1-1-体系结构原则"><a href="#1-1-体系结构原则" class="headerlink" title="1.1 体系结构原则"></a>1.1 体系结构原则</h2><ul>
+<li>TCP&#x2F;IP是一个开放的系统，协议族定义和很多实现是公开的，收费很少或者根本不收费。它构成全球因特网(Internet)的基础。尽管很多人认为因特网和万维网是可互换的术语，但我们通常认为因特网在计算机之间提供了消息通信能力，而万维网是一种使用因特网来通信的具体应用。</li>
+</ul>
+<h3 id="1-1-1-分组，连接和数据报"><a href="#1-1-1-分组，连接和数据报" class="headerlink" title="1.1.1 分组，连接和数据报"></a>1.1.1 分组，连接和数据报</h3><ul>
+<li>20世纪60年代出现的一个重要概念是分组交换思想。在分组交换中包含一定字节数的数字信息“块”(分组)独立通过网络。来自不同来源或发送方的块可以组合，而且以后可以分解，这称为“多路复用”。</li>
+<li>在使用信令协议在一条虚电路上交换数据之前，每个流状态已经建立，该协议支持连接建立，清楚和状态信息。因此，这种网络称为面向连接的。</li>
+<li>无论是建立在线路还是交换的基础上，面向连接的网络是多年来最流行的联网方式。</li>
+<li>在20世纪60年代后期，<strong>数据报</strong>作为另一种可选方案而得到发展。数据包起源于CYCLADES系统，它是一个特定类型的分组，有关来源和最终目的的所有识别信息都位于分组中(而不是分组交换机中)。虽然这通常需要较大的数据包，但不需要再交换机中维护连接状态，它可用于建立一个无连接的网络，并且没必要使用复杂的信令协议。</li>
+</ul>
+<h3 id="1-1-3-差错控制和流量控制"><a href="#1-1-3-差错控制和流量控制" class="headerlink" title="1.1.3 差错控制和流量控制"></a>1.1.3 差错控制和流量控制</h3><ul>
+<li>在网络中存在数据损坏或丢失的情况。这可能出于各种原因，例如硬件问题，数据传输中被修改，在无线网络中超出范围，以及其他因素。对这种错误的处理称为差错控制，它可以在构成网络基础设施的系统，连接到网络的系统或其他组合中实现。</li>
+<li>针对网络中可靠，按顺序交付的实现开销，帧中继和Internet协议采用一种称为尽力而为交付的服务。</li>
+</ul>
+<h2 id="1-2-设计和实现"><a href="#1-2-设计和实现" class="headerlink" title="1.2 设计和实现"></a>1.2 设计和实现</h2><ul>
+<li>我们对协议体系结构和实现体系结构加以区分，实现体系结构定义了协议体系结构中的概念如何用于软件形式的实现中。</li>
+</ul>
+<h3 id="1-2-1-分层"><a href="#1-2-1-分层" class="headerlink" title="1.2.1 分层"></a>1.2.1 分层</h3><ul>
+<li><p>通过分层，每层只负责通信的一个方面。采用多层是有益的，这是因为分层设计允许开发人员分别实现系统的不同部分，他们通常由在不同领域的专业人员完成。最常提到的协议分层概念基于一个称为开发系统互联标准（OSI）的模型。</p>
+</li>
+<li><p>尽管OSI模型建议的7个逻辑层在协议体系结构的模块化实现中是可取的，但是通常认为TCP&#x2F;IP体系结构包含5层。</p>
+</li>
+<li><p>如图1-2的简要介绍，每层都有不同的任务。自上而下</p>
+<ul>
+<li>物理层定义了一种通过某种通信介质传输数字信息的方法。以太网和无线局域网标准的一部分也在这层。</li>
+<li>链路层或数据链路层包含为共享相同介质的邻居建立连接的协议或方法。有些链路层网络只连接两个邻居。当超过一个邻居可以访问共享网络时，这个网络称为多接入网络。WiFi和以太网是这种多接入链路层网络的例子，特定协议用于协调多个站在任何时间访问共享介质。<br><img src="/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.2.1-OSI%E6%A8%A1%E5%9E%8B.png" alt="1.2.1-OSI模型"></li>
+</ul>
+</li>
+<li><p>在层次结构中，我们对网络层或互联网络层最有兴趣。</p>
+</li>
+<li><p>传输层提供了一个会话之间的数据流，而且可能相当复杂，这取决于它提供的服务类型。</p>
+</li>
+<li><p>会话标识运行中的应用之间的交互，会话层协议可提供例如连接初始化和重新启动，增加检查点等功能</p>
+</li>
+<li><p>表示层负责信息的格式转换和标准化编码。</p>
+</li>
+<li><p>正如我们看到的，Internet协议不包括正式的会话层和表示层，如果需要的话，这些功能由应用程序来实现。</p>
+</li>
+<li><p>最高层是应用层。各种应用通常会实现自己的应用层协议，他们对用户来说是最容易看到的。目前已存在大量的应用层协议，并且程序员仍在不断开发新协议。因此，应用层是创新最多，以及新功能开发和部署的地方。</p>
+</li>
+</ul>
+<h3 id="1-2-2-分层实现中的复用，分解和封装"><a href="#1-2-2-分层实现中的复用，分解和封装" class="headerlink" title="1.2.2 分层实现中的复用，分解和封装"></a>1.2.2 分层实现中的复用，分解和封装</h3><ul>
+<li>分层体系结构的一个主要优点是具有协议复用的能力。这种复用形式允许多种协议共存于同一基础设施中。它也允许相同协议对象(例如连接)的多个实例同时存在，并且不会被混淆。</li>
+<li>复用可以发生在不同层，并在每层都有不同类型的标识符，用于确定信息属于哪个协议或信息流。</li>
+<li>当某层的一个称为协议数据单元(PDU)的对象(分组，消息等)被低层携带时，这个过程称为在相邻低层的封装(作为不透明数据)。因此，第N层的多个对象可以通过第N-1层的封装而复用。 </li>
+<li>封装通常与分层一起使用。单纯的封装涉及获得某层的PDU，并在底层将它作为不透明(无需解释)的数据来处理。封装发生在发送方，拆封(还原操作)发生在接收方。多数协议在封装过程中使用头部，少数协议也使用尾部。<br><img src="/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.3--%E5%B0%81%E8%A3%85.png" alt="1.3--封装"></li>
+<li>在上图中，每层都有自己的消息对象(PDU)的概念，对应于负责创建它的哪个特定层。例如，如果第四层(传输层)协议生成一个分组，将它称为第四层PDU或传输层PDU更准确。这是<strong>封装的本质</strong>，每层都将来自上层的数据看成不透明，无需解释的信息。</li>
+</ul>
+<h2 id="1-3-TCP-IP协议族结构和协议"><a href="#1-3-TCP-IP协议族结构和协议" class="headerlink" title="1.3 TCP&#x2F;IP协议族结构和协议"></a>1.3 TCP&#x2F;IP协议族结构和协议</h2><ul>
+<li>到目前为止，我们已讨论了体系结构，协议，协议族和抽象的实现技术。</li>
+</ul>
+<h3 id="ARPANET-参考模型"><a href="#ARPANET-参考模型" class="headerlink" title="ARPANET 参考模型"></a>ARPANET 参考模型</h3><p><img src="/images/Books/TCPIP%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%8D%B7%E4%B8%80/1.5--ARPANET.png" alt="1.5--ARPANET"></p>
+<ul>
+<li>从图1-5底部沿着协议栈上移，我们首先看到的层次是2.5，这是一个 “非正式”的层，有几个协议工作在这层，一个最古老和最重要的协议是地址解析协议(ARP)。它是IPv4的专用协议，只用于多接入链路层协议(例如以太网和Wi-Fi)，未完成IP层使用的地址和链路层使用的地址之间的转换。</li>
+<li>编号为3的层中看到IP，它是TCP&#x2F;IP中最重要的网络层协议。IP发送给链路层协议的PDU称为IP数据报，它的大小是64KB(IPv6将它扩大为4GB)。在很多情况下，当使用的上下文是清晰的，我们将会使用简化的术语 “分组” 来表示IP数据报。 大的分组放入链路层PDU(称为帧)时需要进行缩小处理，这个过程称为分片，它通常由IP主机和某些路由器在必要时执行。在分片的过程中，大数据报的一部分被放入多个称为分片的小鼠举报中，并在到达目的地后组合(称为重组)。</li>
+<li>由于每个IP分组都是一个数据报，所以都包含发送方和接收方的第三层地址。这些地址称为IP地址，即32位的IPv4地址或128位的IPv6地址；IP地址长度不同是IPv4和IPv6之间的最大差别。每个数据报的目的地址用于决定将该数据报发送到哪里，而做出此决定和发送数据报到下一跳的过程称为转发。路由器和主机都能进行转发，但更多的是路由器实现转发。这里有3中类型的IP地址，地址类型决定如何进行转发：单播(目的地是一台主机)，广播(目的地是一个指定网络中的所有主机)和组播(目的地是属于一个组播组中的一组主机)。</li>
+<li>Internet控制消息协议(ICMP)是IP的一个辅助协议，我们将它标注为3.5层协议。IP层使用它与其他主机或路由器的IP层之间交换差错消息和其他重要信息。ICPM有两个版本：IPv4使用的ICMPv4，IPv6使用的ICMPv6.ICMPv6是相当复杂的，包括地址自动配置和邻居发现等功能，他们在IPv4网络中由其他协议处理。虽然ICMP主要由IP使用，但它也能被其他应用使用。事实上两个主流的诊断工具(ping, traceroute)都使用ICMP。ICMP消息被封装在IP数据报中，采用与传输层PDU相同的封装方式。</li>
+<li>Internet组管理协议(IGMP)是IPv4的另一个辅助协议。它采用组播寻址和交付来管理作为组播组成员的主机(一组接收方接收一个特定目的地址的组播流量)。</li>
+<li>在第四层中，常见的两种Internet传输协议有很大区别。广泛使用的传输控制协议(TCP)会处理数据包丢失，重复和重新排序等IP层不处理的问题。它采用面向连接(VC)的方式，并且不保留消息便捷。相反，用户数据包协议(UDP)仅提供比IP协议稍多的功能。UDP允许应用发送数据包并保留消息边界，但不强制实现速率控制或差错控制。</li>
+<li>TCP在两台主机之间提供可靠的数据流传输。TCP涉及很多工作，例如将来自应用的数据分解在网络层中传输的适当尺寸的块，确认接收到的分组和设置超时，以便对方能够确认自己发送的分组。由于传输层提供这种可靠的数据流，所以应用层可以忽略这些细节。TCP发送到IP的PDU称为TCP段</li>
+<li>另一方面，UDP为应用层提供一种更简单的服务。它允许将数据报从一台主机发送到另一台主机，但不保证</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/book/" rel="tag"># book</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/12/notebook/Interview/2025-02-12--%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="prev" title="多线程">
+      <i class="fa fa-chevron-left"></i> 多线程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/14/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-14--TickMeter/" rel="next" title="TickMeter">
+      TickMeter <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">第一章 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%8E%9F%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 体系结构原则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-%E5%88%86%E7%BB%84%EF%BC%8C%E8%BF%9E%E6%8E%A5%E5%92%8C%E6%95%B0%E6%8D%AE%E6%8A%A5"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1.1 分组，连接和数据报</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6%E5%92%8C%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="nav-number">2.1.2.</span> <span class="nav-text">1.1.3 差错控制和流量控制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 设计和实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-%E5%88%86%E5%B1%82"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.2.1 分层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-%E5%88%86%E5%B1%82%E5%AE%9E%E7%8E%B0%E4%B8%AD%E7%9A%84%E5%A4%8D%E7%94%A8%EF%BC%8C%E5%88%86%E8%A7%A3%E5%92%8C%E5%B0%81%E8%A3%85"><span class="nav-number">2.2.2.</span> <span class="nav-text">1.2.2 分层实现中的复用，分解和封装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E7%BB%93%E6%9E%84%E5%92%8C%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 TCP&#x2F;IP协议族结构和协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ARPANET-%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.1.</span> <span class="nav-text">ARPANET 参考模型</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

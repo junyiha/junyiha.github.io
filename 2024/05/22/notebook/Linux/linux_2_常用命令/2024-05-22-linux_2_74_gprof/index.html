@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 gprof命令  linux gprof命令 详解gprof 是用于分析程序性能的 GNU Profiler 工具。它用于生成程序的性能分析报告，显示函数的调用关系、执行时间以及函数调用路径等信息。以下是一些关于 gprof 命令的基本用法和解释： 1. 编译程序时开启性能分析选项：在编译程序时，需要使用 -pg 选项开启性能分析选项，并最好关闭所有优化选项，以确保分析结果准确： 1gcc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_74_gprof">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_74_gprof/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 gprof命令  linux gprof命令 详解gprof 是用于分析程序性能的 GNU Profiler 工具。它用于生成程序的性能分析报告，显示函数的调用关系、执行时间以及函数调用路径等信息。以下是一些关于 gprof 命令的基本用法和解释： 1. 编译程序时开启性能分析选项：在编译程序时，需要使用 -pg 选项开启性能分析选项，并最好关闭所有优化选项，以确保分析结果准确： 1gcc">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.371Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_74_gprof/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_74_gprof | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_74_gprof/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_74_gprof
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>gprof命令</li>
+</ul>
+<h2 id="linux-gprof命令-详解"><a href="#linux-gprof命令-详解" class="headerlink" title="linux gprof命令 详解"></a>linux gprof命令 详解</h2><p><code>gprof</code> 是用于分析程序性能的 GNU Profiler 工具。它用于生成程序的性能分析报告，显示函数的调用关系、执行时间以及函数调用路径等信息。以下是一些关于 <code>gprof</code> 命令的基本用法和解释：</p>
+<h3 id="1-编译程序时开启性能分析选项："><a href="#1-编译程序时开启性能分析选项：" class="headerlink" title="1. 编译程序时开启性能分析选项："></a>1. <strong>编译程序时开启性能分析选项：</strong></h3><p>在编译程序时，需要使用 <code>-pg</code> 选项开启性能分析选项，并最好关闭所有优化选项，以确保分析结果准确：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -pg -o my_program my_source_code.c</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-运行程序："><a href="#2-运行程序：" class="headerlink" title="2. 运行程序："></a>2. <strong>运行程序：</strong></h3><p>运行编译后的程序，它会生成 <code>gmon.out</code> 文件，其中包含了程序运行时的性能数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用-gprof-进行分析："><a href="#3-使用-gprof-进行分析：" class="headerlink" title="3. 使用 gprof 进行分析："></a>3. <strong>使用 <code>gprof</code> 进行分析：</strong></h3><p>使用 <code>gprof</code> 命令来分析 <code>gmon.out</code> 文件，生成性能分析报告：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-生成详细报告："><a href="#4-生成详细报告：" class="headerlink" title="4. 生成详细报告："></a>4. <strong>生成详细报告：</strong></h3><p>可以使用 <code>-b</code> 选项生成更详细的报告，包括每个函数的执行时间、调用次数等信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -b my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-指定输出文件："><a href="#5-指定输出文件：" class="headerlink" title="5. 指定输出文件："></a>5. <strong>指定输出文件：</strong></h3><p>通过 <code>-o</code> 选项可以将分析结果输出到指定文件中，而不是默认的标准输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof my_program -o analysis_report.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-显示平均执行时间："><a href="#6-显示平均执行时间：" class="headerlink" title="6. 显示平均执行时间："></a>6. <strong>显示平均执行时间：</strong></h3><p>使用 <code>-A</code> 选项可以显示每个函数的平均执行时间：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -A my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-显示调用关系图："><a href="#7-显示调用关系图：" class="headerlink" title="7. 显示调用关系图："></a>7. <strong>显示调用关系图：</strong></h3><p>通过 <code>-q</code> 选项可以在报告中显示调用关系图，这对于理解程序中各函数之间的关系非常有帮助：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -q my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-指定分析深度："><a href="#8-指定分析深度：" class="headerlink" title="8. 指定分析深度："></a>8. <strong>指定分析深度：</strong></h3><p>使用 <code>-d</code> 选项可以指定分析深度，即显示调用关系图的深度：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -d 3 my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-显示函数执行的累积时间："><a href="#9-显示函数执行的累积时间：" class="headerlink" title="9. 显示函数执行的累积时间："></a>9. <strong>显示函数执行的累积时间：</strong></h3><p>通过 <code>-c</code> 选项可以显示函数执行的累积时间（inclusive time）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -c my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="10-显示函数执行的独立时间："><a href="#10-显示函数执行的独立时间：" class="headerlink" title="10. 显示函数执行的独立时间："></a>10. <strong>显示函数执行的独立时间：</strong></h3><p>使用 <code>-s</code> 选项可以显示函数执行的独立时间（self time），即不包括子函数调用的时间：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -s my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="11-指定显示的函数数量："><a href="#11-指定显示的函数数量：" class="headerlink" title="11. 指定显示的函数数量："></a>11. <strong>指定显示的函数数量：</strong></h3><p>使用 <code>-n</code> 选项可以指定显示的函数数量，按照执行时间排序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -n 10 my_program</span><br></pre></td></tr></table></figure>
+
+<h3 id="12-显示帮助信息："><a href="#12-显示帮助信息：" class="headerlink" title="12. 显示帮助信息："></a>12. <strong>显示帮助信息：</strong></h3><p>如果需要查看更多选项和帮助信息，可以使用 <code>-h</code> 选项：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -h</span><br></pre></td></tr></table></figure>
+
+<p><code>gprof</code> 提供了强大的性能分析功能，可以帮助开发人员找到程序中的性能瓶颈，并做出相应的优化。在使用 <code>gprof</code> 之前，确保在编译时开启了性能分析选项，并且程序运行时生成了 <code>gmon.out</code> 文件。</p>
+<h2 id="linux-gprof命令-常用技巧"><a href="#linux-gprof命令-常用技巧" class="headerlink" title="linux gprof命令 常用技巧"></a>linux gprof命令 常用技巧</h2><p>使用 <code>gprof</code> 命令进行性能分析时，以下是一些常用的技巧和选项，可以帮助你更深入地了解程序的性能特征：</p>
+<h3 id="1-查看平均执行时间："><a href="#1-查看平均执行时间：" class="headerlink" title="1. 查看平均执行时间："></a>1. <strong>查看平均执行时间：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -A my_program</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-A</code> 选项可以显示每个函数的平均执行时间，这对于理解函数的平均性能贡献很有帮助。</p>
+<h3 id="2-生成详细报告："><a href="#2-生成详细报告：" class="headerlink" title="2. 生成详细报告："></a>2. <strong>生成详细报告：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -b my_program</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-b</code> 选项可以生成更详细的报告，包括每个函数的执行时间、调用次数等信息。</p>
+<h3 id="3-调用关系图："><a href="#3-调用关系图：" class="headerlink" title="3. 调用关系图："></a>3. <strong>调用关系图：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -q my_program</span><br></pre></td></tr></table></figure>
+<p>通过 <code>-q</code> 选项可以在报告中显示调用关系图，有助于理解函数之间的调用关系。</p>
+<h3 id="4-指定分析深度："><a href="#4-指定分析深度：" class="headerlink" title="4. 指定分析深度："></a>4. <strong>指定分析深度：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -d 3 my_program</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-d</code> 选项可以指定调用关系图的深度，显示更深层次的调用关系。</p>
+<h3 id="5-显示函数执行的累积时间："><a href="#5-显示函数执行的累积时间：" class="headerlink" title="5. 显示函数执行的累积时间："></a>5. <strong>显示函数执行的累积时间：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -c my_program</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-c</code> 选项可以显示函数执行的累积时间（inclusive time），即包括了子函数调用的时间。</p>
+<h3 id="6-显示函数执行的独立时间："><a href="#6-显示函数执行的独立时间：" class="headerlink" title="6. 显示函数执行的独立时间："></a>6. <strong>显示函数执行的独立时间：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -s my_program</span><br></pre></td></tr></table></figure>
+<p>通过 <code>-s</code> 选项可以显示函数执行的独立时间（self time），即不包括子函数调用的时间。</p>
+<h3 id="7-指定显示的函数数量："><a href="#7-指定显示的函数数量：" class="headerlink" title="7. 指定显示的函数数量："></a>7. <strong>指定显示的函数数量：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof -n 10 my_program</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-n</code> 选项可以指定显示的函数数量，并按照执行时间排序。</p>
+<h3 id="8-输出到文件："><a href="#8-输出到文件：" class="headerlink" title="8. 输出到文件："></a>8. <strong>输出到文件：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof my_program &gt; analysis_report.txt</span><br></pre></td></tr></table></figure>
+<p>通过重定向输出可以将 <code>gprof</code> 的分析结果保存到文件中，以便后续查阅。</p>
+<h3 id="9-使用-GUI-工具："><a href="#9-使用-GUI-工具：" class="headerlink" title="9. 使用 GUI 工具："></a>9. <strong>使用 GUI 工具：</strong></h3><p>除了命令行分析外，<code>gprof</code> 还支持生成 <code>gmon.out</code> 文件，并使用 GUI 工具 <code>gprof2dot</code> 和 <code>dot</code>（Graphviz 工具）生成更直观的调用关系图。可以通过以下步骤实现：</p>
+<p>首先，使用 <code>-pg</code> 选项编译生成 <code>gmon.out</code> 文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -pg -o my_program my_source_code.c</span><br><span class="line">./my_program</span><br></pre></td></tr></table></figure>
+
+<p>然后，使用 <code>gprof2dot</code> 和 <code>dot</code> 工具生成调用关系图：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gprof my_program &gt; gmon.out</span><br><span class="line">gprof2dot -f gprof -n 0.5 -e 0.1 -w -o output.dot gmon.out</span><br><span class="line">dot -Tpng -o output.png output.dot</span><br></pre></td></tr></table></figure>
+<p>这里，<code>-n</code> 选项指定了显示的函数数量的阈值， <code>-e</code> 选项指定了独立时间的阈值， <code>-w</code> 选项指定了显示函数调用关系图。</p>
+<p>这些技巧可以帮助你更好地理解程序的性能瓶颈和调用关系，从而更有针对性地进行性能优化。</p>
+<h2 id="gprof"><a href="#gprof" class="headerlink" title="gprof"></a>gprof</h2><p>gprof 是一款用于分析和优化 C&#x2F;C++ 程序性能的工具。它可以在 Linux 系统上使用，并提供了丰富的统计信息来帮助开发人员识别程序中的性能瓶颈。</p>
+<p>下面是关于 gprof 的详细解释：</p>
+<ol>
+<li><p>安装 gprof：<br>要使用 gprof 工具，首先需要确保在 Linux 系统上安装了 GNU 编译器集合（GCC）。GCC 包括了 gprof 工具。如果你的系统上没有安装 GCC，可以使用包管理器来安装它。</p>
+</li>
+<li><p>编译程序：<br>在编译程序时，需要添加 -pg 选项来生成 gprof 所需的性能计数器。例如，使用以下命令编译程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -pg -o myprogram myprogram.c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行程序：<br>通过运行生成的可执行文件来执行程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./myprogram</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>生成 gmon.out 文件：<br>当程序执行完毕后，会生成一个名为 gmon.out 的文件，它包含了程序运行期间的性能数据。</p>
+</li>
+<li><p>分析程序性能：<br>使用 gprof 工具对 gmon.out 文件进行分析。运行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof myprogram</span><br></pre></td></tr></table></figure>
+<p>gprof 将输出包含程序的性能分析报告，其中包括函数调用图、函数执行时间和每个函数的调用次数等信息。</p>
+<p>gprof 输出的一部分是一个函数调用图，显示了函数之间的调用关系。调用关系图可以帮助你理解程序中函数之间的依赖关系和调用频率。</p>
+<p>另外，gprof 还会列出每个函数的执行时间和占用总时间的百分比。这些信息对于确定程序的瓶颈所在以及进行性能优化非常有帮助。</p>
+</li>
+</ol>
+<p>这是关于 gprof 工具的简要介绍。通过分析 gprof 的输出，你可以确定程序的性能瓶颈，并针对性地进行优化。希望这些信息对你有所帮助！</p>
+<h2 id="gprof命令是什么"><a href="#gprof命令是什么" class="headerlink" title="gprof命令是什么"></a>gprof命令是什么</h2><p><code>gprof</code> 是一个用于分析程序性能的工具，通常用于 C 和 C++ 程序。它可以生成程序的性能分析报告，显示程序中各个函数的执行时间和调用关系。</p>
+<p>通过 <code>gprof</code>，你可以了解程序中各个函数的执行时间、调用次数、以及函数之间的调用关系。这有助于识别程序中的瓶颈，找出哪些函数消耗了较多的时间，从而优化程序性能。</p>
+<p>要使用 <code>gprof</code> 工具进行程序性能分析，通常需要在编译时启用 <code>-pg</code> 编译选项来生成性能分析所需的信息。然后运行程序，让其产生 <code>gmon.out</code> 文件。接下来，使用 <code>gprof</code> 命令并指定程序的可执行文件和 <code>gmon.out</code> 文件作为参数，即可生成性能分析报告。</p>
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译时启用性能分析选项</span></span><br><span class="line">gcc -pg -o my_program my_program.c</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行程序，让其生成 gmon.out 文件</span></span><br><span class="line">./my_program</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 gprof 分析程序性能并生成报告</span></span><br><span class="line">gprof ./my_program gmon.out &gt; analysis_report.txt</span><br></pre></td></tr></table></figure>
+
+<p>生成的报告会显示每个函数的执行时间占比、调用次数、递归深度和调用关系等信息。这些信息有助于开发人员找到程序中需要优化的部分，提高程序的性能。</p>
+<h2 id="gprof命令-详解"><a href="#gprof命令-详解" class="headerlink" title="gprof命令 详解"></a>gprof命令 详解</h2><p><code>gprof</code> 是一个用于分析程序性能的工具，通常与 GNU 编译器集合（如 GCC）一起使用，用于 C 和 C++ 程序的性能分析。它可以生成程序的性能分析报告，显示程序中各个函数的执行时间和调用关系。</p>
+<p>以下是 <code>gprof</code> 命令的基本用法和选项：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gprof [options] executable [profile-data-files...]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>options</code>: <code>gprof</code> 命令的选项，可以用来控制分析的输出方式和内容。</li>
+<li><code>executable</code>: 要分析的程序的可执行文件。</li>
+<li><code>profile-data-files</code>: 可选参数，用于指定一个或多个包含性能分析数据的文件。默认情况下，<code>gprof</code> 将查找当前目录下的 <code>gmon.out</code> 文件。</li>
+</ul>
+<p>常用的 <code>gprof</code> 命令选项包括：</p>
+<ul>
+<li><code>-b</code>：使用扁平（flat）输出格式，显示每个函数的总执行时间、调用次数和平均执行时间。</li>
+<li><code>-a</code>：显示每个函数的调用图及递归调用关系。</li>
+<li><code>-p</code>：显示每个函数的执行时间占总执行时间的百分比。</li>
+<li><code>-q</code>：以静默模式运行，只输出报告而不显示进度信息。</li>
+<li><code>-z</code>：显示被优化（阉割）的函数列表。</li>
+<li><code>-s</code>：在报告中显示静态调用关系。</li>
+</ul>
+<p>示例用法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 分析程序的性能并输出报告到文件</span></span><br><span class="line">gprof ./my_program &gt; performance_report.txt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用更多选项进行性能分析，显示调用图和执行时间占比</span></span><br><span class="line">gprof -a -p ./my_program &gt; detailed_report.txt</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_78_gcore/" rel="prev" title="linux_2_78_gcore">
+      <i class="fa fa-chevron-left"></i> linux_2_78_gcore
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_75_wget/" rel="next" title="linux_2_75_wget">
+      linux_2_75_wget <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-gprof%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux gprof命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BC%96%E8%AF%91%E7%A8%8B%E5%BA%8F%E6%97%B6%E5%BC%80%E5%90%AF%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">1. 编译程序时开启性能分析选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BF%90%E8%A1%8C%E7%A8%8B%E5%BA%8F%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">2. 运行程序：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8-gprof-%E8%BF%9B%E8%A1%8C%E5%88%86%E6%9E%90%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">3. 使用 gprof 进行分析：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%94%9F%E6%88%90%E8%AF%A6%E7%BB%86%E6%8A%A5%E5%91%8A%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">4. 生成详细报告：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%8C%87%E5%AE%9A%E8%BE%93%E5%87%BA%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">5. 指定输出文件：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%98%BE%E7%A4%BA%E5%B9%B3%E5%9D%87%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4%EF%BC%9A"><span class="nav-number">2.6.</span> <span class="nav-text">6. 显示平均执行时间：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%98%BE%E7%A4%BA%E8%B0%83%E7%94%A8%E5%85%B3%E7%B3%BB%E5%9B%BE%EF%BC%9A"><span class="nav-number">2.7.</span> <span class="nav-text">7. 显示调用关系图：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%8C%87%E5%AE%9A%E5%88%86%E6%9E%90%E6%B7%B1%E5%BA%A6%EF%BC%9A"><span class="nav-number">2.8.</span> <span class="nav-text">8. 指定分析深度：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E6%98%BE%E7%A4%BA%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E7%9A%84%E7%B4%AF%E7%A7%AF%E6%97%B6%E9%97%B4%EF%BC%9A"><span class="nav-number">2.9.</span> <span class="nav-text">9. 显示函数执行的累积时间：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E6%98%BE%E7%A4%BA%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E7%9A%84%E7%8B%AC%E7%AB%8B%E6%97%B6%E9%97%B4%EF%BC%9A"><span class="nav-number">2.10.</span> <span class="nav-text">10. 显示函数执行的独立时间：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E6%8C%87%E5%AE%9A%E6%98%BE%E7%A4%BA%E7%9A%84%E5%87%BD%E6%95%B0%E6%95%B0%E9%87%8F%EF%BC%9A"><span class="nav-number">2.11.</span> <span class="nav-text">11. 指定显示的函数数量：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-%E6%98%BE%E7%A4%BA%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">2.12.</span> <span class="nav-text">12. 显示帮助信息：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-gprof%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux gprof命令 常用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%9F%A5%E7%9C%8B%E5%B9%B3%E5%9D%87%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">1. 查看平均执行时间：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%94%9F%E6%88%90%E8%AF%A6%E7%BB%86%E6%8A%A5%E5%91%8A%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">2. 生成详细报告：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%B0%83%E7%94%A8%E5%85%B3%E7%B3%BB%E5%9B%BE%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">3. 调用关系图：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%8C%87%E5%AE%9A%E5%88%86%E6%9E%90%E6%B7%B1%E5%BA%A6%EF%BC%9A"><span class="nav-number">3.4.</span> <span class="nav-text">4. 指定分析深度：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%98%BE%E7%A4%BA%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E7%9A%84%E7%B4%AF%E7%A7%AF%E6%97%B6%E9%97%B4%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text">5. 显示函数执行的累积时间：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%98%BE%E7%A4%BA%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E7%9A%84%E7%8B%AC%E7%AB%8B%E6%97%B6%E9%97%B4%EF%BC%9A"><span class="nav-number">3.6.</span> <span class="nav-text">6. 显示函数执行的独立时间：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%8C%87%E5%AE%9A%E6%98%BE%E7%A4%BA%E7%9A%84%E5%87%BD%E6%95%B0%E6%95%B0%E9%87%8F%EF%BC%9A"><span class="nav-number">3.7.</span> <span class="nav-text">7. 指定显示的函数数量：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E8%BE%93%E5%87%BA%E5%88%B0%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-number">3.8.</span> <span class="nav-text">8. 输出到文件：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E4%BD%BF%E7%94%A8-GUI-%E5%B7%A5%E5%85%B7%EF%BC%9A"><span class="nav-number">3.9.</span> <span class="nav-text">9. 使用 GUI 工具：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gprof"><span class="nav-number">4.</span> <span class="nav-text">gprof</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gprof%E5%91%BD%E4%BB%A4%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">5.</span> <span class="nav-text">gprof命令是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gprof%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">gprof命令 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

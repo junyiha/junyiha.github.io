@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 根据面试经验，做任何设计任务之前先进行市场调研，形成良好的思维方式，提高工作效率与工作质量 目前正在做机器人项目的任务设计模块，任务流程已经完成，在设计故障模块，本篇文章是关于机器人任务中故障模块的设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="故障模块设计调研">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/21/notebook/Tools/2025-02-21--%E6%95%85%E9%9A%9C%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1%E8%B0%83%E7%A0%94/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 根据面试经验，做任何设计任务之前先进行市场调研，形成良好的思维方式，提高工作效率与工作质量 目前正在做机器人项目的任务设计模块，任务流程已经完成，在设计故障模块，本篇文章是关于机器人任务中故障模块的设计">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-21T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.569Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Tools">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/21/notebook/Tools/2025-02-21--%E6%95%85%E9%9A%9C%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1%E8%B0%83%E7%A0%94/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>故障模块设计调研 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/21/notebook/Tools/2025-02-21--%E6%95%85%E9%9A%9C%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1%E8%B0%83%E7%A0%94/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          故障模块设计调研
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-21 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-21T09:00:00+08:00">2025-02-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>根据面试经验，做任何设计任务之前先进行市场调研，形成良好的思维方式，提高工作效率与工作质量</li>
+<li>目前正在做机器人项目的任务设计模块，任务流程已经完成，在设计故障模块，本篇文章是关于机器人任务中故障模块的设计</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="设计故障处理有什么方法论"><a href="#设计故障处理有什么方法论" class="headerlink" title="设计故障处理有什么方法论"></a>设计故障处理有什么方法论</h2><p>在设计故障处理流程时，采用系统化的方法论有助于提高效率和可靠性。以下是常见的故障处理方法论：</p>
+<ol>
+<li><p><strong>失效模式与影响分析（FMEA）</strong>：通过识别潜在的失效模式，评估其影响程度和发生频率，制定预防措施，减少故障发生的可能性。 citeturn0search10</p>
+</li>
+<li><p><strong>5 Whys 分析法</strong>：通过连续提出“为什么”来深入探究问题的根本原因，直至找到最初的故障源头，有助于制定有效的改进措施。 citeturn0search2</p>
+</li>
+<li><p><strong>故障树分析（FTA）</strong>：采用树状图形结构，从顶层事件出发，逐层分析可能的原因，帮助识别和评估系统中的潜在故障点。</p>
+</li>
+<li><p><strong>事件树分析（ETA）</strong>：从初始事件出发，分析其可能的后果和发展路径，评估不同事件序列的影响，制定相应的应对策略。</p>
+</li>
+<li><p><strong>决策理论故障排除</strong>：结合贝叶斯网络和决策理论，评估不同操作（如观察、修复、配置更改）的效果和成本，优化故障处理流程。 citeturn0academia11</p>
+</li>
+<li><p><strong>标准化故障处理流程</strong>：制定统一的故障处理步骤，包括故障检测、响应、修复、验证和复盘，确保团队在处理故障时有章可循，提高响应速度和处理质量。 citeturn0search0</p>
+</li>
+<li><p><strong>故障复盘机制</strong>：在故障处理完成后，组织相关人员进行复盘，分析故障原因、处理过程中的不足，制定改进措施，防止类似问题再次发生。 citeturn0search4</p>
+</li>
+</ol>
+<p>通过综合运用上述方法论，企业可以建立完善的故障处理体系，提高系统的可靠性和稳定性。 </p>
+<h2 id="故障树分析-详细介绍"><a href="#故障树分析-详细介绍" class="headerlink" title="故障树分析 详细介绍"></a>故障树分析 详细介绍</h2><h3 id="故障树分析（Fault-Tree-Analysis-FTA）详细介绍"><a href="#故障树分析（Fault-Tree-Analysis-FTA）详细介绍" class="headerlink" title="故障树分析（Fault Tree Analysis, FTA）详细介绍"></a><strong>故障树分析（Fault Tree Analysis, FTA）详细介绍</strong></h3><h4 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a><strong>1. 概述</strong></h4><p>故障树分析（FTA）是一种用于分析系统可靠性和安全性的逻辑建模方法。它通过树状结构描述系统故障的层次关系，从顶层事件（系统故障）出发，逐层分解，找到可能导致故障的基本事件，并计算系统的可靠性指标。</p>
+<h4 id="2-主要组成部分"><a href="#2-主要组成部分" class="headerlink" title="2. 主要组成部分"></a><strong>2. 主要组成部分</strong></h4><ol>
+<li><p><strong>顶事件（Top Event）</strong>：  </p>
+<ul>
+<li>研究的主要故障或不期望发生的事件，如”机器人停止运行”。</li>
+</ul>
+</li>
+<li><p><strong>中间事件（Intermediate Events）</strong>：  </p>
+<ul>
+<li>由多个基本事件组合而成，位于顶事件与基本事件之间，起到桥梁作用。</li>
+</ul>
+</li>
+<li><p><strong>基本事件（Basic Events）</strong>：  </p>
+<ul>
+<li>最底层的故障原因，通常是元器件损坏、人为操作失误等。</li>
+</ul>
+</li>
+<li><p><strong>逻辑门（Logic Gates）</strong>：  </p>
+<ul>
+<li>连接不同层次的事件，表示它们之间的逻辑关系。</li>
+<li><strong>AND 门</strong>（“与”关系）：所有输入事件都发生时，输出事件才会发生。</li>
+<li><strong>OR 门</strong>（“或”关系）：任意一个输入事件发生，输出事件就会发生。</li>
+</ul>
+</li>
+<li><p><strong>传输符号（Transfer Symbols）</strong>：  </p>
+<ul>
+<li>连接复杂系统中的多个故障树，便于管理大型系统。</li>
+</ul>
+</li>
+</ol>
+<h4 id="3-分析步骤"><a href="#3-分析步骤" class="headerlink" title="3. 分析步骤"></a><strong>3. 分析步骤</strong></h4><ol>
+<li><p><strong>确定顶事件</strong>：  </p>
+<ul>
+<li>确定需要分析的故障或不希望发生的事件。</li>
+</ul>
+</li>
+<li><p><strong>构建故障树</strong>：  </p>
+<ul>
+<li>通过逻辑分析逐步分解故障原因，构建树状结构。</li>
+</ul>
+</li>
+<li><p><strong>定性分析</strong>：  </p>
+<ul>
+<li><strong>最小割集（Minimal Cut Set, MCS）</strong>：  <ul>
+<li>找出导致顶事件发生的最小事件组合。</li>
+</ul>
+</li>
+<li><strong>最小径集（Minimal Path Set, MPS）</strong>：  <ul>
+<li>找出使系统正常运行所必需的事件组合。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>定量分析</strong>：  </p>
+<ul>
+<li>计算顶事件的发生概率，评估系统可靠性：<ul>
+<li>若采用 OR 门，则：<br>[<br>P(T) &#x3D; 1 - \prod_{i&#x3D;1}^{n} (1 - P_i)<br>]</li>
+<li>若采用 AND 门，则：<br>[<br>P(T) &#x3D; \prod_{i&#x3D;1}^{n} P_i<br>]</li>
+</ul>
+</li>
+<li>其中 ( P(T) ) 为顶事件发生概率，( P_i ) 为基本事件发生概率。</li>
+</ul>
+</li>
+<li><p><strong>改进措施</strong>：  </p>
+<ul>
+<li>针对关键基本事件，提出优化方案，如增加冗余、改进设计、提升检测能力等。</li>
+</ul>
+</li>
+</ol>
+<h4 id="4-应用领域"><a href="#4-应用领域" class="headerlink" title="4. 应用领域"></a><strong>4. 应用领域</strong></h4><ul>
+<li><strong>机器人系统</strong>：分析机械、电子或软件故障导致的运行失败。</li>
+<li><strong>航空航天</strong>：分析发动机或飞行控制系统的可靠性问题。</li>
+<li><strong>核电与电力系统</strong>：预测电网或核电站的关键故障模式。</li>
+<li><strong>汽车制造</strong>：分析汽车关键部件（如制动系统、传感器等）的失效模式。</li>
+</ul>
+<h4 id="5-工具与实现"><a href="#5-工具与实现" class="headerlink" title="5. 工具与实现"></a><strong>5. 工具与实现</strong></h4><ul>
+<li><p><strong>专业软件</strong>：</p>
+<ul>
+<li><strong>ITEM Toolkit</strong>：专业FTA分析软件。</li>
+<li><strong>ReliaSoft BlockSim</strong>：支持故障树建模和可靠性计算。</li>
+<li><strong>Fault Tree+（FT+）</strong>：用于安全分析和系统可靠性建模。</li>
+</ul>
+</li>
+<li><p><strong>开源工具</strong>：</p>
+<ul>
+<li><strong>Python</strong>：<ul>
+<li><code>networkx</code> 用于构建故障树。</li>
+<li><code>matplotlib</code> 用于可视化分析。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>MATLAB</strong>：</p>
+<ul>
+<li>提供 <code>faultTree</code> 模块支持故障树建模和仿真分析。</li>
+</ul>
+</li>
+</ul>
+<h4 id="6-示例：机器人系统故障树"><a href="#6-示例：机器人系统故障树" class="headerlink" title="6. 示例：机器人系统故障树"></a><strong>6. 示例：机器人系统故障树</strong></h4><p>假设要分析“机器人停止运行”的故障，可能的原因有：</p>
+<ol>
+<li><strong>电源故障</strong>（可能由于电池损坏或线路短路）。</li>
+<li><strong>驱动系统故障</strong>（电机损坏或驱动电路故障）。</li>
+<li><strong>传感器故障</strong>（导致机器人无法正常识别环境）。</li>
+</ol>
+<p>可构建如下故障树：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">           机器人停止运行（顶事件）</span><br><span class="line">                │</span><br><span class="line">     ┌─────────┴─────────┐</span><br><span class="line">     │                   │</span><br><span class="line"> 电源故障           传感器故障</span><br><span class="line">     │                   │</span><br><span class="line">电池损坏         传感器信号丢失</span><br></pre></td></tr></table></figure>
+<p>基于此故障树，可以进一步分析最小割集、计算发生概率，并采取针对性的优化措施，如增加备用电源或增强传感器抗干扰能力。</p>
+<hr>
+<p>通过故障树分析（FTA），可以系统地识别和评估故障模式，从而优化机器人系统设计，提高可靠性和安全性。</p>
+<h2 id="故障树设计"><a href="#故障树设计" class="headerlink" title="故障树设计"></a>故障树设计</h2><h3 id="故障树设计（Fault-Tree-Design）"><a href="#故障树设计（Fault-Tree-Design）" class="headerlink" title="故障树设计（Fault Tree Design）"></a><strong>故障树设计（Fault Tree Design）</strong></h3><h4 id="1-设计目标"><a href="#1-设计目标" class="headerlink" title="1. 设计目标"></a><strong>1. 设计目标</strong></h4><p>故障树设计的目标是<strong>识别、分析和减少系统中的潜在故障</strong>，提高系统的可靠性和安全性。主要步骤包括：</p>
+<ul>
+<li>明确顶事件（要分析的故障）。</li>
+<li>识别导致顶事件的直接原因。</li>
+<li>通过逻辑关系构建树状结构，分析底层基本事件。</li>
+<li>进行定性和定量分析，以优化系统设计。</li>
+</ul>
+<hr>
+<h4 id="2-设计步骤"><a href="#2-设计步骤" class="headerlink" title="2. 设计步骤"></a><strong>2. 设计步骤</strong></h4><h5 id="（1）确定顶事件"><a href="#（1）确定顶事件" class="headerlink" title="（1）确定顶事件"></a><strong>（1）确定顶事件</strong></h5><p>顶事件是系统中不希望发生的重大故障。例如：</p>
+<ul>
+<li>机器人失去控制</li>
+<li>设备宕机</li>
+<li>生产线停工</li>
+<li>软件崩溃</li>
+</ul>
+<h5 id="（2）分解顶事件"><a href="#（2）分解顶事件" class="headerlink" title="（2）分解顶事件"></a><strong>（2）分解顶事件</strong></h5><p>识别导致顶事件的主要故障原因，并构建中间事件。例如，”机器人失去控制” 可能由以下因素引起：</p>
+<ul>
+<li>电源系统故障</li>
+<li>控制系统故障</li>
+<li>传感器故障</li>
+<li>通信故障</li>
+</ul>
+<h5 id="（3）构建逻辑关系"><a href="#（3）构建逻辑关系" class="headerlink" title="（3）构建逻辑关系"></a><strong>（3）构建逻辑关系</strong></h5><p>使用逻辑门（AND &#x2F; OR）连接事件：</p>
+<ul>
+<li><strong>OR 门</strong>：表示任意一个子事件发生，父事件就会发生。</li>
+<li><strong>AND 门</strong>：表示所有子事件发生时，父事件才会发生。</li>
+</ul>
+<h5 id="（4）细化基本事件"><a href="#（4）细化基本事件" class="headerlink" title="（4）细化基本事件"></a><strong>（4）细化基本事件</strong></h5><p>逐步分解各个中间事件，直到找到具体的基本事件。例如：</p>
+<ul>
+<li><strong>电源系统故障</strong><ul>
+<li>电池损坏</li>
+<li>供电线路短路</li>
+<li>电源管理模块异常</li>
+</ul>
+</li>
+<li><strong>控制系统故障</strong><ul>
+<li>处理器故障</li>
+<li>软件崩溃</li>
+<li>计算错误</li>
+</ul>
+</li>
+</ul>
+<h5 id="（5）绘制故障树"><a href="#（5）绘制故障树" class="headerlink" title="（5）绘制故障树"></a><strong>（5）绘制故障树</strong></h5><p>用树状结构表示事件之间的关系，可以手绘或使用软件（如<code>Graphviz</code>、<code>Reliability Workbench</code>、<code>MATLAB</code>）。</p>
+<hr>
+<h4 id="3-示例：机器人系统故障树设计"><a href="#3-示例：机器人系统故障树设计" class="headerlink" title="3. 示例：机器人系统故障树设计"></a><strong>3. 示例：机器人系统故障树设计</strong></h4><h5 id="目标：分析“机器人失去控制”的故障模式"><a href="#目标：分析“机器人失去控制”的故障模式" class="headerlink" title="目标：分析“机器人失去控制”的故障模式"></a><strong>目标：分析“机器人失去控制”的故障模式</strong></h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">                    机器人失去控制（顶事件）</span><br><span class="line">                             │</span><br><span class="line">     ┌───────────────┴───────────────┐</span><br><span class="line">     │                               │</span><br><span class="line">  电源故障                     控制系统故障</span><br><span class="line">     │                               │</span><br><span class="line"> ┌───┴───┐                    ┌─────┴─────┐</span><br><span class="line"> │       │                    │           │</span><br><span class="line">电池损坏  线路短路       处理器故障    软件崩溃</span><br></pre></td></tr></table></figure>
+<hr>
+<h4 id="4-计算与优化"><a href="#4-计算与优化" class="headerlink" title="4. 计算与优化"></a><strong>4. 计算与优化</strong></h4><h5 id="（1）最小割集分析"><a href="#（1）最小割集分析" class="headerlink" title="（1）最小割集分析"></a><strong>（1）最小割集分析</strong></h5><ul>
+<li><strong>最小割集（Minimal Cut Set, MCS）</strong>：导致顶事件发生的最小事件组合。<ul>
+<li>例如：<code>&#123;电池损坏&#125;</code>、<code>&#123;线路短路&#125;</code>、<code>&#123;处理器故障&#125;</code>。</li>
+<li>这些事件是关键故障点，应重点预防。</li>
+</ul>
+</li>
+</ul>
+<h5 id="（2）定量分析"><a href="#（2）定量分析" class="headerlink" title="（2）定量分析"></a><strong>（2）定量分析</strong></h5><ul>
+<li>计算各基本事件发生的概率，并使用公式计算顶事件的概率：<ul>
+<li>OR 门：<br>[<br>P(T) &#x3D; 1 - \prod_{i&#x3D;1}^{n} (1 - P_i)<br>]</li>
+<li>AND 门：<br>[<br>P(T) &#x3D; \prod_{i&#x3D;1}^{n} P_i<br>]</li>
+</ul>
+</li>
+<li>例如，如果 <code>电池损坏 P=0.02</code>，<code>线路短路 P=0.01</code>：<br>[<br>P(电源故障) &#x3D; 1 - (1 - 0.02) \times (1 - 0.01) &#x3D; 0.0298<br>]</li>
+</ul>
+<h5 id="（3）优化措施"><a href="#（3）优化措施" class="headerlink" title="（3）优化措施"></a><strong>（3）优化措施</strong></h5><ul>
+<li><strong>提高冗余设计</strong>（增加备用电池、防止单点故障）。</li>
+<li><strong>加强预测维护</strong>（定期检查电源线路、测试控制软件）。</li>
+<li><strong>增加容错机制</strong>（自动重启、降级运行模式）。</li>
+</ul>
+<hr>
+<h3 id="5-设计工具"><a href="#5-设计工具" class="headerlink" title="5. 设计工具"></a><strong>5. 设计工具</strong></h3><ul>
+<li><p><strong>软件工具</strong></p>
+<ul>
+<li><strong>Graphviz</strong>（开源绘图工具）</li>
+<li><strong>Reliability Workbench</strong>（专业故障树分析）</li>
+<li><strong>MATLAB</strong>（支持故障树建模）</li>
+<li>**Python <code>networkx</code> + <code>matplotlib</code>**（可编程分析）</li>
+</ul>
+</li>
+<li><p><strong>编程示例（Python）</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> networkx <span class="keyword">as</span> nx</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">G = nx.DiGraph()</span><br><span class="line">G.add_edges_from([</span><br><span class="line">    (<span class="string">&quot;机器人失去控制&quot;</span>, <span class="string">&quot;电源故障&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;机器人失去控制&quot;</span>, <span class="string">&quot;控制系统故障&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;电源故障&quot;</span>, <span class="string">&quot;电池损坏&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;电源故障&quot;</span>, <span class="string">&quot;线路短路&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;控制系统故障&quot;</span>, <span class="string">&quot;处理器故障&quot;</span>),</span><br><span class="line">    (<span class="string">&quot;控制系统故障&quot;</span>, <span class="string">&quot;软件崩溃&quot;</span>)</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">plt.figure(figsize=(<span class="number">8</span>, <span class="number">6</span>))</span><br><span class="line">pos = nx.spring_layout(G)</span><br><span class="line">nx.draw(G, pos, with_labels=<span class="literal">True</span>, node_color=<span class="string">&quot;lightblue&quot;</span>, edge_color=<span class="string">&quot;gray&quot;</span>, node_size=<span class="number">3000</span>, font_size=<span class="number">10</span>)</span><br><span class="line">plt.title(<span class="string">&quot;机器人故障树&quot;</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="6-结论"><a href="#6-结论" class="headerlink" title="6. 结论"></a><strong>6. 结论</strong></h3><p>故障树设计是一种有效的<strong>系统故障分析工具</strong>，可以：</p>
+<ul>
+<li>系统化地识别关键故障点</li>
+<li>进行定性和定量分析</li>
+<li>提供优化方向，提高系统可靠性</li>
+</ul>
+<p>你希望进一步细化某个具体案例吗？</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Tools/" rel="tag"># Tools</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/20/notebook/Interview/2025-02-20--%E7%BB%BC%E5%90%88%E7%B4%A0%E8%B4%A8/" rel="prev" title="个人综合素质">
+      <i class="fa fa-chevron-left"></i> 个人综合素质
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/21/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-21--%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/" rel="next" title="C++中的错误处理">
+      C++中的错误处理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%95%85%E9%9A%9C%E5%A4%84%E7%90%86%E6%9C%89%E4%BB%80%E4%B9%88%E6%96%B9%E6%B3%95%E8%AE%BA"><span class="nav-number">2.</span> <span class="nav-text">设计故障处理有什么方法论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E6%A0%91%E5%88%86%E6%9E%90-%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">故障树分析 详细介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E6%A0%91%E5%88%86%E6%9E%90%EF%BC%88Fault-Tree-Analysis-FTA%EF%BC%89%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.1.</span> <span class="nav-text">故障树分析（Fault Tree Analysis, FTA）详细介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%A6%82%E8%BF%B0"><span class="nav-number">3.1.1.</span> <span class="nav-text">1. 概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E4%B8%BB%E8%A6%81%E7%BB%84%E6%88%90%E9%83%A8%E5%88%86"><span class="nav-number">3.1.2.</span> <span class="nav-text">2. 主要组成部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%88%86%E6%9E%90%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.1.3.</span> <span class="nav-text">3. 分析步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%BA%94%E7%94%A8%E9%A2%86%E5%9F%9F"><span class="nav-number">3.1.4.</span> <span class="nav-text">4. 应用领域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E5%B7%A5%E5%85%B7%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.1.5.</span> <span class="nav-text">5. 工具与实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%B3%BB%E7%BB%9F%E6%95%85%E9%9A%9C%E6%A0%91"><span class="nav-number">3.1.6.</span> <span class="nav-text">6. 示例：机器人系统故障树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E6%A0%91%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">故障树设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E6%A0%91%E8%AE%BE%E8%AE%A1%EF%BC%88Fault-Tree-Design%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">故障树设计（Fault Tree Design）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%AE%BE%E8%AE%A1%E7%9B%AE%E6%A0%87"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 设计目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%AE%BE%E8%AE%A1%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 设计步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E7%A1%AE%E5%AE%9A%E9%A1%B6%E4%BA%8B%E4%BB%B6"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">（1）确定顶事件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%88%86%E8%A7%A3%E9%A1%B6%E4%BA%8B%E4%BB%B6"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">（2）分解顶事件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%9E%84%E5%BB%BA%E9%80%BB%E8%BE%91%E5%85%B3%E7%B3%BB"><span class="nav-number">4.1.2.3.</span> <span class="nav-text">（3）构建逻辑关系</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%BB%86%E5%8C%96%E5%9F%BA%E6%9C%AC%E4%BA%8B%E4%BB%B6"><span class="nav-number">4.1.2.4.</span> <span class="nav-text">（4）细化基本事件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%885%EF%BC%89%E7%BB%98%E5%88%B6%E6%95%85%E9%9A%9C%E6%A0%91"><span class="nav-number">4.1.2.5.</span> <span class="nav-text">（5）绘制故障树</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%B3%BB%E7%BB%9F%E6%95%85%E9%9A%9C%E6%A0%91%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.1.3.</span> <span class="nav-text">3. 示例：机器人系统故障树设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%EF%BC%9A%E5%88%86%E6%9E%90%E2%80%9C%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%A4%B1%E5%8E%BB%E6%8E%A7%E5%88%B6%E2%80%9D%E7%9A%84%E6%95%85%E9%9A%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.1.3.1.</span> <span class="nav-text">目标：分析“机器人失去控制”的故障模式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E8%AE%A1%E7%AE%97%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">4.1.4.</span> <span class="nav-text">4. 计算与优化</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%9C%80%E5%B0%8F%E5%89%B2%E9%9B%86%E5%88%86%E6%9E%90"><span class="nav-number">4.1.4.1.</span> <span class="nav-text">（1）最小割集分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%AE%9A%E9%87%8F%E5%88%86%E6%9E%90"><span class="nav-number">4.1.4.2.</span> <span class="nav-text">（2）定量分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E4%BC%98%E5%8C%96%E6%8E%AA%E6%96%BD"><span class="nav-number">4.1.4.3.</span> <span class="nav-text">（3）优化措施</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E8%AE%BE%E8%AE%A1%E5%B7%A5%E5%85%B7"><span class="nav-number">4.2.</span> <span class="nav-text">5. 设计工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E7%BB%93%E8%AE%BA"><span class="nav-number">4.3.</span> <span class="nav-text">6. 结论</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

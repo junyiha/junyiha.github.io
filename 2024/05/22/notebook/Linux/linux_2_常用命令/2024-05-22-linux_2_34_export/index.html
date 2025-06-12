@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 export命令  linux export命令 详解export命令用于将变量设置为环境变量，使其在当前Shell及其子进程中可见。环境变量是一种全局变量，对于所有运行在当前Shell下的命令都是可见的。以下是export命令的基本语法和一些示例： 基本语法：1export VARIABLE&#x3D;value  其中，VARIABLE是环境变量的名称，value是变量的值。 示例： 设置单个环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_34_export">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_34_export/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 export命令  linux export命令 详解export命令用于将变量设置为环境变量，使其在当前Shell及其子进程中可见。环境变量是一种全局变量，对于所有运行在当前Shell下的命令都是可见的。以下是export命令的基本语法和一些示例： 基本语法：1export VARIABLE&#x3D;value  其中，VARIABLE是环境变量的名称，value是变量的值。 示例： 设置单个环境">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.345Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_34_export/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_34_export | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_34_export/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_34_export
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>export命令</li>
+</ul>
+<h2 id="linux-export命令-详解"><a href="#linux-export命令-详解" class="headerlink" title="linux export命令 详解"></a>linux export命令 详解</h2><p><code>export</code>命令用于将变量设置为环境变量，使其在当前Shell及其子进程中可见。环境变量是一种全局变量，对于所有运行在当前Shell下的命令都是可见的。以下是<code>export</code>命令的基本语法和一些示例：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> VARIABLE=value</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>VARIABLE</code>是环境变量的名称，<code>value</code>是变量的值。</p>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ol>
+<li><p><strong>设置单个环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> MY_VARIABLE=<span class="string">&quot;Hello, World!&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这将创建一个名为<code>MY_VARIABLE</code>的环境变量，其值为”Hello, World!”。</p>
+</li>
+<li><p><strong>设置多个环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> VAR1=<span class="string">&quot;Value1&quot;</span> VAR2=<span class="string">&quot;Value2&quot;</span></span><br></pre></td></tr></table></figure>
+<p>通过在一行上设置多个变量，可以一次性导出多个环境变量。</p>
+</li>
+<li><p><strong>在变量中包含空格：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> GREETING=<span class="string">&quot;Hello, World!&quot;</span></span><br></pre></td></tr></table></figure>
+<p>如果变量的值包含空格或特殊字符，可以使用引号将其括起来。</p>
+</li>
+<li><p><strong>查看当前的环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span></span><br></pre></td></tr></table></figure>
+<p>不带任何参数，可以查看当前所有的环境变量。</p>
+</li>
+<li><p><strong>在一行中执行命令并设置环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MY_VARIABLE=<span class="string">&quot;Hello&quot;</span> <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>在执行命令前设置环境变量，仅对该命令生效。</p>
+</li>
+</ol>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><p><strong>环境变量生命周期：</strong> 使用<code>export</code>设置的环境变量在当前Shell及其所有子进程中可见。当当前Shell关闭时，这些环境变量也将失效。</p>
+</li>
+<li><p><strong>查看特定环境变量：</strong> 若要查看特定环境变量的值，可以使用<code>echo</code>命令或<code>env</code>命令。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$MY_VARIABLE</span></span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">env</span> | grep MY_VARIABLE</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>永久设置环境变量：</strong> 若要使环境变量在系统重启后仍然有效，可以将<code>export</code>语句添加到用户的配置文件（如<code>~/.bashrc</code>或<code>~/.bash_profile</code>）中。</p>
+</li>
+<li><p><strong>无需<code>export</code>的本地变量：</strong> 如果变量只在当前Shell中使用，而不需要在子进程中可见，可以不使用<code>export</code>，直接设置变量即可。</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MY_LOCAL_VARIABLE=<span class="string">&quot;Local Value&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>export</code>命令是在Shell脚本和交互式Shell中管理环境变量的重要工具，它允许你创建、修改和删除环境变量，以满足特定的需求。</p>
+<h2 id="linux-export命令-常用技巧"><a href="#linux-export命令-常用技巧" class="headerlink" title="linux export命令 常用技巧"></a>linux export命令 常用技巧</h2><p>在使用<code>export</code>命令时，有一些常用的技巧和选项，可以帮助你更灵活地处理环境变量。以下是一些常见的<code>export</code>命令技巧：</p>
+<ol>
+<li><p><strong>在一行中执行命令并设置环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MY_VARIABLE=<span class="string">&quot;Hello&quot;</span> <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>在执行命令前设置环境变量，仅对该命令生效。</p>
+</li>
+<li><p><strong>在一行中定义并导出环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> MY_VARIABLE=<span class="string">&quot;Hello&quot;</span> &amp;&amp; <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>&amp;&amp;</code>运算符可以确保导出环境变量后再执行后续的命令。</p>
+</li>
+<li><p><strong>清除环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unset</span> MY_VARIABLE</span><br></pre></td></tr></table></figure>
+<p>使用<code>unset</code>命令可以清除已导出的环境变量。</p>
+</li>
+<li><p><strong>将变量值追加到现有值：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/new/directory</span><br></pre></td></tr></table></figure>
+<p>使用<code>$PATH</code>获取现有的<code>PATH</code>值，并将新目录追加到其中。</p>
+</li>
+<li><p><strong>设置多个变量并导出：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> VAR1=<span class="string">&quot;Value1&quot;</span> VAR2=<span class="string">&quot;Value2&quot;</span></span><br></pre></td></tr></table></figure>
+<p>通过在一行上设置多个变量，可以一次性导出多个环境变量。</p>
+</li>
+<li><p><strong>查看当前Shell的所有环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span></span><br></pre></td></tr></table></figure>
+<p>不带任何参数，可以查看当前所有的环境变量。</p>
+</li>
+<li><p><strong>在子Shell中执行命令并保留环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="built_in">export</span> MY_VARIABLE=<span class="string">&quot;Hello&quot;</span> &amp;&amp; some_command)</span><br></pre></td></tr></table></figure>
+<p>使用圆括号创建子Shell，在其中执行命令，并确保在子Shell中导出的环境变量不会影响到父Shell。</p>
+</li>
+<li><p><strong>将命令的输出赋值给变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> MY_VARIABLE=$(some_command)</span><br></pre></td></tr></table></figure>
+<p>使用命令替换<code>$()</code>将命令的输出赋值给环境变量。</p>
+</li>
+<li><p><strong>将当前目录添加到<code>PATH</code>中：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:.</span><br></pre></td></tr></table></figure>
+<p>将当前目录添加到<code>PATH</code>中，以便执行当前目录中的命令。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更好地使用<code>export</code>命令，灵活地管理和调整环境变量，以满足不同的需求。确保理解环境变量的生命周期和影响范围，以避免潜在的问题。</p>
+<h2 id="export"><a href="#export" class="headerlink" title="export"></a>export</h2><ul>
+<li>export,命令用于设置或显示环境变量</li>
+<li>在shell中执行程序时,shell会提供一组环境变量.</li>
+<li>export可新增,修改或删除环境变量,供后续执行的程序使用</li>
+<li>export的效力仅限于该次登录操作</li>
+<li>语法:<code>export [-fnp] [变量名称] = [变量设置值]</code><ul>
+<li><code>-f</code>:代表变量名称中为函数名称</li>
+<li><code>-n</code>:删除指定的变量.变量实际上并未删除,只是不会输出到后续指令的执行环境中</li>
+<li><code>-p</code>:列出所有的shell赋予程序的环境变量</li>
+</ul>
+</li>
+</ul>
+<p>在Linux中，<code>export</code>命令用于设置环境变量。环境变量是在Shell会话中可用的全局变量，它们包含了对系统行为和配置起作用的值。</p>
+<p>以下是<code>export</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export [option] variable=value</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>option</code>是可选的一些选项，<code>variable</code>是要设置的环境变量的名称，<code>value</code>是要分配给该环境变量的值。</p>
+<p>以下是一些常见的<code>export</code>命令选项和用法：</p>
+<ol>
+<li><p>设置环境变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export VARIABLE=value</span><br></pre></td></tr></table></figure>
+
+<p>此命令将设置名为<code>VARIABLE</code>的环境变量，并将其值设置为<code>value</code>。</p>
+</li>
+<li><p>查看当前环境变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export</span><br></pre></td></tr></table></figure>
+
+<p>此命令将列出当前所有已设置的环境变量及其值。</p>
+</li>
+<li><p>设置多个环境变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export VAR1=value1 VAR2=value2 VAR3=value3</span><br></pre></td></tr></table></figure>
+
+<p>此命令将一次性设置多个环境变量，并为每个变量指定一个值。</p>
+</li>
+</ol>
+<p>环境变量在Shell会话中起作用，它们可以用于配置系统行为、定义路径、设置临时变量等。通过<code>export</code>命令设置的环境变量可以在当前Shell会话及其子进程中访问。</p>
+<p>请注意，通过<code>export</code>命令设置的环境变量在Shell会话结束时会失效。如果您希望永久性地设置环境变量，可以将其添加到Shell配置文件（如<code>.bashrc</code>或<code>.profile</code>）中。</p>
+<h2 id="linux-export命令-高级技巧"><a href="#linux-export命令-高级技巧" class="headerlink" title="linux export命令 高级技巧"></a>linux export命令 高级技巧</h2><p>在高级应用场景下，<code>export</code>命令可以结合其他工具和技巧，提供更灵活、强大的环境变量管理。以下是一些高级的<code>export</code>命令技巧：</p>
+<ol>
+<li><p><strong>使用<code>env</code>命令预设环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">env</span> MY_VARIABLE=<span class="string">&quot;Hello&quot;</span> some_command</span><br></pre></td></tr></table></figure>
+<p>使用<code>env</code>命令可以在执行命令的同时预设环境变量，而不需要显式使用<code>export</code>。</p>
+</li>
+<li><p><strong>在脚本中使用<code>set -a</code>导出所有变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -a</span><br><span class="line">MY_VARIABLE=<span class="string">&quot;Hello&quot;</span></span><br><span class="line">some_command</span><br></pre></td></tr></table></figure>
+<p>使用<code>set -a</code>可以自动将所有变量导出为环境变量，而无需显式使用<code>export</code>。</p>
+</li>
+<li><p><strong>使用<code>declare</code>命令声明并导出环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">declare</span> -x MY_VARIABLE=<span class="string">&quot;Hello&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>declare -x</code>命令可以声明并导出环境变量，类似于<code>export</code>的作用。</p>
+</li>
+<li><p><strong>通过<code>source</code>命令加载变量定义：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> my_variables.sh</span><br></pre></td></tr></table></figure>
+<p>将变量定义存储在脚本中，然后使用<code>source</code>或<code>.</code>命令加载它们，使其成为当前Shell的一部分。</p>
+</li>
+<li><p><strong>使用<code>trap</code>命令在脚本退出时清除环境变量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">trap</span> <span class="string">&#x27;unset MY_VARIABLE&#x27;</span> EXIT</span><br><span class="line">MY_VARIABLE=<span class="string">&quot;Hello&quot;</span></span><br><span class="line">some_command</span><br></pre></td></tr></table></figure>
+<p>使用<code>trap</code>命令可以在脚本退出时自动清除导出的环境变量。</p>
+</li>
+<li><p><strong>动态设置<code>PS1</code>环境变量以自定义Shell提示符：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PS1=<span class="string">&#x27;\u@\h:\w\$ &#x27;</span></span><br></pre></td></tr></table></figure>
+<p>定义<code>PS1</code>环境变量可以自定义Shell的提示符，提高Shell使用体验。</p>
+</li>
+<li><p><strong>使用<code>eval</code>执行动态生成的<code>export</code>语句：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;export <span class="variable">$VARIABLE_NAME</span>=<span class="variable">$VARIABLE_VALUE</span>&quot;</span></span><br></pre></td></tr></table></figure>
+<p>在脚本中使用<code>eval</code>执行动态生成的<code>export</code>语句，根据需要设置环境变量。</p>
+</li>
+<li><p><strong>使用<code>declare</code>动态创建函数并导出：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">declare</span> -fx my_function</span><br><span class="line"><span class="built_in">export</span> -f my_function</span><br></pre></td></tr></table></figure>
+<p>使用<code>declare -f</code>可以导出函数定义作为环境变量，然后使用<code>export -f</code>进行导出。</p>
+</li>
+</ol>
+<p>这些高级技巧可以在更复杂的脚本和环境中提供更大的灵活性。在使用这些技巧时，要注意确保代码的可读性和安全性，以及理解环境变量的作用范围和生命周期。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_38_chown/" rel="prev" title="linux_2_38_chown">
+      <i class="fa fa-chevron-left"></i> linux_2_38_chown
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_32_eval/" rel="next" title="linux_2_32_eval">
+      linux_2_32_eval <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-export%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux export命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-export%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux export命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#export"><span class="nav-number">4.</span> <span class="nav-text">export</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-export%E5%91%BD%E4%BB%A4-%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7"><span class="nav-number">5.</span> <span class="nav-text">linux export命令 高级技巧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 tensorflow serving库相关笔记  TensorFlow Serving是什么 TensorFlow Serving 是一个适用于机器学习模型的灵活、高性能应用系统，专为生产环境而设计。借助 TensorFlow Serving，您可以轻松部署新算法和实验，同时保留相同的服务器架构和 API。TensorFlow Serving 提供与 TensorFlow 模型的开箱即用型集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow_serving">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/DeepLearning/2024-05-22-tensorflow_serving/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 tensorflow serving库相关笔记  TensorFlow Serving是什么 TensorFlow Serving 是一个适用于机器学习模型的灵活、高性能应用系统，专为生产环境而设计。借助 TensorFlow Serving，您可以轻松部署新算法和实验，同时保留相同的服务器架构和 API。TensorFlow Serving 提供与 TensorFlow 模型的开箱即用型集">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.284Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="DL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/DeepLearning/2024-05-22-tensorflow_serving/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>tensorflow_serving | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/DeepLearning/2024-05-22-tensorflow_serving/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorflow_serving
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>tensorflow serving库相关笔记</li>
+</ul>
+<h2 id="TensorFlow-Serving是什么"><a href="#TensorFlow-Serving是什么" class="headerlink" title="TensorFlow Serving是什么"></a>TensorFlow Serving是什么</h2><ul>
+<li>TensorFlow Serving 是一个适用于机器学习模型的灵活、高性能应用系统，专为生产环境而设计。借助 TensorFlow Serving，您可以轻松部署新算法和实验，同时保留相同的服务器架构和 API。TensorFlow Serving 提供与 TensorFlow 模型的开箱即用型集成，但也可以轻松扩展以应用其他类型的模型和数据。</li>
+</ul>
+<h2 id="C-tensorflow-serving库-详解"><a href="#C-tensorflow-serving库-详解" class="headerlink" title="C++ tensorflow serving库 详解"></a>C++ tensorflow serving库 详解</h2><p>TensorFlow Serving 是一个用于部署机器学习模型的开源库，它提供了一个高性能、灵活的方式来将训练好的 TensorFlow 模型部署到生产环境中，以便进行实时预测。虽然 TensorFlow Serving 主要是用 C++ 实现的，但它也提供了 Python API 以方便用户使用。</p>
+<p>下面是对 TensorFlow Serving C++ 库的详细介绍：</p>
+<ol>
+<li><p><strong>核心功能</strong>：</p>
+<ul>
+<li>加载和管理模型：TensorFlow Serving 能够加载和管理训练好的 TensorFlow 模型，包括 SavedModel 格式。</li>
+<li>提供预测服务：一旦模型被加载，TensorFlow Serving 可以为客户端提供实时的预测服务，支持单个或批量请求。</li>
+<li>高性能和可扩展性：TensorFlow Serving 在设计上注重性能和可扩展性，能够处理高并发的请求并保持低延迟。</li>
+</ul>
+</li>
+<li><p><strong>架构</strong>：</p>
+<ul>
+<li>TensorFlow Serving 的架构主要由三个组件组成：Servable、Loader 和 Servable Manager。</li>
+<li>Servable 是指 TensorFlow 模型的一种抽象，它代表了一个可部署的模型或模型的版本。</li>
+<li>Loader 负责加载 Servable，并在需要时将其初始化或卸载。</li>
+<li>Servable Manager 负责管理 Servable 的生命周期，包括加载、卸载和路由请求等。</li>
+</ul>
+</li>
+<li><p><strong>部署流程</strong>：</p>
+<ul>
+<li>准备模型：首先需要使用 TensorFlow 训练模型，并将其保存为 SavedModel 格式。</li>
+<li>配置 TensorFlow Serving：创建一个模型配置文件，指定模型的路径、输入和输出等信息。</li>
+<li>启动 TensorFlow Serving：运行 TensorFlow Serving 服务器，并指定模型配置文件。</li>
+<li>发送请求：客户端向 TensorFlow Serving 发送预测请求，服务器返回预测结果。</li>
+</ul>
+</li>
+<li><p><strong>使用示例</strong>：<br>下面是一个简单的 TensorFlow Serving C++ 应用示例，假设我们已经有一个名为 <code>my_model</code> 的 SavedModel：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;grpcpp/grpcpp.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tensorflow_serving/apis/prediction_service.grpc.pb.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> grpc::Channel;</span><br><span class="line"><span class="keyword">using</span> grpc::ClientContext;</span><br><span class="line"><span class="keyword">using</span> grpc::Status;</span><br><span class="line"><span class="keyword">using</span> tensorflow::serving::PredictRequest;</span><br><span class="line"><span class="keyword">using</span> tensorflow::serving::PredictResponse;</span><br><span class="line"><span class="keyword">using</span> tensorflow::serving::PredictionService;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TensorFlowServingClient</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">TensorFlowServingClient</span>(std::shared_ptr&lt;Channel&gt; channel)</span><br><span class="line">        : <span class="built_in">stub_</span>(PredictionService::<span class="built_in">NewStub</span>(channel)) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送预测请求</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Predict</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        PredictRequest request;</span><br><span class="line">        PredictResponse response;</span><br><span class="line">        ClientContext context;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置输入数据</span></span><br><span class="line">        <span class="comment">// request.mutable_model_spec()-&gt;set_name(&quot;my_model&quot;);</span></span><br><span class="line">        <span class="comment">// 添加输入数据</span></span><br><span class="line">        <span class="comment">// request.mutable_inputs()-&gt;...;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 发送预测请求</span></span><br><span class="line">        Status status = stub_-&gt;<span class="built_in">Predict</span>(&amp;context, request, &amp;response);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 处理预测结果</span></span><br><span class="line">        <span class="keyword">if</span> (status.<span class="built_in">ok</span>()) &#123;</span><br><span class="line">            <span class="comment">// 处理 response 中的输出结果</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">&quot;RPC failed: &quot;</span> &lt;&lt; status.<span class="built_in">error_message</span>() &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::unique_ptr&lt;PredictionService::Stub&gt; stub_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建 TensorFlow Serving 客户端</span></span><br><span class="line">    <span class="function">TensorFlowServingClient <span class="title">client</span><span class="params">(grpc::CreateChannel(<span class="string">&quot;localhost:8500&quot;</span>, grpc::InsecureChannelCredentials()))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送预测请求</span></span><br><span class="line">    client.<span class="built_in">Predict</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该示例演示了如何创建一个 TensorFlow Serving 客户端，并发送预测请求。需要注意的是，你需要根据实际情况修改模型的名称、输入数据等信息。</p>
+</li>
+</ol>
+<p>总的来说，TensorFlow Serving 提供了一个功能强大的 C++ 库，用于部署 TensorFlow 模型并提供实时预测服务。通过了解其核心功能、架构和部署流程，你可以更好地使用 TensorFlow Serving 来满足你的部署需求。</p>
+<h2 id="SavedModel格式是什么"><a href="#SavedModel格式是什么" class="headerlink" title="SavedModel格式是什么"></a>SavedModel格式是什么</h2><p>SavedModel 是 TensorFlow 中用于保存和加载模型的标准格式。它是一种可移植、可恢复的模型表示形式，可以轻松地在不同的平台上进行部署和共享。SavedModel 以文件夹的形式存储，其中包含了模型的结构、权重参数、计算图以及其他相关的元数据。</p>
+<p>SavedModel 主要由两个部分组成：</p>
+<ol>
+<li><p><strong>模型图（GraphDef）</strong>：模型的计算图以 Protocol Buffers 格式保存在名为 <code>saved_model.pb</code> 的文件中。计算图定义了模型的结构，包括输入、输出、各种操作（如张量运算、变量等）以及操作之间的连接关系。</p>
+</li>
+<li><p><strong>变量和资源</strong>：模型的权重参数、变量和其他资源以二进制格式保存在名为 <code>variables/</code> 的文件夹中。这些文件包含了模型的具体参数值，用于在加载模型时恢复模型的状态。</p>
+</li>
+</ol>
+<p>除了这两个基本部分之外，SavedModel 还可以包含其他的元数据信息，例如模型的签名信息（用于描述模型的输入和输出）、运行配置、版本信息等。</p>
+<p>SavedModel 的优点在于它具有跨平台和版本控制的能力，可以在不同的 TensorFlow 版本和不同的硬件平台上进行部署和加载。这使得 SavedModel 成为了 TensorFlow 模型部署和共享的标准格式，被广泛应用于生产环境中。</p>
+<h2 id="C-tensorflow-serving加载onnx模型"><a href="#C-tensorflow-serving加载onnx模型" class="headerlink" title="C++ tensorflow serving加载onnx模型"></a>C++ tensorflow serving加载onnx模型</h2><p>TensorFlow Serving 最初设计用于加载和提供 TensorFlow 模型的预测服务，但它也支持加载其他格式的模型，包括 ONNX（Open Neural Network Exchange）格式的模型。ONNX 是一种开放的标准，用于表示深度学习模型，它允许用户在不同的深度学习框架之间交换模型，并在不同的硬件平台上运行这些模型。</p>
+<p>要在 TensorFlow Serving 中加载 ONNX 模型，你需要先将 ONNX 模型转换为 TensorFlow 的 SavedModel 格式，然后再使用 TensorFlow Serving 加载 SavedModel。以下是一个大致的步骤：</p>
+<ol>
+<li><p><strong>将 ONNX 模型转换为 TensorFlow SavedModel</strong>：</p>
+<ul>
+<li>使用 ONNX-TensorFlow 或 onnx-tf 工具将 ONNX 模型转换为 TensorFlow 的 SavedModel 格式。这些工具可以帮助你将 ONNX 模型导入到 TensorFlow 中，并将其保存为 SavedModel 格式。</li>
+</ul>
+</li>
+<li><p><strong>使用 TensorFlow Serving 加载 SavedModel</strong>：</p>
+<ul>
+<li>使用 TensorFlow Serving 的配置文件（通常是 TensorFlow Serving 的 Docker 镜像中的配置文件），将转换后的 SavedModel 添加到配置中。</li>
+<li>启动 TensorFlow Serving 服务器，并指定模型配置文件。</li>
+</ul>
+</li>
+</ol>
+<p>下面是一个大致的示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 将 ONNX 模型转换为 TensorFlow SavedModel</span></span><br><span class="line">onnx-tf convert -i model.onnx -o saved_model/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 配置 TensorFlow Serving</span></span><br><span class="line"><span class="comment"># 创建一个模型配置文件，例如 model_config.json，指定模型的路径和类型</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;model_version_policy&quot;</span>: &#123; <span class="string">&quot;specific&quot;</span>: &#123; <span class="string">&quot;versions&quot;</span>: &#123; <span class="string">&quot;1&quot;</span>: &#123;&#125; &#125; &#125; &#125;,</span><br><span class="line">  <span class="string">&quot;model_platform&quot;</span>: <span class="string">&quot;tensorflow&quot;</span>,</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;onnx_model&quot;</span>,</span><br><span class="line">  <span class="string">&quot;base_path&quot;</span>: <span class="string">&quot;/path/to/saved_model&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 启动 TensorFlow Serving</span></span><br><span class="line">docker run -p 8500:8500 -p 8501:8501 --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,<span class="built_in">source</span>=/path/to/model_config.json,target=/models/onnx_model/config.json -t tensorflow/serving</span><br></pre></td></tr></table></figure>
+
+<p>这里的关键步骤是将 ONNX 模型转换为 TensorFlow 的 SavedModel 格式，并通过 TensorFlow Serving 的配置文件将 SavedModel 添加到 TensorFlow Serving 中。这样就可以在 TensorFlow Serving 中加载和提供 ONNX 模型的预测服务了。</p>
+<h2 id="docker方式部署-官方示例"><a href="#docker方式部署-官方示例" class="headerlink" title="docker方式部署(官方示例)"></a>docker方式部署(官方示例)</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Download the TensorFlow Serving Docker image and repo</span></span><br><span class="line">docker pull tensorflow/serving</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/tensorflow/serving</span><br><span class="line"><span class="comment"># Location of demo models</span></span><br><span class="line">TESTDATA=<span class="string">&quot;<span class="subst">$(pwd)</span>/serving/tensorflow_serving/servables/tensorflow/testdata&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Start TensorFlow Serving container and open the REST API port</span></span><br><span class="line">docker run -t --<span class="built_in">rm</span> -p 8501:8501 \</span><br><span class="line">    -v <span class="string">&quot;<span class="variable">$TESTDATA</span>/saved_model_half_plus_two_cpu:/models/half_plus_two&quot;</span> \</span><br><span class="line">    -e MODEL_NAME=half_plus_two \</span><br><span class="line">    tensorflow/serving &amp;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Query the model using the predict API</span></span><br><span class="line">curl -d <span class="string">&#x27;&#123;&quot;instances&quot;: [1.0, 2.0, 5.0]&#125;&#x27;</span> \</span><br><span class="line">    -X POST http://localhost:8501/v1/models/half_plus_two:predict</span><br><span class="line"></span><br><span class="line"><span class="comment"># Returns =&gt; &#123; &quot;predictions&quot;: [2.5, 3.0, 4.5] &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="拉取serving-docker-image"><a href="#拉取serving-docker-image" class="headerlink" title="拉取serving docker image"></a>拉取serving docker image</h2><ul>
+<li><p>运行命令</p>
+<ul>
+<li>docker pull tensorflow&#x2F;serving</li>
+</ul>
+</li>
+<li><p>tensorflow serving docker历史镜像</p>
+<ul>
+<li>地址: <a target="_blank" rel="noopener" href="https://hub.docker.com/r/tensorflow/serving/tags/">https://hub.docker.com/r/tensorflow/serving/tags/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="从serving-docker-image-启动一个容器"><a href="#从serving-docker-image-启动一个容器" class="headerlink" title="从serving docker image 启动一个容器"></a>从serving docker image 启动一个容器</h2><ul>
+<li>serving images有以下属性<ul>
+<li>8500 端口服务于gRPC</li>
+<li>8501 端口服务于 REST API</li>
+<li>可选的环境变量 MODEL_NAME(默认为 model)</li>
+<li>可选的环境变量 MODEL_BASE_PATH(默认为 &#x2F;models)</li>
+</ul>
+</li>
+<li>当 serving image运行一个容器时，其内部实际运行的命令是<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tensorflow_model_server --port=8500 --rest_api_port=8501 \</span><br><span class="line">  --model_name=<span class="variable">$&#123;MODEL_NAME&#125;</span> --model_base_path=<span class="variable">$&#123;MODEL_BASE_PATH&#125;</span>/<span class="variable">$&#123;MODEL_NAME&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DL/" rel="tag"># DL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/DeepLearning/2024-05-22-pytorch/" rel="prev" title="pytorch">
+      <i class="fa fa-chevron-left"></i> pytorch
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/DeepLearning/2024-05-22-%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="next" title="计算机视觉">
+      计算机视觉 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TensorFlow-Serving%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">TensorFlow Serving是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-tensorflow-serving%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">C++ tensorflow serving库 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SavedModel%E6%A0%BC%E5%BC%8F%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">4.</span> <span class="nav-text">SavedModel格式是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-tensorflow-serving%E5%8A%A0%E8%BD%BDonnx%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">C++ tensorflow serving加载onnx模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker%E6%96%B9%E5%BC%8F%E9%83%A8%E7%BD%B2-%E5%AE%98%E6%96%B9%E7%A4%BA%E4%BE%8B"><span class="nav-number">6.</span> <span class="nav-text">docker方式部署(官方示例)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%89%E5%8F%96serving-docker-image"><span class="nav-number">7.</span> <span class="nav-text">拉取serving docker image</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8Eserving-docker-image-%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AA%E5%AE%B9%E5%99%A8"><span class="nav-number">8.</span> <span class="nav-text">从serving docker image 启动一个容器</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

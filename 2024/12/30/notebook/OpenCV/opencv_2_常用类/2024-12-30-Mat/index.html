@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 cv::Mat 类相关学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mat">
+<meta property="og:url" content="https://junyiha.github.io/2024/12/30/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 cv::Mat 类相关学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-12-30T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.427Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/12/30/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Mat | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mat
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-30 10:00:00" itemprop="dateCreated datePublished" datetime="2024-12-30T10:00:00+08:00">2024-12-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>cv::Mat 类相关学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="OpenCV-cv-Mat-详解"><a href="#OpenCV-cv-Mat-详解" class="headerlink" title="OpenCV cv::Mat 详解"></a>OpenCV cv::Mat 详解</h2><p>在 OpenCV 中，<code>cv::Mat</code> 是一个用于表示图像的核心类。它是 OpenCV 中所有图像操作的基础，可以用于存储图像数据以及执行各种图像处理操作。<code>cv::Mat</code> 既可以表示二维图像（如灰度图像、RGB图像），也可以表示多维数据（如视频帧、深度图等）。</p>
+<h3 id="1-cv-Mat-基本概念"><a href="#1-cv-Mat-基本概念" class="headerlink" title="1. cv::Mat 基本概念"></a><strong>1. <code>cv::Mat</code> 基本概念</strong></h3><p><code>cv::Mat</code> 是 OpenCV 的主要数据结构之一，代表一个多维矩阵。它能够存储不同类型的数据（如像素值、浮动数据、整数数据等）。图像通常作为矩阵存储，因此 <code>cv::Mat</code> 是处理图像和其他类型矩阵数据的基础。</p>
+<h3 id="2-cv-Mat-构造与初始化"><a href="#2-cv-Mat-构造与初始化" class="headerlink" title="2. cv::Mat 构造与初始化"></a><strong>2. <code>cv::Mat</code> 构造与初始化</strong></h3><p><code>cv::Mat</code> 可以通过多种方式进行初始化。</p>
+<h4 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a><strong>构造函数</strong></h4><ol>
+<li><strong>空矩阵构造</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mat;</span><br></pre></td></tr></table></figure>
+
+<p>这会创建一个空的 <code>cv::Mat</code> 对象，矩阵大小为 0，数据为空。</p>
+<ol start="2">
+<li><strong>指定大小的矩阵</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cv::Mat <span class="title">mat</span><span class="params">(rows, cols, type)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>rows</code>：行数（矩阵的高度）。</li>
+<li><code>cols</code>：列数（矩阵的宽度）。</li>
+<li><code>type</code>：数据类型，通常由 <code>CV_</code> 开头的常量指定（如 <code>CV_8UC3</code> 表示 8 位无符号 3 通道图像）。</li>
+</ul>
+<ol start="3">
+<li><strong>初始化矩阵</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cv::Mat <span class="title">mat</span><span class="params">(rows, cols, CV_8UC3, cv::Scalar(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))</span></span>;  <span class="comment">// 创建一个 RGB 图像，填充为红色</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>这里 <code>cv::Scalar(255, 0, 0)</code> 初始化矩阵中的所有像素值为红色（在 RGB 中，255 代表红色，0 代表绿色和蓝色）。</li>
+</ul>
+<ol start="4">
+<li><strong>从文件加载图像</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat img = cv::<span class="built_in">imread</span>(<span class="string">&quot;image.jpg&quot;</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>cv::imread()</code> 函数加载图像文件，并将其存储为 <code>cv::Mat</code>。</li>
+</ul>
+<ol start="5">
+<li><strong>深拷贝与浅拷贝</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mat2 = mat;  <span class="comment">// 浅拷贝</span></span><br><span class="line">cv::Mat mat3 = mat.<span class="built_in">clone</span>();  <span class="comment">// 深拷贝</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>浅拷贝：<code>mat2</code> 会与 <code>mat</code> 共享相同的数据，修改其中一个也会影响另一个。</li>
+<li>深拷贝：<code>mat3</code> 会复制 <code>mat</code> 的数据，修改 <code>mat3</code> 不会影响 <code>mat</code>。</li>
+</ul>
+<h3 id="3-cv-Mat-数据结构"><a href="#3-cv-Mat-数据结构" class="headerlink" title="3. cv::Mat 数据结构"></a><strong>3. <code>cv::Mat</code> 数据结构</strong></h3><p><code>cv::Mat</code> 是一个复杂的数据结构，包含了以下几个重要部分：</p>
+<ol>
+<li><p><strong>数据指针（<code>data</code>）</strong>：</p>
+<ul>
+<li><code>cv::Mat</code> 内部包含指向矩阵数据的指针。通过该指针，可以直接访问图像的像素值。</li>
+</ul>
+</li>
+<li><p><strong>矩阵的尺寸（<code>rows</code> 和 <code>cols</code>）</strong>：</p>
+<ul>
+<li><code>rows</code>：矩阵的行数。</li>
+<li><code>cols</code>：矩阵的列数。</li>
+</ul>
+</li>
+<li><p><strong>矩阵的数据类型（<code>depth()</code> 和 <code>channels()</code>）</strong>：</p>
+<ul>
+<li><code>depth()</code>：返回矩阵的数据类型，表示每个元素的位深。例如，<code>CV_8U</code> 表示每个元素是 8 位无符号整数。</li>
+<li><code>channels()</code>：返回矩阵的通道数。对于彩色图像，通常是 3（RGB），而对于灰度图像，是 1。</li>
+</ul>
+</li>
+<li><p><strong>矩阵的步长（<code>step</code>）</strong>：</p>
+<ul>
+<li>步长指的是矩阵每一行的字节数（也就是每行的内存偏移量）。通过步长可以实现对矩阵不同区域的访问。</li>
+</ul>
+</li>
+<li><p><strong>矩阵引用计数</strong>：</p>
+<ul>
+<li><code>cv::Mat</code> 采用引用计数机制。当多个 <code>cv::Mat</code> 对象指向同一块数据时，引用计数会增加。数据会在引用计数为 0 时自动释放。</li>
+</ul>
+</li>
+</ol>
+<h3 id="4-cv-Mat-常用函数"><a href="#4-cv-Mat-常用函数" class="headerlink" title="4. cv::Mat 常用函数"></a><strong>4. <code>cv::Mat</code> 常用函数</strong></h3><h4 id="获取和设置像素值"><a href="#获取和设置像素值" class="headerlink" title="获取和设置像素值"></a><strong>获取和设置像素值</strong></h4><ol>
+<li><strong>访问像素值</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat image = cv::<span class="built_in">imread</span>(<span class="string">&quot;image.jpg&quot;</span>);</span><br><span class="line">cv::Vec3b pixel = image.<span class="built_in">at</span>&lt;cv::Vec3b&gt;(row, col);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>cv::Vec3b</code> 是一个包含 3 个元素的向量（用于表示 RGB 图像的三个颜色通道）。</li>
+</ul>
+<ol start="2">
+<li><strong>设置像素值</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image.<span class="built_in">at</span>&lt;cv::Vec3b&gt;(row, col) = cv::<span class="built_in">Vec3b</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>);  <span class="comment">// 设置像素为红色</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="矩阵的形状和大小"><a href="#矩阵的形状和大小" class="headerlink" title="矩阵的形状和大小"></a><strong>矩阵的形状和大小</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cv::Size size = image.<span class="built_in">size</span>();  <span class="comment">// 获取图像的大小</span></span><br><span class="line"><span class="type">int</span> rows = image.rows;         <span class="comment">// 获取行数（高度）</span></span><br><span class="line"><span class="type">int</span> cols = image.cols;         <span class="comment">// 获取列数（宽度）</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="矩阵类型和通道数"><a href="#矩阵类型和通道数" class="headerlink" title="矩阵类型和通道数"></a><strong>矩阵类型和通道数</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> type = image.<span class="built_in">type</span>();         <span class="comment">// 获取矩阵的数据类型</span></span><br><span class="line"><span class="type">int</span> channels = image.<span class="built_in">channels</span>(); <span class="comment">// 获取矩阵的通道数</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="矩阵的复制"><a href="#矩阵的复制" class="headerlink" title="矩阵的复制"></a><strong>矩阵的复制</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mat_copy = image.<span class="built_in">clone</span>(); <span class="comment">// 创建一个深拷贝</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="矩阵的拆分与合并"><a href="#矩阵的拆分与合并" class="headerlink" title="矩阵的拆分与合并"></a><strong>矩阵的拆分与合并</strong></h4><ol>
+<li><strong>拆分图像通道</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;cv::Mat&gt; channels;</span><br><span class="line">cv::<span class="built_in">split</span>(image, channels);  <span class="comment">// 将 BGR 图像分割为 3 个单通道图像</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>合并多个图像通道</strong></li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat merged;</span><br><span class="line">cv::<span class="built_in">merge</span>(channels, merged);  <span class="comment">// 合并多个单通道图像为 BGR 图像</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-cv-Mat-的数据类型"><a href="#5-cv-Mat-的数据类型" class="headerlink" title="5. cv::Mat 的数据类型"></a><strong>5. <code>cv::Mat</code> 的数据类型</strong></h3><p>OpenCV 使用 <code>CV_</code> 作为前缀来表示矩阵的数据类型。以下是一些常见的类型：</p>
+<ul>
+<li>**<code>CV_8U</code>**：8 位无符号整数，常用于表示灰度图像或每通道数据为 0-255 的图像。</li>
+<li>**<code>CV_32F</code>**：32 位浮动数，常用于表示浮动图像或特征数据。</li>
+<li>**<code>CV_64F</code>**：64 位浮动数，常用于精度较高的图像数据或数学运算。</li>
+<li>**<code>CV_8SC3</code>**：表示每个元素为 8 位带符号整数且有 3 个通道（例如，RGB 图像）。</li>
+</ul>
+<p>通过 <code>type()</code> 方法可以获取图像的类型。</p>
+<h3 id="6-cv-Mat-的运算与操作"><a href="#6-cv-Mat-的运算与操作" class="headerlink" title="6. cv::Mat 的运算与操作"></a><strong>6. <code>cv::Mat</code> 的运算与操作</strong></h3><p><code>cv::Mat</code> 还提供了许多常见的数学运算和图像处理方法：</p>
+<ul>
+<li><strong>加法、减法、乘法、除法</strong>：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat result = image + <span class="number">50</span>;  <span class="comment">// 图像加上常数</span></span><br><span class="line">cv::Mat result = image - <span class="number">50</span>;  <span class="comment">// 图像减去常数</span></span><br><span class="line">cv::Mat result = image * <span class="number">2</span>;   <span class="comment">// 图像乘以常数</span></span><br><span class="line">cv::Mat result = image / <span class="number">2</span>;   <span class="comment">// 图像除以常数</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>图像变换</strong>：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat rotated;</span><br><span class="line">cv::<span class="built_in">warpAffine</span>(image, rotated, rotationMatrix, image.<span class="built_in">size</span>());  <span class="comment">// 仿射变换</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>图像滤波</strong>：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat blurred;</span><br><span class="line">cv::<span class="built_in">GaussianBlur</span>(image, blurred, cv::<span class="built_in">Size</span>(<span class="number">5</span>, <span class="number">5</span>), <span class="number">0</span>);  <span class="comment">// 高斯模糊</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>图像矩阵与其它矩阵的运算</strong>：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matA = cv::Mat::<span class="built_in">ones</span>(<span class="number">3</span>, <span class="number">3</span>, CV_32F);</span><br><span class="line">cv::Mat matB = cv::Mat::<span class="built_in">eye</span>(<span class="number">3</span>, <span class="number">3</span>, CV_32F);</span><br><span class="line">cv::Mat result = matA + matB;  <span class="comment">// 矩阵相加</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a><strong>7. 总结</strong></h3><ul>
+<li><code>cv::Mat</code> 是 OpenCV 中的核心数据结构，用于表示图像和多维矩阵数据。</li>
+<li>它支持丰富的图像处理操作，包括像素级操作、矩阵运算、形态学变换、滤波、几何变换等。</li>
+<li><code>cv::Mat</code> 提供了数据类型、形状、通道数等信息，以及内存管理和引用计数的功能，简化了图像数据的处理。</li>
+</ul>
+<p>通过理解和熟练使用 <code>cv::Mat</code>，可以方便地实现图像处理任务，如图像读写、转换、滤波、矩阵运算等。</p>
+<h2 id="cv-Mat-常用成员变量和成员方法"><a href="#cv-Mat-常用成员变量和成员方法" class="headerlink" title="cv::Mat 常用成员变量和成员方法"></a>cv::Mat 常用成员变量和成员方法</h2><p><code>cv::Mat</code> 是 OpenCV 中的一个核心数据结构，广泛用于表示图像、矩阵以及其他多维数据。它提供了许多成员变量和成员方法，便于对矩阵进行各种操作。以下是 <code>cv::Mat</code> 常用的成员变量和成员方法的详细介绍。</p>
+<h3 id="常用成员变量"><a href="#常用成员变量" class="headerlink" title="常用成员变量"></a><strong>常用成员变量</strong></h3><ol>
+<li><p><strong><code>rows</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>int</code></li>
+<li><strong>描述</strong>：表示矩阵的行数，即图像的高度。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> rows = mat.rows;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>cols</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>int</code></li>
+<li><strong>描述</strong>：表示矩阵的列数，即图像的宽度。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> cols = mat.cols;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>depth()</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>int</code></li>
+<li><strong>描述</strong>：返回矩阵数据的深度，表示每个元素的位深。常见的值有：<ul>
+<li><code>CV_8U</code>（8 位无符号整数）</li>
+<li><code>CV_8S</code>（8 位有符号整数）</li>
+<li><code>CV_16U</code>（16 位无符号整数）</li>
+<li><code>CV_16S</code>（16 位有符号整数）</li>
+<li><code>CV_32S</code>（32 位有符号整数）</li>
+<li><code>CV_32F</code>（32 位浮动数）</li>
+<li><code>CV_64F</code>（64 位浮动数）</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> depth = mat.<span class="built_in">depth</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>channels()</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>int</code></li>
+<li><strong>描述</strong>：返回矩阵的通道数。对于单通道图像（如灰度图像）为 1，对于多通道图像（如 RGB 图像）为 3。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> channels = mat.<span class="built_in">channels</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>type()</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>int</code></li>
+<li><strong>描述</strong>：返回矩阵的数据类型（结合 <code>depth()</code> 和 <code>channels()</code>）。常见的返回值包括：<ul>
+<li><code>CV_8UC3</code>：8 位无符号整数 3 通道（RGB 图像）</li>
+<li><code>CV_32F</code>：32 位浮动数单通道</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> type = mat.<span class="built_in">type</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>data</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>uchar*</code></li>
+<li><strong>描述</strong>：返回指向矩阵数据的指针。通过 <code>data</code> 指针，可以直接访问矩阵的元素。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uchar* ptr = mat.data;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>step</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>size_t</code></li>
+<li><strong>描述</strong>：每行的字节数。<code>step</code> 是矩阵中每行的内存偏移量，也就是说它告诉你一行数据的大小。通常用于在内存中遍历矩阵时，计算每行的起始地址。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> step = mat.step;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>empty()</code></strong></p>
+<ul>
+<li><strong>类型</strong>：<code>bool</code></li>
+<li><strong>描述</strong>：判断矩阵是否为空（即是否有有效数据）。如果矩阵没有分配内存，或者矩阵的尺寸为 0，则返回 <code>true</code>。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> isEmpty = mat.<span class="built_in">empty</span>();</span><br></pre></td></tr></table></figure></li>
+</ol>
+<hr>
+<h3 id="常用成员方法"><a href="#常用成员方法" class="headerlink" title="常用成员方法"></a><strong>常用成员方法</strong></h3><ol>
+<li><p><strong><code>at&lt;T&gt;(row, col)</code></strong></p>
+<ul>
+<li><strong>描述</strong>：返回指定位置 <code>(row, col)</code> 的元素值。<code>T</code> 是矩阵元素的数据类型，可以是 <code>uchar</code>, <code>int</code>, <code>float</code> 等。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mat = cv::Mat::<span class="built_in">ones</span>(<span class="number">3</span>, <span class="number">3</span>, CV_8UC1);  <span class="comment">// 创建一个 3x3 的 8 位单通道矩阵</span></span><br><span class="line">uchar value = mat.<span class="built_in">at</span>&lt;uchar&gt;(<span class="number">1</span>, <span class="number">1</span>);  <span class="comment">// 获取 (1, 1) 位置的像素值</span></span><br></pre></td></tr></table></figure>
+
+<p>这种方法非常方便，但它有性能开销，特别是在处理大型矩阵时。对于大量的像素访问，可以考虑使用 <code>ptr()</code> 方法。</p>
+</li>
+<li><p><strong><code>ptr&lt;T&gt;(row)</code></strong></p>
+<ul>
+<li><strong>描述</strong>：返回指向指定行的指针，<code>T</code> 是矩阵的元素类型。可以通过该指针访问该行的元素，通常用于高效的矩阵操作。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uchar* rowPtr = mat.<span class="built_in">ptr</span>&lt;uchar&gt;(<span class="number">1</span>);  <span class="comment">// 获取第 1 行的指针</span></span><br></pre></td></tr></table></figure>
+
+<p><code>ptr()</code> 方法返回的是 <code>uchar*</code> 类型的指针，因此可以直接访问和修改该行的数据。</p>
+</li>
+<li><p><strong><code>clone()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：返回矩阵的深拷贝，创建一个新的矩阵并复制数据。原矩阵的修改不会影响拷贝。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matCopy = mat.<span class="built_in">clone</span>();  <span class="comment">// 创建一个矩阵的深拷贝</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>copyTo()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：将当前矩阵的数据复制到另一个矩阵。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mat2;</span><br><span class="line">mat.<span class="built_in">copyTo</span>(mat2);  <span class="comment">// 将 mat 的数据复制到 mat2</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>reshape()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：将矩阵的尺寸更改为新形状，但不改变其数据。可以用来改变矩阵的行列数目，但总的元素数量不变。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matReshaped = mat.<span class="built_in">reshape</span>(<span class="number">0</span>, newRows);  <span class="comment">// 改变矩阵形状</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>resize()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：调整矩阵的大小。与 <code>reshape()</code> 不同，<code>resize()</code> 会根据新的大小修改矩阵的内容。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">resize</span>(mat, matResized, cv::<span class="built_in">Size</span>(newWidth, newHeight));  <span class="comment">// 调整矩阵的大小</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>convertTo()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：将矩阵的数据类型转换为其他类型。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matConverted;</span><br><span class="line">mat.<span class="built_in">convertTo</span>(matConverted, CV_32F);  <span class="comment">// 将矩阵转换为 32 位浮动数类型</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>split()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：将一个多通道图像分割为多个单通道图像。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;cv::Mat&gt; channels;</span><br><span class="line">cv::<span class="built_in">split</span>(mat, channels);  <span class="comment">// 分割为多个单通道图像</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>merge()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：将多个单通道图像合并为一个多通道图像。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matMerged;</span><br><span class="line">cv::<span class="built_in">merge</span>(channels, matMerged);  <span class="comment">// 合并多个通道为一个图像</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>setTo()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：将矩阵的所有元素设置为一个特定的值，或根据条件设置为特定的值。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mat.<span class="built_in">setTo</span>(cv::<span class="built_in">Scalar</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>));  <span class="comment">// 将矩阵的所有像素设置为红色（BGR）</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>row()</code> 和 <code>col()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：返回矩阵的某一行或某一列作为一个新的矩阵。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat rowMat = mat.<span class="built_in">row</span>(<span class="number">1</span>);  <span class="comment">// 获取第 1 行</span></span><br><span class="line">cv::Mat colMat = mat.<span class="built_in">col</span>(<span class="number">0</span>);  <span class="comment">// 获取第 0 列</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>transpose()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：返回矩阵的转置。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matTransposed = mat.<span class="built_in">t</span>();  <span class="comment">// 获取矩阵的转置</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>inv()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：返回矩阵的逆。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat matInv = mat.<span class="built_in">inv</span>();  <span class="comment">// 获取矩阵的逆</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>norm()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：计算矩阵的范数（例如，L2 范数）。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> normVal = cv::<span class="built_in">norm</span>(mat);  <span class="comment">// 计算矩阵的 L2 范数</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>empty()</code></strong></p>
+<ul>
+<li><strong>描述</strong>：判断矩阵是否为空（即是否没有分配内存或矩阵的尺寸为 0）。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> isEmpty = mat.<span class="built_in">empty</span>();  <span class="comment">// 判断矩阵是否为空</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p><code>cv::Mat</code> 是 OpenCV 中非常核心的类，提供了丰富的成员变量和方法，用于图像的存储、操作和转换。理解这些成员方法和变量可以帮助你更高效地进行图像处理和矩阵运算。</p>
+<h2 id="cv-Mat-total-函数-详解"><a href="#cv-Mat-total-函数-详解" class="headerlink" title="cv::Mat::total() 函数 详解"></a>cv::Mat::total() 函数 详解</h2><p><code>cv::Mat::total()</code> 是 OpenCV 中 <code>cv::Mat</code> 类的一个成员函数，主要用于计算矩阵的总元素数量。它返回矩阵中所有元素的总数，等于矩阵的行数 (<code>rows</code>) 和列数 (<code>cols</code>) 的乘积。</p>
+<h3 id="函数定义"><a href="#函数定义" class="headerlink" title="函数定义"></a><strong>函数定义</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">total</span><span class="params">()</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li><strong>类型</strong>：<code>size_t</code></li>
+<li><strong>描述</strong>：返回矩阵中所有元素的总数。如果矩阵是二维的，则返回行数与列数的乘积；如果矩阵是多维的，返回每个维度大小的乘积。</li>
+</ul>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a><strong>作用</strong></h3><p><code>total()</code> 计算矩阵所有元素的数量，而不考虑矩阵的深度（即每个元素的字节数）。如果你知道矩阵的形状，可以用它来确定矩阵总共有多少个元素。</p>
+<p>例如：</p>
+<ul>
+<li>对于一个 <code>3x3</code> 的矩阵，<code>total()</code> 将返回 <code>9</code>。</li>
+<li>对于一个 <code>4x5</code> 的矩阵，<code>total()</code> 将返回 <code>20</code>。</li>
+</ul>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a><strong>例子</strong></h3><h4 id="1-使用-total-计算二维矩阵的总元素数量"><a href="#1-使用-total-计算二维矩阵的总元素数量" class="headerlink" title="1. 使用 total() 计算二维矩阵的总元素数量"></a><strong>1. 使用 <code>total()</code> 计算二维矩阵的总元素数量</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cv::Mat mat = cv::Mat::<span class="built_in">ones</span>(<span class="number">4</span>, <span class="number">5</span>, CV_32F);  <span class="comment">// 创建一个 4x5 的矩阵，元素值为 1</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Total elements: &quot;</span> &lt;&lt; mat.<span class="built_in">total</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Total elements: 20</span><br></pre></td></tr></table></figure>
+
+<p>这里，<code>mat</code> 是一个 <code>4x5</code> 的矩阵，因此 <code>mat.total()</code> 返回 <code>20</code>，即矩阵中有 20 个元素。</p>
+<h4 id="2-使用-total-计算多维矩阵的总元素数量"><a href="#2-使用-total-计算多维矩阵的总元素数量" class="headerlink" title="2. 使用 total() 计算多维矩阵的总元素数量"></a><strong>2. 使用 <code>total()</code> 计算多维矩阵的总元素数量</strong></h4><p>对于多维矩阵，<code>total()</code> 会计算所有维度的元素数量。例如，如果矩阵是三维的，那么它将返回三个维度的大小的乘积。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cv::Mat mat = cv::Mat::<span class="built_in">ones</span>(<span class="number">3</span>, <span class="number">4</span>, CV_32F);  <span class="comment">// 创建一个 3x4 的二维矩阵</span></span><br><span class="line">    mat = mat.<span class="built_in">reshape</span>(<span class="number">1</span>, <span class="number">2</span>);  <span class="comment">// 将矩阵重塑为 2x12 的二维矩阵</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Total elements after reshape: &quot;</span> &lt;&lt; mat.<span class="built_in">total</span>() &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Total elements after reshape: 24</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，矩阵最初是 <code>3x4</code>，后来被重塑为 <code>2x12</code> 的形状。因此，<code>mat.total()</code> 返回 <code>24</code>，即矩阵中有 24 个元素。</p>
+<h3 id="为什么使用-total"><a href="#为什么使用-total" class="headerlink" title="为什么使用 total()"></a><strong>为什么使用 <code>total()</code></strong></h3><ul>
+<li><strong>简洁性</strong>：使用 <code>total()</code> 可以快速获取矩阵的总元素数量，而不需要手动计算行数和列数的乘积。</li>
+<li><strong>多维支持</strong>：对于多维矩阵（例如，<code>n</code> 维矩阵），<code>total()</code> 可以自动处理所有维度的计算，简化代码。</li>
+<li><strong>性能</strong>：<code>total()</code> 是一个常量时间操作，其计算时间为 O(1)，它直接返回矩阵的元素总数。</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a><strong>应用场景</strong></h3><ol>
+<li><strong>矩阵元素遍历</strong>：在遍历矩阵时，可以使用 <code>total()</code> 来确定矩阵中元素的总数，从而控制循环次数。</li>
+<li><strong>内存占用估算</strong>：如果你知道矩阵的元素类型和总元素数，可以估算矩阵占用的内存大小。例如，通过 <code>total()</code> 结合 <code>elemSize()</code>（每个元素的字节数），可以计算矩阵的总内存占用。</li>
+</ol>
+<h3 id="示例代码：计算内存占用"><a href="#示例代码：计算内存占用" class="headerlink" title="示例代码：计算内存占用"></a><strong>示例代码：计算内存占用</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cv::Mat mat = cv::Mat::<span class="built_in">ones</span>(<span class="number">1000</span>, <span class="number">1000</span>, CV_8UC3);  <span class="comment">// 创建一个 1000x1000 的彩色图像</span></span><br><span class="line">    <span class="type">size_t</span> totalElements = mat.<span class="built_in">total</span>();  <span class="comment">// 获取元素总数</span></span><br><span class="line">    <span class="type">size_t</span> totalMemory = totalElements * mat.<span class="built_in">elemSize</span>();  <span class="comment">// 计算矩阵占用的内存</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Total elements: &quot;</span> &lt;&lt; totalElements &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Total memory: &quot;</span> &lt;&lt; totalMemory &lt;&lt; <span class="string">&quot; bytes&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Total elements: 3000000</span><br><span class="line">Total memory: 9000000 bytes</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>mat</code> 是一个 1000x1000 的彩色图像（每个像素 3 个通道），所以总共有 <code>3000000</code> 个元素，每个元素占用 3 字节，因此矩阵的总内存占用为 <code>9000000</code> 字节。</p>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><ul>
+<li><code>cv::Mat::total()</code> 用于获取矩阵中所有元素的总数，返回一个 <code>size_t</code> 类型的值。</li>
+<li>它是一个简洁且高效的函数，适用于计算任何维度矩阵的元素数量。</li>
+<li>在图像处理和矩阵操作中，<code>total()</code> 可以方便地帮助你了解矩阵的规模，从而优化内存管理和性能。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/30/notebook/DeepLearning/2024-12-30-%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84/" rel="prev" title="处理器架构">
+      <i class="fa fa-chevron-left"></i> 处理器架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/30/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Rect/" rel="next" title="Rect">
+      Rect <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenCV-cv-Mat-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">OpenCV cv::Mat 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-cv-Mat-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">1. cv::Mat 基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-cv-Mat-%E6%9E%84%E9%80%A0%E4%B8%8E%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">2.2.</span> <span class="nav-text">2. cv::Mat 构造与初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.1.</span> <span class="nav-text">构造函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-cv-Mat-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.3.</span> <span class="nav-text">3. cv::Mat 数据结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-cv-Mat-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">2.4.</span> <span class="nav-text">4. cv::Mat 常用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%92%8C%E8%AE%BE%E7%BD%AE%E5%83%8F%E7%B4%A0%E5%80%BC"><span class="nav-number">2.4.1.</span> <span class="nav-text">获取和设置像素值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%9A%84%E5%BD%A2%E7%8A%B6%E5%92%8C%E5%A4%A7%E5%B0%8F"><span class="nav-number">2.4.2.</span> <span class="nav-text">矩阵的形状和大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%B1%BB%E5%9E%8B%E5%92%8C%E9%80%9A%E9%81%93%E6%95%B0"><span class="nav-number">2.4.3.</span> <span class="nav-text">矩阵类型和通道数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%9A%84%E5%A4%8D%E5%88%B6"><span class="nav-number">2.4.4.</span> <span class="nav-text">矩阵的复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%9A%84%E6%8B%86%E5%88%86%E4%B8%8E%E5%90%88%E5%B9%B6"><span class="nav-number">2.4.5.</span> <span class="nav-text">矩阵的拆分与合并</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-cv-Mat-%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.5.</span> <span class="nav-text">5. cv::Mat 的数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-cv-Mat-%E7%9A%84%E8%BF%90%E7%AE%97%E4%B8%8E%E6%93%8D%E4%BD%9C"><span class="nav-number">2.6.</span> <span class="nav-text">6. cv::Mat 的运算与操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%80%BB%E7%BB%93"><span class="nav-number">2.7.</span> <span class="nav-text">7. 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cv-Mat-%E5%B8%B8%E7%94%A8%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%92%8C%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">cv::Mat 常用成员变量和成员方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="nav-number">3.1.</span> <span class="nav-text">常用成员变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">常用成员方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cv-Mat-total-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">cv::Mat::total() 函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">4.2.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">4.3.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">4.4.</span> <span class="nav-text">例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8-total-%E8%AE%A1%E7%AE%97%E4%BA%8C%E7%BB%B4%E7%9F%A9%E9%98%B5%E7%9A%84%E6%80%BB%E5%85%83%E7%B4%A0%E6%95%B0%E9%87%8F"><span class="nav-number">4.4.1.</span> <span class="nav-text">1. 使用 total() 计算二维矩阵的总元素数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8-total-%E8%AE%A1%E7%AE%97%E5%A4%9A%E7%BB%B4%E7%9F%A9%E9%98%B5%E7%9A%84%E6%80%BB%E5%85%83%E7%B4%A0%E6%95%B0%E9%87%8F"><span class="nav-number">4.4.2.</span> <span class="nav-text">2. 使用 total() 计算多维矩阵的总元素数量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8-total"><span class="nav-number">4.5.</span> <span class="nav-text">为什么使用 total()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.6.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%9A%E8%AE%A1%E7%AE%97%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8"><span class="nav-number">4.7.</span> <span class="nav-text">示例代码：计算内存占用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">4.8.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

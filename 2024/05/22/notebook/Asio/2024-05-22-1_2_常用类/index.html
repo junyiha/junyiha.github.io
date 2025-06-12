@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 Asio常用的类  Asio asio::io_context 详解asio::io_context 是 Boost.Asio 库（也是 C++ 标准库中的一部分，自 C++17 起）中的核心类之一。它是实现异步 I&#x2F;O 操作的关键部分，用于驱动异步事件处理。 作用： 提供 I&#x2F;O 上下文： io_context 对象是异步操作的执行上下文，用于管理异步操作、事件处理、任">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1_2_常用类">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Asio/2024-05-22-1_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 Asio常用的类  Asio asio::io_context 详解asio::io_context 是 Boost.Asio 库（也是 C++ 标准库中的一部分，自 C++17 起）中的核心类之一。它是实现异步 I&#x2F;O 操作的关键部分，用于驱动异步事件处理。 作用： 提供 I&#x2F;O 上下文： io_context 对象是异步操作的执行上下文，用于管理异步操作、事件处理、任">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.113Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Asio">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Asio/2024-05-22-1_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>1_2_常用类 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Asio/2024-05-22-1_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          1_2_常用类
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Asio/" itemprop="url" rel="index"><span itemprop="name">Asio</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Asio常用的类</li>
+</ul>
+<h2 id="Asio-asio-io-context-详解"><a href="#Asio-asio-io-context-详解" class="headerlink" title="Asio asio::io_context 详解"></a>Asio asio::io_context 详解</h2><p><code>asio::io_context</code> 是 Boost.Asio 库（也是 C++ 标准库中的一部分，自 C++17 起）中的核心类之一。它是实现异步 I&#x2F;O 操作的关键部分，用于驱动异步事件处理。</p>
+<h3 id="作用："><a href="#作用：" class="headerlink" title="作用："></a>作用：</h3><ul>
+<li><strong>提供 I&#x2F;O 上下文：</strong> <code>io_context</code> 对象是异步操作的执行上下文，用于管理异步操作、事件处理、任务队列和事件循环。</li>
+<li><strong>事件驱动：</strong> 通过 <code>io_context</code>，可以注册异步操作（如套接字操作、定时器事件等），<code>io_context</code> 将在合适的时机进行调度、执行和完成这些异步操作。</li>
+</ul>
+<h3 id="主要功能和方法："><a href="#主要功能和方法：" class="headerlink" title="主要功能和方法："></a>主要功能和方法：</h3><ul>
+<li><strong><code>run()</code>：</strong> 开始 <code>io_context</code> 上的事件循环，处理已注册的所有异步操作，直到所有操作完成或 <code>io_context</code> 被停止。</li>
+<li><strong><code>stop()</code>：</strong> 停止 <code>io_context</code> 上的事件循环。停止后，<code>run()</code> 函数将在处理完当前已注册的操作后立即返回。</li>
+<li><strong><code>poll()</code>：</strong> 执行 <code>io_context</code> 上的事件循环，但仅处理当前可立即完成的操作，然后立即返回。</li>
+<li><strong><code>restart()</code>：</strong> 重新启动已经停止的 <code>io_context</code>。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个定时器</span></span><br><span class="line">    boost::<span class="function">asio::steady_timer <span class="title">timer</span><span class="params">(io_context, boost::asio::chrono::seconds(<span class="number">5</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步等待定时器完成</span></span><br><span class="line">    timer.<span class="built_in">async_wait</span>([](<span class="type">const</span> boost::system::error_code&amp; ec) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!ec) &#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;Timer expired!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context 上的事件循环，直到所有操作完成</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>io_context</code> 用于驱动异步操作（这里是一个定时器异步等待）。通过调用 <code>run()</code> 方法，<code>io_context</code> 开始处理已注册的异步操作，并在完成所有操作或者遇到停止指令时返回。</p>
+<p><code>io_context</code> 是 Boost.Asio 中非常重要的一个类，它为异步操作提供了执行环境，能够有效地管理和调度异步事件，是异步编程的核心。</p>
+<h2 id="Asio-asio-thread-pool-详解"><a href="#Asio-asio-thread-pool-详解" class="headerlink" title="Asio asio::thread_pool 详解"></a>Asio asio::thread_pool 详解</h2><p><code>asio::thread_pool</code> 是 Boost.Asio 库中的一个类，它提供了一个线程池，用于管理和执行异步操作。线程池是一种用于管理线程的技术，它可以预先创建一组线程，以便在需要时执行任务或处理异步操作。</p>
+<h3 id="主要作用："><a href="#主要作用：" class="headerlink" title="主要作用："></a>主要作用：</h3><ul>
+<li><strong>管理线程：</strong> <code>asio::thread_pool</code> 提供了线程池，可用于执行异步操作，避免了频繁创建和销毁线程的开销。</li>
+<li><strong>处理异步操作：</strong> 可以将异步操作（如定时器、套接字操作等）提交给线程池，线程池会自动将其分配到可用的线程上执行。</li>
+</ul>
+<h3 id="主要方法和功能："><a href="#主要方法和功能：" class="headerlink" title="主要方法和功能："></a>主要方法和功能：</h3><ul>
+<li><strong><code>asio::thread_pool(size_t num_threads)</code> 构造函数：</strong> 创建具有指定数量线程的线程池。</li>
+<li><strong><code>~thread_pool()</code> 析构函数：</strong> 销毁线程池，等待所有线程执行完毕并释放资源。</li>
+<li><strong><code>submit(Function &amp;&amp; function)</code>：</strong> 提交任务到线程池，执行 <code>function</code> 函数。</li>
+<li><strong><code>stop()</code>：</strong> 停止线程池，不再接受新的任务，等待所有任务执行完毕后销毁线程池。</li>
+<li><strong><code>join()</code>：</strong> 阻塞等待线程池中的所有任务执行完成。</li>
+<li><strong><code>notify_one()</code> 和 <code>notify_all()</code>：</strong> 用于唤醒正在等待的线程。</li>
+</ul>
+<h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio/thread_pool.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio/post.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">task</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Task executed in thread: &quot;</span> &lt;&lt; std::this_thread::<span class="built_in">get_id</span>() &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::<span class="function">asio::thread_pool <span class="title">pool</span><span class="params">(<span class="number">4</span>)</span></span>; <span class="comment">// 创建有4个线程的线程池</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提交任务到线程池</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">8</span>; ++i) &#123;</span><br><span class="line">        boost::asio::<span class="built_in">post</span>(pool, task);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待所有任务完成</span></span><br><span class="line">    pool.<span class="built_in">join</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，创建了一个具有 4 个线程的线程池 <code>pool</code>，然后向线程池提交了 8 个任务。这些任务会被线程池中的线程异步执行。最后，调用 <code>pool.join()</code> 阻塞等待所有任务执行完成。</p>
+<p><code>asio::thread_pool</code> 提供了一种有效地管理和执行异步操作的方式，避免了线程频繁创建和销毁的开销，并提高了异步操作的执行效率。</p>
+<h2 id="Asio-asio-ip-tcp-socket-详解"><a href="#Asio-asio-ip-tcp-socket-详解" class="headerlink" title="Asio asio::ip::tcp::socket 详解"></a>Asio asio::ip::tcp::socket 详解</h2><p><code>asio::ip::tcp::socket</code> 是 Boost.Asio 库中用于 TCP 协议的套接字类，用于在 C++ 中进行 TCP 网络通信。</p>
+<h3 id="主要作用：-1"><a href="#主要作用：-1" class="headerlink" title="主要作用："></a>主要作用：</h3><ul>
+<li><strong>实现 TCP 客户端和服务器：</strong> <code>asio::ip::tcp::socket</code> 允许 C++ 应用程序创建 TCP 客户端或服务器套接字，并进行数据传输。</li>
+</ul>
+<h3 id="主要方法和功能：-1"><a href="#主要方法和功能：-1" class="headerlink" title="主要方法和功能："></a>主要方法和功能：</h3><ul>
+<li><strong><code>constructor</code> 构造函数：</strong> 创建 TCP 套接字。</li>
+<li><strong><code>open()</code>：</strong> 打开套接字。</li>
+<li><strong><code>close()</code>：</strong> 关闭套接字。</li>
+<li><strong><code>connect()</code>：</strong> 用于客户端，连接到远程服务器。</li>
+<li><strong><code>async_connect()</code>：</strong> 异步连接到远程服务器。</li>
+<li><strong><code>bind()</code>：</strong> 将套接字与本地端口或地址绑定。</li>
+<li><strong><code>async_bind()</code>：</strong> 异步绑定套接字。</li>
+<li><strong><code>listen()</code>：</strong> 在服务器上监听传入连接请求。</li>
+<li><strong><code>accept()</code>：</strong> 接受传入的连接请求。</li>
+<li><strong><code>async_accept()</code>：</strong> 异步接受传入的连接请求。</li>
+<li><strong><code>read_some()</code> 和 <code>write_some()</code>：</strong> 同步读取和写入数据。</li>
+<li><strong><code>async_read_some()</code> 和 <code>async_write_some()</code>：</strong> 异步读取和写入数据。</li>
+<li><strong><code>shutdown()</code>：</strong> 关闭套接字的输入、输出或全部流。</li>
+</ul>
+<h3 id="示例（简化的服务器端）："><a href="#示例（简化的服务器端）：" class="headerlink" title="示例（简化的服务器端）："></a>示例（简化的服务器端）：</h3><p>下面是一个简化的 Boost.Asio TCP 服务器端示例，展示了如何使用 <code>asio::ip::tcp::socket</code> 接受连接和读取数据：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> boost::asio::ip::tcp;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line">    <span class="function">tcp::acceptor <span class="title">acceptor</span><span class="params">(io_context, tcp::endpoint(tcp::v4(), <span class="number">8080</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="function">tcp::socket <span class="title">socket</span><span class="params">(io_context)</span></span>;</span><br><span class="line">        acceptor.<span class="built_in">accept</span>(socket);</span><br><span class="line"></span><br><span class="line">        std::array&lt;<span class="type">char</span>, 128&gt; buffer;</span><br><span class="line">        boost::system::error_code error;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 读取数据</span></span><br><span class="line">        <span class="type">size_t</span> len = socket.<span class="built_in">read_some</span>(boost::asio::<span class="built_in">buffer</span>(buffer), error);</span><br><span class="line">        <span class="keyword">if</span> (error == boost::asio::error::eof) &#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;Connection closed by peer.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (error) &#123;</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; error.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;Received data: &quot;</span> &lt;&lt; std::<span class="built_in">string</span>(buffer.<span class="built_in">data</span>(), len) &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>asio::ip::tcp::socket</code> 是 Boost.Asio 中用于 TCP 通信的关键类之一，提供了处理 TCP 套接字的方法和功能，可以用于创建 TCP 客户端或服务器，并进行数据的读写操作。</p>
+<h2 id="Asio-asio-steady-timer详解"><a href="#Asio-asio-steady-timer详解" class="headerlink" title="Asio asio::steady_timer详解"></a>Asio asio::steady_timer详解</h2><p><code>asio::steady_timer</code> 是 Boost.Asio 库中的一个定时器类，用于在指定时间点执行或触发操作。</p>
+<h3 id="主要作用：-2"><a href="#主要作用：-2" class="headerlink" title="主要作用："></a>主要作用：</h3><ul>
+<li><strong>定时触发事件：</strong> <code>asio::steady_timer</code> 用于创建定时器对象，可以在设定的时间点之后触发回调函数。</li>
+</ul>
+<h3 id="主要方法和功能：-2"><a href="#主要方法和功能：-2" class="headerlink" title="主要方法和功能："></a>主要方法和功能：</h3><ul>
+<li><strong><code>constructor</code> 构造函数：</strong> 创建定时器对象。</li>
+<li><strong><code>expires_at()</code> 和 <code>expires_from_now()</code>：</strong> 分别设置定时器的到期时间和到期时刻的相对偏移量。</li>
+<li><strong><code>async_wait()</code>：</strong> 异步等待定时器触发。可以向定时器对象提交一个回调函数，在指定时间点触发回调。</li>
+<li><strong><code>cancel()</code>：</strong> 取消定时器，终止尚未触发的操作。</li>
+<li><strong><code>wait()</code>：</strong> 阻塞等待定时器触发。</li>
+</ul>
+<h3 id="示例：-2"><a href="#示例：-2" class="headerlink" title="示例："></a>示例：</h3><p>下面是一个简单的 Boost.Asio 定时器示例，演示了 <code>asio::steady_timer</code> 的基本用法：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">timer_handler</span><span class="params">(<span class="type">const</span> boost::system::error_code&amp; ec)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!ec) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Timer expired!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line">    boost::<span class="function">asio::steady_timer <span class="title">timer</span><span class="params">(io_context, boost::asio::chrono::seconds(<span class="number">5</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步等待定时器触发，并指定回调函数</span></span><br><span class="line">    timer.<span class="built_in">async_wait</span>(timer_handler);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context 上的事件循环</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，创建了一个 <code>asio::steady_timer</code> 对象 <code>timer</code>，设置定时器在 5 秒后触发。然后使用 <code>timer.async_wait()</code> 异步等待定时器的触发，并指定了一个回调函数 <code>timer_handler</code>。最后，调用 <code>io_context.run()</code> 运行事件循环，等待定时器触发并执行回调函数。</p>
+<p><code>asio::steady_timer</code> 类是 Boost.Asio 中用于管理定时器的重要类之一，允许程序在指定的时间点执行特定操作，通常用于实现定时任务、超时控制等功能。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Asio/" rel="tag"># Asio</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Asio/2024-05-22-1_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="prev" title="1_3_常用函数">
+      <i class="fa fa-chevron-left"></i> 1_3_常用函数
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Asio/2024-05-22-1_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="1_1_理论基础">
+      1_1_理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Asio-asio-io-context-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">Asio asio::io_context 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">作用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD%E5%92%8C%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">主要功能和方法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Asio-asio-thread-pool-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Asio asio::thread_pool 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">主要作用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95%E5%92%8C%E5%8A%9F%E8%83%BD%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">主要方法和功能：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">3.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Asio-asio-ip-tcp-socket-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">Asio asio::ip::tcp::socket 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8%EF%BC%9A-1"><span class="nav-number">4.1.</span> <span class="nav-text">主要作用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95%E5%92%8C%E5%8A%9F%E8%83%BD%EF%BC%9A-1"><span class="nav-number">4.2.</span> <span class="nav-text">主要方法和功能：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%88%E7%AE%80%E5%8C%96%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%EF%BC%89%EF%BC%9A"><span class="nav-number">4.3.</span> <span class="nav-text">示例（简化的服务器端）：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Asio-asio-steady-timer%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">Asio asio::steady_timer详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8%EF%BC%9A-2"><span class="nav-number">5.1.</span> <span class="nav-text">主要作用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95%E5%92%8C%E5%8A%9F%E8%83%BD%EF%BC%9A-2"><span class="nav-number">5.2.</span> <span class="nav-text">主要方法和功能：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">5.3.</span> <span class="nav-text">示例：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

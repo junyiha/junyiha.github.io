@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 windows下C++编程 相关学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MSVC编译器">
+<meta property="og:url" content="https://junyiha.github.io/2024/12/10/notebook/Compiler/2024-12-10-msvc%E7%BC%96%E8%AF%91%E5%99%A8/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 windows下C++编程 相关学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-12-10T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.270Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="compiler basic">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/12/10/notebook/Compiler/2024-12-10-msvc%E7%BC%96%E8%AF%91%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MSVC编译器 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/10/notebook/Compiler/2024-12-10-msvc%E7%BC%96%E8%AF%91%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MSVC编译器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-10 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-10T09:00:00+08:00">2024-12-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Compiler/" itemprop="url" rel="index"><span itemprop="name">Compiler</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>windows下C++编程 相关学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="MSVC-编译项目的全过程-详解"><a href="#MSVC-编译项目的全过程-详解" class="headerlink" title="MSVC 编译项目的全过程 详解"></a>MSVC 编译项目的全过程 详解</h2><p>MSVC（Microsoft Visual C++）是微软提供的编译器和开发环境，用于编译和构建 C++ 项目。在使用 MSVC 编译项目时，会经过以下几个关键阶段：<strong>预处理、编译、汇编、链接</strong>。以下是 MSVC 编译项目的全过程详解。</p>
+<hr>
+<h2 id="1-项目构建过程概述"><a href="#1-项目构建过程概述" class="headerlink" title="1. 项目构建过程概述"></a><strong>1. 项目构建过程概述</strong></h2><p>MSVC 编译项目时，主要分为以下步骤：</p>
+<ol>
+<li><strong>预处理（Preprocessing）</strong></li>
+<li><strong>编译（Compilation）</strong></li>
+<li><strong>汇编（Assembly）</strong></li>
+<li><strong>链接（Linking）</strong></li>
+</ol>
+<p>每一步都对源码进行特定的处理，逐步生成最终的可执行文件或库。</p>
+<hr>
+<h2 id="2-MSVC-编译项目的全过程"><a href="#2-MSVC-编译项目的全过程" class="headerlink" title="2. MSVC 编译项目的全过程"></a><strong>2. MSVC 编译项目的全过程</strong></h2><h3 id="2-1-预处理阶段"><a href="#2-1-预处理阶段" class="headerlink" title="2.1 预处理阶段"></a><strong>2.1 预处理阶段</strong></h3><p><strong>输入：</strong> 源文件（<code>.cpp</code> 或 <code>.c</code>）<br><strong>输出：</strong> 预处理后的文件（通常为 <code>.i</code> 文件）</p>
+<p>在此阶段，MSVC 的预处理器会处理代码中的所有 <strong>预处理指令</strong>，例如 <code>#include</code>、<code>#define</code> 和 <code>#ifdef</code>。主要任务包括：</p>
+<ul>
+<li><p><strong>头文件展开</strong><br>把 <code>#include</code> 的头文件内容嵌入到源文件中。</p>
+</li>
+<li><p><strong>宏替换</strong><br>展开 <code>#define</code> 宏定义的内容。</p>
+</li>
+<li><p><strong>条件编译</strong><br>根据 <code>#ifdef</code>、<code>#ifndef</code> 和 <code>#if</code> 等条件编译指令选择性保留代码。</p>
+</li>
+<li><p><strong>去除注释</strong><br>去掉代码中的注释部分。</p>
+</li>
+</ul>
+<p><strong>命令示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /E source.cpp &gt; source.i</span><br></pre></td></tr></table></figure>
+
+<p><code>/E</code> 开关表示仅运行预处理，并将结果输出到控制台或文件。</p>
+<hr>
+<h3 id="2-2-编译阶段"><a href="#2-2-编译阶段" class="headerlink" title="2.2 编译阶段"></a><strong>2.2 编译阶段</strong></h3><p><strong>输入：</strong> 预处理后的文件（<code>.i</code> 文件）<br><strong>输出：</strong> 汇编代码文件（<code>.asm</code> 文件，通常是临时文件）</p>
+<p>编译器将预处理后的代码翻译为汇编代码。这一过程主要涉及：</p>
+<ul>
+<li><p><strong>语法分析</strong><br>检查代码是否符合 C++ 语言规范。</p>
+</li>
+<li><p><strong>语义分析</strong><br>检查变量类型、函数调用等是否符合逻辑。</p>
+</li>
+<li><p><strong>优化</strong><br>优化代码，例如去掉冗余计算、内联函数展开等。</p>
+</li>
+<li><p><strong>生成汇编代码</strong><br>输出与目标平台架构相关的汇编代码。</p>
+</li>
+</ul>
+<p><strong>命令示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /c source.cpp</span><br></pre></td></tr></table></figure>
+
+<p><code>/c</code> 开关表示仅编译，不进行链接。</p>
+<hr>
+<h3 id="2-3-汇编阶段"><a href="#2-3-汇编阶段" class="headerlink" title="2.3 汇编阶段"></a><strong>2.3 汇编阶段</strong></h3><p><strong>输入：</strong> 汇编代码文件（<code>.asm</code> 文件）<br><strong>输出：</strong> 目标文件（<code>.obj</code> 文件）</p>
+<p>汇编器将汇编代码转换为机器代码，并打包成目标文件。目标文件包含：</p>
+<ul>
+<li>机器码指令</li>
+<li>符号表（记录外部符号和未定义符号）</li>
+<li>调试信息（如果启用调试）</li>
+</ul>
+<p>汇编通常是自动完成的，<code>.asm</code> 文件是中间产物，通常不会显式生成。</p>
+<hr>
+<h3 id="2-4-链接阶段"><a href="#2-4-链接阶段" class="headerlink" title="2.4 链接阶段"></a><strong>2.4 链接阶段</strong></h3><p><strong>输入：</strong> 多个目标文件（<code>.obj</code> 文件）、库文件（<code>.lib</code> 文件）<br><strong>输出：</strong> 可执行文件（<code>.exe</code> 文件）或动态库（<code>.dll</code> 文件）</p>
+<p>链接器的主要任务是将所有目标文件和库文件整合成一个可执行文件或动态链接库。具体操作包括：</p>
+<ul>
+<li><p><strong>符号解析</strong><br>将各目标文件中的符号（函数、变量）解析为具体地址。</p>
+</li>
+<li><p><strong>外部符号解析</strong><br>从静态库或动态库中找到未定义符号。</p>
+</li>
+<li><p><strong>地址重定位</strong><br>为代码和数据分配内存地址。</p>
+</li>
+<li><p><strong>生成可执行文件或动态库</strong><br>输出最终的二进制文件。</p>
+</li>
+</ul>
+<p><strong>命令示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">link</span> /OUT:program.exe file1.obj file2.obj</span><br></pre></td></tr></table></figure>
+
+<p><code>/OUT</code> 指定输出文件名。</p>
+<hr>
+<h2 id="3-MSVC-编译器的关键工具和开关"><a href="#3-MSVC-编译器的关键工具和开关" class="headerlink" title="3. MSVC 编译器的关键工具和开关"></a><strong>3. MSVC 编译器的关键工具和开关</strong></h2><p>MSVC 提供了一些核心工具和开关，帮助完成编译过程。</p>
+<h3 id="3-1-核心工具"><a href="#3-1-核心工具" class="headerlink" title="3.1 核心工具"></a><strong>3.1 核心工具</strong></h3><ul>
+<li><strong><code>cl.exe</code></strong><br>MSVC 编译器，用于预处理、编译和汇编。</li>
+<li><strong><code>link.exe</code></strong><br>MSVC 链接器，用于链接目标文件生成可执行文件。</li>
+<li><strong><code>nmake.exe</code></strong><br>构建工具，用于处理 Makefile 构建复杂项目。</li>
+<li><strong><code>msbuild.exe</code></strong><br>项目构建工具，用于编译 Visual Studio 工程。</li>
+</ul>
+<h3 id="3-2-常用编译器开关"><a href="#3-2-常用编译器开关" class="headerlink" title="3.2 常用编译器开关"></a><strong>3.2 常用编译器开关</strong></h3><table>
+<thead>
+<tr>
+<th>开关</th>
+<th>功能说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/E</code></td>
+<td>仅预处理，并将结果输出到控制台。</td>
+</tr>
+<tr>
+<td><code>/c</code></td>
+<td>仅编译，不链接。</td>
+</tr>
+<tr>
+<td><code>/Wn</code></td>
+<td>设置警告级别，<code>n</code> 为 0-4，<code>/W4</code> 是最高警告级别。</td>
+</tr>
+<tr>
+<td><code>/O1</code>、<code>/O2</code></td>
+<td>启用优化，<code>/O1</code> 是最小代码大小优化，<code>/O2</code> 是最大速度优化。</td>
+</tr>
+<tr>
+<td><code>/Zi</code></td>
+<td>生成调试信息。</td>
+</tr>
+<tr>
+<td><code>/D</code></td>
+<td>定义预处理宏，例如 <code>/DDEBUG</code>。</td>
+</tr>
+<tr>
+<td><code>/MD</code>、<code>/MT</code></td>
+<td>指定运行时库，<code>/MD</code> 使用多线程 DLL，<code>/MT</code> 使用多线程静态库。</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="4-示例：从源码到可执行文件的完整过程"><a href="#4-示例：从源码到可执行文件的完整过程" class="headerlink" title="4. 示例：从源码到可执行文件的完整过程"></a><strong>4. 示例：从源码到可执行文件的完整过程</strong></h2><p>假设有一个简单的 <code>main.cpp</code> 文件：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Hello, MSVC!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-使用命令行构建"><a href="#4-1-使用命令行构建" class="headerlink" title="4.1 使用命令行构建"></a><strong>4.1 使用命令行构建</strong></h3><ol>
+<li><p><strong>预处理</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /E main.cpp &gt; main.i</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>编译</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /c main.cpp</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>链接</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">link</span> /OUT:program.exe main.obj</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="4-2-使用-Visual-Studio-构建"><a href="#4-2-使用-Visual-Studio-构建" class="headerlink" title="4.2 使用 Visual Studio 构建"></a><strong>4.2 使用 Visual Studio 构建</strong></h3><ol>
+<li>打开 Visual Studio，新建或加载项目。</li>
+<li>配置项目属性，例如目标平台、运行时库等。</li>
+<li>按下 <code>Ctrl + Shift + B</code> 进行构建。</li>
+</ol>
+<hr>
+<h2 id="5-常见问题和解决方法"><a href="#5-常见问题和解决方法" class="headerlink" title="5. 常见问题和解决方法"></a><strong>5. 常见问题和解决方法</strong></h2><h3 id="1-缺少运行时库"><a href="#1-缺少运行时库" class="headerlink" title="1. 缺少运行时库"></a><strong>1. 缺少运行时库</strong></h3><p>错误：<code>MSVCP140.dll is missing</code><br>解决：</p>
+<ul>
+<li>确保安装了正确的 Visual C++ Redistributable。</li>
+<li>使用 <code>/MT</code> 静态链接运行时库。</li>
+</ul>
+<h3 id="2-未解析的外部符号"><a href="#2-未解析的外部符号" class="headerlink" title="2. 未解析的外部符号"></a><strong>2. 未解析的外部符号</strong></h3><p>错误：<code>unresolved external symbol</code><br>解决：</p>
+<ul>
+<li>确认链接时包含了所有需要的 <code>.lib</code> 文件。</li>
+<li>检查函数声明和定义是否一致。</li>
+</ul>
+<h3 id="3-调试信息未生成"><a href="#3-调试信息未生成" class="headerlink" title="3. 调试信息未生成"></a><strong>3. 调试信息未生成</strong></h3><p>解决：</p>
+<ul>
+<li>启用 <code>/Zi</code> 选项生成调试信息。</li>
+<li>确保链接器启用了调试信息（<code>/DEBUG</code>）。</li>
+</ul>
+<hr>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h2><p>MSVC 的编译过程包括 <strong>预处理、编译、汇编和链接</strong> 四个阶段。理解每个阶段的功能和工具，可以帮助开发者更高效地调试和优化项目。通过合理使用编译器选项，可以满足不同的开发需求，例如调试、优化和平台适配。</p>
+<h2 id="windows-msvc在cmakelist中设置编译优化级别"><a href="#windows-msvc在cmakelist中设置编译优化级别" class="headerlink" title="windows msvc在cmakelist中设置编译优化级别"></a>windows msvc在cmakelist中设置编译优化级别</h2><p>在 Windows MSVC 环境中，可以通过在 <strong>CMakeLists.txt</strong> 中使用编译选项来设置不同的优化级别。以下是针对 MSVC 的编译优化选项，以及如何在 CMake 中实现设置的方法。</p>
+<hr>
+<h3 id="1-MSVC-常用优化选项"><a href="#1-MSVC-常用优化选项" class="headerlink" title="1. MSVC 常用优化选项"></a><strong>1. MSVC 常用优化选项</strong></h3><ul>
+<li><code>/Od</code>：关闭优化。</li>
+<li><code>/O1</code>：最小化空间（启用代码优化，主要针对减小生成的代码大小）。</li>
+<li><code>/O2</code>：最大化速度（推荐用于 <code>Release</code> 构建）。</li>
+<li><code>/Ox</code>：启用大多数优化（不包括特定优化，例如 <code>/Og</code>）。</li>
+<li><code>/Ot</code>：优化代码以提高速度（通常与 <code>/O2</code> 配合使用）。</li>
+<li><code>/GL</code>：全局优化（用于链接时优化（LTCG））。</li>
+<li><code>/GF</code>：启用字符串池化。</li>
+<li><code>/Gy</code>：启用函数级链接（减少函数的重复性）。</li>
+</ul>
+<hr>
+<h3 id="2-设置全局优化级别"><a href="#2-设置全局优化级别" class="headerlink" title="2. 设置全局优化级别"></a><strong>2. 设置全局优化级别</strong></h3><p>可以通过全局变量如 <code>CMAKE_CXX_FLAGS</code> 或 <code>CMAKE_C_FLAGS</code> 添加优化选项。</p>
+<h4 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS_RELEASE <span class="string">&quot;$&#123;CMAKE_CXX_FLAGS_RELEASE&#125; /O2 /GL&quot;</span>)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS_RELEASE <span class="string">&quot;$&#123;CMAKE_C_FLAGS_RELEASE&#125; /O2 /GL&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-针对特定目标设置优化级别"><a href="#3-针对特定目标设置优化级别" class="headerlink" title="3. 针对特定目标设置优化级别"></a><strong>3. 针对特定目标设置优化级别</strong></h3><p>CMake 提供了 <code>target_compile_options</code> 和 <code>target_link_options</code>，可以为单个目标指定优化级别：</p>
+<h4 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(my_target main.cpp)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="keyword">target_compile_options</span>(my_target PRIVATE</span><br><span class="line">        $&lt;$&lt;CONFIG:Release&gt;:/O2 /GL&gt;</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">target_link_options</span>(my_target PRIVATE</span><br><span class="line">        $&lt;$&lt;CONFIG:Release&gt;:/LTCG&gt;</span><br><span class="line">    )</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-使用生成器表达式设置优化级别"><a href="#4-使用生成器表达式设置优化级别" class="headerlink" title="4. 使用生成器表达式设置优化级别"></a><strong>4. 使用生成器表达式设置优化级别</strong></h3><p>生成器表达式允许根据构建配置动态设置选项，例如仅在 <code>Release</code> 模式下应用优化。</p>
+<h4 id="示例：-2"><a href="#示例：-2" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="keyword">add_compile_options</span>(</span><br><span class="line">        $&lt;$&lt;CONFIG:Release&gt;:/O2 /GL&gt;</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">add_link_options</span>(</span><br><span class="line">        $&lt;$&lt;CONFIG:Release&gt;:/LTCG&gt;</span><br><span class="line">    )</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5-在-Release-构建类型中自定义优化"><a href="#5-在-Release-构建类型中自定义优化" class="headerlink" title="5. 在 Release 构建类型中自定义优化"></a><strong>5. 在 <code>Release</code> 构建类型中自定义优化</strong></h3><p>如果需要修改所有目标的 <code>Release</code> 优化级别，可以直接更改 <code>CMAKE_CXX_FLAGS_RELEASE</code> 和相关变量。</p>
+<h4 id="示例：-3"><a href="#示例：-3" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS_RELEASE <span class="string">&quot;/O2 /GL /DNDEBUG&quot;</span>)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_EXE_LINKER_FLAGS_RELEASE <span class="string">&quot;/LTCG&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="6-完整示例：CMakeLists-txt"><a href="#6-完整示例：CMakeLists-txt" class="headerlink" title="6. 完整示例：CMakeLists.txt"></a><strong>6. 完整示例：CMakeLists.txt</strong></h3><p>以下是一个完整的示例，展示如何为 MSVC 设置优化级别：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.15</span>)</span><br><span class="line"><span class="keyword">project</span>(MyProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置全局 Release 优化选项</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS_RELEASE <span class="string">&quot;$&#123;CMAKE_CXX_FLAGS_RELEASE&#125; /O2 /GL /DNDEBUG&quot;</span>)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS_RELEASE <span class="string">&quot;$&#123;CMAKE_C_FLAGS_RELEASE&#125; /O2 /GL /DNDEBUG&quot;</span>)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_EXE_LINKER_FLAGS_RELEASE <span class="string">&quot;$&#123;CMAKE_EXE_LINKER_FLAGS_RELEASE&#125; /LTCG&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加目标</span></span><br><span class="line"><span class="keyword">add_executable</span>(my_target main.cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 针对目标添加编译和链接优化</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="keyword">target_compile_options</span>(my_target PRIVATE</span><br><span class="line">        $&lt;$&lt;CONFIG:Release&gt;:/O2 /GL&gt;</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">target_link_options</span>(my_target PRIVATE</span><br><span class="line">        $&lt;$&lt;CONFIG:Release&gt;:/LTCG&gt;</span><br><span class="line">    )</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="7-在命令行中验证优化选项"><a href="#7-在命令行中验证优化选项" class="headerlink" title="7. 在命令行中验证优化选项"></a><strong>7. 在命令行中验证优化选项</strong></h3><p>运行 CMake 配置后，可以通过以下命令验证是否生效：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake --build . --config Release</span><br></pre></td></tr></table></figure>
+
+<p>生成的编译命令中应包含 <code>/O2</code>、<code>/GL</code> 等选项。</p>
+<hr>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
+<li><strong>仅针对 MSVC 编译器</strong>：以上配置通过 <code>if(MSVC)</code> 限定为 MSVC 环境。对于其他编译器，需要相应调整优化选项。</li>
+<li><strong>构建类型</strong>：确保在生成项目时指定 <code>Release</code> 类型（<code>-DCMAKE_BUILD_TYPE=Release</code> 或 <code>--config Release</code>）。</li>
+<li><strong>链接优化（LTCG）</strong>：全局优化 <code>/GL</code> 和链接时间优化 <code>/LTCG</code> 通常需要配合使用，否则可能报错。</li>
+</ol>
+<p>通过这些配置，可以在 CMake 中高效地设置 MSVC 编译优化级别。</p>
+<h2 id="windows-cl-exe-设置编译告警等级"><a href="#windows-cl-exe-设置编译告警等级" class="headerlink" title="windows cl.exe 设置编译告警等级"></a>windows cl.exe 设置编译告警等级</h2><p>在使用 <code>cl.exe</code>（Microsoft C&#x2F;C++ 编译器）编译代码时，可以通过指定编译选项来设置警告等级（Warning Level）。以下是常见的方法和选项：</p>
+<hr>
+<h3 id="设置警告等级选项"><a href="#设置警告等级选项" class="headerlink" title="设置警告等级选项"></a><strong>设置警告等级选项</strong></h3><p><code>/W</code> 选项用于设置警告等级，值从 0 到 4：</p>
+<ul>
+<li><code>/W0</code>: 关闭所有警告。</li>
+<li><code>/W1</code>: 显示最低级别的重要警告。</li>
+<li><code>/W2</code>: 显示更详细的警告信息。</li>
+<li><code>/W3</code>: 默认等级，显示大多数常见的警告。</li>
+<li><code>/W4</code>: 显示所有警告，包括详细信息。</li>
+</ul>
+<h4 id="示例：-4"><a href="#示例：-4" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /W3 main.cpp</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="提升警告为错误"><a href="#提升警告为错误" class="headerlink" title="提升警告为错误"></a><strong>提升警告为错误</strong></h3><p>可以使用 <code>/WX</code> 选项将警告视为错误（会阻止生成目标文件）：</p>
+<ul>
+<li><code>/WX</code>: 将所有警告视为错误。</li>
+<li><code>/WX-</code>: 禁止将警告视为错误。</li>
+</ul>
+<h4 id="示例：-5"><a href="#示例：-5" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /W4 /WX main.cpp</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="禁用特定警告"><a href="#禁用特定警告" class="headerlink" title="禁用特定警告"></a><strong>禁用特定警告</strong></h3><p>使用 <code>/wd&lt;number&gt;</code> 来禁用指定警告编号：</p>
+<ul>
+<li><code>number</code> 是警告的编号。</li>
+</ul>
+<h4 id="示例：-6"><a href="#示例：-6" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /W4 /wd4996 main.cpp</span><br></pre></td></tr></table></figure>
+<p>以上命令会禁用编号为 4996 的警告（通常是关于不安全函数的警告）。</p>
+<hr>
+<h3 id="报告特定警告为错误"><a href="#报告特定警告为错误" class="headerlink" title="报告特定警告为错误"></a><strong>报告特定警告为错误</strong></h3><p>可以使用 <code>/we&lt;number&gt;</code> 来将特定警告编号视为错误：</p>
+<h4 id="示例：-7"><a href="#示例：-7" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /W3 /we4013 main.cpp</span><br></pre></td></tr></table></figure>
+<p>此命令会将警告 4013 提升为错误。</p>
+<hr>
+<h3 id="仅报告特定警告"><a href="#仅报告特定警告" class="headerlink" title="仅报告特定警告"></a><strong>仅报告特定警告</strong></h3><p>使用 <code>/wo&lt;number&gt;</code> 仅输出指定的警告编号：</p>
+<h4 id="示例：-8"><a href="#示例：-8" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /W3 /wo4700 main.cpp</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="综合示例"><a href="#综合示例" class="headerlink" title="综合示例"></a><strong>综合示例</strong></h3><p>假设你希望设置最高警告等级，同时忽略编号为 4996 的警告，并将编号为 4013 的警告提升为错误：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /W4 /wd4996 /we4013 main.cpp</span><br></pre></td></tr></table></figure>
+
+<p>这样可以灵活地根据项目需求调整警告的级别和处理方式。</p>
+<h2 id="在cmakelists中设置编译告警等级"><a href="#在cmakelists中设置编译告警等级" class="headerlink" title="在cmakelists中设置编译告警等级"></a>在cmakelists中设置编译告警等级</h2><p>在 <strong>CMake</strong> 中，可以通过设置编译选项来控制 <code>cl.exe</code> 的警告等级和其他相关行为。以下是具体方法：</p>
+<hr>
+<h3 id="设置全局警告等级"><a href="#设置全局警告等级" class="headerlink" title="设置全局警告等级"></a><strong>设置全局警告等级</strong></h3><p>可以通过 <code>CMAKE_CXX_FLAGS</code> 或 <code>CMAKE_C_FLAGS</code> 添加 <code>cl.exe</code> 的警告等级选项。</p>
+<h4 id="示例：-9"><a href="#示例：-9" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">&quot;$&#123;CMAKE_CXX_FLAGS&#125; /W4&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>或者更优雅的方式，使用 <code>add_compile_options</code>：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_compile_options</span>(/W4)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="针对特定目标设置"><a href="#针对特定目标设置" class="headerlink" title="针对特定目标设置"></a><strong>针对特定目标设置</strong></h3><p>如果只想为某个目标设置警告等级，可以使用 <code>target_compile_options</code>。</p>
+<h4 id="示例：-10"><a href="#示例：-10" class="headerlink" title="示例："></a>示例：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(my_target main.cpp)</span><br><span class="line"><span class="keyword">target_compile_options</span>(my_target PRIVATE /W4)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="禁用特定警告-1"><a href="#禁用特定警告-1" class="headerlink" title="禁用特定警告"></a><strong>禁用特定警告</strong></h3><p>可以通过 <code>/wd&lt;number&gt;</code> 禁用指定警告编号。同样可以使用全局或目标范围的设置。</p>
+<h4 id="示例（全局禁用警告-4996）："><a href="#示例（全局禁用警告-4996）：" class="headerlink" title="示例（全局禁用警告 4996）："></a>示例（全局禁用警告 4996）：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_compile_options</span>(/wd4996)</span><br></pre></td></tr></table></figure>
+
+<h4 id="示例（针对目标禁用警告-4996）："><a href="#示例（针对目标禁用警告-4996）：" class="headerlink" title="示例（针对目标禁用警告 4996）："></a>示例（针对目标禁用警告 4996）：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_compile_options</span>(my_target PRIVATE /wd4996)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="将警告视为错误"><a href="#将警告视为错误" class="headerlink" title="将警告视为错误"></a><strong>将警告视为错误</strong></h3><p>使用 <code>/WX</code> 选项可以将警告提升为错误。</p>
+<h4 id="示例（全局设置）："><a href="#示例（全局设置）：" class="headerlink" title="示例（全局设置）："></a>示例（全局设置）：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_compile_options</span>(/WX)</span><br></pre></td></tr></table></figure>
+
+<h4 id="示例（目标范围设置）："><a href="#示例（目标范围设置）：" class="headerlink" title="示例（目标范围设置）："></a>示例（目标范围设置）：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_compile_options</span>(my_target PRIVATE /WX)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="综合示例-1"><a href="#综合示例-1" class="headerlink" title="综合示例"></a><strong>综合示例</strong></h3><p>假设你需要：</p>
+<ol>
+<li>设置全局警告等级为 <code>/W4</code>。</li>
+<li>忽略编号为 4996 的警告。</li>
+<li>对特定目标启用警告视为错误。</li>
+</ol>
+<h4 id="完整-CMakeLists-txt："><a href="#完整-CMakeLists-txt：" class="headerlink" title="完整 CMakeLists.txt："></a>完整 CMakeLists.txt：</h4><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.15</span>)</span><br><span class="line"><span class="keyword">project</span>(MyProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置全局警告等级和禁用警告</span></span><br><span class="line"><span class="keyword">add_compile_options</span>(/W4 /wd4996)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加可执行目标</span></span><br><span class="line"><span class="keyword">add_executable</span>(my_target main.cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为特定目标启用警告视为错误</span></span><br><span class="line"><span class="keyword">target_compile_options</span>(my_target PRIVATE /WX)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
+<li><p>如果你的项目是跨平台的，建议使用生成器表达式来确保选项只在 MSVC 编译器中生效：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_compile_options</span>(<span class="string">&quot;$&lt;$&lt;CXX_COMPILER_ID:MSVC&gt;:/W4&gt;&quot;</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>跨平台警告设置可以通过 <code>CMAKE_CXX_STANDARD_WARNING_FLAGS</code> 等工具链变量进行管理，但这需要更多定制。</p>
+</li>
+</ol>
+<p>这样配置后，<code>cl.exe</code> 的警告等级和相关选项将在 CMake 中正确应用。</p>
+<h2 id="预处理阶段-详解"><a href="#预处理阶段-详解" class="headerlink" title="预处理阶段 详解"></a>预处理阶段 详解</h2><p>预处理阶段是编译的第一个阶段，它主要负责处理代码中的 <strong>预处理指令</strong> 和一些文本操作，生成预处理后的源代码（通常以 <code>.i</code> 为后缀）。这个阶段不会生成机器代码，而是为后续的编译阶段准备简化后的源代码。</p>
+<p>以下是预处理阶段的详解：</p>
+<hr>
+<h2 id="1-预处理阶段的主要任务"><a href="#1-预处理阶段的主要任务" class="headerlink" title="1. 预处理阶段的主要任务"></a><strong>1. 预处理阶段的主要任务</strong></h2><h3 id="1-1-宏替换"><a href="#1-1-宏替换" class="headerlink" title="1.1 宏替换"></a><strong>1.1 宏替换</strong></h3><ul>
+<li><strong>定义宏：</strong> 使用 <code>#define</code> 定义的宏会在预处理阶段被替换为对应的值。</li>
+<li><strong>替换规则：</strong><br>宏名在源代码中出现时，被展开为宏定义中的内容。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PI 3.14159</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SQUARE(x) ((x) * (x))</span></span><br><span class="line"></span><br><span class="line"><span class="type">double</span> area = PI * <span class="built_in">SQUARE</span>(<span class="number">10</span>);</span><br></pre></td></tr></table></figure>
+
+<p>预处理后的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> area = <span class="number">3.14159</span> * ((<span class="number">10</span>) * (<span class="number">10</span>));</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-2-头文件展开"><a href="#1-2-头文件展开" class="headerlink" title="1.2 头文件展开"></a><strong>1.2 头文件展开</strong></h3><ul>
+<li><strong><code>#include</code> 指令：</strong> 将头文件的内容直接插入到包含该指令的地方。</li>
+<li><strong>支持两种头文件形式：</strong><ul>
+<li><code>#include &lt;filename&gt;</code>：查找系统路径中的头文件。</li>
+<li><code>#include &quot;filename&quot;</code>：优先查找当前文件所在目录，然后查找系统路径。</li>
+</ul>
+</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;myheader.h&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>假设 <code>myheader.h</code> 的内容为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> GREETING <span class="string">&quot;Hello, World!&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>预处理后的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GREETING <span class="string">&quot;Hello, World!&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>系统头文件如 <code>&lt;iostream&gt;</code> 的内容也会被展开，但通常为了简化分析，不会显示完整展开内容。</p>
+<hr>
+<h3 id="1-3-条件编译"><a href="#1-3-条件编译" class="headerlink" title="1.3 条件编译"></a><strong>1.3 条件编译</strong></h3><p>条件编译允许根据宏的定义状态控制代码是否被编译。常用的指令包括 <code>#if</code>、<code>#ifdef</code>、<code>#ifndef</code>、<code>#else</code> 和 <code>#endif</code>。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> DEBUG</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Debug mode enabled&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Release mode&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>假设宏 <code>DEBUG</code> 被定义，则预处理后的代码为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::cout &lt;&lt; <span class="string">&quot;Debug mode enabled&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<p>如果未定义 <code>DEBUG</code>，则预处理后的代码为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::cout &lt;&lt; <span class="string">&quot;Release mode&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-4-注释移除"><a href="#1-4-注释移除" class="headerlink" title="1.4 注释移除"></a><strong>1.4 注释移除</strong></h3><p>预处理阶段会去除所有注释，包括单行注释和多行注释。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This is a single-line comment</span></span><br><span class="line"><span class="type">int</span> x = <span class="number">10</span>; <span class="comment">/* This is a multi-line comment */</span></span><br></pre></td></tr></table></figure>
+
+<p>预处理后的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-5-内置宏处理"><a href="#1-5-内置宏处理" class="headerlink" title="1.5 内置宏处理"></a><strong>1.5 内置宏处理</strong></h3><p>C++ 提供了一些内置宏，可以在预处理阶段被替换为特定值：</p>
+<table>
+<thead>
+<tr>
+<th>宏</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>__FILE__</code></td>
+<td>当前源文件名</td>
+</tr>
+<tr>
+<td><code>__LINE__</code></td>
+<td>当前行号</td>
+</tr>
+<tr>
+<td><code>__DATE__</code></td>
+<td>源文件编译日期（格式：”Mmm dd yyyy”）</td>
+</tr>
+<tr>
+<td><code>__TIME__</code></td>
+<td>源文件编译时间（格式：”hh:mm:ss”）</td>
+</tr>
+<tr>
+<td><code>__cplusplus</code></td>
+<td>表示当前编译器支持的 C++ 语言标准的版本号</td>
+</tr>
+</tbody></table>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::cout &lt;&lt; <span class="string">&quot;File: &quot;</span> &lt;&lt; __FILE__ &lt;&lt; <span class="string">&quot;, Line: &quot;</span> &lt;&lt; __LINE__ &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<p>预处理后的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::cout &lt;&lt; <span class="string">&quot;File: main.cpp, Line: 10&quot;</span> &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-6-行控制"><a href="#1-6-行控制" class="headerlink" title="1.6 行控制"></a><strong>1.6 行控制</strong></h3><p>通过 <code>#line</code> 指令可以更改文件名和行号信息，用于生成调试信息或代码生成工具。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">line</span> 100 <span class="string">&quot;newfile.cpp&quot;</span></span></span><br><span class="line"><span class="type">int</span> x = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>预处理后的代码将被视为从 <code>newfile.cpp</code> 文件的第 100 行开始。</p>
+<hr>
+<h3 id="1-7-移除无用代码"><a href="#1-7-移除无用代码" class="headerlink" title="1.7 移除无用代码"></a><strong>1.7 移除无用代码</strong></h3><p>预处理阶段会移除所有无用的代码段。例如，通过条件编译屏蔽的代码不会出现在预处理后的文件中。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> UNUSED</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">unused_function</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>UNUSED</code> 未定义，则 <code>unused_function()</code> 会被完全移除。</p>
+<hr>
+<h2 id="2-如何运行预处理阶段"><a href="#2-如何运行预处理阶段" class="headerlink" title="2. 如何运行预处理阶段"></a><strong>2. 如何运行预处理阶段</strong></h2><p>在 MSVC 中，可以通过以下命令执行预处理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /E source.cpp &gt; source.i</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>/E</code>：仅运行预处理，输出结果到控制台。</li>
+<li><code>&gt; source.i</code>：将预处理结果保存到文件 <code>source.i</code>。</li>
+</ul>
+<hr>
+<h2 id="3-预处理阶段的工具和实现细节"><a href="#3-预处理阶段的工具和实现细节" class="headerlink" title="3. 预处理阶段的工具和实现细节"></a><strong>3. 预处理阶段的工具和实现细节</strong></h2><h3 id="3-1-预处理器的作用"><a href="#3-1-预处理器的作用" class="headerlink" title="3.1 预处理器的作用"></a><strong>3.1 预处理器的作用</strong></h3><p>预处理器是一种文本处理工具，不理解 C++ 的语义，只按照预定义规则操作代码。</p>
+<h3 id="3-2-与编译的关系"><a href="#3-2-与编译的关系" class="headerlink" title="3.2 与编译的关系"></a><strong>3.2 与编译的关系</strong></h3><p>预处理是编译的第一步，编译器会直接使用预处理后的代码进行语法和语义分析。</p>
+<hr>
+<h2 id="4-示例：完整预处理过程"><a href="#4-示例：完整预处理过程" class="headerlink" title="4. 示例：完整预处理过程"></a><strong>4. 示例：完整预处理过程</strong></h2><p>假设有以下代码文件 <code>example.cpp</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PI 3.14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AREA(r) (PI * (r) * (r))</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> radius = <span class="number">5</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Area: &quot;</span> &lt;&lt; <span class="built_in">AREA</span>(radius) &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行预处理命令后（<code>cl /E example.cpp &gt; example.i</code>），预处理结果可能如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 预处理后的展开代码</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> radius = <span class="number">5</span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Area: &quot;</span> &lt;&lt; (<span class="number">3.14</span> * (radius) * (radius)) &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>头文件 <code>&lt;iostream&gt;</code></strong> 的内容已经被展开（此处省略）。</li>
+<li>宏 <code>PI</code> 和 <code>AREA(r)</code> 被替换。</li>
+<li>原始注释已被移除。</li>
+</ul>
+<hr>
+<h2 id="5-预处理阶段的注意事项"><a href="#5-预处理阶段的注意事项" class="headerlink" title="5. 预处理阶段的注意事项"></a><strong>5. 预处理阶段的注意事项</strong></h2><ol>
+<li><p><strong>宏的副作用</strong><br>宏展开时可能引发意外行为，例如多次求值问题。<br><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> SQUARE(x) (x * x)</span></span><br><span class="line"><span class="type">int</span> result = <span class="built_in">SQUARE</span>(<span class="number">1</span> + <span class="number">1</span>); <span class="comment">// 错误：展开为 (1 + 1 * 1 + 1)</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>包含保护</strong><br>使用 <code>#pragma once</code> 或条件编译保护头文件，防止重复包含：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> HEADER_FILE</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HEADER_FILE</span></span><br><span class="line"><span class="comment">// 内容</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>调试预处理结果</strong><br>在复杂项目中，查看预处理输出可以帮助分析宏替换和头文件问题。</p>
+</li>
+</ol>
+<hr>
+<h2 id="6-总结-1"><a href="#6-总结-1" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h2><p>预处理阶段是 C++ 编译过程中重要的第一步，负责处理宏替换、头文件展开、条件编译等操作。通过预处理器，将源代码简化为无注释、无条件编译指令的代码，以便后续的编译器能高效地进行语法和语义分析。</p>
+<p>理解预处理过程有助于解决编译问题，优化代码结构，并避免常见的宏使用错误。</p>
+<h2 id="编译阶段-详解"><a href="#编译阶段-详解" class="headerlink" title="编译阶段 详解"></a>编译阶段 详解</h2><p>编译阶段是从预处理后的代码生成目标代码的过程。它将人类可读的高级代码翻译成更底层的汇编代码，是整个编译流程中最核心的部分。编译阶段涉及语法和语义的检查，以及初步的优化工作。</p>
+<p>以下是编译阶段的详解：</p>
+<hr>
+<h2 id="1-编译阶段的主要任务"><a href="#1-编译阶段的主要任务" class="headerlink" title="1. 编译阶段的主要任务"></a><strong>1. 编译阶段的主要任务</strong></h2><h3 id="1-1-语法分析"><a href="#1-1-语法分析" class="headerlink" title="1.1 语法分析"></a><strong>1.1 语法分析</strong></h3><p>在编译阶段，编译器首先会对预处理后的代码进行 <strong>语法分析</strong>，确保代码符合语言的语法规则。</p>
+<ul>
+<li><p><strong>词法分析</strong>：将源代码拆解为 <strong>标记（token）</strong>。<br>例如，将 <code>int main() &#123; return 0; &#125;</code> 拆解为：</p>
+<ul>
+<li><code>int</code>（关键字）</li>
+<li><code>main</code>（标识符）</li>
+<li><code>(</code>（符号）等。</li>
+</ul>
+</li>
+<li><p><strong>语法树生成</strong>：根据语言的语法规则，构建代码的语法树。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = a + b * c;</span><br></pre></td></tr></table></figure>
+<p>会被解析为语法树：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  =</span><br><span class="line"> / \</span><br><span class="line">x   +</span><br><span class="line">   / \</span><br><span class="line">  a   *</span><br><span class="line">     / \</span><br><span class="line">    b   c</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="1-2-语义分析"><a href="#1-2-语义分析" class="headerlink" title="1.2 语义分析"></a><strong>1.2 语义分析</strong></h3><p>语义分析检查代码是否符合语言的语义规则。它包括：</p>
+<ul>
+<li><p><strong>类型检查</strong>：检查变量类型是否匹配。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="string">&quot;hello&quot;</span>; <span class="comment">// 错误：类型不匹配</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>作用域检查</strong>：检查标识符是否在当前作用域中可见。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> y = x; <span class="comment">// 错误：x 超出了作用域</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>函数调用检查</strong>：验证函数参数是否与定义匹配。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">int</span> a)</span></span>;</span><br><span class="line"><span class="built_in">func</span>(<span class="string">&quot;hello&quot;</span>); <span class="comment">// 错误：参数类型不匹配</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="1-3-中间代码生成"><a href="#1-3-中间代码生成" class="headerlink" title="1.3 中间代码生成"></a><strong>1.3 中间代码生成</strong></h3><p>编译器将源代码转换为中间代码。这种中间代码是一种抽象的、与平台无关的表示，便于优化和后续生成目标代码。</p>
+<ul>
+<li><p><strong>三地址码</strong><br>一种常见的中间代码形式，每个指令最多包含三个操作数。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x = a + b * c;</span><br></pre></td></tr></table></figure>
+<p>转换为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">t1 = b * c;</span><br><span class="line">t2 = a + t1;</span><br><span class="line">x = t2;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>抽象语法树（AST）</strong><br>是中间代码的另一种表示形式。</p>
+</li>
+</ul>
+<hr>
+<h3 id="1-4-优化（可选）"><a href="#1-4-优化（可选）" class="headerlink" title="1.4 优化（可选）"></a><strong>1.4 优化（可选）</strong></h3><p>在中间代码生成后，编译器可能会进行初步优化以提高代码效率或减少资源使用。这些优化包括：</p>
+<ul>
+<li><p><strong>常量折叠</strong><br>将编译时可计算的常量表达式直接替换为结果。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">2</span> + <span class="number">3</span>; <span class="comment">// 优化为 int x = 5;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>公共子表达式消除</strong><br>避免重复计算相同的表达式。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = a * b + c * d;</span><br><span class="line"><span class="type">int</span> y = a * b + e;</span><br></pre></td></tr></table></figure>
+<p>优化为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">t1 = a * b;</span><br><span class="line">x = t1 + c * d;</span><br><span class="line">y = t1 + e;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>死代码消除</strong><br>删除永远不会执行的代码。<br>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="literal">false</span>) &#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="2-编译阶段的输入与输出"><a href="#2-编译阶段的输入与输出" class="headerlink" title="2. 编译阶段的输入与输出"></a><strong>2. 编译阶段的输入与输出</strong></h2><h3 id="输入："><a href="#输入：" class="headerlink" title="输入："></a><strong>输入：</strong></h3><ul>
+<li>预处理后的代码（通常以 <code>.i</code> 为后缀）。</li>
+</ul>
+<h3 id="输出："><a href="#输出：" class="headerlink" title="输出："></a><strong>输出：</strong></h3><ul>
+<li>汇编代码（通常以 <code>.asm</code> 为后缀）。<br>该代码是针对特定硬件架构的低级代码，描述程序如何执行。</li>
+</ul>
+<hr>
+<h2 id="3-编译阶段的执行"><a href="#3-编译阶段的执行" class="headerlink" title="3. 编译阶段的执行"></a><strong>3. 编译阶段的执行</strong></h2><p>在 MSVC 编译器中，编译阶段可以通过以下命令执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /c source.cpp</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>/c</code>：表示仅编译，不链接。</li>
+<li><code>source.cpp</code>：源文件名称。</li>
+</ul>
+<hr>
+<h2 id="4-编译器的主要组件"><a href="#4-编译器的主要组件" class="headerlink" title="4. 编译器的主要组件"></a><strong>4. 编译器的主要组件</strong></h2><p>一个现代编译器在编译阶段通常由以下组件组成：</p>
+<h3 id="4-1-前端（Front-end）"><a href="#4-1-前端（Front-end）" class="headerlink" title="4.1 前端（Front-end）"></a><strong>4.1 前端（Front-end）</strong></h3><p>负责将源代码解析为中间代码，同时进行语法和语义检查。<br>前端的目标是确保源代码是合法的。</p>
+<h3 id="4-2-中端（Middle-end）"><a href="#4-2-中端（Middle-end）" class="headerlink" title="4.2 中端（Middle-end）"></a><strong>4.2 中端（Middle-end）</strong></h3><p>对中间代码进行优化。<br>中端的目标是生成高效的中间表示，而不依赖具体的目标机器。</p>
+<h3 id="4-3-后端（Back-end）"><a href="#4-3-后端（Back-end）" class="headerlink" title="4.3 后端（Back-end）"></a><strong>4.3 后端（Back-end）</strong></h3><p>将中间代码转换为目标机器代码（汇编代码或机器码）。<br>后端的目标是生成高效的目标代码。</p>
+<hr>
+<h2 id="5-编译阶段的输出示例"><a href="#5-编译阶段的输出示例" class="headerlink" title="5. 编译阶段的输出示例"></a><strong>5. 编译阶段的输出示例</strong></h2><p>假设有以下代码文件 <code>example.cpp</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> y = <span class="number">20</span>;</span><br><span class="line">    <span class="type">int</span> z = x + y;</span><br><span class="line">    std::cout &lt;&lt; z &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译后的汇编代码可能类似如下（简化示例）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">_main:</span><br><span class="line">    push    rbp</span><br><span class="line">    mov     rbp, rsp</span><br><span class="line">    sub     rsp, 16</span><br><span class="line">    mov     DWORD PTR [rbp-4], 10</span><br><span class="line">    mov     DWORD PTR [rbp-8], 20</span><br><span class="line">    mov     eax, DWORD PTR [rbp-4]</span><br><span class="line">    add     eax, DWORD PTR [rbp-8]</span><br><span class="line">    mov     DWORD PTR [rbp-12], eax</span><br><span class="line">    mov     eax, DWORD PTR [rbp-12]</span><br><span class="line">    mov     edi, eax</span><br><span class="line">    call    _std::cout</span><br><span class="line">    mov     eax, 0</span><br><span class="line">    leave</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-编译阶段的常见问题"><a href="#6-编译阶段的常见问题" class="headerlink" title="6. 编译阶段的常见问题"></a><strong>6. 编译阶段的常见问题</strong></h2><h3 id="1-类型错误"><a href="#1-类型错误" class="headerlink" title="1. 类型错误"></a><strong>1. 类型错误</strong></h3><p>错误：<code>cannot convert &#39;const char*&#39; to &#39;int&#39;</code><br>原因：变量或参数的类型不匹配。<br>解决：检查变量和函数参数的类型。</p>
+<h3 id="2-未声明的标识符"><a href="#2-未声明的标识符" class="headerlink" title="2. 未声明的标识符"></a><strong>2. 未声明的标识符</strong></h3><p>错误：<code>&#39;x&#39; : undeclared identifier</code><br>原因：变量或函数在使用前未声明。<br>解决：确保所有变量和函数都已声明。</p>
+<h3 id="3-语法错误"><a href="#3-语法错误" class="headerlink" title="3. 语法错误"></a><strong>3. 语法错误</strong></h3><p>错误：<code>expected &#39;;&#39; before &#39;&#125;&#39; token</code><br>原因：代码语法错误，例如漏掉分号。<br>解决：检查代码语法是否正确。</p>
+<hr>
+<h2 id="7-编译阶段与后续阶段的关系"><a href="#7-编译阶段与后续阶段的关系" class="headerlink" title="7. 编译阶段与后续阶段的关系"></a><strong>7. 编译阶段与后续阶段的关系</strong></h2><ul>
+<li><p><strong>汇编阶段</strong><br>编译阶段的输出是汇编代码，这些汇编代码将在下一阶段被汇编器转换为目标代码（<code>.obj</code> 文件）。</p>
+</li>
+<li><p><strong>链接阶段</strong><br>编译阶段不涉及将多个目标文件合并，这一任务由链接器完成。</p>
+</li>
+</ul>
+<hr>
+<h2 id="8-总结"><a href="#8-总结" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h2><p>编译阶段是整个编译流程的核心，它将高级代码翻译为底层汇编代码。该阶段包括语法分析、语义分析、中间代码生成和初步优化。</p>
+<p>通过深入理解编译阶段，可以：</p>
+<ul>
+<li>更高效地排查语法或语义错误。</li>
+<li>理解编译器优化的作用。</li>
+<li>更好地书写符合编译器预期的高效代码。</li>
+</ul>
+<h2 id="汇编阶段-详解"><a href="#汇编阶段-详解" class="headerlink" title="汇编阶段 详解"></a>汇编阶段 详解</h2><p><strong>汇编阶段</strong>是编译器将生成的汇编代码（assembly code）转换为机器代码（machine code）的过程。这一步通常由<strong>汇编器（assembler）</strong>完成，输出的是一个目标文件（object file），其内容是二进制的机器指令，且与具体的硬件架构紧密相关。</p>
+<p>以下是汇编阶段的详解：</p>
+<hr>
+<h2 id="1-汇编阶段的主要任务"><a href="#1-汇编阶段的主要任务" class="headerlink" title="1. 汇编阶段的主要任务"></a><strong>1. 汇编阶段的主要任务</strong></h2><h3 id="1-1-汇编代码解析"><a href="#1-1-汇编代码解析" class="headerlink" title="1.1 汇编代码解析"></a><strong>1.1 汇编代码解析</strong></h3><p>汇编器读取编译器生成的汇编代码文件（通常以 <code>.asm</code> 或 <code>.s</code> 为后缀），并逐行解析每条指令。</p>
+<p>示例汇编代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">section .data</span><br><span class="line">    msg db &quot;Hello, World!&quot;, 0</span><br><span class="line"></span><br><span class="line">section .text</span><br><span class="line">    global _start</span><br><span class="line"></span><br><span class="line">_start:</span><br><span class="line">    mov rax, 1        ; 系统调用号 (write)</span><br><span class="line">    mov rdi, 1        ; 文件描述符 (stdout)</span><br><span class="line">    mov rsi, msg      ; 指向消息的地址</span><br><span class="line">    mov rdx, 13       ; 消息长度</span><br><span class="line">    syscall           ; 调用内核</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-符号表生成"><a href="#1-2-符号表生成" class="headerlink" title="1.2 符号表生成"></a><strong>1.2 符号表生成</strong></h3><ul>
+<li>汇编器会生成一个<strong>符号表</strong>，记录代码中所有标识符（例如变量、函数名和标签）的地址或引用信息。</li>
+<li>这些符号信息会被写入目标文件中，并在链接阶段用于符号解析。</li>
+</ul>
+<p>示例符号表：</p>
+<table>
+<thead>
+<tr>
+<th>符号名</th>
+<th>地址（偏移量）</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>_start</code></td>
+<td>0x0000</td>
+<td>函数</td>
+</tr>
+<tr>
+<td><code>msg</code></td>
+<td>0x1000</td>
+<td>数据段</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-指令翻译"><a href="#1-3-指令翻译" class="headerlink" title="1.3 指令翻译"></a><strong>1.3 指令翻译</strong></h3><p>将汇编指令翻译为机器指令（即对应的二进制编码），这些机器指令是 CPU 可以直接理解和执行的内容。</p>
+<p>示例翻译：</p>
+<ul>
+<li>汇编代码：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov rax, 1</span><br></pre></td></tr></table></figure></li>
+<li>对应机器指令（二进制编码）：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x48 0xC7 0xC0 0x01 0x00 0x00 0x00</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="2-汇编阶段的输入与输出"><a href="#2-汇编阶段的输入与输出" class="headerlink" title="2. 汇编阶段的输入与输出"></a><strong>2. 汇编阶段的输入与输出</strong></h2><h3 id="输入：-1"><a href="#输入：-1" class="headerlink" title="输入："></a><strong>输入：</strong></h3><ul>
+<li>汇编代码文件（通常以 <code>.s</code> 或 <code>.asm</code> 为后缀）。</li>
+</ul>
+<h3 id="输出：-1"><a href="#输出：-1" class="headerlink" title="输出："></a><strong>输出：</strong></h3><ul>
+<li>目标文件（通常以 <code>.obj</code> 或 <code>.o</code> 为后缀）。<ul>
+<li>目标文件是二进制文件，包含机器指令和符号信息。</li>
+<li>目标文件是不可执行的，需要通过链接阶段生成最终的可执行文件。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-汇编阶段的具体过程"><a href="#3-汇编阶段的具体过程" class="headerlink" title="3. 汇编阶段的具体过程"></a><strong>3. 汇编阶段的具体过程</strong></h2><h3 id="3-1-代码段和数据段解析"><a href="#3-1-代码段和数据段解析" class="headerlink" title="3.1 代码段和数据段解析"></a><strong>3.1 代码段和数据段解析</strong></h3><p>汇编代码通常分为多个段，例如：</p>
+<ul>
+<li><strong>代码段</strong>（<code>.text</code>）：包含可执行的机器指令。</li>
+<li><strong>数据段</strong>（<code>.data</code>）：包含初始化的全局和静态变量。</li>
+<li><strong>未初始化数据段</strong>（<code>.bss</code>）：包含未初始化的全局和静态变量。</li>
+</ul>
+<p>汇编器会识别这些段并将它们分别组织在目标文件中。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">section .data</span><br><span class="line">    x db 10   ; 初始化变量 x = 10</span><br><span class="line"></span><br><span class="line">section .bss</span><br><span class="line">    y resb 1  ; 分配 1 字节未初始化内存</span><br><span class="line"></span><br><span class="line">section .text</span><br><span class="line">    mov rax, x</span><br><span class="line">    add rax, y</span><br></pre></td></tr></table></figure>
+
+<p>目标文件中：</p>
+<ul>
+<li><code>.data</code> 段包含 <code>x</code> 的初始值 <code>10</code>。</li>
+<li><code>.bss</code> 段为 <code>y</code> 分配了 1 字节的未初始化空间。</li>
+<li><code>.text</code> 段包含汇编指令的二进制编码。</li>
+</ul>
+<hr>
+<h3 id="3-2-地址分配"><a href="#3-2-地址分配" class="headerlink" title="3.2 地址分配"></a><strong>3.2 地址分配</strong></h3><p>汇编器为符号分配地址。由于目标文件尚未链接，符号的地址通常是相对的或占位符。</p>
+<p>示例：</p>
+<ul>
+<li><code>_start</code> 地址为 <code>0x0000</code>（相对 <code>.text</code> 段起始地址）。</li>
+<li><code>msg</code> 地址为 <code>0x1000</code>（相对 <code>.data</code> 段起始地址）。</li>
+</ul>
+<hr>
+<h3 id="3-3-处理伪指令"><a href="#3-3-处理伪指令" class="headerlink" title="3.3 处理伪指令"></a><strong>3.3 处理伪指令</strong></h3><p>汇编代码中可能包含伪指令（pseudo-instructions），它们不是实际的机器指令，但帮助开发者简化代码编写。汇编器会将伪指令转换为实际的机器指令或二进制数据。</p>
+<p>常见伪指令：</p>
+<ul>
+<li><code>db</code>（定义字节）：用于定义数据。</li>
+<li><code>resb</code>（保留字节）：为未初始化变量分配空间。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x db 10</span><br></pre></td></tr></table></figure>
+<p>被翻译为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x0A</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-4-重定位信息生成"><a href="#3-4-重定位信息生成" class="headerlink" title="3.4 重定位信息生成"></a><strong>3.4 重定位信息生成</strong></h3><p>汇编器会为目标文件生成 <strong>重定位表</strong>，记录需要在链接阶段调整的地址。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov rax, msg</span><br></pre></td></tr></table></figure>
+<ul>
+<li>汇编器无法直接确定 <code>msg</code> 的绝对地址，因为它可能依赖于其他模块。</li>
+<li>重定位表会记录 <code>msg</code> 的符号信息，留待链接器解析。</li>
+</ul>
+<hr>
+<h2 id="4-汇编阶段的工具"><a href="#4-汇编阶段的工具" class="headerlink" title="4. 汇编阶段的工具"></a><strong>4. 汇编阶段的工具</strong></h2><p>在 MSVC 中，汇编阶段是隐式完成的，但可以通过以下方式查看汇编代码或生成目标文件：</p>
+<ol>
+<li><p><strong>查看汇编代码：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /FAs source.cpp</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>/FAs</code>：生成汇编代码文件（<code>.asm</code>）。</li>
+</ul>
+</li>
+<li><p><strong>生成目标文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cl /c source.cpp</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>/c</code>：仅编译和汇编，不链接。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-目标文件的结构"><a href="#5-目标文件的结构" class="headerlink" title="5. 目标文件的结构"></a><strong>5. 目标文件的结构</strong></h2><p>目标文件是汇编阶段的输出，通常具有以下结构：</p>
+<ul>
+<li><strong>头部信息</strong>：描述文件格式、段表、符号表等。</li>
+<li><strong>代码段（.text）</strong>：包含程序的机器指令。</li>
+<li><strong>数据段（.data）</strong>：包含已初始化的全局变量和静态变量。</li>
+<li><strong>未初始化数据段（.bss）</strong>：包含未初始化的全局变量和静态变量。</li>
+<li><strong>符号表</strong>：记录符号的名称、类型和地址信息。</li>
+<li><strong>重定位表</strong>：记录需要链接器修改的地址信息。</li>
+</ul>
+<hr>
+<h2 id="6-汇编阶段的常见问题"><a href="#6-汇编阶段的常见问题" class="headerlink" title="6. 汇编阶段的常见问题"></a><strong>6. 汇编阶段的常见问题</strong></h2><h3 id="1-符号未定义"><a href="#1-符号未定义" class="headerlink" title="1. 符号未定义"></a><strong>1. 符号未定义</strong></h3><p>错误：<code>undefined reference to &#39;symbol&#39;</code><br>原因：引用了未定义的符号，可能是外部函数或变量未声明。<br>解决：确保所有引用的符号在后续的链接阶段有定义。</p>
+<h3 id="2-段冲突"><a href="#2-段冲突" class="headerlink" title="2. 段冲突"></a><strong>2. 段冲突</strong></h3><p>错误：<code>segment exceeds limit</code><br>原因：某个段（如 <code>.text</code> 或 <code>.data</code>）超出了目标平台的内存限制。<br>解决：优化代码或减少数据段大小。</p>
+<h3 id="3-伪指令错误"><a href="#3-伪指令错误" class="headerlink" title="3. 伪指令错误"></a><strong>3. 伪指令错误</strong></h3><p>错误：<code>invalid pseudo-instruction</code><br>原因：伪指令的语法错误或不支持的伪指令。<br>解决：查阅汇编器文档，确保使用正确的语法。</p>
+<hr>
+<h2 id="7-汇编阶段的示例"><a href="#7-汇编阶段的示例" class="headerlink" title="7. 汇编阶段的示例"></a><strong>7. 汇编阶段的示例</strong></h2><p><strong>源代码（<code>example.cpp</code>）：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> x = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> y = <span class="number">20</span>;</span><br><span class="line">    <span class="type">int</span> z = x + y;</span><br><span class="line">    std::cout &lt;&lt; z &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>对应汇编代码（<code>example.asm</code>）：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_main:</span><br><span class="line">    push    rbp</span><br><span class="line">    mov     rbp, rsp</span><br><span class="line">    sub     rsp, 16</span><br><span class="line">    mov     DWORD PTR [rbp-4], 10</span><br><span class="line">    mov     DWORD PTR [rbp-8], 20</span><br><span class="line">    mov     eax, DWORD PTR [rbp-4]</span><br><span class="line">    add     eax, DWORD PTR [rbp-8]</span><br><span class="line">    mov     DWORD PTR [rbp-12], eax</span><br><span class="line">    mov     edi, eax</span><br><span class="line">    call    _std::cout</span><br><span class="line">    mov     eax, 0</span><br><span class="line">    leave</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<p><strong>生成目标文件（<code>example.obj</code>）：</strong><br>目标文件中包含二进制的机器指令和符号信息，供链接阶段使用。</p>
+<hr>
+<h2 id="8-总结-1"><a href="#8-总结-1" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h2><p>汇编阶段是编译器将汇编代码翻译为机器代码的过程，输出目标文件。<br>它的核心任务包括：</p>
+<ul>
+<li><strong>解析汇编代码</strong>并生成对应的机器指令。</li>
+<li><strong>管理符号表和重定位表</strong>，为链接阶段提供支持。</li>
+<li><strong>处理伪指令和段信息</strong>，组织目标文件结构。</li>
+</ul>
+<p>通过理解汇编阶段，可以更好地优化代码、调试汇编问题，并深入了解目标文件的生成机制。</p>
+<h2 id="链接阶段-详解"><a href="#链接阶段-详解" class="headerlink" title="链接阶段 详解"></a>链接阶段 详解</h2><p>链接阶段是将一个或多个目标文件（<code>.o</code> 或 <code>.obj</code>）和所需的库文件合并为一个可执行文件的过程。这一步由<strong>链接器（linker）</strong>完成，是程序从源代码到可执行文件的最后一步。</p>
+<p>以下是链接阶段的详解：</p>
+<hr>
+<h2 id="1-链接阶段的主要任务"><a href="#1-链接阶段的主要任务" class="headerlink" title="1. 链接阶段的主要任务"></a><strong>1. 链接阶段的主要任务</strong></h2><h3 id="1-1-符号解析"><a href="#1-1-符号解析" class="headerlink" title="1.1 符号解析"></a><strong>1.1 符号解析</strong></h3><p>在目标文件中，每个函数、变量等都可能被多个文件引用或定义。链接器需要：</p>
+<ul>
+<li>找到每个符号的定义位置。</li>
+<li>将符号的引用与定义进行匹配。</li>
+</ul>
+<h4 id="符号表"><a href="#符号表" class="headerlink" title="符号表"></a>符号表</h4><p>每个目标文件都包含一个符号表，记录了：</p>
+<ul>
+<li><strong>全局符号</strong>：函数和变量等。</li>
+<li><strong>未解析符号</strong>：目标文件中引用但未定义的符号。</li>
+</ul>
+<p>链接器会将所有目标文件的符号表合并，并尝试解析未解析的符号。</p>
+<p><strong>示例：</strong><br>文件 <code>main.cpp</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">int</span> x;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>文件 <code>variable.cpp</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>目标文件 <code>main.o</code> 的符号表：</p>
+<table>
+<thead>
+<tr>
+<th>符号名</th>
+<th>类型</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>main</code></td>
+<td>函数</td>
+<td>已定义</td>
+</tr>
+<tr>
+<td><code>x</code></td>
+<td>变量</td>
+<td>未解析</td>
+</tr>
+</tbody></table>
+<p>目标文件 <code>variable.o</code> 的符号表：</p>
+<table>
+<thead>
+<tr>
+<th>符号名</th>
+<th>类型</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x</code></td>
+<td>变量</td>
+<td>已定义</td>
+</tr>
+</tbody></table>
+<p>链接器将解析 <code>main.o</code> 中的 <code>x</code>，并将其链接到 <code>variable.o</code>。</p>
+<hr>
+<h3 id="1-2-重定位"><a href="#1-2-重定位" class="headerlink" title="1.2 重定位"></a><strong>1.2 重定位</strong></h3><p>重定位的目标是将符号的引用更新为其实际内存地址。<br>由于目标文件中的地址是相对的或占位符，链接器需要根据代码的组织和内存布局调整这些地址。</p>
+<h4 id="重定位表"><a href="#重定位表" class="headerlink" title="重定位表"></a>重定位表</h4><p>目标文件中包含一个重定位表，记录了需要调整的地址信息。</p>
+<p><strong>示例：</strong><br>假设目标文件中包含以下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov rax, x   ; x 的地址尚未确定</span><br></pre></td></tr></table></figure>
+
+<p>在链接后，链接器将替换 <code>x</code> 的占位符为实际的地址：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov rax, [0x400080]</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-3-合并段"><a href="#1-3-合并段" class="headerlink" title="1.3 合并段"></a><strong>1.3 合并段</strong></h3><p>目标文件中的代码和数据分为多个段（如 <code>.text</code>、<code>.data</code>、<code>.bss</code> 等）。链接器需要将所有目标文件的段合并，并为每个段分配连续的内存地址。</p>
+<h4 id="段类型"><a href="#段类型" class="headerlink" title="段类型"></a>段类型</h4><ul>
+<li><strong>代码段（.text）</strong>：包含程序的机器指令。</li>
+<li><strong>数据段（.data）</strong>：包含已初始化的全局和静态变量。</li>
+<li><strong>未初始化数据段（.bss）</strong>：包含未初始化的全局和静态变量。</li>
+</ul>
+<p><strong>示例：</strong><br>文件 <code>a.o</code>：</p>
+<ul>
+<li><code>.text</code> 段大小：100 字节。</li>
+<li><code>.data</code> 段大小：50 字节。</li>
+</ul>
+<p>文件 <code>b.o</code>：</p>
+<ul>
+<li><code>.text</code> 段大小：200 字节。</li>
+<li><code>.data</code> 段大小：30 字节。</li>
+</ul>
+<p>链接后：</p>
+<ul>
+<li><code>.text</code> 段起始地址：0x400000，总大小：300 字节。</li>
+<li><code>.data</code> 段起始地址：0x401000，总大小：80 字节。</li>
+</ul>
+<hr>
+<h3 id="1-4-添加库"><a href="#1-4-添加库" class="headerlink" title="1.4 添加库"></a><strong>1.4 添加库</strong></h3><p>在链接阶段，程序可能依赖外部的库文件。这些库文件分为两种：</p>
+<ol>
+<li><strong>静态库</strong>（<code>.lib</code> 或 <code>.a</code>）：直接将库的代码复制到可执行文件中。</li>
+<li><strong>动态库</strong>（<code>.dll</code> 或 <code>.so</code>）：可执行文件在运行时加载库文件。</li>
+</ol>
+<p>链接器需要将静态库合并到可执行文件中，或记录动态库的路径。</p>
+<hr>
+<h2 id="2-链接阶段的输入与输出"><a href="#2-链接阶段的输入与输出" class="headerlink" title="2. 链接阶段的输入与输出"></a><strong>2. 链接阶段的输入与输出</strong></h2><h3 id="输入：-2"><a href="#输入：-2" class="headerlink" title="输入："></a><strong>输入：</strong></h3><ol>
+<li>一个或多个目标文件（<code>.o</code> 或 <code>.obj</code>）。</li>
+<li>所需的库文件（静态库或动态库）。</li>
+<li>链接器脚本（可选，用于指定内存布局等）。</li>
+</ol>
+<h3 id="输出：-2"><a href="#输出：-2" class="headerlink" title="输出："></a><strong>输出：</strong></h3><ul>
+<li>一个可执行文件（通常无后缀或以 <code>.exe</code> 为后缀）。</li>
+</ul>
+<hr>
+<h2 id="3-链接阶段的执行"><a href="#3-链接阶段的执行" class="headerlink" title="3. 链接阶段的执行"></a><strong>3. 链接阶段的执行</strong></h2><h3 id="3-1-静态链接"><a href="#3-1-静态链接" class="headerlink" title="3.1 静态链接"></a><strong>3.1 静态链接</strong></h3><p>静态链接将所有目标文件和静态库整合到可执行文件中，生成的可执行文件是独立的。</p>
+<h4 id="示例命令："><a href="#示例命令：" class="headerlink" title="示例命令："></a>示例命令：</h4><p>在 Linux：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ main.o variable.o -o program</span><br></pre></td></tr></table></figure>
+
+<p>在 MSVC：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">link</span> main.obj variable.obj /out:program.exe</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-动态链接"><a href="#3-2-动态链接" class="headerlink" title="3.2 动态链接"></a><strong>3.2 动态链接</strong></h3><p>动态链接只将目标文件与动态库的符号表匹配，生成的可执行文件在运行时加载动态库。</p>
+<h4 id="示例命令：-1"><a href="#示例命令：-1" class="headerlink" title="示例命令："></a>示例命令：</h4><p>在 Linux：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ main.o -o program -L. -lmylib</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-L.</code>：指定动态库路径。</li>
+<li><code>-lmylib</code>：链接动态库 <code>libmylib.so</code>。</li>
+</ul>
+<p>在 MSVC：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">link</span> main.obj mylib.lib /out:program.exe</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-目标文件的合并"><a href="#4-目标文件的合并" class="headerlink" title="4. 目标文件的合并"></a><strong>4. 目标文件的合并</strong></h2><p>链接器将多个目标文件中的段合并。以下是合并示例：</p>
+<p>文件 <code>file1.o</code>：</p>
+<ul>
+<li><code>.text</code> 段起始地址：0x400000。</li>
+<li><code>.data</code> 段起始地址：0x500000。</li>
+</ul>
+<p>文件 <code>file2.o</code>：</p>
+<ul>
+<li><code>.text</code> 段起始地址：0x400100。</li>
+<li><code>.data</code> 段起始地址：0x500050。</li>
+</ul>
+<p>链接后：</p>
+<ul>
+<li>合并的 <code>.text</code> 段大小：200 字节，起始地址：0x400000。</li>
+<li>合并的 <code>.data</code> 段大小：100 字节，起始地址：0x500000。</li>
+</ul>
+<hr>
+<h2 id="5-链接器的主要功能"><a href="#5-链接器的主要功能" class="headerlink" title="5. 链接器的主要功能"></a><strong>5. 链接器的主要功能</strong></h2><ol>
+<li><p><strong>符号解析</strong></p>
+<ul>
+<li>解决函数和变量的引用与定义关系。</li>
+</ul>
+</li>
+<li><p><strong>地址重定位</strong></p>
+<ul>
+<li>将所有符号地址更新为内存中的绝对地址。</li>
+</ul>
+</li>
+<li><p><strong>段合并</strong></p>
+<ul>
+<li>将代码段和数据段整合到最终的内存布局中。</li>
+</ul>
+</li>
+<li><p><strong>库文件的合并</strong></p>
+<ul>
+<li>将静态库的代码和数据合并到目标文件。</li>
+<li>记录动态库的符号和路径。</li>
+</ul>
+</li>
+<li><p><strong>生成可执行文件</strong></p>
+<ul>
+<li>输出包含机器指令的最终可执行文件。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="6-链接阶段的常见问题"><a href="#6-链接阶段的常见问题" class="headerlink" title="6. 链接阶段的常见问题"></a><strong>6. 链接阶段的常见问题</strong></h2><h3 id="1-符号未定义-1"><a href="#1-符号未定义-1" class="headerlink" title="1. 符号未定义"></a><strong>1. 符号未定义</strong></h3><p>错误：<code>undefined reference to &#39;symbol&#39;</code><br>原因：目标文件或库文件中缺少该符号的定义。<br>解决：检查是否忘记链接所需的库或目标文件。</p>
+<h3 id="2-符号重定义"><a href="#2-符号重定义" class="headerlink" title="2. 符号重定义"></a><strong>2. 符号重定义</strong></h3><p>错误：<code>multiple definition of &#39;symbol&#39;</code><br>原因：多个目标文件中重复定义了同一个符号。<br>解决：确保全局变量或函数只定义一次，其他地方使用 <code>extern</code>。</p>
+<h3 id="3-动态库未找到"><a href="#3-动态库未找到" class="headerlink" title="3. 动态库未找到"></a><strong>3. 动态库未找到</strong></h3><p>错误：<code>cannot find -lmylib</code> 或 <code>missing DLL</code><br>原因：动态库路径未正确设置。<br>解决：添加库路径或确保运行环境中存在所需的动态库。</p>
+<hr>
+<h2 id="7-链接阶段的优化"><a href="#7-链接阶段的优化" class="headerlink" title="7. 链接阶段的优化"></a><strong>7. 链接阶段的优化</strong></h2><ol>
+<li><p><strong>移除未使用的符号</strong></p>
+<ul>
+<li>链接器可以移除未使用的函数或变量，减小可执行文件大小。</li>
+<li>在 GCC 中使用 <code>-Wl,--gc-sections</code>。</li>
+</ul>
+</li>
+<li><p><strong>静态链接与动态链接的选择</strong></p>
+<ul>
+<li><strong>静态链接</strong>：无需额外的动态库文件，但可执行文件较大。</li>
+<li><strong>动态链接</strong>：减少文件大小，但依赖运行时环境。</li>
+</ul>
+</li>
+<li><p><strong>减少全局符号</strong></p>
+<ul>
+<li>使用 <code>static</code> 限制符号的作用域，避免不必要的全局符号。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="8-链接阶段的示例"><a href="#8-链接阶段的示例" class="headerlink" title="8. 链接阶段的示例"></a><strong>8. 链接阶段的示例</strong></h2><p><strong>代码文件：</strong></p>
+<p>文件 <code>main.cpp</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Sum: &quot;</span> &lt;&lt; <span class="built_in">add</span>(<span class="number">10</span>, <span class="number">20</span>) &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>文件 <code>add.cpp</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>编译与链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g++ -c main.cpp</span><br><span class="line">g++ -c add.cpp</span><br><span class="line">g++ main.o add.o -o program</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="9-总结"><a href="#9-总结" class="headerlink" title="9. 总结"></a><strong>9. 总结</strong></h2><p>链接阶段是将多个目标文件和库文件整合为可执行文件的过程。主要任务包括：</p>
+<ol>
+<li>符号解析：匹配函数和变量的引用与定义。</li>
+<li>地址重定位：将符号的地址更新为内存中的绝对地址。</li>
+<li>段合并：将代码段和数据段整合到最终的内存布局中。</li>
+<li>库文件处理：整合静态库或记录动态库路径。</li>
+</ol>
+<p>理解链接阶段的工作原理有助于优化程序结构、排查符号问题，以及高效管理项目依赖的库文件。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/compiler-basic/" rel="tag"># compiler basic</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/03/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-12-03-python_3_pathlib%E6%A8%A1%E5%9D%97/" rel="prev" title="python_3_pathlib模块">
+      <i class="fa fa-chevron-left"></i> python_3_pathlib模块
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/11/notebook/Compiler/LLVM/2024-12-11-clang-format/" rel="next" title="Clang-Format">
+      Clang-Format <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MSVC-%E7%BC%96%E8%AF%91%E9%A1%B9%E7%9B%AE%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">MSVC 编译项目的全过程 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%A1%B9%E7%9B%AE%E6%9E%84%E5%BB%BA%E8%BF%87%E7%A8%8B%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">1. 项目构建过程概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-MSVC-%E7%BC%96%E8%AF%91%E9%A1%B9%E7%9B%AE%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">2. MSVC 编译项目的全过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E9%A2%84%E5%A4%84%E7%90%86%E9%98%B6%E6%AE%B5"><span class="nav-number">4.1.</span> <span class="nav-text">2.1 预处理阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5"><span class="nav-number">4.2.</span> <span class="nav-text">2.2 编译阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5"><span class="nav-number">4.3.</span> <span class="nav-text">2.3 汇编阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5"><span class="nav-number">4.4.</span> <span class="nav-text">2.4 链接阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-MSVC-%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E5%85%B3%E9%94%AE%E5%B7%A5%E5%85%B7%E5%92%8C%E5%BC%80%E5%85%B3"><span class="nav-number">5.</span> <span class="nav-text">3. MSVC 编译器的关键工具和开关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%A0%B8%E5%BF%83%E5%B7%A5%E5%85%B7"><span class="nav-number">5.1.</span> <span class="nav-text">3.1 核心工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%B8%B8%E7%94%A8%E7%BC%96%E8%AF%91%E5%99%A8%E5%BC%80%E5%85%B3"><span class="nav-number">5.2.</span> <span class="nav-text">3.2 常用编译器开关</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E4%BB%8E%E6%BA%90%E7%A0%81%E5%88%B0%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84%E5%AE%8C%E6%95%B4%E8%BF%87%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text">4. 示例：从源码到可执行文件的完整过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%9E%84%E5%BB%BA"><span class="nav-number">6.1.</span> <span class="nav-text">4.1 使用命令行构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E4%BD%BF%E7%94%A8-Visual-Studio-%E6%9E%84%E5%BB%BA"><span class="nav-number">6.2.</span> <span class="nav-text">4.2 使用 Visual Studio 构建</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">7.</span> <span class="nav-text">5. 常见问题和解决方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BC%BA%E5%B0%91%E8%BF%90%E8%A1%8C%E6%97%B6%E5%BA%93"><span class="nav-number">7.1.</span> <span class="nav-text">1. 缺少运行时库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9C%AA%E8%A7%A3%E6%9E%90%E7%9A%84%E5%A4%96%E9%83%A8%E7%AC%A6%E5%8F%B7"><span class="nav-number">7.2.</span> <span class="nav-text">2. 未解析的外部符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%B0%83%E8%AF%95%E4%BF%A1%E6%81%AF%E6%9C%AA%E7%94%9F%E6%88%90"><span class="nav-number">7.3.</span> <span class="nav-text">3. 调试信息未生成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">6. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-msvc%E5%9C%A8cmakelist%E4%B8%AD%E8%AE%BE%E7%BD%AE%E7%BC%96%E8%AF%91%E4%BC%98%E5%8C%96%E7%BA%A7%E5%88%AB"><span class="nav-number">9.</span> <span class="nav-text">windows msvc在cmakelist中设置编译优化级别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-MSVC-%E5%B8%B8%E7%94%A8%E4%BC%98%E5%8C%96%E9%80%89%E9%A1%B9"><span class="nav-number">9.1.</span> <span class="nav-text">1. MSVC 常用优化选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%AE%BE%E7%BD%AE%E5%85%A8%E5%B1%80%E4%BC%98%E5%8C%96%E7%BA%A7%E5%88%AB"><span class="nav-number">9.2.</span> <span class="nav-text">2. 设置全局优化级别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">9.2.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%92%88%E5%AF%B9%E7%89%B9%E5%AE%9A%E7%9B%AE%E6%A0%87%E8%AE%BE%E7%BD%AE%E4%BC%98%E5%8C%96%E7%BA%A7%E5%88%AB"><span class="nav-number">9.3.</span> <span class="nav-text">3. 针对特定目标设置优化级别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">9.3.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8%E7%94%9F%E6%88%90%E5%99%A8%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AE%BE%E7%BD%AE%E4%BC%98%E5%8C%96%E7%BA%A7%E5%88%AB"><span class="nav-number">9.4.</span> <span class="nav-text">4. 使用生成器表达式设置优化级别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">9.4.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%9C%A8-Release-%E6%9E%84%E5%BB%BA%E7%B1%BB%E5%9E%8B%E4%B8%AD%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BC%98%E5%8C%96"><span class="nav-number">9.5.</span> <span class="nav-text">5. 在 Release 构建类型中自定义优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-3"><span class="nav-number">9.5.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%AE%8C%E6%95%B4%E7%A4%BA%E4%BE%8B%EF%BC%9ACMakeLists-txt"><span class="nav-number">9.6.</span> <span class="nav-text">6. 完整示例：CMakeLists.txt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E5%9C%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%AD%E9%AA%8C%E8%AF%81%E4%BC%98%E5%8C%96%E9%80%89%E9%A1%B9"><span class="nav-number">9.7.</span> <span class="nav-text">7. 在命令行中验证优化选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">9.8.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-cl-exe-%E8%AE%BE%E7%BD%AE%E7%BC%96%E8%AF%91%E5%91%8A%E8%AD%A6%E7%AD%89%E7%BA%A7"><span class="nav-number">10.</span> <span class="nav-text">windows cl.exe 设置编译告警等级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E8%AD%A6%E5%91%8A%E7%AD%89%E7%BA%A7%E9%80%89%E9%A1%B9"><span class="nav-number">10.1.</span> <span class="nav-text">设置警告等级选项</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-4"><span class="nav-number">10.1.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E5%8D%87%E8%AD%A6%E5%91%8A%E4%B8%BA%E9%94%99%E8%AF%AF"><span class="nav-number">10.2.</span> <span class="nav-text">提升警告为错误</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-5"><span class="nav-number">10.2.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E7%89%B9%E5%AE%9A%E8%AD%A6%E5%91%8A"><span class="nav-number">10.3.</span> <span class="nav-text">禁用特定警告</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-6"><span class="nav-number">10.3.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A5%E5%91%8A%E7%89%B9%E5%AE%9A%E8%AD%A6%E5%91%8A%E4%B8%BA%E9%94%99%E8%AF%AF"><span class="nav-number">10.4.</span> <span class="nav-text">报告特定警告为错误</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-7"><span class="nav-number">10.4.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%85%E6%8A%A5%E5%91%8A%E7%89%B9%E5%AE%9A%E8%AD%A6%E5%91%8A"><span class="nav-number">10.5.</span> <span class="nav-text">仅报告特定警告</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-8"><span class="nav-number">10.5.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%BC%E5%90%88%E7%A4%BA%E4%BE%8B"><span class="nav-number">10.6.</span> <span class="nav-text">综合示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8cmakelists%E4%B8%AD%E8%AE%BE%E7%BD%AE%E7%BC%96%E8%AF%91%E5%91%8A%E8%AD%A6%E7%AD%89%E7%BA%A7"><span class="nav-number">11.</span> <span class="nav-text">在cmakelists中设置编译告警等级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%85%A8%E5%B1%80%E8%AD%A6%E5%91%8A%E7%AD%89%E7%BA%A7"><span class="nav-number">11.1.</span> <span class="nav-text">设置全局警告等级</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-9"><span class="nav-number">11.1.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%92%88%E5%AF%B9%E7%89%B9%E5%AE%9A%E7%9B%AE%E6%A0%87%E8%AE%BE%E7%BD%AE"><span class="nav-number">11.2.</span> <span class="nav-text">针对特定目标设置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-10"><span class="nav-number">11.2.1.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E7%89%B9%E5%AE%9A%E8%AD%A6%E5%91%8A-1"><span class="nav-number">11.3.</span> <span class="nav-text">禁用特定警告</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%88%E5%85%A8%E5%B1%80%E7%A6%81%E7%94%A8%E8%AD%A6%E5%91%8A-4996%EF%BC%89%EF%BC%9A"><span class="nav-number">11.3.1.</span> <span class="nav-text">示例（全局禁用警告 4996）：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%88%E9%92%88%E5%AF%B9%E7%9B%AE%E6%A0%87%E7%A6%81%E7%94%A8%E8%AD%A6%E5%91%8A-4996%EF%BC%89%EF%BC%9A"><span class="nav-number">11.3.2.</span> <span class="nav-text">示例（针对目标禁用警告 4996）：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E8%AD%A6%E5%91%8A%E8%A7%86%E4%B8%BA%E9%94%99%E8%AF%AF"><span class="nav-number">11.4.</span> <span class="nav-text">将警告视为错误</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%88%E5%85%A8%E5%B1%80%E8%AE%BE%E7%BD%AE%EF%BC%89%EF%BC%9A"><span class="nav-number">11.4.1.</span> <span class="nav-text">示例（全局设置）：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%88%E7%9B%AE%E6%A0%87%E8%8C%83%E5%9B%B4%E8%AE%BE%E7%BD%AE%EF%BC%89%EF%BC%9A"><span class="nav-number">11.4.2.</span> <span class="nav-text">示例（目标范围设置）：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%BC%E5%90%88%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">11.5.</span> <span class="nav-text">综合示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4-CMakeLists-txt%EF%BC%9A"><span class="nav-number">11.5.1.</span> <span class="nav-text">完整 CMakeLists.txt：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-1"><span class="nav-number">11.6.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86%E9%98%B6%E6%AE%B5-%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">预处理阶段 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%A2%84%E5%A4%84%E7%90%86%E9%98%B6%E6%AE%B5%E7%9A%84%E4%B8%BB%E8%A6%81%E4%BB%BB%E5%8A%A1"><span class="nav-number">13.</span> <span class="nav-text">1. 预处理阶段的主要任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%AE%8F%E6%9B%BF%E6%8D%A2"><span class="nav-number">13.1.</span> <span class="nav-text">1.1 宏替换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%A4%B4%E6%96%87%E4%BB%B6%E5%B1%95%E5%BC%80"><span class="nav-number">13.2.</span> <span class="nav-text">1.2 头文件展开</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%9D%A1%E4%BB%B6%E7%BC%96%E8%AF%91"><span class="nav-number">13.3.</span> <span class="nav-text">1.3 条件编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%B3%A8%E9%87%8A%E7%A7%BB%E9%99%A4"><span class="nav-number">13.4.</span> <span class="nav-text">1.4 注释移除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E5%86%85%E7%BD%AE%E5%AE%8F%E5%A4%84%E7%90%86"><span class="nav-number">13.5.</span> <span class="nav-text">1.5 内置宏处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E8%A1%8C%E6%8E%A7%E5%88%B6"><span class="nav-number">13.6.</span> <span class="nav-text">1.6 行控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8%E4%BB%A3%E7%A0%81"><span class="nav-number">13.7.</span> <span class="nav-text">1.7 移除无用代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C%E9%A2%84%E5%A4%84%E7%90%86%E9%98%B6%E6%AE%B5"><span class="nav-number">14.</span> <span class="nav-text">2. 如何运行预处理阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%A2%84%E5%A4%84%E7%90%86%E9%98%B6%E6%AE%B5%E7%9A%84%E5%B7%A5%E5%85%B7%E5%92%8C%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">15.</span> <span class="nav-text">3. 预处理阶段的工具和实现细节</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">15.1.</span> <span class="nav-text">3.1 预处理器的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E4%B8%8E%E7%BC%96%E8%AF%91%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">15.2.</span> <span class="nav-text">3.2 与编译的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%AE%8C%E6%95%B4%E9%A2%84%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B"><span class="nav-number">16.</span> <span class="nav-text">4. 示例：完整预处理过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%A2%84%E5%A4%84%E7%90%86%E9%98%B6%E6%AE%B5%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">17.</span> <span class="nav-text">5. 预处理阶段的注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93-1"><span class="nav-number">18.</span> <span class="nav-text">6. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5-%E8%AF%A6%E8%A7%A3"><span class="nav-number">19.</span> <span class="nav-text">编译阶段 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E7%9A%84%E4%B8%BB%E8%A6%81%E4%BB%BB%E5%8A%A1"><span class="nav-number">20.</span> <span class="nav-text">1. 编译阶段的主要任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">20.1.</span> <span class="nav-text">1.1 语法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E8%AF%AD%E4%B9%89%E5%88%86%E6%9E%90"><span class="nav-number">20.2.</span> <span class="nav-text">1.2 语义分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%B8%AD%E9%97%B4%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90"><span class="nav-number">20.3.</span> <span class="nav-text">1.3 中间代码生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E4%BC%98%E5%8C%96%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89"><span class="nav-number">20.4.</span> <span class="nav-text">1.4 优化（可选）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E7%9A%84%E8%BE%93%E5%85%A5%E4%B8%8E%E8%BE%93%E5%87%BA"><span class="nav-number">21.</span> <span class="nav-text">2. 编译阶段的输入与输出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%EF%BC%9A"><span class="nav-number">21.1.</span> <span class="nav-text">输入：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%EF%BC%9A"><span class="nav-number">21.2.</span> <span class="nav-text">输出：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">22.</span> <span class="nav-text">3. 编译阶段的执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E4%B8%BB%E8%A6%81%E7%BB%84%E4%BB%B6"><span class="nav-number">23.</span> <span class="nav-text">4. 编译器的主要组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%89%8D%E7%AB%AF%EF%BC%88Front-end%EF%BC%89"><span class="nav-number">23.1.</span> <span class="nav-text">4.1 前端（Front-end）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E4%B8%AD%E7%AB%AF%EF%BC%88Middle-end%EF%BC%89"><span class="nav-number">23.2.</span> <span class="nav-text">4.2 中端（Middle-end）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E5%90%8E%E7%AB%AF%EF%BC%88Back-end%EF%BC%89"><span class="nav-number">23.3.</span> <span class="nav-text">4.3 后端（Back-end）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E7%9A%84%E8%BE%93%E5%87%BA%E7%A4%BA%E4%BE%8B"><span class="nav-number">24.</span> <span class="nav-text">5. 编译阶段的输出示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">25.</span> <span class="nav-text">6. 编译阶段的常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%B1%BB%E5%9E%8B%E9%94%99%E8%AF%AF"><span class="nav-number">25.1.</span> <span class="nav-text">1. 类型错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9C%AA%E5%A3%B0%E6%98%8E%E7%9A%84%E6%A0%87%E8%AF%86%E7%AC%A6"><span class="nav-number">25.2.</span> <span class="nav-text">2. 未声明的标识符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%AF%AD%E6%B3%95%E9%94%99%E8%AF%AF"><span class="nav-number">25.3.</span> <span class="nav-text">3. 语法错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%BC%96%E8%AF%91%E9%98%B6%E6%AE%B5%E4%B8%8E%E5%90%8E%E7%BB%AD%E9%98%B6%E6%AE%B5%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">26.</span> <span class="nav-text">7. 编译阶段与后续阶段的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93"><span class="nav-number">27.</span> <span class="nav-text">8. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5-%E8%AF%A6%E8%A7%A3"><span class="nav-number">28.</span> <span class="nav-text">汇编阶段 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5%E7%9A%84%E4%B8%BB%E8%A6%81%E4%BB%BB%E5%8A%A1"><span class="nav-number">29.</span> <span class="nav-text">1. 汇编阶段的主要任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">29.1.</span> <span class="nav-text">1.1 汇编代码解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E7%AC%A6%E5%8F%B7%E8%A1%A8%E7%94%9F%E6%88%90"><span class="nav-number">29.2.</span> <span class="nav-text">1.2 符号表生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%8C%87%E4%BB%A4%E7%BF%BB%E8%AF%91"><span class="nav-number">29.3.</span> <span class="nav-text">1.3 指令翻译</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5%E7%9A%84%E8%BE%93%E5%85%A5%E4%B8%8E%E8%BE%93%E5%87%BA"><span class="nav-number">30.</span> <span class="nav-text">2. 汇编阶段的输入与输出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%EF%BC%9A-1"><span class="nav-number">30.1.</span> <span class="nav-text">输入：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%EF%BC%9A-1"><span class="nav-number">30.2.</span> <span class="nav-text">输出：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5%E7%9A%84%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="nav-number">31.</span> <span class="nav-text">3. 汇编阶段的具体过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E4%BB%A3%E7%A0%81%E6%AE%B5%E5%92%8C%E6%95%B0%E6%8D%AE%E6%AE%B5%E8%A7%A3%E6%9E%90"><span class="nav-number">31.1.</span> <span class="nav-text">3.1 代码段和数据段解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%9C%B0%E5%9D%80%E5%88%86%E9%85%8D"><span class="nav-number">31.2.</span> <span class="nav-text">3.2 地址分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E5%A4%84%E7%90%86%E4%BC%AA%E6%8C%87%E4%BB%A4"><span class="nav-number">31.3.</span> <span class="nav-text">3.3 处理伪指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E9%87%8D%E5%AE%9A%E4%BD%8D%E4%BF%A1%E6%81%AF%E7%94%9F%E6%88%90"><span class="nav-number">31.4.</span> <span class="nav-text">3.4 重定位信息生成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="nav-number">32.</span> <span class="nav-text">4. 汇编阶段的工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">33.</span> <span class="nav-text">5. 目标文件的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">34.</span> <span class="nav-text">6. 汇编阶段的常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%AC%A6%E5%8F%B7%E6%9C%AA%E5%AE%9A%E4%B9%89"><span class="nav-number">34.1.</span> <span class="nav-text">1. 符号未定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%AE%B5%E5%86%B2%E7%AA%81"><span class="nav-number">34.2.</span> <span class="nav-text">2. 段冲突</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BC%AA%E6%8C%87%E4%BB%A4%E9%94%99%E8%AF%AF"><span class="nav-number">34.3.</span> <span class="nav-text">3. 伪指令错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%B1%87%E7%BC%96%E9%98%B6%E6%AE%B5%E7%9A%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">35.</span> <span class="nav-text">7. 汇编阶段的示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93-1"><span class="nav-number">36.</span> <span class="nav-text">8. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5-%E8%AF%A6%E8%A7%A3"><span class="nav-number">37.</span> <span class="nav-text">链接阶段 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E7%9A%84%E4%B8%BB%E8%A6%81%E4%BB%BB%E5%8A%A1"><span class="nav-number">38.</span> <span class="nav-text">1. 链接阶段的主要任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%AC%A6%E5%8F%B7%E8%A7%A3%E6%9E%90"><span class="nav-number">38.1.</span> <span class="nav-text">1.1 符号解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%A1%A8"><span class="nav-number">38.1.1.</span> <span class="nav-text">符号表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="nav-number">38.2.</span> <span class="nav-text">1.2 重定位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8"><span class="nav-number">38.2.1.</span> <span class="nav-text">重定位表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%90%88%E5%B9%B6%E6%AE%B5"><span class="nav-number">38.3.</span> <span class="nav-text">1.3 合并段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AE%B5%E7%B1%BB%E5%9E%8B"><span class="nav-number">38.3.1.</span> <span class="nav-text">段类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%B7%BB%E5%8A%A0%E5%BA%93"><span class="nav-number">38.4.</span> <span class="nav-text">1.4 添加库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E7%9A%84%E8%BE%93%E5%85%A5%E4%B8%8E%E8%BE%93%E5%87%BA"><span class="nav-number">39.</span> <span class="nav-text">2. 链接阶段的输入与输出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%EF%BC%9A-2"><span class="nav-number">39.1.</span> <span class="nav-text">输入：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%EF%BC%9A-2"><span class="nav-number">39.2.</span> <span class="nav-text">输出：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">40.</span> <span class="nav-text">3. 链接阶段的执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5"><span class="nav-number">40.1.</span> <span class="nav-text">3.1 静态链接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%91%BD%E4%BB%A4%EF%BC%9A"><span class="nav-number">40.1.1.</span> <span class="nav-text">示例命令：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5"><span class="nav-number">40.2.</span> <span class="nav-text">3.2 动态链接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%91%BD%E4%BB%A4%EF%BC%9A-1"><span class="nav-number">40.2.1.</span> <span class="nav-text">示例命令：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E5%90%88%E5%B9%B6"><span class="nav-number">41.</span> <span class="nav-text">4. 目标文件的合并</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%93%BE%E6%8E%A5%E5%99%A8%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="nav-number">42.</span> <span class="nav-text">5. 链接器的主要功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">43.</span> <span class="nav-text">6. 链接阶段的常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%AC%A6%E5%8F%B7%E6%9C%AA%E5%AE%9A%E4%B9%89-1"><span class="nav-number">43.1.</span> <span class="nav-text">1. 符号未定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%AC%A6%E5%8F%B7%E9%87%8D%E5%AE%9A%E4%B9%89"><span class="nav-number">43.2.</span> <span class="nav-text">2. 符号重定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%8A%A8%E6%80%81%E5%BA%93%E6%9C%AA%E6%89%BE%E5%88%B0"><span class="nav-number">43.3.</span> <span class="nav-text">3. 动态库未找到</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">44.</span> <span class="nav-text">7. 链接阶段的优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E9%93%BE%E6%8E%A5%E9%98%B6%E6%AE%B5%E7%9A%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">45.</span> <span class="nav-text">8. 链接阶段的示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E6%80%BB%E7%BB%93"><span class="nav-number">46.</span> <span class="nav-text">9. 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

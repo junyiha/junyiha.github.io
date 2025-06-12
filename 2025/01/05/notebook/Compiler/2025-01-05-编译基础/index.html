@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 编译相关学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译基础">
+<meta property="og:url" content="https://junyiha.github.io/2025/01/05/notebook/Compiler/2025-01-05-%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 编译相关学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-01-05T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.270Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="compiler basic">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/01/05/notebook/Compiler/2025-01-05-%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>编译基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/05/notebook/Compiler/2025-01-05-%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编译基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-01-05 09:00:00" itemprop="dateCreated datePublished" datetime="2025-01-05T09:00:00+08:00">2025-01-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Compiler/" itemprop="url" rel="index"><span itemprop="name">Compiler</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>编译相关学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="不同源文件可以存在相同的函数吗？"><a href="#不同源文件可以存在相同的函数吗？" class="headerlink" title="不同源文件可以存在相同的函数吗？"></a>不同源文件可以存在相同的函数吗？</h2><p>在 C++ 中，不同源文件中<strong>可以存在相同的函数</strong>，但是否会导致问题取决于函数的<strong>链接类型</strong>和<strong>作用域</strong>。以下是详细的解释：</p>
+<hr>
+<h2 id="1-函数的链接类型"><a href="#1-函数的链接类型" class="headerlink" title="1. 函数的链接类型"></a><strong>1. 函数的链接类型</strong></h2><p>函数的链接类型决定了它是否可以在多个源文件中共存或被引用。主要有两种类型：</p>
+<h3 id="1-1-外部链接（External-Linkage）"><a href="#1-1-外部链接（External-Linkage）" class="headerlink" title="1.1 外部链接（External Linkage）"></a><strong>1.1 外部链接（External Linkage）</strong></h3><ul>
+<li>默认情况下，函数具有外部链接，这意味着它可以被其他源文件访问。</li>
+<li>如果不同源文件中定义了同名函数（且具有外部链接），在链接阶段会发生<strong>符号重定义错误</strong>。</li>
+</ul>
+<p><strong>示例：错误案例</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file1.cpp</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// file2.cpp</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译和链接时：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ file1.cpp file2.cpp -o program</span><br></pre></td></tr></table></figure>
+<p><strong>错误</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">multiple definition of `func&#x27;; file1.cpp:(.text+0x0): first defined here</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-2-内部链接（Internal-Linkage）"><a href="#1-2-内部链接（Internal-Linkage）" class="headerlink" title="1.2 内部链接（Internal Linkage）"></a><strong>1.2 内部链接（Internal Linkage）</strong></h3><ul>
+<li>如果使用 <code>static</code> 关键字修饰函数，它的链接类型变为内部链接（internal linkage），仅在当前源文件中可见。</li>
+<li>不同源文件中的同名 <code>static</code> 函数是独立的，不会发生冲突。</li>
+</ul>
+<p><strong>示例：正确案例</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file1.cpp</span></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// file2.cpp</span></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译和链接时不会出错，因为两个 <code>func</code> 函数仅在各自的源文件中可见。</p>
+<hr>
+<h3 id="1-3-匿名命名空间"><a href="#1-3-匿名命名空间" class="headerlink" title="1.3 匿名命名空间"></a><strong>1.3 匿名命名空间</strong></h3><ul>
+<li>在 C++ 中，可以通过匿名命名空间（<code>namespace &#123;&#125;</code>）限制函数的作用域到当前源文件，类似于 <code>static</code>。</li>
+<li>不同源文件中的匿名命名空间内定义的同名函数不会冲突。</li>
+</ul>
+<p><strong>示例：正确案例</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file1.cpp</span></span><br><span class="line"><span class="keyword">namespace</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// file2.cpp</span></span><br><span class="line"><span class="keyword">namespace</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种方式比 <code>static</code> 更推荐，因为它更符合现代 C++ 的风格。</p>
+<hr>
+<h2 id="2-如何避免函数重定义问题？"><a href="#2-如何避免函数重定义问题？" class="headerlink" title="2. 如何避免函数重定义问题？"></a><strong>2. 如何避免函数重定义问题？</strong></h2><h3 id="2-1-使用函数声明而非重复定义"><a href="#2-1-使用函数声明而非重复定义" class="headerlink" title="2.1 使用函数声明而非重复定义"></a><strong>2.1 使用函数声明而非重复定义</strong></h3><p>在头文件中，只声明函数，而将定义放在单独的实现文件中。</p>
+<p><strong>示例：头文件与源文件的分离</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// func.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> FUNC_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FUNC_H</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// func.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;func.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;func.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">func</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，函数的定义只出现在一个源文件中，避免了重定义问题。</p>
+<hr>
+<h3 id="2-2-使用内联函数（inline）"><a href="#2-2-使用内联函数（inline）" class="headerlink" title="2.2 使用内联函数（inline）"></a><strong>2.2 使用内联函数（<code>inline</code>）</strong></h3><ul>
+<li>内联函数的定义可以放在头文件中，不会引起多重定义问题。</li>
+<li>编译器会在链接时自动合并相同的内联函数。</li>
+</ul>
+<p><strong>示例：内联函数</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// func.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> FUNC_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FUNC_H</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>多个源文件包含 <code>func.h</code> 也不会引发重定义问题。</p>
+<hr>
+<h3 id="2-3-使用命名空间隔离"><a href="#2-3-使用命名空间隔离" class="headerlink" title="2.3 使用命名空间隔离"></a><strong>2.3 使用命名空间隔离</strong></h3><p>通过将函数放入不同的命名空间中，可以避免重名冲突。</p>
+<p><strong>示例：命名空间</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file1.cpp</span></span><br><span class="line"><span class="keyword">namespace</span> A &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// file2.cpp</span></span><br><span class="line"><span class="keyword">namespace</span> B &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在调用时明确使用命名空间：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; A::<span class="built_in">func</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>; <span class="comment">// 输出 1</span></span><br><span class="line">    std::cout &lt;&lt; B::<span class="built_in">func</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>; <span class="comment">// 输出 2</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a><strong>3. 总结</strong></h2><ul>
+<li><strong>可以存在相同的函数</strong>：<ul>
+<li>如果函数是 <code>static</code> 或在匿名命名空间中。</li>
+<li>如果通过命名空间隔离。</li>
+</ul>
+</li>
+<li><strong>不可以存在相同的函数</strong>：<ul>
+<li>如果多个源文件中定义了具有外部链接的同名函数，会导致链接错误。</li>
+</ul>
+</li>
+<li><strong>最佳实践</strong>：<ul>
+<li>将函数声明与定义分离。</li>
+<li>使用内联函数或命名空间避免冲突。</li>
+<li>使用 <code>static</code> 或匿名命名空间限制函数作用域。</li>
+</ul>
+</li>
+</ul>
+<h2 id="关于C-编译和链接的书籍-推荐"><a href="#关于C-编译和链接的书籍-推荐" class="headerlink" title="关于C++编译和链接的书籍 推荐"></a>关于C++编译和链接的书籍 推荐</h2><p>如果你想深入理解 C++ 编译和链接的过程，以下是一些非常有用的书籍，它们涵盖了从语言特性到编译过程再到链接过程的方方面面：</p>
+<hr>
+<h3 id="1-《C-Primer》"><a href="#1-《C-Primer》" class="headerlink" title="1.《C++ Primer》"></a><strong>1.《C++ Primer》</strong></h3><ul>
+<li><strong>作者</strong>：Stanley B. Lippman, Josée Lajoie, Barbara E. Moo</li>
+<li><strong>推荐理由</strong>：这本书是学习 C++ 基础和进阶概念的经典之作。尽管它主要集中在 C++ 编程本身，但它也涉及了一些关于 C++ 编译和链接的基本概念，特别是关于作用域、名称解析、链接规则等内容。</li>
+<li><strong>适合读者</strong>：C++ 初学者和中级开发者。</li>
+</ul>
+<hr>
+<h3 id="2-《Effective-C-》系列"><a href="#2-《Effective-C-》系列" class="headerlink" title="2.《Effective C++》系列"></a><strong>2.《Effective C++》系列</strong></h3><ul>
+<li><strong>作者</strong>：Scott Meyers</li>
+<li><strong>推荐理由</strong>：这个系列包含了很多关于 C++ 编程最佳实践的内容，尤其是对于复杂的编译和链接过程有很多洞察，能帮助你理解链接过程中的一些常见问题和优化方法，如符号导出、静态与动态链接等。</li>
+<li><strong>适合读者</strong>：已经掌握 C++ 基础并希望深入理解语言细节的开发者。</li>
+</ul>
+<hr>
+<h3 id="3-《Linkers-and-Loaders》"><a href="#3-《Linkers-and-Loaders》" class="headerlink" title="3.《Linkers and Loaders》"></a><strong>3.《Linkers and Loaders》</strong></h3><ul>
+<li><strong>作者</strong>：John R. Levine</li>
+<li><strong>推荐理由</strong>：这本书是专门讲解链接器和加载器的，涵盖了从编译到链接的整个过程，深入探讨了符号解析、重定位、静态链接、动态链接等内容。非常适合那些想要深入了解链接阶段的读者。</li>
+<li><strong>适合读者</strong>：有一定编程基础，尤其是对链接过程有较大兴趣的开发者。</li>
+</ul>
+<hr>
+<h3 id="4-《The-C-Programming-Language》"><a href="#4-《The-C-Programming-Language》" class="headerlink" title="4.《The C++ Programming Language》"></a><strong>4.《The C++ Programming Language》</strong></h3><ul>
+<li><strong>作者</strong>：Bjarne Stroustrup</li>
+<li><strong>推荐理由</strong>：作为 C++ 的发明者，Bjarne Stroustrup 的这本书是学习 C++ 的必读书籍。它全面介绍了 C++ 的特性，并对编译、链接等底层实现有详细讲解。书中的一些示例代码涉及编译和链接过程中常见的问题，帮助读者理解编译器如何处理代码。</li>
+<li><strong>适合读者</strong>：C++ 高级开发者及想深入了解 C++ 设计与实现的读者。</li>
+</ul>
+<hr>
+<h3 id="5-《C-Internals》"><a href="#5-《C-Internals》" class="headerlink" title="5.《C++ Internals》"></a><strong>5.《C++ Internals》</strong></h3><ul>
+<li><strong>作者</strong>：Leonard Richardson</li>
+<li><strong>推荐理由</strong>：这本书详细描述了 C++ 程序在编译、链接、运行时等不同阶段的内部实现。通过分析编译器的工作方式、链接过程以及编程技巧，它帮助读者更好地理解 C++ 程序的底层结构。</li>
+<li><strong>适合读者</strong>：想要更深入了解 C++ 编译和链接过程的开发者。</li>
+</ul>
+<hr>
+<h3 id="6-《Compilers-Principles-Techniques-and-Tools》-Dragon-Book"><a href="#6-《Compilers-Principles-Techniques-and-Tools》-Dragon-Book" class="headerlink" title="6.《Compilers: Principles, Techniques, and Tools》 (Dragon Book)"></a><strong>6.《Compilers: Principles, Techniques, and Tools》 (Dragon Book)</strong></h3><ul>
+<li><strong>作者</strong>：Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman</li>
+<li><strong>推荐理由</strong>：这本书被称为“编译器设计领域的圣经”，深入探讨了编译原理，虽然书中大多数内容是与编译器设计相关，但它也包含了大量的编译过程、语法分析、优化和链接的知识。它是编译器学习者的经典读物。</li>
+<li><strong>适合读者</strong>：有编程基础并且对编译原理、编译器实现等感兴趣的读者。</li>
+</ul>
+<hr>
+<h3 id="7-《Programming-in-C-A-Primer-for-Beginners》"><a href="#7-《Programming-in-C-A-Primer-for-Beginners》" class="headerlink" title="7.《Programming in C++: A Primer for Beginners》"></a><strong>7.《Programming in C++: A Primer for Beginners》</strong></h3><ul>
+<li><strong>作者</strong>：Bjarne Stroustrup</li>
+<li><strong>推荐理由</strong>：这本书专为 C++ 初学者设计，虽然它主要讲解 C++ 的语言特性，但也简要介绍了编译和链接的基本过程，对于初学者来说非常适合。</li>
+<li><strong>适合读者</strong>：C++ 初学者。</li>
+</ul>
+<hr>
+<h3 id="8-《Professional-C-》"><a href="#8-《Professional-C-》" class="headerlink" title="8.《Professional C++》"></a><strong>8.《Professional C++》</strong></h3><ul>
+<li><strong>作者</strong>：Marc Gregoire</li>
+<li><strong>推荐理由</strong>：这是一本涵盖了 C++ 各个方面的综合性书籍，其中包含了对编译、链接、库管理等底层操作的详细讨论。它也深入讲解了 C++ 的高级特性，包括模板、内存管理、并发等，帮助开发者更好地编写高效、可维护的代码。</li>
+<li><strong>适合读者</strong>：中级到高级 C++ 开发者，尤其是想了解 C++ 编译和链接过程的开发者。</li>
+</ul>
+<hr>
+<h3 id="9-《The-Art-of-Compiler-Design》"><a href="#9-《The-Art-of-Compiler-Design》" class="headerlink" title="9.《The Art of Compiler Design》"></a><strong>9.《The Art of Compiler Design》</strong></h3><ul>
+<li><strong>作者</strong>：Thomas Pittman, James Peters</li>
+<li><strong>推荐理由</strong>：这本书详细讲解了编译器设计中的各个方面，包括词法分析、语法分析、语义分析、优化、代码生成和链接等。尽管它侧重于编译器的实现，但其中很多内容可以帮助你更好地理解 C++ 编译和链接的工作原理。</li>
+<li><strong>适合读者</strong>：对编译器实现和语言内部机制有兴趣的开发者。</li>
+</ul>
+<hr>
+<h3 id="10-《C-Concurrency-in-Action》"><a href="#10-《C-Concurrency-in-Action》" class="headerlink" title="10.《C++ Concurrency in Action》"></a><strong>10.《C++ Concurrency in Action》</strong></h3><ul>
+<li><strong>作者</strong>：Anthony Williams</li>
+<li><strong>推荐理由</strong>：这本书专注于 C++ 并发编程，但它也涉及了如何在多线程和并发程序中有效管理和链接不同模块的内容。对于那些希望理解链接在并发和多线程环境下如何工作的人来说，这本书非常有价值。</li>
+<li><strong>适合读者</strong>：中级到高级 C++ 开发者，尤其是并发编程相关的开发者。</li>
+</ul>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>这些书籍涉及 C++ 编译和链接过程的不同层面，从语言特性到底层实现、从符号解析到重定位、从静态链接到动态链接，帮助你全面理解和优化 C++ 的编译与链接过程。如果你是一个中高级开发者或对编译原理感兴趣，建议重点阅读《Linkers and Loaders》和《Compilers: Principles, Techniques, and Tools》。而《The C++ Programming Language》及《Effective C++》则适合进一步提升 C++ 编程技能的开发者。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/compiler-basic/" rel="tag"># compiler basic</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/01/05/notebook/DeepLearning/OpenVINO/2025-01-05-CompiledModel/" rel="prev" title="ov::CompiledModel">
+      <i class="fa fa-chevron-left"></i> ov::CompiledModel
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/05/notebook/Compiler/2025-01-05-%E5%B8%B8%E8%A7%81%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98/" rel="next" title="常见编译问题">
+      常见编译问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%BA%90%E6%96%87%E4%BB%B6%E5%8F%AF%E4%BB%A5%E5%AD%98%E5%9C%A8%E7%9B%B8%E5%90%8C%E7%9A%84%E5%87%BD%E6%95%B0%E5%90%97%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">不同源文件可以存在相同的函数吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%87%BD%E6%95%B0%E7%9A%84%E9%93%BE%E6%8E%A5%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">1. 函数的链接类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%A4%96%E9%83%A8%E9%93%BE%E6%8E%A5%EF%BC%88External-Linkage%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">1.1 外部链接（External Linkage）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%86%85%E9%83%A8%E9%93%BE%E6%8E%A5%EF%BC%88Internal-Linkage%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">1.2 内部链接（Internal Linkage）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%8C%BF%E5%90%8D%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4"><span class="nav-number">3.3.</span> <span class="nav-text">1.3 匿名命名空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E5%87%BD%E6%95%B0%E9%87%8D%E5%AE%9A%E4%B9%89%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">2. 如何避免函数重定义问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%BD%BF%E7%94%A8%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E%E8%80%8C%E9%9D%9E%E9%87%8D%E5%A4%8D%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">2.1 使用函数声明而非重复定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%BD%BF%E7%94%A8%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0%EF%BC%88inline%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">2.2 使用内联函数（inline）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E4%BD%BF%E7%94%A8%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E9%9A%94%E7%A6%BB"><span class="nav-number">4.3.</span> <span class="nav-text">2.3 使用命名空间隔离</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">3. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8EC-%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5%E7%9A%84%E4%B9%A6%E7%B1%8D-%E6%8E%A8%E8%8D%90"><span class="nav-number">6.</span> <span class="nav-text">关于C++编译和链接的书籍 推荐</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E3%80%8AC-Primer%E3%80%8B"><span class="nav-number">6.1.</span> <span class="nav-text">1.《C++ Primer》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E3%80%8AEffective-C-%E3%80%8B%E7%B3%BB%E5%88%97"><span class="nav-number">6.2.</span> <span class="nav-text">2.《Effective C++》系列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E3%80%8ALinkers-and-Loaders%E3%80%8B"><span class="nav-number">6.3.</span> <span class="nav-text">3.《Linkers and Loaders》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E3%80%8AThe-C-Programming-Language%E3%80%8B"><span class="nav-number">6.4.</span> <span class="nav-text">4.《The C++ Programming Language》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E3%80%8AC-Internals%E3%80%8B"><span class="nav-number">6.5.</span> <span class="nav-text">5.《C++ Internals》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E3%80%8ACompilers-Principles-Techniques-and-Tools%E3%80%8B-Dragon-Book"><span class="nav-number">6.6.</span> <span class="nav-text">6.《Compilers: Principles, Techniques, and Tools》 (Dragon Book)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E3%80%8AProgramming-in-C-A-Primer-for-Beginners%E3%80%8B"><span class="nav-number">6.7.</span> <span class="nav-text">7.《Programming in C++: A Primer for Beginners》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E3%80%8AProfessional-C-%E3%80%8B"><span class="nav-number">6.8.</span> <span class="nav-text">8.《Professional C++》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E3%80%8AThe-Art-of-Compiler-Design%E3%80%8B"><span class="nav-number">6.9.</span> <span class="nav-text">9.《The Art of Compiler Design》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E3%80%8AC-Concurrency-in-Action%E3%80%8B"><span class="nav-number">6.10.</span> <span class="nav-text">10.《C++ Concurrency in Action》</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.11.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

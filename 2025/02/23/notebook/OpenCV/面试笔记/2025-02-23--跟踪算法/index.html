@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 OpenCV 实现跟踪算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV 跟踪算法">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/23/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-23--%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 OpenCV 实现跟踪算法">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-23T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.449Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/23/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-23--%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>OpenCV 跟踪算法 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/23/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-23--%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenCV 跟踪算法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-23 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-23T09:00:00+08:00">2025-02-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>OpenCV 实现跟踪算法</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="OpenCV-跟踪算法-交并比计算"><a href="#OpenCV-跟踪算法-交并比计算" class="headerlink" title="OpenCV 跟踪算法 交并比计算"></a>OpenCV 跟踪算法 交并比计算</h2><p>在 OpenCV 中，目标跟踪算法通常用于检测并跟踪物体的运动。衡量跟踪算法效果的一个重要指标是 <strong>交并比（IoU, Intersection over Union）</strong>，它用于评估预测的边界框与真实边界框的重叠程度。</p>
+<hr>
+<h2 id="1-交并比（IoU）的计算公式"><a href="#1-交并比（IoU）的计算公式" class="headerlink" title="1. 交并比（IoU）的计算公式"></a><strong>1. 交并比（IoU）的计算公式</strong></h2><p>交并比的计算公式如下：</p>
+<p>[<br>IoU &#x3D; \frac{Area \ of \ Intersection}{Area \ of \ Union}<br>]</p>
+<p>其中：</p>
+<ul>
+<li><strong>交集（Intersection）</strong> 是预测框和真实框的重叠区域面积。</li>
+<li><strong>并集（Union）</strong> 是预测框和真实框的总面积（去重重叠部分）。</li>
+</ul>
+<p>IoU 值的范围是 <strong>[0, 1]</strong>：</p>
+<ul>
+<li><strong>IoU &#x3D; 0</strong>：两个框完全不重叠。</li>
+<li><strong>IoU &#x3D; 1</strong>：两个框完全重合。</li>
+<li><strong>IoU &gt; 0.5（或其他阈值）</strong>：一般认为检测是成功的（具体阈值依应用而定）。</li>
+</ul>
+<hr>
+<h2 id="2-OpenCV-跟踪算法"><a href="#2-OpenCV-跟踪算法" class="headerlink" title="2. OpenCV 跟踪算法"></a><strong>2. OpenCV 跟踪算法</strong></h2><p>OpenCV 提供了一些主流的跟踪算法，如：</p>
+<ul>
+<li><code>BOOSTING</code>（基于 AdaBoost 的跟踪）</li>
+<li><code>MIL</code>（多实例学习）</li>
+<li><code>KCF</code>（核相关滤波）</li>
+<li><code>TLD</code>（跟踪-学习-检测）</li>
+<li><code>MEDIANFLOW</code>（光流跟踪）</li>
+<li><code>GOTURN</code>（基于 CNN 的跟踪）</li>
+<li><code>CSRT</code>（基于通道和空间可靠性）</li>
+<li><code>MOSSE</code>（高效相关滤波）</li>
+</ul>
+<p>在 OpenCV 里，使用 <code>cv2.Tracker</code> 类可以选择这些跟踪器。</p>
+<hr>
+<h2 id="3-OpenCV-计算-IoU-的代码"><a href="#3-OpenCV-计算-IoU-的代码" class="headerlink" title="3. OpenCV 计算 IoU 的代码"></a><strong>3. OpenCV 计算 IoU 的代码</strong></h2><p>这里是一个 Python 代码示例，使用 OpenCV 跟踪目标并计算 IoU：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">compute_iou</span>(<span class="params">boxA, boxB</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    计算两个边界框的 IoU（交并比）</span></span><br><span class="line"><span class="string">    boxA, boxB 格式为 (x, y, w, h)</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    xA = <span class="built_in">max</span>(boxA[<span class="number">0</span>], boxB[<span class="number">0</span>])</span><br><span class="line">    yA = <span class="built_in">max</span>(boxA[<span class="number">1</span>], boxB[<span class="number">1</span>])</span><br><span class="line">    xB = <span class="built_in">min</span>(boxA[<span class="number">0</span>] + boxA[<span class="number">2</span>], boxB[<span class="number">0</span>] + boxB[<span class="number">2</span>])</span><br><span class="line">    yB = <span class="built_in">min</span>(boxA[<span class="number">1</span>] + boxA[<span class="number">3</span>], boxB[<span class="number">1</span>] + boxB[<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算交集面积</span></span><br><span class="line">    interArea = <span class="built_in">max</span>(<span class="number">0</span>, xB - xA) * <span class="built_in">max</span>(<span class="number">0</span>, yB - yA)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算并集面积</span></span><br><span class="line">    boxAArea = boxA[<span class="number">2</span>] * boxA[<span class="number">3</span>]</span><br><span class="line">    boxBArea = boxB[<span class="number">2</span>] * boxB[<span class="number">3</span>]</span><br><span class="line">    unionArea = boxAArea + boxBArea - interArea</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算 IoU</span></span><br><span class="line">    iou = interArea / <span class="built_in">float</span>(unionArea) <span class="keyword">if</span> unionArea != <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> iou</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取视频</span></span><br><span class="line">cap = cv2.VideoCapture(<span class="string">&quot;video.mp4&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 选择一个跟踪器（例如 KCF）</span></span><br><span class="line">tracker = cv2.TrackerKCF_create()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取第一帧并选择目标</span></span><br><span class="line">ret, frame = cap.read()</span><br><span class="line">bbox = cv2.selectROI(<span class="string">&quot;Tracking&quot;</span>, frame, <span class="literal">False</span>)</span><br><span class="line">tracker.init(frame, bbox)</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    ret, frame = cap.read()</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> ret:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 更新跟踪器</span></span><br><span class="line">    success, box = tracker.update(frame)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> success:</span><br><span class="line">        x, y, w, h = [<span class="built_in">int</span>(v) <span class="keyword">for</span> v <span class="keyword">in</span> box]</span><br><span class="line">        cv2.rectangle(frame, (x, y), (x + w, y + h), (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 假设真实框（可以通过人工标注或检测器得到）</span></span><br><span class="line">        ground_truth_box = (<span class="number">200</span>, <span class="number">150</span>, <span class="number">100</span>, <span class="number">120</span>)  <span class="comment"># 示例真实框</span></span><br><span class="line">        iou = compute_iou((x, y, w, h), ground_truth_box)</span><br><span class="line">        cv2.putText(frame, <span class="string">f&quot;IoU: <span class="subst">&#123;iou:<span class="number">.2</span>f&#125;</span>&quot;</span>, (x, y - <span class="number">10</span>),</span><br><span class="line">                    cv2.FONT_HERSHEY_SIMPLEX, <span class="number">0.6</span>, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    cv2.imshow(<span class="string">&quot;Tracking&quot;</span>, frame)</span><br><span class="line">    <span class="keyword">if</span> cv2.waitKey(<span class="number">20</span>) &amp; <span class="number">0xFF</span> == <span class="number">27</span>:  <span class="comment"># 按ESC退出</span></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">cap.release()</span><br><span class="line">cv2.destroyAllWindows()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-代码解析"><a href="#4-代码解析" class="headerlink" title="4. 代码解析"></a><strong>4. 代码解析</strong></h2><ol>
+<li><p>**<code>compute_iou(boxA, boxB)</code>**：</p>
+<ul>
+<li>计算两个边界框的 IoU 值。</li>
+<li><code>boxA</code> 和 <code>boxB</code> 格式为 <code>(x, y, width, height)</code>。</li>
+</ul>
+</li>
+<li><p><strong>OpenCV 目标跟踪流程</strong>：</p>
+<ul>
+<li>读取视频并选择目标区域（<code>cv2.selectROI()</code>）。</li>
+<li>初始化 <code>cv2.TrackerKCF_create()</code> 并进行目标跟踪。</li>
+<li>在每一帧中，获取预测框并计算 IoU 值。</li>
+<li>显示跟踪框和 IoU 值。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-结果分析"><a href="#5-结果分析" class="headerlink" title="5. 结果分析"></a><strong>5. 结果分析</strong></h2><ul>
+<li><strong>IoU 接近 1</strong>：说明跟踪器效果很好。</li>
+<li><strong>IoU 低于 0.5</strong>：说明跟踪误差较大，可能需要换跟踪算法或调参。</li>
+<li><strong>IoU 过低</strong>：可能目标丢失，需要重新初始化跟踪器。</li>
+</ul>
+<hr>
+<h2 id="6-其他改进"><a href="#6-其他改进" class="headerlink" title="6. 其他改进"></a><strong>6. 其他改进</strong></h2><ul>
+<li><strong>更换不同的跟踪算法</strong>：如 <code>cv2.TrackerCSRT_create()</code> 可能效果更好。</li>
+<li>**使用目标检测器（如 YOLO、SSD）获得 <code>ground_truth_box</code>**，提升评估准确性。</li>
+<li><strong>调整 IoU 阈值</strong>：适应不同的应用场景，如自动驾驶或视频监控。</li>
+</ul>
+<p>这个方法可以帮助你评估 OpenCV 目标跟踪算法的效果，并结合 IoU 进行分析！🚀</p>
+<h2 id="C-OpenCV中的跟踪算法"><a href="#C-OpenCV中的跟踪算法" class="headerlink" title="C++ OpenCV中的跟踪算法"></a>C++ OpenCV中的跟踪算法</h2><p>在 C++ 中，OpenCV 提供了多种目标跟踪算法，主要基于 <code>cv::Tracker</code> 类。不同的跟踪算法适用于不同的场景，具体选择取决于应用需求。</p>
+<hr>
+<h2 id="1-OpenCV-目标跟踪算法"><a href="#1-OpenCV-目标跟踪算法" class="headerlink" title="1. OpenCV 目标跟踪算法"></a><strong>1. OpenCV 目标跟踪算法</strong></h2><p>OpenCV 4.x 版本支持以下目标跟踪算法：</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>说明</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>BOOSTING</code></td>
+<td>基于 AdaBoost 的跟踪</td>
+<td>适用于简单场景</td>
+<td>计算量大，容易丢失目标</td>
+</tr>
+<tr>
+<td><code>MIL</code></td>
+<td>多实例学习</td>
+<td>适用于遮挡情况</td>
+<td>误跟踪率较高</td>
+</tr>
+<tr>
+<td><code>KCF</code></td>
+<td>核相关滤波</td>
+<td>速度快，适合平滑运动</td>
+<td>对尺度变化敏感</td>
+</tr>
+<tr>
+<td><code>TLD</code></td>
+<td>跟踪-学习-检测</td>
+<td>适用于长时间跟踪</td>
+<td>计算量大，易误检测</td>
+</tr>
+<tr>
+<td><code>MEDIANFLOW</code></td>
+<td>采用光流跟踪</td>
+<td>精确，适合小目标</td>
+<td>易受快速运动影响</td>
+</tr>
+<tr>
+<td><code>GOTURN</code></td>
+<td>CNN 深度学习跟踪</td>
+<td>适合复杂环境</td>
+<td>需要预训练模型</td>
+</tr>
+<tr>
+<td><code>MOSSE</code></td>
+<td>相关滤波</td>
+<td>速度极快，适用于实时</td>
+<td>仅适用于稳定目标</td>
+</tr>
+<tr>
+<td><code>CSRT</code></td>
+<td>通道和空间可靠性</td>
+<td>精度高，适用于复杂目标</td>
+<td>计算量大，较慢</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-OpenCV-C-跟踪代码"><a href="#2-OpenCV-C-跟踪代码" class="headerlink" title="2. OpenCV C++ 跟踪代码"></a><strong>2. OpenCV C++ 跟踪代码</strong></h2><p>下面是一个完整的 C++ 代码示例，演示如何使用 OpenCV 进行目标跟踪：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/tracking.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算 IoU (交并比)</span></span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">computeIoU</span><span class="params">(Rect2d boxA, Rect2d boxB)</span> </span>&#123;</span><br><span class="line">    <span class="type">double</span> xA = <span class="built_in">max</span>(boxA.x, boxB.x);</span><br><span class="line">    <span class="type">double</span> yA = <span class="built_in">max</span>(boxA.y, boxB.y);</span><br><span class="line">    <span class="type">double</span> xB = <span class="built_in">min</span>(boxA.x + boxA.width, boxB.x + boxB.width);</span><br><span class="line">    <span class="type">double</span> yB = <span class="built_in">min</span>(boxA.y + boxA.height, boxB.y + boxB.height);</span><br><span class="line"></span><br><span class="line">    <span class="type">double</span> interArea = <span class="built_in">max</span>(<span class="number">0.0</span>, xB - xA) * <span class="built_in">max</span>(<span class="number">0.0</span>, yB - yA);</span><br><span class="line">    <span class="type">double</span> boxAArea = boxA.width * boxA.height;</span><br><span class="line">    <span class="type">double</span> boxBArea = boxB.width * boxB.height;</span><br><span class="line">    <span class="type">double</span> unionArea = boxAArea + boxBArea - interArea;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> unionArea &gt; <span class="number">0</span> ? interArea / unionArea : <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 选择跟踪器</span></span><br><span class="line">    Ptr&lt;Tracker&gt; tracker = TrackerKCF::<span class="built_in">create</span>();  <span class="comment">// 可更换不同的跟踪器</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打开视频</span></span><br><span class="line">    <span class="function">VideoCapture <span class="title">cap</span><span class="params">(<span class="string">&quot;video.mp4&quot;</span>)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!cap.<span class="built_in">isOpened</span>()) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;无法打开视频文件!&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读取第一帧</span></span><br><span class="line">    Mat frame;</span><br><span class="line">    cap.<span class="built_in">read</span>(frame);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 选择 ROI（手动选择初始目标框）</span></span><br><span class="line">    Rect2d bbox = <span class="built_in">selectROI</span>(<span class="string">&quot;Tracking&quot;</span>, frame, <span class="literal">false</span>);</span><br><span class="line">    tracker-&gt;<span class="built_in">init</span>(frame, bbox);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 假设 Ground Truth 真实框 (可从标注数据获取)</span></span><br><span class="line">    <span class="function">Rect2d <span class="title">groundTruthBox</span><span class="params">(<span class="number">200</span>, <span class="number">150</span>, <span class="number">100</span>, <span class="number">120</span>)</span></span>;  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (cap.<span class="built_in">read</span>(frame)) &#123;</span><br><span class="line">        <span class="comment">// 更新跟踪器</span></span><br><span class="line">        <span class="type">bool</span> ok = tracker-&gt;<span class="built_in">update</span>(frame, bbox);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ok) &#123;</span><br><span class="line">            <span class="built_in">rectangle</span>(frame, bbox, <span class="built_in">Scalar</span>(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>, <span class="number">1</span>);  <span class="comment">// 绘制跟踪框</span></span><br><span class="line">            <span class="type">double</span> iou = <span class="built_in">computeIoU</span>(bbox, groundTruthBox);    <span class="comment">// 计算 IoU</span></span><br><span class="line">            <span class="built_in">putText</span>(frame, <span class="string">&quot;IoU: &quot;</span> + <span class="built_in">to_string</span>(iou), <span class="built_in">Point</span>(<span class="number">20</span>, <span class="number">50</span>), </span><br><span class="line">                    FONT_HERSHEY_SIMPLEX, <span class="number">0.6</span>, <span class="built_in">Scalar</span>(<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">putText</span>(frame, <span class="string">&quot;Tracking Lost&quot;</span>, <span class="built_in">Point</span>(<span class="number">20</span>, <span class="number">50</span>), </span><br><span class="line">                    FONT_HERSHEY_SIMPLEX, <span class="number">0.6</span>, <span class="built_in">Scalar</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>), <span class="number">2</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">imshow</span>(<span class="string">&quot;Tracking&quot;</span>, frame);</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">waitKey</span>(<span class="number">20</span>) == <span class="number">27</span>) <span class="keyword">break</span>;  <span class="comment">// ESC 退出</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cap.<span class="built_in">release</span>();</span><br><span class="line">    <span class="built_in">destroyAllWindows</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-代码解析"><a href="#3-代码解析" class="headerlink" title="3. 代码解析"></a><strong>3. 代码解析</strong></h2><ol>
+<li><p><strong>选择跟踪器</strong></p>
+<ul>
+<li><code>Ptr&lt;Tracker&gt; tracker = TrackerKCF::create();</code></li>
+<li>可替换为 <code>TrackerCSRT::create()</code> 等不同的算法。</li>
+</ul>
+</li>
+<li><p><strong>初始化跟踪</strong></p>
+<ul>
+<li><code>selectROI()</code> 允许用户手动选择目标区域。</li>
+<li><code>tracker-&gt;init(frame, bbox);</code> 进行目标初始化。</li>
+</ul>
+</li>
+<li><p><strong>计算 IoU（交并比）</strong></p>
+<ul>
+<li><code>computeIoU(Rect2d boxA, Rect2d boxB)</code> 计算 IoU 以衡量跟踪器性能。</li>
+</ul>
+</li>
+<li><p><strong>主循环</strong></p>
+<ul>
+<li>每帧更新 <code>tracker-&gt;update(frame, bbox)</code>。</li>
+<li>计算并显示 IoU 。</li>
+<li><code>rectangle()</code> 绘制跟踪框。</li>
+<li><code>waitKey(20) == 27</code> 用 ESC 退出。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="4-选择不同的跟踪算法"><a href="#4-选择不同的跟踪算法" class="headerlink" title="4. 选择不同的跟踪算法"></a><strong>4. 选择不同的跟踪算法</strong></h2><p>如果想更换跟踪算法，只需要更改 <code>tracker</code> 初始化部分，例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Ptr&lt;Tracker&gt; tracker = TrackerCSRT::<span class="built_in">create</span>();  <span class="comment">// 精度高，但速度较慢</span></span><br><span class="line">Ptr&lt;Tracker&gt; tracker = TrackerMOSSE::<span class="built_in">create</span>(); <span class="comment">// 速度快，适用于稳定目标</span></span><br><span class="line">Ptr&lt;Tracker&gt; tracker = TrackerGOTURN::<span class="built_in">create</span>(); <span class="comment">// 需要额外下载预训练模型</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-结果分析-1"><a href="#5-结果分析-1" class="headerlink" title="5. 结果分析"></a><strong>5. 结果分析</strong></h2><ul>
+<li><strong>IoU 接近 1</strong>：跟踪器效果较好，目标跟踪稳定。</li>
+<li><strong>IoU 低于 0.5</strong>：跟踪器可能出现漂移或目标丢失。</li>
+<li><strong>跟踪失败</strong>：可以尝试 <code>CSRT</code>（精度高但慢）或 <code>MOSSE</code>（速度快但精度低）。</li>
+</ul>
+<hr>
+<h2 id="6-进一步优化"><a href="#6-进一步优化" class="headerlink" title="6. 进一步优化"></a><strong>6. 进一步优化</strong></h2><ul>
+<li><strong>结合目标检测（YOLO、SSD）</strong>：使用检测器提供 <code>groundTruthBox</code>，提升评估准确性。</li>
+<li><strong>自动重新初始化跟踪器</strong>：当 IoU 过低或丢失目标时，重新检测并初始化跟踪器。</li>
+<li><strong>多目标跟踪（MOT）</strong>：可以使用 <code>cv::MultiTracker</code> 进行多目标跟踪。</li>
+</ul>
+<hr>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a><strong>7. 总结</strong></h2><ul>
+<li>OpenCV 提供了多种目标跟踪算法，适用于不同的应用场景。</li>
+<li>计算 IoU（交并比）可以用于评估跟踪器性能。</li>
+<li><code>TrackerKCF</code> 适用于一般应用，<code>TrackerCSRT</code> 适用于精度要求高的应用，<code>TrackerMOSSE</code> 适用于实时应用。</li>
+</ul>
+<p>这个 C++ 代码可以作为一个基础，帮助你理解和使用 OpenCV 进行目标跟踪！🚀</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-22--C++%E7%AC%94%E8%AF%95/" rel="prev" title="C++笔试">
+      <i class="fa fa-chevron-left"></i> C++笔试
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/23/notebook/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2025-02-23--%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B003/" rel="next" title="常用函数">
+      常用函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenCV-%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95-%E4%BA%A4%E5%B9%B6%E6%AF%94%E8%AE%A1%E7%AE%97"><span class="nav-number">2.</span> <span class="nav-text">OpenCV 跟踪算法 交并比计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BA%A4%E5%B9%B6%E6%AF%94%EF%BC%88IoU%EF%BC%89%E7%9A%84%E8%AE%A1%E7%AE%97%E5%85%AC%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">1. 交并比（IoU）的计算公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-OpenCV-%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">2. OpenCV 跟踪算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-OpenCV-%E8%AE%A1%E7%AE%97-IoU-%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="nav-number">5.</span> <span class="nav-text">3. OpenCV 计算 IoU 的代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">6.</span> <span class="nav-text">4. 代码解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90"><span class="nav-number">7.</span> <span class="nav-text">5. 结果分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%85%B6%E4%BB%96%E6%94%B9%E8%BF%9B"><span class="nav-number">8.</span> <span class="nav-text">6. 其他改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-OpenCV%E4%B8%AD%E7%9A%84%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="nav-number">9.</span> <span class="nav-text">C++ OpenCV中的跟踪算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-OpenCV-%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="nav-number">10.</span> <span class="nav-text">1. OpenCV 目标跟踪算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-OpenCV-C-%E8%B7%9F%E8%B8%AA%E4%BB%A3%E7%A0%81"><span class="nav-number">11.</span> <span class="nav-text">2. OpenCV C++ 跟踪代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">12.</span> <span class="nav-text">3. 代码解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%80%89%E6%8B%A9%E4%B8%8D%E5%90%8C%E7%9A%84%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="nav-number">13.</span> <span class="nav-text">4. 选择不同的跟踪算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90-1"><span class="nav-number">14.</span> <span class="nav-text">5. 结果分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%BC%98%E5%8C%96"><span class="nav-number">15.</span> <span class="nav-text">6. 进一步优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%80%BB%E7%BB%93"><span class="nav-number">16.</span> <span class="nav-text">7. 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

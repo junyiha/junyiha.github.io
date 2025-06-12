@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 pidstat命令  linux pidstat命令 详解pidstat 是一个 Linux 性能分析工具，用于监视进程的 CPU 使用情况、内存使用情况和其他系统资源。它属于 sysstat 工具包的一部分。以下是关于 pidstat 命令的详细解释： 1. 基本用法：1pidstat [options] [interval] [count]  options: 可选的命令选项，用于指定要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_79_pidstat">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_79_pidstat/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 pidstat命令  linux pidstat命令 详解pidstat 是一个 Linux 性能分析工具，用于监视进程的 CPU 使用情况、内存使用情况和其他系统资源。它属于 sysstat 工具包的一部分。以下是关于 pidstat 命令的详细解释： 1. 基本用法：1pidstat [options] [interval] [count]  options: 可选的命令选项，用于指定要">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.374Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_79_pidstat/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_79_pidstat | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_79_pidstat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_79_pidstat
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>pidstat命令</li>
+</ul>
+<h2 id="linux-pidstat命令-详解"><a href="#linux-pidstat命令-详解" class="headerlink" title="linux pidstat命令 详解"></a>linux pidstat命令 详解</h2><p><code>pidstat</code> 是一个 Linux 性能分析工具，用于监视进程的 CPU 使用情况、内存使用情况和其他系统资源。它属于 <code>sysstat</code> 工具包的一部分。以下是关于 <code>pidstat</code> 命令的详细解释：</p>
+<h3 id="1-基本用法："><a href="#1-基本用法：" class="headerlink" title="1. 基本用法："></a>1. <strong>基本用法：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat [options] [interval] [count]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>options</code>: 可选的命令选项，用于指定要监视的资源和显示的信息。</li>
+<li><code>interval</code>: 指定输出的时间间隔，以秒为单位。</li>
+<li><code>count</code>: 指定输出的次数，如果未指定，则会无限次输出。</li>
+</ul>
+<h3 id="2-常用选项："><a href="#2-常用选项：" class="headerlink" title="2. 常用选项："></a>2. <strong>常用选项：</strong></h3><ul>
+<li><p><strong>CPU 相关：</strong></p>
+<ul>
+<li><code>-u</code> 或 <code>--cpu</code>: 显示 CPU 使用情况。</li>
+<li><code>-p PID</code> 或 <code>--pid=PID</code>: 仅监视指定进程ID的 CPU 使用情况。</li>
+</ul>
+</li>
+<li><p><strong>内存相关：</strong></p>
+<ul>
+<li><code>-r</code> 或 <code>--memory</code>: 显示内存使用情况。</li>
+</ul>
+</li>
+<li><p><strong>I&#x2F;O 相关：</strong></p>
+<ul>
+<li><code>-d</code> 或 <code>--disk</code>: 显示磁盘 I&#x2F;O 情况。</li>
+<li><code>-w</code> 或 <code>--io</code>: 显示 I&#x2F;O 等待情况。</li>
+</ul>
+</li>
+<li><p><strong>网络相关：</strong></p>
+<ul>
+<li><code>-n</code> 或 <code>--network</code>: 显示网络使用情况。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-示例用法："><a href="#3-示例用法：" class="headerlink" title="3. 示例用法："></a>3. <strong>示例用法：</strong></h3><ol>
+<li><p><strong>显示所有进程的 CPU 使用情况：</strong></p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>显示指定进程ID的 CPU 使用情况：</strong></p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -p PID</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>显示所有进程的内存使用情况：</strong></p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -r</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>显示所有进程的磁盘 I&#x2F;O 情况：</strong></p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>以指定时间间隔和次数显示 CPU 使用情况：</strong></p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u 2 5</span><br></pre></td></tr></table></figure>
+<p> 上述命令每2秒输出一次 CPU 使用情况，共输出5次。</p>
+</li>
+</ol>
+<h3 id="4-其他选项："><a href="#4-其他选项：" class="headerlink" title="4. 其他选项："></a>4. <strong>其他选项：</strong></h3><ul>
+<li><strong><code>-h</code> 或 <code>--help</code>：</strong> 显示帮助信息，列出可用的选项和参数。</li>
+<li><strong><code>-V</code> 或 <code>--version</code>：</strong> 显示 <code>pidstat</code> 的版本信息。</li>
+</ul>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>pidstat</code> 通常需要 <code>sysstat</code> 包的安装。在许多 Linux 发行版中，可以通过包管理器安装它。</li>
+</ul>
+<p><code>pidstat</code> 提供了丰富的信息，可以帮助你监视进程的性能，并及时发现潜在的性能问题。在使用时，根据具体的监控需求选择合适的选项。</p>
+<h2 id="linux-pidstat命令-常用技巧"><a href="#linux-pidstat命令-常用技巧" class="headerlink" title="linux pidstat命令 常用技巧"></a>linux pidstat命令 常用技巧</h2><p>以下是一些在使用 <code>pidstat</code> 命令时常用的技巧：</p>
+<h3 id="1-监视指定进程的-CPU-使用情况："><a href="#1-监视指定进程的-CPU-使用情况：" class="headerlink" title="1. 监视指定进程的 CPU 使用情况："></a>1. <strong>监视指定进程的 CPU 使用情况：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -p &lt;PID&gt;</span><br></pre></td></tr></table></figure>
+<p>通过指定 <code>-p</code> 选项和进程ID，可以监视特定进程的 CPU 使用情况。</p>
+<h3 id="2-监视多个进程的-CPU-使用情况："><a href="#2-监视多个进程的-CPU-使用情况：" class="headerlink" title="2. 监视多个进程的 CPU 使用情况："></a>2. <strong>监视多个进程的 CPU 使用情况：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -p &lt;PID1,PID2,PID3&gt;</span><br></pre></td></tr></table></figure>
+<p>通过逗号分隔的方式，可以同时监视多个进程的 CPU 使用情况。</p>
+<h3 id="3-按指定时间间隔和次数输出结果："><a href="#3-按指定时间间隔和次数输出结果：" class="headerlink" title="3. 按指定时间间隔和次数输出结果："></a>3. <strong>按指定时间间隔和次数输出结果：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -r -p &lt;PID&gt; 2 5</span><br></pre></td></tr></table></figure>
+<p>此命令每2秒输出一次指定进程的 CPU 使用情况和内存使用情况，共输出5次。</p>
+<h3 id="4-显示所有进程的-CPU-使用情况和命令行参数："><a href="#4-显示所有进程的-CPU-使用情况和命令行参数：" class="headerlink" title="4. 显示所有进程的 CPU 使用情况和命令行参数："></a>4. <strong>显示所有进程的 CPU 使用情况和命令行参数：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -C &lt;<span class="built_in">command</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>通过 <code>-C</code> 选项，可以显示指定命令行参数的所有进程的 CPU 使用情况。</p>
+<h3 id="5-显示指定用户的进程信息："><a href="#5-显示指定用户的进程信息：" class="headerlink" title="5. 显示指定用户的进程信息："></a>5. <strong>显示指定用户的进程信息：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -U &lt;username&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-U</code> 选项，可以显示指定用户的所有进程的 CPU 使用情况。</p>
+<h3 id="6-显示指定进程的线程信息："><a href="#6-显示指定进程的线程信息：" class="headerlink" title="6. 显示指定进程的线程信息："></a>6. <strong>显示指定进程的线程信息：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -t -p &lt;PID&gt;</span><br></pre></td></tr></table></figure>
+<p>通过 <code>-t</code> 选项，可以显示指定进程的线程信息，包括每个线程的 CPU 使用情况。</p>
+<h3 id="7-输出到文件："><a href="#7-输出到文件：" class="headerlink" title="7. 输出到文件："></a>7. <strong>输出到文件：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -r -p &lt;PID&gt; 2 5 &gt; output.txt</span><br></pre></td></tr></table></figure>
+<p>通过使用输出重定向，可以将 <code>pidstat</code> 的输出保存到文件中，以供后续分析。</p>
+<h3 id="8-显示帮助信息："><a href="#8-显示帮助信息：" class="headerlink" title="8. 显示帮助信息："></a>8. <strong>显示帮助信息：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -h</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-h</code> 选项可以查看 <code>pidstat</code> 命令的帮助信息，列出所有可用选项和参数。</p>
+<h3 id="9-查看-pidstat-的版本信息："><a href="#9-查看-pidstat-的版本信息：" class="headerlink" title="9. 查看 pidstat 的版本信息："></a>9. <strong>查看 <code>pidstat</code> 的版本信息：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -V</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-V</code> 选项可以显示 <code>pidstat</code> 的版本信息。</p>
+<h3 id="10-使用交互式模式："><a href="#10-使用交互式模式：" class="headerlink" title="10. 使用交互式模式："></a>10. <strong>使用交互式模式：</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -I</span><br></pre></td></tr></table></figure>
+<p>通过使用 <code>-I</code> 选项，可以启动交互式模式，允许用户在运行时切换显示的统计信息。</p>
+<p>这些技巧可以帮助你更灵活地使用 <code>pidstat</code> 命令，根据具体需求选择合适的选项，并监视系统中进程的性能。</p>
+<h2 id="Linux-pidstat命令-详解"><a href="#Linux-pidstat命令-详解" class="headerlink" title="Linux pidstat命令 详解"></a>Linux pidstat命令 详解</h2><p><code>pidstat</code> 是 Linux 系统上的一个性能分析工具，用于监视进程的资源使用情况。它属于 sysstat 工具包，通过收集和显示各个进程的统计信息，帮助系统管理员和开发人员了解系统上的进程行为和性能状况。以下是对 <code>pidstat</code> 命令的详细解释：</p>
+<h3 id="1-安装-sysstat-工具包"><a href="#1-安装-sysstat-工具包" class="headerlink" title="1. 安装 sysstat 工具包"></a>1. 安装 sysstat 工具包</h3><p>在大多数 Linux 发行版上，<code>pidstat</code> 都是 sysstat 工具包的一部分。如果尚未安装，可以使用以下命令安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install sysstat    <span class="comment"># 对于 Debian/Ubuntu</span></span><br><span class="line"><span class="built_in">sudo</span> yum install sysstat        <span class="comment"># 对于 CentOS/RHEL</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-pidstat-基本语法"><a href="#2-pidstat-基本语法" class="headerlink" title="2. pidstat 基本语法"></a>2. <code>pidstat</code> 基本语法</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat [options] [interval [count]]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>options</strong>: <code>pidstat</code> 的各种选项，用于指定输出的格式和内容。</li>
+<li><strong>interval</strong>: 采样的时间间隔（以秒为单位），表示 <code>pidstat</code> 将在这个时间间隔内对系统进行一次采样。</li>
+<li><strong>count</strong>: 采样的次数，表示 <code>pidstat</code> 将在指定次数的采样后停止。</li>
+</ul>
+<h3 id="3-常用选项"><a href="#3-常用选项" class="headerlink" title="3. 常用选项"></a>3. 常用选项</h3><p>以下是一些常用的 <code>pidstat</code> 选项：</p>
+<ul>
+<li><strong>-u</strong>: 显示 CPU 使用情况。</li>
+<li><strong>-r</strong>: 显示内存使用情况。</li>
+<li><strong>-d</strong>: 显示磁盘 I&#x2F;O 情况。</li>
+<li><strong>-w</strong>: 显示上下文切换和进程切换情况。</li>
+<li><strong>-p PID</strong>: 指定要监视的进程ID，可以指定多个 PID。</li>
+</ul>
+<h3 id="4-使用示例"><a href="#4-使用示例" class="headerlink" title="4. 使用示例"></a>4. 使用示例</h3><h4 id="4-1-显示-CPU-使用情况"><a href="#4-1-显示-CPU-使用情况" class="headerlink" title="4.1 显示 CPU 使用情况"></a>4.1 显示 CPU 使用情况</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-显示内存使用情况"><a href="#4-2-显示内存使用情况" class="headerlink" title="4.2 显示内存使用情况"></a>4.2 显示内存使用情况</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -r</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-3-显示磁盘-I-O-情况"><a href="#4-3-显示磁盘-I-O-情况" class="headerlink" title="4.3 显示磁盘 I&#x2F;O 情况"></a>4.3 显示磁盘 I&#x2F;O 情况</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-4-显示上下文切换和进程切换情况"><a href="#4-4-显示上下文切换和进程切换情况" class="headerlink" title="4.4 显示上下文切换和进程切换情况"></a>4.4 显示上下文切换和进程切换情况</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -w</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-5-指定要监视的特定进程"><a href="#4-5-指定要监视的特定进程" class="headerlink" title="4.5 指定要监视的特定进程"></a>4.5 指定要监视的特定进程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -p PID</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-输出解释"><a href="#5-输出解释" class="headerlink" title="5. 输出解释"></a>5. 输出解释</h3><p><code>pidstat</code> 的输出包含多列信息，其中一些关键列如下：</p>
+<ul>
+<li><strong>PID</strong>: 进程ID。</li>
+<li><strong>%usr</strong>: 用户空间 CPU 使用百分比。</li>
+<li><strong>%system</strong>: 内核空间 CPU 使用百分比。</li>
+<li><strong>%CPU</strong>: 进程的总 CPU 使用百分比。</li>
+<li><strong>minflt&#x2F;s</strong>: 每秒的次缺页错误数。</li>
+<li><strong>majflt&#x2F;s</strong>: 每秒的主缺页错误数。</li>
+<li><strong>VSZ</strong>: 进程的虚拟内存大小（KB）。</li>
+<li><strong>RSS</strong>: 进程的驻留集大小（KB）。</li>
+<li><strong>Command</strong>: 进程的命令名称。</li>
+</ul>
+<h3 id="6-其他信息"><a href="#6-其他信息" class="headerlink" title="6. 其他信息"></a>6. 其他信息</h3><ul>
+<li><p><code>pidstat</code> 还支持许多其他选项，可以通过 <code>man pidstat</code> 命令查看完整的手册。</p>
+</li>
+<li><p>可以使用 <code>pidstat</code> 来监视系统上运行的各个进程，以便及时发现和解决性能问题。</p>
+</li>
+</ul>
+<p>这只是 <code>pidstat</code> 命令的基本介绍，更详细的信息可以参考 <code>man pidstat</code> 或者 <code>pidstat --help</code>。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_82_alias/" rel="prev" title="linux_2_82_alias">
+      <i class="fa fa-chevron-left"></i> linux_2_82_alias
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_77_valgrind/" rel="next" title="linux_2_77_valgrind">
+      linux_2_77_valgrind <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-pidstat%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux pidstat命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">1. 基本用法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">2. 常用选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">3. 示例用法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%85%B6%E4%BB%96%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">4. 其他选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-pidstat%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux pidstat命令 常用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%9B%91%E8%A7%86%E6%8C%87%E5%AE%9A%E8%BF%9B%E7%A8%8B%E7%9A%84-CPU-%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">1. 监视指定进程的 CPU 使用情况：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%9B%91%E8%A7%86%E5%A4%9A%E4%B8%AA%E8%BF%9B%E7%A8%8B%E7%9A%84-CPU-%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">2. 监视多个进程的 CPU 使用情况：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%8C%89%E6%8C%87%E5%AE%9A%E6%97%B6%E9%97%B4%E9%97%B4%E9%9A%94%E5%92%8C%E6%AC%A1%E6%95%B0%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9C%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">3. 按指定时间间隔和次数输出结果：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%98%BE%E7%A4%BA%E6%89%80%E6%9C%89%E8%BF%9B%E7%A8%8B%E7%9A%84-CPU-%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5%E5%92%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%BC%9A"><span class="nav-number">3.4.</span> <span class="nav-text">4. 显示所有进程的 CPU 使用情况和命令行参数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%98%BE%E7%A4%BA%E6%8C%87%E5%AE%9A%E7%94%A8%E6%88%B7%E7%9A%84%E8%BF%9B%E7%A8%8B%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text">5. 显示指定用户的进程信息：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%98%BE%E7%A4%BA%E6%8C%87%E5%AE%9A%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%BA%BF%E7%A8%8B%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">3.6.</span> <span class="nav-text">6. 显示指定进程的线程信息：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E8%BE%93%E5%87%BA%E5%88%B0%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-number">3.7.</span> <span class="nav-text">7. 输出到文件：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%98%BE%E7%A4%BA%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">3.8.</span> <span class="nav-text">8. 显示帮助信息：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E6%9F%A5%E7%9C%8B-pidstat-%E7%9A%84%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="nav-number">3.9.</span> <span class="nav-text">9. 查看 pidstat 的版本信息：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E4%BD%BF%E7%94%A8%E4%BA%A4%E4%BA%92%E5%BC%8F%E6%A8%A1%E5%BC%8F%EF%BC%9A"><span class="nav-number">3.10.</span> <span class="nav-text">10. 使用交互式模式：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-pidstat%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">Linux pidstat命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85-sysstat-%E5%B7%A5%E5%85%B7%E5%8C%85"><span class="nav-number">4.1.</span> <span class="nav-text">1. 安装 sysstat 工具包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-pidstat-%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text">2. pidstat 基本语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9"><span class="nav-number">4.3.</span> <span class="nav-text">3. 常用选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.4.</span> <span class="nav-text">4. 使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-%E6%98%BE%E7%A4%BA-CPU-%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5"><span class="nav-number">4.4.1.</span> <span class="nav-text">4.1 显示 CPU 使用情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-%E6%98%BE%E7%A4%BA%E5%86%85%E5%AD%98%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5"><span class="nav-number">4.4.2.</span> <span class="nav-text">4.2 显示内存使用情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-%E6%98%BE%E7%A4%BA%E7%A3%81%E7%9B%98-I-O-%E6%83%85%E5%86%B5"><span class="nav-number">4.4.3.</span> <span class="nav-text">4.3 显示磁盘 I&#x2F;O 情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-%E6%98%BE%E7%A4%BA%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%E5%92%8C%E8%BF%9B%E7%A8%8B%E5%88%87%E6%8D%A2%E6%83%85%E5%86%B5"><span class="nav-number">4.4.4.</span> <span class="nav-text">4.4 显示上下文切换和进程切换情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-5-%E6%8C%87%E5%AE%9A%E8%A6%81%E7%9B%91%E8%A7%86%E7%9A%84%E7%89%B9%E5%AE%9A%E8%BF%9B%E7%A8%8B"><span class="nav-number">4.4.5.</span> <span class="nav-text">4.5 指定要监视的特定进程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E8%BE%93%E5%87%BA%E8%A7%A3%E9%87%8A"><span class="nav-number">4.5.</span> <span class="nav-text">5. 输出解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%85%B6%E4%BB%96%E4%BF%A1%E6%81%AF"><span class="nav-number">4.6.</span> <span class="nav-text">6. 其他信息</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

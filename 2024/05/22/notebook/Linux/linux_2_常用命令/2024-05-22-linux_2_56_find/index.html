@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 find命令  linux find命令 详解find 命令是在 Linux 系统中用于在文件系统中查找文件和目录的强大工具。find 可以根据不同的条件搜索文件，如文件名、文件类型、大小、权限等。以下是关于 find 命令的详细说明： 基本用法：1find [path...] [expression]   path： 要开始搜索的路径。 expression： 定义搜索条件的表达式。  常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_56_find">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_56_find/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 find命令  linux find命令 详解find 命令是在 Linux 系统中用于在文件系统中查找文件和目录的强大工具。find 可以根据不同的条件搜索文件，如文件名、文件类型、大小、权限等。以下是关于 find 命令的详细说明： 基本用法：1find [path...] [expression]   path： 要开始搜索的路径。 expression： 定义搜索条件的表达式。  常">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_56_find/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_56_find | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_56_find/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_56_find
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>find命令</li>
+</ul>
+<h2 id="linux-find命令-详解"><a href="#linux-find命令-详解" class="headerlink" title="linux find命令 详解"></a>linux find命令 详解</h2><p><code>find</code> 命令是在 Linux 系统中用于在文件系统中查找文件和目录的强大工具。<code>find</code> 可以根据不同的条件搜索文件，如文件名、文件类型、大小、权限等。以下是关于 <code>find</code> 命令的详细说明：</p>
+<h3 id="基本用法："><a href="#基本用法：" class="headerlink" title="基本用法："></a>基本用法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find [path...] [expression]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>path：</strong> 要开始搜索的路径。</li>
+<li><strong>expression：</strong> 定义搜索条件的表达式。</li>
+</ul>
+<h3 id="常用表达式："><a href="#常用表达式：" class="headerlink" title="常用表达式："></a>常用表达式：</h3><ol>
+<li><p><strong>按文件名搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;filename&quot;</span></span><br></pre></td></tr></table></figure>
+<p>通过文件名进行搜索。</p>
+</li>
+<li><p><strong>按文件类型搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -<span class="built_in">type</span> f</span><br></pre></td></tr></table></figure>
+<p>通过文件类型进行搜索，其中 <code>-type f</code> 表示文件，<code>-type d</code> 表示目录。</p>
+</li>
+<li><p><strong>按文件大小搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -size +10M</span><br></pre></td></tr></table></figure>
+<p>搜索大于10兆字节的文件，也可以使用 <code>-size -10M</code> 来搜索小于10兆字节的文件。</p>
+</li>
+<li><p><strong>按文件权限搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -perm 644</span><br></pre></td></tr></table></figure>
+<p>搜索文件权限为644的文件。</p>
+</li>
+<li><p><strong>按时间戳搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -mtime -7</span><br></pre></td></tr></table></figure>
+<p>搜索过去7天内修改过的文件。使用 <code>-atime</code> 和 <code>-ctime</code> 选项可以分别按访问时间和变化时间搜索。</p>
+</li>
+<li><p><strong>按用户和组搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -user username -group groupname</span><br></pre></td></tr></table></figure>
+<p>搜索属于特定用户和组的文件。</p>
+</li>
+<li><p><strong>按多个条件组合搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">type</span> f -size +1M</span><br></pre></td></tr></table></figure>
+<p>可以组合多个条件，以便更精确地搜索文件。</p>
+</li>
+</ol>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ol>
+<li><p><strong>查找并删除所有 <code>.log</code> 文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.log&quot;</span> -delete</span><br></pre></td></tr></table></figure>
+<p>查找并删除所有后缀为 <code>.log</code> 的文件。</p>
+</li>
+<li><p><strong>查找所有文件并将结果输出到文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search &gt; results.txt</span><br></pre></td></tr></table></figure>
+<p>将所有搜索结果输出到 <code>results.txt</code> 文件。</p>
+</li>
+<li><p><strong>查找所有 <code>.jpg</code> 文件并将它们移动到另一个目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.jpg&quot;</span> -<span class="built_in">exec</span> <span class="built_in">mv</span> &#123;&#125; /path/to/destination \;</span><br></pre></td></tr></table></figure>
+<p>将所有后缀为 <code>.jpg</code> 的文件移动到另一个目录。</p>
+</li>
+<li><p><strong>查找所有空文件或目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -empty</span><br></pre></td></tr></table></figure>
+<p>查找并显示所有空文件或目录。</p>
+</li>
+<li><p><strong>查找并压缩所有 <code>.txt</code> 文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">exec</span> gzip &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<p>查找并使用 <code>gzip</code> 命令压缩所有后缀为 <code>.txt</code> 的文件。</p>
+</li>
+</ol>
+<p><code>find</code> 命令非常强大，可以根据各种条件在文件系统中进行灵活的搜索。请注意，在使用 <code>find</code> 命令时要小心，确保你了解你的搜索条件以及其潜在的影响。</p>
+<h2 id="linux-find命令-常用技巧"><a href="#linux-find命令-常用技巧" class="headerlink" title="linux find命令 常用技巧"></a>linux find命令 常用技巧</h2><p>以下是一些在使用 <code>find</code> 命令时的常用技巧，可以帮助你更灵活地进行文件搜索和操作：</p>
+<ol>
+<li><p><strong>使用 <code>-exec</code> 执行操作：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-exec</code> 选项可以在找到的每个文件上执行特定的操作，这里是删除所有后缀为 <code>.txt</code> 的文件。</p>
+</li>
+<li><p><strong>使用 <code>-exec</code> 执行复杂命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.log&quot;</span> -<span class="built_in">exec</span> sh -c <span class="string">&#x27;mv &#123;&#125; $(dirname &#123;&#125;)/archive/&#x27;</span> \;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-exec</code> 时，可以执行更复杂的命令，这里将所有后缀为 <code>.log</code> 的文件移动到它们所在目录下的 <code>archive</code> 子目录。</p>
+</li>
+<li><p><strong>使用 <code>-iname</code> 进行不区分大小写的搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -iname <span class="string">&quot;*.jpg&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-iname</code> 可以进行不区分大小写的文件名搜索。</p>
+</li>
+<li><p><strong>查找特定类型的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -<span class="built_in">type</span> f -name <span class="string">&quot;*.txt&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-type</code> 选项可以限制搜索结果为文件，而不是目录。</p>
+</li>
+<li><p><strong>查找符号链接文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -<span class="built_in">type</span> l</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-type l</code> 可以查找符号链接文件。</p>
+</li>
+<li><p><strong>查找并显示文件详细信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-ls</code> 可以显示详细的文件信息，包括权限、大小、时间戳等。</p>
+</li>
+<li><p><strong>查找文件并排除特定目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -not -path <span class="string">&quot;/path/to/exclude/*&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-not -path</code> 可以排除特定目录下的文件。</p>
+</li>
+<li><p><strong>查找文件并按修改时间排序：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">exec</span> <span class="built_in">stat</span> --format=<span class="string">&quot;%Y %n&quot;</span> &#123;&#125; \; | <span class="built_in">sort</span> -n</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-exec</code> 结合 <code>stat</code> 命令和 <code>sort</code> 命令，可以按修改时间对搜索结果进行排序。</p>
+</li>
+<li><p><strong>查找空文件和空目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -empty</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-empty</code> 可以查找空文件和空目录。</p>
+</li>
+<li><p><strong>使用 <code>-maxdepth</code> 限制搜索深度：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -maxdepth 2</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-maxdepth</code> 可以限制搜索的深度，防止过度搜索。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更灵活地使用 <code>find</code> 命令，根据具体需求进行文件搜索和操作。请确保在使用复杂的命令时仔细测试，以避免不必要的文件操作。</p>
+<h2 id="linux-find命令-高级技巧"><a href="#linux-find命令-高级技巧" class="headerlink" title="linux find命令 高级技巧"></a>linux find命令 高级技巧</h2><p>以下是一些高级技巧，可以帮助你更有效地使用 <code>find</code> 命令进行文件搜索和操作：</p>
+<ol>
+<li><p><strong>使用 <code>-regex</code> 进行正则表达式搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -regex <span class="string">&quot;.*\.txt&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-regex</code> 可以进行正则表达式匹配，这对于复杂的文件名模式非常有用。</p>
+</li>
+<li><p><strong>使用 <code>-newer</code> 按时间戳搜索新文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -newer /path/to/reference_file</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-newer</code> 可以搜索比参考文件更新的文件。</p>
+</li>
+<li><p><strong>使用 <code>-delete</code> 直接删除匹配的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.tmp&quot;</span> -delete</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-delete</code> 可以直接删除匹配的文件，而无需使用 <code>-exec rm</code>。</p>
+</li>
+<li><p><strong>使用 <code>-execdir</code> 在文件所在目录执行命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -execdir <span class="built_in">mv</span> &#123;&#125; /path/to/destination \;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-execdir</code> 可以在匹配的文件所在目录执行命令，避免可能的路径问题。</p>
+</li>
+<li><p><strong>使用 <code>-printf</code> 格式化输出信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">printf</span> <span class="string">&quot;%p\t%s\n&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-printf</code> 可以自定义输出信息的格式，这对于生成报告非常有用。</p>
+</li>
+<li><p><strong>在 <code>-exec</code> 中使用 <code>+</code> 提高效率：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.log&quot;</span> -<span class="built_in">exec</span> <span class="built_in">cat</span> &#123;&#125; +</span><br></pre></td></tr></table></figure>
+<p>在 <code>-exec</code> 中使用 <code>+</code> 可以将多个文件一次性传递给命令，提高效率。</p>
+</li>
+<li><p><strong>查找包含特定文本的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -rl <span class="string">&quot;search_text&quot;</span> /path/to/search</span><br></pre></td></tr></table></figure>
+<p>如果你要查找包含特定文本的文件，可能更适合使用 <code>grep</code> 命令。</p>
+</li>
+<li><p><strong>在搜索结果中排除特定目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -not -path <span class="string">&quot;/path/to/exclude/*&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-not -path</code> 可以排除特定目录下的文件。</p>
+</li>
+<li><p><strong>使用 <code>-exec sh -c</code> 执行复杂的命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -<span class="built_in">exec</span> sh -c <span class="string">&#x27;mv &#123;&#125; $(dirname &#123;&#125;)/archive/&#x27;</span> \;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-exec sh -c</code> 可以执行包含变量和子命令的复杂命令。</p>
+</li>
+<li><p><strong>通过 <code>-print0</code> 和 <code>xargs -0</code> 处理包含空格的文件名：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/search -name <span class="string">&quot;*.txt&quot;</span> -print0 | xargs -0 <span class="built_in">command</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-print0</code> 和 <code>xargs -0</code> 可以处理文件名中包含空格等特殊字符的情况。</p>
+</li>
+</ol>
+<p>这些高级技巧可以帮助你更灵活地使用 <code>find</code> 命令，根据具体需求进行文件搜索和操作。要牢记在使用复杂命令时小心，确保它们符合你的预期。</p>
+<h2 id="find"><a href="#find" class="headerlink" title="find"></a>find</h2><p>在Linux中，<code>find</code>命令用于在文件系统中查找符合指定条件的文件和目录。它提供了强大的搜索功能，可以根据不同的搜索标准来定位文件和目录。</p>
+<p><code>find</code>命令的基本语法如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find [路径] [表达式]</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>路径</code>指定要搜索的起始目录路径，<code>表达式</code>用于指定搜索条件和操作。</p>
+<p>以下是一些常见的用法示例：</p>
+<ol>
+<li><p>搜索指定目录下的所有文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索指定目录下的特定文件类型（例如，所有的文本文件）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f -name &quot;*.txt&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索指定目录及其子目录下的所有文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索指定目录下最近修改的文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f -mtime -7</span><br></pre></td></tr></table></figure>
+<p>上述命令将搜索在最近7天内被修改的文件。</p>
+</li>
+<li><p>搜索指定目录下的文件并执行操作（如打印文件名或删除文件）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f -exec echo &#123;&#125; \;</span><br><span class="line">find /path/to/directory -type f -exec rm &#123;&#125; \;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>需要注意以下几点：</p>
+<ul>
+<li><code>find</code>命令默认会递归地搜索指定目录及其子目录下的文件和目录。</li>
+<li><code>-type</code>选项用于指定要搜索的文件类型，例如<code>f</code>表示普通文件，<code>d</code>表示目录。</li>
+<li><code>-name</code>选项用于指定文件名的模式匹配。</li>
+<li><code>-mtime</code>选项用于指定文件的修改时间，例如<code>-mtime -7</code>表示最近7天内修改的文件。</li>
+<li><code>-exec</code>选项用于在找到的文件上执行特定的命令。</li>
+</ul>
+<p><code>find</code>命令还支持许多其他选项和表达式，用于更精确地控制搜索条件和操作。你可以使用<code>man find</code>命令查阅<code>find</code>命令的详细文档，以了解更多关于其用法和选项的信息。</p>
+<hr>
+<h2 id="find-exec选项"><a href="#find-exec选项" class="headerlink" title="find -exec选项"></a>find -exec选项</h2><p>在Linux中，<code>-exec</code>是<code>find</code>命令的一个选项，用于在找到的文件上执行指定的命令。<code>-exec</code>选项允许你对找到的文件执行各种自定义操作。</p>
+<p><code>-exec</code>选项的语法如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-exec command &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+
+<p>解释如下：</p>
+<ul>
+<li><code>command</code>：要执行的命令，可以是任何合法的Linux命令。命令必须以空格或分号结尾，并用单引号或双引号括起来。</li>
+<li><code>&#123;&#125;</code>：是一个占位符，表示<code>find</code>命令找到的每个文件。<code>&#123;&#125;</code>会被实际的文件名替换。</li>
+<li><code>\;</code>：表示<code>-exec</code>选项的结束，必须使用反斜杠转义字符进行转义。</li>
+</ul>
+<p>以下是一些常见的用法示例：</p>
+<ol>
+<li><p>打印找到的文件名：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f -exec echo &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>复制找到的文件到目标目录：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f -exec cp &#123;&#125; /path/to/destination/ \;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除所有找到的文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/directory -type f -exec rm &#123;&#125; \;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>需要注意以下几点：</p>
+<ul>
+<li>如果在<code>command</code>中使用<code>&#123;&#125;</code>，确保在命令中引用文件名之前进行适当的转义或引号处理，以避免解释错误。</li>
+<li>如果要对多个文件执行命令，可以使用<code>+</code>代替<code>\;</code>作为结束符。这样会将多个文件一次传递给命令，从而提高效率。</li>
+</ul>
+<p>总而言之，<code>-exec</code>选项使得<code>find</code>命令具有强大的功能，可以在找到的文件上执行自定义的命令和操作。这对于批量处理文件或执行复杂的操作非常有用。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_55_rename/" rel="prev" title="linux_2_55_rename">
+      <i class="fa fa-chevron-left"></i> linux_2_55_rename
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_54_mkdir/" rel="next" title="linux_2_54_mkdir">
+      linux_2_54_mkdir <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-find%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux find命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本用法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E8%A1%A8%E8%BE%BE%E5%BC%8F%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常用表达式：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-find%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux find命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-find%E5%91%BD%E4%BB%A4-%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7"><span class="nav-number">4.</span> <span class="nav-text">linux find命令 高级技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#find"><span class="nav-number">5.</span> <span class="nav-text">find</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#find-exec%E9%80%89%E9%A1%B9"><span class="nav-number">6.</span> <span class="nav-text">find -exec选项</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

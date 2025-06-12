@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 tensorrt库  tensorrt GA和EA的区别 EA版本代表抢鲜体验，在正式发布之前 GA代表通用性，表示稳定版，经过全面测试。  TensorRT加速 TensorRT是英伟达开发针对自身显卡来优化的推理加速框架，TensorRT主要做了两件事情，来提升模型的运行速度 TensorRT降精度推理支持INT8和FP16的计算。深度学习网络在训练时，通常使用 32 位或 16 位数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorrt_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/NVIDIA/TensorRT/2024-05-22-tensorrt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 tensorrt库  tensorrt GA和EA的区别 EA版本代表抢鲜体验，在正式发布之前 GA代表通用性，表示稳定版，经过全面测试。  TensorRT加速 TensorRT是英伟达开发针对自身显卡来优化的推理加速框架，TensorRT主要做了两件事情，来提升模型的运行速度 TensorRT降精度推理支持INT8和FP16的计算。深度学习网络在训练时，通常使用 32 位或 16 位数据">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.414Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="NVIDIA">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/NVIDIA/TensorRT/2024-05-22-tensorrt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>tensorrt_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/NVIDIA/TensorRT/2024-05-22-tensorrt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorrt_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NVIDIA/" itemprop="url" rel="index"><span itemprop="name">NVIDIA</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>tensorrt库</li>
+</ul>
+<h2 id="tensorrt-GA和EA的区别"><a href="#tensorrt-GA和EA的区别" class="headerlink" title="tensorrt GA和EA的区别"></a>tensorrt GA和EA的区别</h2><ul>
+<li>EA版本代表抢鲜体验，在正式发布之前</li>
+<li>GA代表通用性，表示稳定版，经过全面测试。</li>
+</ul>
+<h2 id="TensorRT加速"><a href="#TensorRT加速" class="headerlink" title="TensorRT加速"></a>TensorRT加速</h2><ul>
+<li>TensorRT是英伟达开发针对自身显卡来优化的推理加速框架，TensorRT主要做了两件事情，来提升模型的运行速度<ul>
+<li>TensorRT降精度推理支持INT8和FP16的计算。深度学习网络在训练时，通常使用 32 位或 16 位数据。TensorRT则在网络的推理时选用不这么高的精度，达到加速推断的目的。</li>
+<li>TensorRT对于网络结构进行了重构，把一些能够合并的运算合并在了一起，针对GPU的特性做了优化。因为显卡是英伟达出的没有谁比英伟达更懂自己的显卡，自然就推出了针对自己GPU的加速工具TensorRT。一个深度学习模型，在没有优化的情况下，比如一个卷积层、一个偏置层和一个reload层，这三层是需要调用三次cuDNN对应的API，但实际上这三层的实现完全是可以合并到一起的，TensorRT会对一些可以合并网络进行合并。</li>
+</ul>
+</li>
+</ul>
+<h2 id="C-tensorrt是什么"><a href="#C-tensorrt是什么" class="headerlink" title="C++ tensorrt是什么"></a>C++ tensorrt是什么</h2><p>TensorRT（Tensor Runtime）是由 NVIDIA 开发的用于高性能深度学习推理（inference）的库。它主要用于加速深度学习模型在 NVIDIA GPU 上的推理阶段，以提高模型的实时性能。</p>
+<p>TensorRT 提供了许多优化技术，以减少深度学习模型推理的计算和内存开销。它通过使用精确的数值计算、层融合（layer fusion）、动态 Tensor 网络（dynamic tensor network）、深度学习加速库（cuDNN）、自动混合精度（automatic mixed precision）等技术，提供高效的推理加速。</p>
+<p>TensorRT 支持多种深度学习框架，包括 TensorFlow、PyTorch、ONNX（Open Neural Network Exchange）等。你可以使用 TensorRT 将经过训练的深度学习模型转换为 TensorRT 可以高效执行的格式，以利用 GPU 进行快速推理。</p>
+<p>以下是 TensorRT 的一些主要特性：</p>
+<ol>
+<li><p><strong>快速推理：</strong> TensorRT 通过 GPU 加速深度学习推理，提供高性能的模型执行。</p>
+</li>
+<li><p><strong>精确数值计算：</strong> TensorRT 支持对模型进行精确数值计算，以在不牺牲模型精度的情况下提高推理速度。</p>
+</li>
+<li><p><strong>层融合：</strong> TensorRT 可以自动融合相邻层，减少计算和内存开销。</p>
+</li>
+<li><p><strong>支持多种框架：</strong> TensorRT 提供用于与多种深度学习框架集成的工具，包括 TensorFlow、PyTorch、ONNX 等。</p>
+</li>
+<li><p><strong>动态 Tensor 网络：</strong> TensorRT 支持构建动态的 Tensor 网络，适用于需要在推理期间动态改变形状的模型。</p>
+</li>
+</ol>
+<p>TensorRT 的使用通常涉及到以下几个步骤：</p>
+<ol>
+<li><p><strong>创建和训练模型：</strong> 使用深度学习框架创建和训练深度学习模型。</p>
+</li>
+<li><p><strong>模型转换：</strong> 使用 TensorRT 提供的工具将训练好的模型转换为 TensorRT 可以高效执行的格式。</p>
+</li>
+<li><p><strong>加载和推理：</strong> 在 C++ 或其他支持的语言中加载 TensorRT 格式的模型并进行推理。</p>
+</li>
+</ol>
+<p>TensorRT 是用于加速深度学习推理的强大工具，尤其在实时应用、嵌入式系统和边缘计算等场景中具有重要作用。</p>
+<h2 id="C-tensorrt-库-详解"><a href="#C-tensorrt-库-详解" class="headerlink" title="C++ tensorrt 库 详解"></a>C++ tensorrt 库 详解</h2><p>TensorRT 是 NVIDIA 提供的深度学习推理库，专为在 NVIDIA GPU 上进行深度学习模型的加速而设计。TensorRT 提供了一系列工具和优化技术，以在推理阶段获得高性能、低延迟的模型执行。以下是关于 TensorRT 库的一些详细信息：</p>
+<h3 id="TensorRT-的主要特性："><a href="#TensorRT-的主要特性：" class="headerlink" title="TensorRT 的主要特性："></a>TensorRT 的主要特性：</h3><ol>
+<li><p><strong>快速推理：</strong> TensorRT 通过 GPU 加速深度学习推理，提供高性能的模型执行。它针对 NVIDIA GPU 的架构进行了优化，充分利用了 GPU 的并行计算能力。</p>
+</li>
+<li><p><strong>精确数值计算：</strong> TensorRT 支持深度学习模型的精确数值计算，同时考虑到模型推理过程中的计算精度和效率。</p>
+</li>
+<li><p><strong>层融合：</strong> TensorRT 可以自动融合相邻层，减少计算和内存开销。这种层融合技术有助于减小模型的计算图，提高推理性能。</p>
+</li>
+<li><p><strong>多精度计算：</strong> TensorRT 支持多种精度计算，包括 FP32、FP16 和 INT8。可以根据模型的需求选择合适的精度，以在保持精度的同时提高计算性能。</p>
+</li>
+<li><p><strong>层和操作库：</strong> TensorRT 提供了包括卷积、归一化、激活函数等在内的一系列层和操作库，以满足不同模型结构的推理需求。</p>
+</li>
+<li><p><strong>支持多种框架：</strong> TensorRT 支持多种深度学习框架，包括 TensorFlow、PyTorch、ONNX 等。通过支持多种框架，TensorRT 提供了灵活性，使用户能够在不同框架之间无缝转换和使用模型。</p>
+</li>
+<li><p><strong>动态 Tensor 网络：</strong> TensorRT 支持构建动态的 Tensor 网络，适用于需要在推理期间动态改变形状的模型。</p>
+</li>
+</ol>
+<h3 id="TensorRT-的使用流程："><a href="#TensorRT-的使用流程：" class="headerlink" title="TensorRT 的使用流程："></a>TensorRT 的使用流程：</h3><ol>
+<li><p><strong>创建和训练模型：</strong> 使用深度学习框架（例如 TensorFlow、PyTorch）创建和训练深度学习模型。</p>
+</li>
+<li><p><strong>模型转换：</strong> 使用 TensorRT 提供的工具将训练好的模型转换为 TensorRT 可以高效执行的格式。这通常涉及到使用 TensorRT 的 Python API 进行模型转换。</p>
+</li>
+<li><p><strong>TensorRT 推理引擎构建：</strong> 使用 C++ 或其他支持的语言，在运行时加载 TensorRT 格式的模型并构建 TensorRT 推理引擎。推理引擎是 TensorRT 用于高效执行模型的核心组件。</p>
+</li>
+<li><p><strong>输入数据传递和推理：</strong> 将输入数据传递给 TensorRT 推理引擎，并执行推理操作。TensorRT 会在 GPU 上对输入数据进行并行计算，并输出模型的推理结果。</p>
+</li>
+<li><p><strong>清理资源：</strong> 在推理完成后，释放分配的 GPU 和 CPU 资源，以确保良好的系统资源管理。</p>
+</li>
+</ol>
+<h3 id="TensorRT-C-API-使用示例："><a href="#TensorRT-C-API-使用示例：" class="headerlink" title="TensorRT C++ API 使用示例："></a>TensorRT C++ API 使用示例：</h3><p>以下是一个简化的 TensorRT C++ API 使用示例，展示了加载 TensorRT 模型并进行推理的基本步骤：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;NvInfer.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 初始化 TensorRT</span></span><br><span class="line">    nvinfer1::IRuntime* runtime = nvinfer1::<span class="built_in">createInferRuntime</span>(gLogger);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从文件中加载 TensorRT 模型</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* trtModelPath = <span class="string">&quot;path/to/your/model.plan&quot;</span>;</span><br><span class="line">    <span class="function">std::ifstream <span class="title">trtModelStream</span><span class="params">(trtModelPath, std::ios::binary)</span></span>;</span><br><span class="line">    trtModelStream.<span class="built_in">seekg</span>(<span class="number">0</span>, trtModelStream.end);</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> modelSize = trtModelStream.<span class="built_in">tellg</span>();</span><br><span class="line">    trtModelStream.<span class="built_in">seekg</span>(<span class="number">0</span>, trtModelStream.beg);</span><br><span class="line">    <span class="function">std::vector&lt;<span class="type">char</span>&gt; <span class="title">modelData</span><span class="params">(modelSize)</span></span>;</span><br><span class="line">    trtModelStream.<span class="built_in">read</span>(modelData.<span class="built_in">data</span>(), modelSize);</span><br><span class="line"></span><br><span class="line">    nvinfer1::ICudaEngine* engine = runtime-&gt;<span class="built_in">deserializeCudaEngine</span>(modelData.<span class="built_in">data</span>(), modelSize, <span class="literal">nullptr</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建执行上下文</span></span><br><span class="line">    nvinfer1::IExecutionContext* context = engine-&gt;<span class="built_in">createExecutionContext</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 准备输入数据和输出缓冲区</span></span><br><span class="line">    <span class="type">float</span> inputData[INPUT_SIZE]; <span class="comment">// INPUT_SIZE 是模型期望的输入大小</span></span><br><span class="line">    <span class="type">float</span> outputData[OUTPUT_SIZE]; <span class="comment">// OUTPUT_SIZE 是模型期望的输出大小</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配 GPU 内存并将输入数据传输到 GPU</span></span><br><span class="line">    <span class="type">void</span>* gpuInputBuffer;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;gpuInputBuffer, INPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(gpuInputBuffer, inputData, INPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyHostToDevice);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分配 GPU 内存用于输出</span></span><br><span class="line">    <span class="type">void</span>* gpuOutputBuffer;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;gpuOutputBuffer, OUTPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行推理</span></span><br><span class="line">    context-&gt;<span class="built_in">execute</span>(<span class="number">1</span>, &amp;gpuInputBuffer, &amp;gpuOutputBuffer, <span class="literal">nullptr</span>, <span class="literal">nullptr</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将输出数据从 GPU 复制回主机</span></span><br><span class="line">    <span class="built_in">cudaMemcpy</span>(outputData, gpuOutputBuffer, OUTPUT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>), cudaMemcpyDeviceToHost);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 处理输出数据...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清理资源</span></span><br><span class="line">    <span class="built_in">cudaFree</span>(gpuInputBuffer);</span><br><span class="line">    <span class="built_in">cudaFree</span>(gpuOutputBuffer);</span><br><span class="line">    context-&gt;<span class="built_in">destroy</span>();</span><br><span class="line">    engine-&gt;<span class="built_in">destroy</span>();</span><br><span class="line">    runtime-&gt;<span class="built_in">destroy</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请注意，实际的使用场景可能会更加复杂，具体的实现可能需要更多的代码，特别是在处理不同类型和形状的输入数据时。确保查阅 TensorRT 的文档和示例，以获得详细的使用说明。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NVIDIA/" rel="tag"># NVIDIA</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Kafka/kafka_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-kafka_1_1/" rel="prev" title="kafka_1_1">
+      <i class="fa fa-chevron-left"></i> kafka_1_1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/NVIDIA/CUDA/2024-05-22-nvidia_2_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="next" title="nvidia_2_常用函数">
+      nvidia_2_常用函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tensorrt-GA%E5%92%8CEA%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">tensorrt GA和EA的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TensorRT%E5%8A%A0%E9%80%9F"><span class="nav-number">3.</span> <span class="nav-text">TensorRT加速</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-tensorrt%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">4.</span> <span class="nav-text">C++ tensorrt是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-tensorrt-%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">C++ tensorrt 库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TensorRT-%E7%9A%84%E4%B8%BB%E8%A6%81%E7%89%B9%E6%80%A7%EF%BC%9A"><span class="nav-number">5.1.</span> <span class="nav-text">TensorRT 的主要特性：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TensorRT-%E7%9A%84%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="nav-number">5.2.</span> <span class="nav-text">TensorRT 的使用流程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TensorRT-C-API-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">5.3.</span> <span class="nav-text">TensorRT C++ API 使用示例：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

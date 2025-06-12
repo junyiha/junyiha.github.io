@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 gdb工具使用中常见的技巧  日志重定向在使用GDB进行调试时，您可以将GDB的日志输出重定向到文件中。以下是一种方法：  打开终端并运行GDB。  在GDB提示符下，输入以下命令以启用日志记录功能并指定输出文件： 1set logging file &lt;file_path&gt;  将&lt;file_path&gt;替换为您想要将日志记录写入的文件路径和文件名。  输入以下命令以开始">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gdb_2_常用技巧">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Debugger/2024-05-22-gdb_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 gdb工具使用中常见的技巧  日志重定向在使用GDB进行调试时，您可以将GDB的日志输出重定向到文件中。以下是一种方法：  打开终端并运行GDB。  在GDB提示符下，输入以下命令以启用日志记录功能并指定输出文件： 1set logging file &lt;file_path&gt;  将&lt;file_path&gt;替换为您想要将日志记录写入的文件路径和文件名。  输入以下命令以开始">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.270Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="GDB">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Debugger/2024-05-22-gdb_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>gdb_2_常用技巧 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Debugger/2024-05-22-gdb_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gdb_2_常用技巧
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Debugger/" itemprop="url" rel="index"><span itemprop="name">Debugger</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>gdb工具使用中常见的技巧</li>
+</ul>
+<h2 id="日志重定向"><a href="#日志重定向" class="headerlink" title="日志重定向"></a>日志重定向</h2><p>在使用GDB进行调试时，您可以将GDB的日志输出重定向到文件中。以下是一种方法：</p>
+<ol>
+<li><p>打开终端并运行GDB。</p>
+</li>
+<li><p>在GDB提示符下，输入以下命令以启用日志记录功能并指定输出文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set logging file &lt;file_path&gt;</span><br></pre></td></tr></table></figure>
+
+<p>将<code>&lt;file_path&gt;</code>替换为您想要将日志记录写入的文件路径和文件名。</p>
+</li>
+<li><p>输入以下命令以开始记录GDB日志：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set logging on</span><br></pre></td></tr></table></figure>
+
+<p>GDB将开始将日志记录写入指定的文件。</p>
+</li>
+<li><p>执行您的调试操作，进行需要的步骤和命令。</p>
+</li>
+<li><p>当您完成调试并想要停止日志记录时，输入以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set logging off</span><br></pre></td></tr></table></figure>
+
+<p>GDB将停止将日志写入文件。</p>
+</li>
+</ol>
+<p>请注意，这种方法将GDB的整个会话记录到文件中，包括所有输入和输出。这对于调试复杂的问题或追踪程序执行流程非常有用。</p>
+<p>希望这可以帮助您将GDB的日志输出到文件中。如有其他问题，请随时提问。</p>
+<hr>
+<h2 id="启动程序-输入-参数"><a href="#启动程序-输入-参数" class="headerlink" title="启动程序 输入 参数"></a>启动程序 输入 参数</h2><ul>
+<li>示例：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb --args ./mnc.exe --port=10008 --ip=0.0.0.0</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="gdb-查看断点"><a href="#gdb-查看断点" class="headerlink" title="gdb 查看断点"></a>gdb 查看断点</h2><p>要查看在GDB中设置的所有断点，你可以使用以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">info breakpoints</span><br></pre></td></tr></table></figure>
+
+<p>该命令会显示当前设置的所有断点的列表，包括断点编号、断点位置和断点条件（如果有设置条件的话）。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info breakpoints</span><br><span class="line">Num     Type           Disp Enb Address            What</span><br><span class="line">1       breakpoint     keep y   0x000000000040051a in main at example.c:10</span><br><span class="line">2       breakpoint     keep y   0x00000000004004f6 in foo at example.c:5</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，有两个断点，编号为1和2。第一个断点位于文件<code>example.c</code>的第10行的<code>main</code>函数处，第二个断点位于第5行的<code>foo</code>函数处。</p>
+<p>如果你只想查看某个特定断点的详细信息，你可以使用以下命令，并将<code>&lt;breakpoint&gt;</code>替换为断点的编号：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">info breakpoints &lt;breakpoint&gt;</span><br></pre></td></tr></table></figure>
+
+<p>例如，要查看断点1的详细信息，可以执行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info breakpoints 1</span><br></pre></td></tr></table></figure>
+
+<p>这将显示关于断点1的更多信息，如断点位置、断点条件等。</p>
+<hr>
+<h2 id="gdb-选项-详解"><a href="#gdb-选项-详解" class="headerlink" title="gdb 选项 详解"></a>gdb 选项 详解</h2><p>GDB（GNU Debugger）是一个功能强大的调试工具，用于在Linux和其他操作系统上调试程序。GDB 9.2版本引入了许多新的选项和功能，以下是一些常用的选项的详解：</p>
+<ol>
+<li><p><code>-ex &quot;command&quot;</code>：在启动GDB后执行指定的GDB命令。可以使用多个<code>-ex</code>选项来执行多个命令。</p>
+</li>
+<li><p><code>-tui</code>：启动GDB的文本用户界面（Text User Interface，TUI）模式。TUI模式提供了源代码和程序状态的交互式显示。</p>
+</li>
+<li><p><code>-batch</code>：以批处理模式运行GDB，不显示交互式命令提示符。适用于自动化脚本或批处理任务。</p>
+</li>
+<li><p><code>-core &lt;corefile&gt;</code>：指定要调试的核心转储文件。核心转储文件包含程序在崩溃或异常终止时的状态信息。</p>
+</li>
+<li><p><code>-pid &lt;pid&gt;</code>：调试指定进程标识符（PID）的正在运行的程序。通过此选项，可以附加到正在运行的进程进行调试。</p>
+</li>
+<li><p><code>-symbols=&lt;path&gt;</code>：指定要加载的调试符号文件的路径。调试符号文件包含程序的符号信息，如变量名、函数名等。</p>
+</li>
+<li><p><code>-directory=&lt;path&gt;</code>：指定要搜索源代码文件的目录。当源代码文件不在当前目录或GDB默认搜索路径中时，可以使用此选项指定源代码的位置。</p>
+</li>
+<li><p><code>-quiet</code>：以静默模式运行GDB，不显示任何冗余的信息。</p>
+</li>
+<li><p><code>-ex=dir=&lt;dir&gt;</code>：指定GDB的工作目录。GDB将在指定的目录中查找程序和其他文件。</p>
+</li>
+<li><p><code>-command=&lt;script_file&gt;</code>：指定要执行的GDB脚本文件。可以在脚本文件中定义自定义的GDB命令和操作。</p>
+</li>
+</ol>
+<p>这些选项只是GDB 9.2版本中的一部分，还有许多其他选项可供使用。你可以参考GDB的官方文档或运行<code>gdb --help</code>命令获取完整的选项列表和详细说明。通过熟悉和灵活运用这些选项，你可以根据具体需求使用GDB的功能来调试和分析程序。</p>
+<hr>
+<h2 id="gdb-9-2-保存崩溃时堆栈信息"><a href="#gdb-9-2-保存崩溃时堆栈信息" class="headerlink" title="gdb 9.2 保存崩溃时堆栈信息"></a>gdb 9.2 保存崩溃时堆栈信息</h2><p>在GDB 9.2中，你可以通过使用<code>generate-core-file</code>命令来保存崩溃时的堆栈信息。这个命令会生成一个核心转储文件，其中包含了程序在崩溃时的内存状态和堆栈信息。</p>
+<p>以下是保存崩溃时堆栈信息的步骤：</p>
+<ol>
+<li><p>在命令行中使用以下命令启动GDB并加载可执行文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb ./my_program</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置断点或者在崩溃发生的地方让程序停下来。你可以使用<code>break</code>命令设置断点，或者通过其他方式确保程序会在崩溃时停下来。</p>
+</li>
+<li><p>运行程序。在GDB命令行中，使用以下命令运行程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当程序崩溃时，GDB会自动停在断点处或者崩溃位置。</p>
+</li>
+<li><p>在GDB命令行中使用以下命令生成核心转储文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">generate-core-file &lt;corefile&gt;</span><br></pre></td></tr></table></figure>
+<p>其中<code>&lt;corefile&gt;</code>是你想要保存核心转储文件的路径和文件名。</p>
+</li>
+<li><p>此时，核心转储文件就保存了程序崩溃时的堆栈信息和内存状态。</p>
+</li>
+</ol>
+<p>通过保存核心转储文件，你可以在后续的调试过程中使用该文件进行分析。你可以加载核心转储文件并使用GDB命令查看堆栈、变量值等信息，以定位崩溃的原因和解决问题。</p>
+<p>需要注意的是，生成核心转储文件可能需要对系统进行相应的配置。确保你的系统允许生成核心转储文件，并且具有足够的权限来保存文件。有些系统默认禁用了核心转储文件的生成，你可能需要修改相应的设置。</p>
+<p>另外，记住在发布或共享代码时，避免包含核心转储文件，因为它可能包含敏感信息。核心转储文件主要用于调试和分析崩溃问题。</p>
+<hr>
+<h2 id="gdb-9-2-调试核心转储文件"><a href="#gdb-9-2-调试核心转储文件" class="headerlink" title="gdb 9.2 调试核心转储文件"></a>gdb 9.2 调试核心转储文件</h2><p>在GDB 9.2中，你可以使用核心转储文件进行调试。核心转储文件是程序在崩溃或异常终止时保存的内存状态的快照，它包含了程序崩溃时的堆栈信息和内存数据。以下是使用GDB调试核心转储文件的步骤：</p>
+<ol>
+<li><p>启动GDB，并加载可执行文件以及核心转储文件。在命令行中使用以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb ./my_program &lt;corefile&gt;</span><br></pre></td></tr></table></figure>
+<p>其中<code>&lt;corefile&gt;</code>是核心转储文件的路径和文件名。</p>
+</li>
+<li><p>一旦GDB加载了核心转储文件，它会还原程序崩溃时的内存状态。你可以使用GDB命令来查看堆栈信息、变量值等。</p>
+</li>
+<li><p>使用<code>backtrace</code>或<code>bt</code>命令查看堆栈跟踪，了解程序崩溃的位置和调用链。</p>
+</li>
+<li><p>使用其他GDB命令进行调试。你可以使用<code>print</code>或<code>p</code>命令查看变量值，使用<code>step</code>或<code>s</code>命令单步执行程序，使用<code>continue</code>或<code>c</code>命令让程序继续执行等。</p>
+</li>
+<li><p>分析堆栈信息和变量值，定位问题的原因，并进行修复。</p>
+</li>
+</ol>
+<p>需要注意的是，调试核心转储文件时，可执行文件和核心转储文件必须是对应的，即生成核心转储文件的程序版本与进行调试的程序版本相同。如果可执行文件和核心转储文件不匹配，可能会导致调试结果不准确或无法正常调试。</p>
+<p>此外，调试核心转储文件还可以结合其他GDB功能和命令，例如条件断点、内存查看等，以进一步分析问题。GDB提供了丰富的调试功能，可以帮助你定位和解决程序崩溃问题。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/GDB/" rel="tag"># GDB</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Debugger/2024-05-22-gdbserver_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="gdbserver_1_理论基础">
+      <i class="fa fa-chevron-left"></i> gdbserver_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/DeepLearning/2024-05-22-DL__AI-EDU/" rel="next" title="DL__AI-EDU">
+      DL__AI-EDU <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">2.</span> <span class="nav-text">日志重定向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F-%E8%BE%93%E5%85%A5-%E5%8F%82%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">启动程序 输入 参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb-%E6%9F%A5%E7%9C%8B%E6%96%AD%E7%82%B9"><span class="nav-number">4.</span> <span class="nav-text">gdb 查看断点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb-%E9%80%89%E9%A1%B9-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">gdb 选项 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb-9-2-%E4%BF%9D%E5%AD%98%E5%B4%A9%E6%BA%83%E6%97%B6%E5%A0%86%E6%A0%88%E4%BF%A1%E6%81%AF"><span class="nav-number">6.</span> <span class="nav-text">gdb 9.2 保存崩溃时堆栈信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb-9-2-%E8%B0%83%E8%AF%95%E6%A0%B8%E5%BF%83%E8%BD%AC%E5%82%A8%E6%96%87%E4%BB%B6"><span class="nav-number">7.</span> <span class="nav-text">gdb 9.2 调试核心转储文件</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

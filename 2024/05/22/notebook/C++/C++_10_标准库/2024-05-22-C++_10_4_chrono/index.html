@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 标准库相关笔记  std::chrono::duration 时间段转为时分秒的形式输出在 C++ 中，std::chrono::duration 表示一个时间间隔，你可以将其转换为时、分、秒的形式进行输出。下面是具体方法： 方法： **使用 std::chrono::duration_cast 将 duration 转换为 hours、minutes 和 seconds**。 使用取模运算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_10_4_chrono">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_4_chrono/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 标准库相关笔记  std::chrono::duration 时间段转为时分秒的形式输出在 C++ 中，std::chrono::duration 表示一个时间间隔，你可以将其转换为时、分、秒的形式进行输出。下面是具体方法： 方法： **使用 std::chrono::duration_cast 将 duration 转换为 hours、minutes 和 seconds**。 使用取模运算">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.207Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppSTL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_4_chrono/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_10_4_chrono | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_4_chrono/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_10_4_chrono
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><chrono>标准库相关笔记</li>
+</ul>
+<h2 id="std-chrono-duration-时间段转为时分秒的形式输出"><a href="#std-chrono-duration-时间段转为时分秒的形式输出" class="headerlink" title="std::chrono::duration 时间段转为时分秒的形式输出"></a>std::chrono::duration 时间段转为时分秒的形式输出</h2><p>在 C++ 中，<code>std::chrono::duration</code> 表示一个时间间隔，你可以将其转换为时、分、秒的形式进行输出。下面是具体方法：</p>
+<h2 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h2><ol>
+<li>**使用 <code>std::chrono::duration_cast</code> 将 <code>duration</code> 转换为 <code>hours</code>、<code>minutes</code> 和 <code>seconds</code>**。</li>
+<li><strong>使用取模运算 (<code>%</code>) 计算去掉小时后的分钟数，去掉分钟后的秒数</strong>。</li>
+</ol>
+<hr>
+<h2 id="代码示例："><a href="#代码示例：" class="headerlink" title="代码示例："></a>代码示例：</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_duration</span><span class="params">(std::chrono::seconds duration)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> std::chrono;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提取小时、分钟、秒</span></span><br><span class="line">    <span class="keyword">auto</span> h = <span class="built_in">duration_cast</span>&lt;hours&gt;(duration);</span><br><span class="line">    <span class="keyword">auto</span> m = <span class="built_in">duration_cast</span>&lt;minutes&gt;(duration % <span class="built_in">hours</span>(<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">auto</span> s = <span class="built_in">duration_cast</span>&lt;seconds&gt;(duration % <span class="built_in">minutes</span>(<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出</span></span><br><span class="line">    std::cout &lt;&lt; h.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot;h &quot;</span></span><br><span class="line">              &lt;&lt; m.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot;m &quot;</span></span><br><span class="line">              &lt;&lt; s.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot;s&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::<span class="function">chrono::seconds <span class="title">duration</span><span class="params">(<span class="number">3665</span>)</span></span>; <span class="comment">// 3665秒 = 1小时 1分 5秒</span></span><br><span class="line">    <span class="built_in">print_duration</span>(duration);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="运行结果："><a href="#运行结果：" class="headerlink" title="运行结果："></a>运行结果：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1h 1m 5s</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释："><a href="#解释：" class="headerlink" title="解释："></a>解释：</h3><ul>
+<li><code>duration_cast&lt;std::chrono::hours&gt;(duration)</code> 计算完整的小时数。</li>
+<li><code>duration % std::chrono::hours(1)</code> 获取去掉小时后剩余的时间，然后转换为分钟。</li>
+<li><code>duration % std::chrono::minutes(1)</code> 获取去掉分钟后剩余的秒数。</li>
+</ul>
+<p>这样，你可以把任何 <code>std::chrono::duration</code> 转换为 <code>hh:mm:ss</code> 的格式！</p>
+<h2 id="持续时间的表示-Duration-Representation"><a href="#持续时间的表示-Duration-Representation" class="headerlink" title="持续时间的表示(Duration Representation)"></a>持续时间的表示(Duration Representation)</h2><ul>
+<li>持续时间在std::chrono中是以一种非常直观的方式表示的，它反映了我们对时间的基本理解：时间是连续的，并且可以以不同的单位来衡量。在std::chrono中，持续时间是通过两个模板参数来定义的：一个是用于存储时间值的底层类型（如int64_t），另一个是时间单位（如秒、毫秒）。</li>
+</ul>
+<h2 id="C-标准库是什么"><a href="#C-标准库是什么" class="headerlink" title="C++ 标准库是什么"></a>C++ <chrono>标准库是什么</h2><p>C++ 标准库中的 <code>&lt;chrono&gt;</code> 是用于处理时间相关操作的头文件，提供了时间点（<code>time_point</code>）和持续时间（<code>duration</code>）的类模板，以及用于操作时间的各种函数和工具。</p>
+<p>主要包括以下内容：</p>
+<h3 id="时间点（time-point）和持续时间（duration）："><a href="#时间点（time-point）和持续时间（duration）：" class="headerlink" title="时间点（time_point）和持续时间（duration）："></a>时间点（<code>time_point</code>）和持续时间（<code>duration</code>）：</h3><ul>
+<li><strong><code>std::chrono::time_point</code>：</strong> 代表时间的点，通常表示自某个特定时钟起的时间。例如，<code>std::chrono::system_clock::time_point</code> 表示系统时钟的时间点。</li>
+<li><strong><code>std::chrono::duration</code>：</strong> 表示时间间隔的持续时间，可以用于表示一段时间的长度。例如，<code>std::chrono::duration&lt;int&gt;</code> 表示以整数单位的时间段。</li>
+</ul>
+<h3 id="时钟（Clocks）："><a href="#时钟（Clocks）：" class="headerlink" title="时钟（Clocks）："></a>时钟（Clocks）：</h3><ul>
+<li><strong><code>std::chrono::system_clock</code>：</strong> 代表系统时钟，提供了从 Epoch（通常是 1970 年 1 月 1 日）起的时间点。</li>
+<li><strong><code>std::chrono::steady_clock</code>：</strong> 代表一个单调递增的时钟，不受系统时间调整影响，适合测量时间间隔。</li>
+<li><strong><code>std::chrono::high_resolution_clock</code>：</strong> 代表一个高分辨率的时钟，提供了更高精度的计时。</li>
+</ul>
+<h3 id="时间相关工具和函数："><a href="#时间相关工具和函数：" class="headerlink" title="时间相关工具和函数："></a>时间相关工具和函数：</h3><ul>
+<li><strong>时间单位转换：</strong> 提供了 <code>duration_cast</code> 函数用于不同时间单位之间的转换。</li>
+<li><strong>时间点的算术运算：</strong> 可以对时间点进行加减运算。</li>
+<li><strong>定时器操作：</strong> 可以用于实现定时器，比如 <code>std::this_thread::sleep_for</code> 和 <code>std::this_thread::sleep_until</code>。</li>
+<li><strong>时钟的特性和属性：</strong> 可以获取时钟的特性，如时钟的最小精度、是否稳定等。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前时间点</span></span><br><span class="line">    <span class="keyword">auto</span> now = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 时间点转换为时间戳</span></span><br><span class="line">    std::<span class="type">time_t</span> now_c = std::chrono::system_clock::<span class="built_in">to_time_t</span>(now);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印当前时间</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Current time: &quot;</span> &lt;&lt; std::<span class="built_in">ctime</span>(&amp;now_c);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建持续时间并延迟一段时间</span></span><br><span class="line">    std::<span class="function">chrono::milliseconds <span class="title">delay</span><span class="params">(<span class="number">1000</span>)</span></span>;</span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(delay);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>&lt;chrono&gt;</code> 提供了一种标准化的时间处理方式，可用于测量和管理时间，执行定时操作以及进行时间单位转换。</p>
+<h2 id="C-标准库-详解"><a href="#C-标准库-详解" class="headerlink" title="C++ 标准库 详解"></a>C++ <chrono>标准库 详解</h2><p><code>&lt;chrono&gt;</code> 是 C++ 标准库中用于处理时间相关操作的头文件，自 C++11 起引入。它提供了时间点（<code>time_point</code>）、持续时间（<code>duration</code>）、时钟（<code>clock</code>）以及与时间相关的函数和工具，使得在 C++ 中对时间进行精确测量和处理变得更加方便和标准化。</p>
+<h3 id="重要的类型和类："><a href="#重要的类型和类：" class="headerlink" title="重要的类型和类："></a>重要的类型和类：</h3><ul>
+<li><strong><code>std::chrono::time_point</code>：</strong> 表示时间的点，在特定时钟下的时间。例如，<code>std::chrono::system_clock::time_point</code> 表示系统时钟的时间点。</li>
+<li><strong><code>std::chrono::duration</code>：</strong> 表示时间间隔的持续时间，可以用于表示一段时间的长度。例如，<code>std::chrono::duration&lt;int&gt;</code> 表示以整数单位的时间段。</li>
+</ul>
+<h3 id="重要的时钟（Clocks）："><a href="#重要的时钟（Clocks）：" class="headerlink" title="重要的时钟（Clocks）："></a>重要的时钟（Clocks）：</h3><ul>
+<li><strong><code>std::chrono::system_clock</code>：</strong> 代表系统时钟，提供了从 Epoch（通常是 1970 年 1 月 1 日）起的时间点。</li>
+<li><strong><code>std::chrono::steady_clock</code>：</strong> 代表一个单调递增的时钟，不受系统时间调整影响，适合测量时间间隔。</li>
+<li><strong><code>std::chrono::high_resolution_clock</code>：</strong> 代表一个高分辨率的时钟，提供了更高精度的计时。</li>
+</ul>
+<h3 id="主要函数和工具："><a href="#主要函数和工具：" class="headerlink" title="主要函数和工具："></a>主要函数和工具：</h3><ul>
+<li><strong>时间单位转换：</strong> 提供了 <code>std::chrono::duration_cast</code> 函数用于不同时间单位之间的转换。</li>
+<li><strong>时间点的算术运算：</strong> 可以对时间点进行加减运算。</li>
+<li><strong>定时器操作：</strong> 可以用于实现定时器，比如 <code>std::this_thread::sleep_for</code> 和 <code>std::this_thread::sleep_until</code>。</li>
+<li><strong>获取时间点：</strong> 提供了 <code>std::chrono::system_clock::now()</code> 用于获取当前时间点。</li>
+</ul>
+<h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前时间点</span></span><br><span class="line">    <span class="keyword">auto</span> now = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 时间点转换为时间戳</span></span><br><span class="line">    std::<span class="type">time_t</span> now_c = std::chrono::system_clock::<span class="built_in">to_time_t</span>(now);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印当前时间</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Current time: &quot;</span> &lt;&lt; std::<span class="built_in">ctime</span>(&amp;now_c);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建持续时间并延迟一段时间</span></span><br><span class="line">    std::<span class="function">chrono::milliseconds <span class="title">delay</span><span class="params">(<span class="number">1000</span>)</span></span>;</span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(delay);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>&lt;chrono&gt;</code> 提供了一种标准化的时间处理方式，可用于测量和管理时间，执行定时操作以及进行时间单位转换。它的引入使得在 C++ 中对时间进行处理更加方便和跨平台。</p>
+<h2 id="C-标准库-常用函数"><a href="#C-标准库-常用函数" class="headerlink" title="C++ 标准库 常用函数"></a>C++ <chrono>标准库 常用函数</h2><p>C++ <code>&lt;chrono&gt;</code> 标准库提供了用于处理时间的功能，包括时间点（time points）、时间间隔（durations）、时钟（clocks）等。以下是一些 <code>&lt;chrono&gt;</code> 标准库中常用的函数和类：</p>
+<h3 id="类和类型"><a href="#类和类型" class="headerlink" title="类和类型"></a>类和类型</h3><ol>
+<li><p>**<code>std::chrono::duration</code>**：表示时间间隔的类型。例如 <code>std::chrono::duration&lt;int&gt;</code> 表示以整数秒为单位的时间间隔。</p>
+</li>
+<li><p>**<code>std::chrono::time_point</code>**：表示特定时钟的时间点。它由时钟和持续时间构成。</p>
+</li>
+<li><p>**<code>std::chrono::system_clock</code>**：提供当前时间，并使用 UNIX 时间（1970 年 1 月 1 日午夜起的秒数）作为其时间起点。</p>
+</li>
+<li><p>**<code>std::chrono::steady_clock</code>**：提供一个稳定的时钟，用于测量时间间隔，不受系统时间调整的影响。</p>
+</li>
+<li><p>**<code>std::chrono::high_resolution_clock</code>**：提供高分辨率时钟，尽可能提供最高精度的计时，但其精度因平台而异。</p>
+</li>
+</ol>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><ol>
+<li><p>**<code>std::chrono::duration_cast</code>**：用于将一个时间间隔类型转换为另一个时间间隔类型。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> result = std::chrono::<span class="built_in">duration_cast</span>&lt;std::chrono::minutes&gt;(some_duration);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**<code>std::chrono::time_point_cast</code>**：用于将一个时间点类型转换为另一个时间点类型。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> result = std::chrono::<span class="built_in">time_point_cast</span>&lt;std::chrono::hours&gt;(some_time_point);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**<code>std::chrono::system_clock::now</code>**：获取当前时间点。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> current_time = std::chrono::system_clock::<span class="built_in">now</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**<code>std::chrono::steady_clock::now</code>**：获取当前稳定时钟的时间点。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> current_time = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>std::chrono::duration</code> 中的各种算术运算</strong>：例如加法、减法、乘法和除法，用于处理时间间隔之间的运算。</p>
+</li>
+</ol>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前系统时间点</span></span><br><span class="line">    <span class="keyword">auto</span> start_time = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 模拟一段程序执行时间</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Working...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; ++i) &#123;</span><br><span class="line">        <span class="comment">// 做一些计算</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取结束时间点</span></span><br><span class="line">    <span class="keyword">auto</span> end_time = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算程序执行时间间隔</span></span><br><span class="line">    <span class="keyword">auto</span> duration = end_time - start_time;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Program execution time: &quot;</span> &lt;&lt; std::chrono::<span class="built_in">duration_cast</span>&lt;std::chrono::milliseconds&gt;(duration).<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; milliseconds\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上是 C++ <code>&lt;chrono&gt;</code> 标准库中一些常用的函数和类，可以用于时间点和时间间隔的操作和管理。</p>
+<h2 id="std-chrono-duration"><a href="#std-chrono-duration" class="headerlink" title="std::chrono::duration"></a>std::chrono::duration</h2><p><code>std::chrono::duration</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中表示时间间隔的类模板。它表示一个时间段，可以用于测量不同时间点之间的时间差，以及进行时间单位之间的转换。<code>std::chrono::duration</code> 的模板定义如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span> = std::ratio&lt;<span class="number">1</span>&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> duration;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Rep</code>：表示持续时间的类型，通常是一个整数类型，用于存储时间长度。</li>
+<li><code>Period</code>：表示时间单位的类型，通常是 <code>std::ratio</code> 类型，它定义了时间间隔的基本单位。</li>
+</ul>
+<h3 id="示例用法："><a href="#示例用法：" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 定义一个持续时间为10秒的duration</span></span><br><span class="line">    std::<span class="function">chrono::duration&lt;<span class="type">int</span>&gt; <span class="title">ten_seconds</span><span class="params">(<span class="number">10</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取duration的值和单位</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;ten_seconds: &quot;</span> &lt;&lt; ten_seconds.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 定义一个浮点型持续时间，表示0.5秒</span></span><br><span class="line">    std::<span class="function">chrono::duration&lt;<span class="type">double</span>&gt; <span class="title">half_second</span><span class="params">(<span class="number">0.5</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取duration的值和单位</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;half_second: &quot;</span> &lt;&lt; half_second.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行duration之间的加法操作</span></span><br><span class="line">    <span class="keyword">auto</span> total_duration = ten_seconds + half_second;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取总持续时间的值和单位</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;total_duration: &quot;</span> &lt;&lt; total_duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>std::chrono::duration</code> 被用来表示不同的时间间隔，可以通过 <code>count()</code> 函数获取其持续时间的值，并且支持多种时间间隔的算术操作，如加法、减法等。</p>
+<h2 id="std-chrono-time-point"><a href="#std-chrono-time-point" class="headerlink" title="std::chrono::time_point"></a>std::chrono::time_point</h2><p><code>std::chrono::time_point</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中的类模板，用于表示特定时钟（<code>Clock</code>）的时间点。它结合了时钟（<code>Clock</code>）和持续时间（<code>Duration</code>），可以表示从时钟的起点开始经过的时间。<code>std::chrono::time_point</code> 的模板定义如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span> = <span class="keyword">typename</span> Clock::duration&gt;</span><br><span class="line"><span class="keyword">class</span> time_point;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Clock</code>：表示时钟类型，例如 <code>std::chrono::system_clock</code>、<code>std::chrono::steady_clock</code> 等。</li>
+<li><code>Duration</code>：表示时间间隔的类型，通常是 <code>std::chrono::duration</code> 类型。</li>
+</ul>
+<h3 id="示例用法：-1"><a href="#示例用法：-1" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用 system_clock 获取当前时间点</span></span><br><span class="line">    std::chrono::time_point&lt;std::chrono::system_clock&gt; current_time = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 steady_clock 获取当前时间点</span></span><br><span class="line">    std::chrono::time_point&lt;std::chrono::steady_clock&gt; start_time = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行一些操作...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取另一个时间点并计算时间间隔</span></span><br><span class="line">    std::chrono::time_point&lt;std::chrono::steady_clock&gt; end_time = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br><span class="line">    std::chrono::duration&lt;<span class="type">double</span>&gt; duration = end_time - start_time;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出时间间隔</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Duration: &quot;</span> &lt;&lt; duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>std::chrono::time_point</code> 被用于存储不同时钟类型（<code>std::chrono::system_clock</code> 和 <code>std::chrono::steady_clock</code>）的时间点。可以使用 <code>now()</code> 函数获取当前时间点，也可以进行时间点之间的算术运算（例如计算时间间隔）。</p>
+<h2 id="std-chrono-system-clock"><a href="#std-chrono-system-clock" class="headerlink" title="std::chrono::system_clock"></a>std::chrono::system_clock</h2><p><code>std::chrono::system_clock</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中的时钟类型，用于提供当前系统时间和日期。它是一个基于实时时钟的时钟类，使用的时钟起点通常是 UNIX 时间（1970 年 1 月 1 日午夜起的秒数）。<code>std::chrono::system_clock</code> 提供了获取当前时间的方法。</p>
+<h3 id="示例用法：-2"><a href="#示例用法：-2" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ctime&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前系统时间点</span></span><br><span class="line">    std::chrono::system_clock::time_point now = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将时间点转换为时间戳（秒数）</span></span><br><span class="line">    std::<span class="type">time_t</span> timestamp = std::chrono::system_clock::<span class="built_in">to_time_t</span>(now);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出时间戳</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Current timestamp: &quot;</span> &lt;&lt; timestamp &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将时间戳转换回时间点</span></span><br><span class="line">    std::chrono::system_clock::time_point time_from_timestamp = std::chrono::system_clock::<span class="built_in">from_time_t</span>(timestamp);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查时间点是否相同</span></span><br><span class="line">    <span class="keyword">if</span> (time_from_timestamp == now) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Time points are equal.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Time points are not equal.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>std::chrono::system_clock</code> 被用于获取当前系统时间点 (<code>now</code>)，并且可以将时间点转换为时间戳 (<code>std::time_t</code>)，以及将时间戳转换回时间点。这允许在不同的时钟表示之间进行转换和比较。</p>
+<h2 id="std-chrono-steady-clock"><a href="#std-chrono-steady-clock" class="headerlink" title="std::chrono::steady_clock"></a>std::chrono::steady_clock</h2><p><code>std::chrono::steady_clock</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中的时钟类型，用于提供稳定、不受系统时间调整影响的时钟。它用于测量时间间隔，适合于需要精确计时而不受系统时间调整（例如时间同步或夏令时变化）影响的场景。</p>
+<h3 id="示例用法：-3"><a href="#示例用法：-3" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取起始时间点</span></span><br><span class="line">    std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 模拟一段程序执行时间</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; ++i) &#123;</span><br><span class="line">        <span class="comment">// 做一些计算</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取结束时间点</span></span><br><span class="line">    std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算程序执行时间间隔</span></span><br><span class="line">    std::chrono::duration&lt;<span class="type">double</span>&gt; duration = end_time - start_time;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出程序执行时间</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Program execution time: &quot;</span> &lt;&lt; duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::chrono::steady_clock</code> 被用于获取程序开始和结束时的时间点，并计算两个时间点之间的持续时间。这种时钟不受系统时间调整的影响，适用于需要精确计时的场景，比如性能测试或计时要求较高的应用程序。</p>
+<h2 id="std-chrono-high-resolution-clock"><a href="#std-chrono-high-resolution-clock" class="headerlink" title="std::chrono::high_resolution_clock"></a>std::chrono::high_resolution_clock</h2><p><code>std::chrono::high_resolution_clock</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中的时钟类型，提供了高精度计时功能，尽可能提供最高分辨率的时间测量。然而，精度和实际分辨率可能因平台和实现而异。</p>
+<h3 id="示例用法：-4"><a href="#示例用法：-4" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取起始时间点</span></span><br><span class="line">    <span class="keyword">auto</span> start_time = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 模拟一段程序执行时间</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; ++i) &#123;</span><br><span class="line">        <span class="comment">// 做一些计算</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取结束时间点</span></span><br><span class="line">    <span class="keyword">auto</span> end_time = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算程序执行时间间隔</span></span><br><span class="line">    <span class="keyword">auto</span> duration = end_time - start_time;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出程序执行时间</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Program execution time: &quot;</span> &lt;&lt; std::chrono::<span class="built_in">duration_cast</span>&lt;std::chrono::microseconds&gt;(duration).<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; microseconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>std::chrono::high_resolution_clock</code> 被用于测量程序执行时间。需要注意的是，尽管这个时钟通常提供较高的分辨率，但实际精度取决于系统的支持以及硬件平台。因此，在不同的系统上，精度和分辨率可能会有所不同。</p>
+<h2 id="std-chrono-duration-cast"><a href="#std-chrono-duration-cast" class="headerlink" title="std::chrono::duration_cast"></a>std::chrono::duration_cast</h2><p><code>std::chrono::duration_cast</code> 是 <code>&lt;chrono&gt;</code> 标准库中的函数，用于执行 <code>std::chrono::duration</code> 类型之间的转换。它允许将一个持续时间（duration）对象从一种单位转换为另一种单位。常用于从高精度单位（例如纳秒或微秒）转换为较低精度单位（例如秒或毫秒）。</p>
+<h3 id="示例用法：-5"><a href="#示例用法：-5" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个高精度的持续时间（纳秒）</span></span><br><span class="line">    std::<span class="function">chrono::nanoseconds <span class="title">ns_duration</span><span class="params">(<span class="number">123456789</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将纳秒转换为毫秒</span></span><br><span class="line">    std::chrono::milliseconds ms_duration = std::chrono::<span class="built_in">duration_cast</span>&lt;std::chrono::milliseconds&gt;(ns_duration);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出转换后的持续时间</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Milliseconds: &quot;</span> &lt;&lt; ms_duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; ms&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>std::chrono::duration_cast</code> 将纳秒时间持续时间对象 <code>ns_duration</code> 转换为毫秒时间持续时间对象 <code>ms_duration</code>。<code>count()</code> 函数用于获取转换后持续时间的数值，并输出转换后的持续时间。这个函数非常有用，因为它允许你在不同时间单位之间进行安全和精确的转换。</p>
+<h2 id="std-chrono-time-point-cast"><a href="#std-chrono-time-point-cast" class="headerlink" title="std::chrono::time_point_cast"></a>std::chrono::time_point_cast</h2><p><code>std::chrono::time_point_cast</code> 是 <code>&lt;chrono&gt;</code> 标准库中的函数，用于将 <code>std::chrono::time_point</code> 对象从一种时钟类型（<code>Clock</code>）转换为另一种时钟类型，并指定新的时间单位。</p>
+<h3 id="示例用法：-6"><a href="#示例用法：-6" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 定义一个时间点，使用系统时钟</span></span><br><span class="line">    std::chrono::system_clock::time_point sys_time = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将系统时钟时间点转换为稳定时钟时间点</span></span><br><span class="line">    std::chrono::steady_clock::time_point steady_time = std::chrono::<span class="built_in">time_point_cast</span>&lt;std::chrono::steady_clock::duration&gt;(sys_time);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出转换后的时间点（稳定时钟）</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Steady clock time: &quot;</span> &lt;&lt; std::chrono::steady_clock::<span class="built_in">to_time_t</span>(steady_time) &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::chrono::time_point_cast</code> 用于将系统时钟 (<code>std::chrono::system_clock</code>) 的时间点 <code>sys_time</code> 转换为稳定时钟 (<code>std::chrono::steady_clock</code>) 的时间点 <code>steady_time</code>。这种转换可能导致精度损失，因为不同的时钟可能具有不同的分辨率和特性。</p>
+<h2 id="std-chrono-system-clock-now"><a href="#std-chrono-system-clock-now" class="headerlink" title="std::chrono::system_clock::now"></a>std::chrono::system_clock::now</h2><p><code>std::chrono::system_clock::now</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中的函数，用于获取当前系统时间点，返回一个 <code>std::chrono::time_point</code> 对象，表示当前的系统时间。</p>
+<h3 id="示例用法：-7"><a href="#示例用法：-7" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ctime&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前系统时间点</span></span><br><span class="line">    std::chrono::system_clock::time_point now = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将时间点转换为时间戳（秒数）</span></span><br><span class="line">    std::<span class="type">time_t</span> timestamp = std::chrono::system_clock::<span class="built_in">to_time_t</span>(now);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出时间戳</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Current timestamp: &quot;</span> &lt;&lt; timestamp &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::chrono::system_clock::now()</code> 用于获取当前系统时间点，然后通过 <code>std::chrono::system_clock::to_time_t</code> 将时间点转换为时间戳（秒数）以便输出。</p>
+<h2 id="std-chrono-steady-clock-now"><a href="#std-chrono-steady-clock-now" class="headerlink" title="std::chrono::steady_clock::now"></a>std::chrono::steady_clock::now</h2><p><code>std::chrono::steady_clock::now()</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中的函数，用于获取当前稳定时钟（<code>std::chrono::steady_clock</code>）的时间点，返回一个 <code>std::chrono::time_point</code> 对象，表示当前的稳定时钟时间点。</p>
+<h3 id="示例用法：-8"><a href="#示例用法：-8" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前稳定时钟时间点</span></span><br><span class="line">    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行一些操作...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取经过的时间间隔</span></span><br><span class="line">    std::chrono::steady_clock::time_point later = std::chrono::steady_clock::<span class="built_in">now</span>();</span><br><span class="line">    std::chrono::duration&lt;<span class="type">double</span>&gt; duration = later - now;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出经过的时间间隔</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Elapsed time: &quot;</span> &lt;&lt; duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::chrono::steady_clock::now()</code> 被用于获取程序执行时的稳定时钟时间点，然后可以计算程序执行所经过的时间间隔，这在需要精确计时而又不受系统时间变化影响的场景下非常有用。</p>
+<h2 id="std-chrono-duration-1"><a href="#std-chrono-duration-1" class="headerlink" title="std::chrono::duration"></a>std::chrono::duration</h2><p><code>std::chrono::duration</code> 是 C++ <code>&lt;chrono&gt;</code> 标准库中用于表示时间间隔的类模板。它能够表示一个时间段，即持续时间，以及可以用于测量不同时间点之间的时间差。</p>
+<h3 id="模板定义："><a href="#模板定义：" class="headerlink" title="模板定义："></a>模板定义：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span> = std::ratio&lt;<span class="number">1</span>&gt;&gt;</span><br><span class="line"><span class="keyword">class</span> duration;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Rep</code>：表示时间长度的类型，通常是一个整数类型，用于存储时间的长度。</li>
+<li><code>Period</code>：表示时间单位的类型，通常是 <code>std::ratio</code> 类型，定义了时间间隔的基本单位。</li>
+</ul>
+<h3 id="示例用法：-9"><a href="#示例用法：-9" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 定义一个持续时间为 5 秒的 duration 对象</span></span><br><span class="line">    std::<span class="function">chrono::duration&lt;<span class="type">int</span>&gt; <span class="title">five_seconds</span><span class="params">(<span class="number">5</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取 duration 对象的值和单位</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Five seconds: &quot;</span> &lt;&lt; five_seconds.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 定义一个浮点型持续时间，表示 2.5 秒</span></span><br><span class="line">    std::<span class="function">chrono::duration&lt;<span class="type">double</span>&gt; <span class="title">two_and_half_seconds</span><span class="params">(<span class="number">2.5</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取浮点型 duration 对象的值和单位</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Two and a half seconds: &quot;</span> &lt;&lt; two_and_half_seconds.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行 duration 对象之间的加法操作</span></span><br><span class="line">    <span class="keyword">auto</span> total_duration = five_seconds + two_and_half_seconds;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取总持续时间的值和单位</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Total duration: &quot;</span> &lt;&lt; total_duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>std::chrono::duration</code> 用于表示不同的时间间隔，并可以通过 <code>count()</code> 函数获取持续时间的值。同时，<code>std::chrono::duration</code> 还支持不同时间间隔之间的算术操作，比如加法、减法等。</p>
+<h2 id="C-格式化输出年月日-时分秒"><a href="#C-格式化输出年月日-时分秒" class="headerlink" title="C++  格式化输出年月日-时分秒"></a>C++ <chrono> 格式化输出年月日-时分秒</h2><p>要格式化输出年月日-时分秒，你可以使用<code>std::put_time</code>函数。这个函数允许你将<code>std::tm</code>结构体转换为一个字符串，以指定的格式输出。下面是一个示例代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iomanip&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取当前时间点</span></span><br><span class="line">    <span class="keyword">auto</span> now = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将时间点转换为时间结构体</span></span><br><span class="line">    std::<span class="type">time_t</span> now_c = std::chrono::system_clock::<span class="built_in">to_time_t</span>(now);</span><br><span class="line">    std::tm* now_tm = std::<span class="built_in">localtime</span>(&amp;now_c);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 格式化输出年月日-时分秒</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;当前时间：&quot;</span> &lt;&lt; std::<span class="built_in">put_time</span>(now_tm, <span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>) &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码使用<code>std::put_time</code>将<code>now_tm</code>结构体以指定格式输出，即”%Y-%m-%d %H:%M:%S”，其中：</p>
+<ul>
+<li><code>%Y</code>表示年份（四位数）</li>
+<li><code>%m</code>表示月份（两位数）</li>
+<li><code>%d</code>表示日期（两位数）</li>
+<li><code>%H</code>表示小时（24小时制，两位数）</li>
+<li><code>%M</code>表示分钟（两位数）</li>
+<li><code>%S</code>表示秒（两位数）</li>
+</ul>
+<p>运行这段代码将输出当前的年月日-时分秒。</p>
+<h2 id="C-std-chrono-literals-是什么"><a href="#C-std-chrono-literals-是什么" class="headerlink" title="C++ std::chrono_literals 是什么"></a>C++ std::chrono_literals 是什么</h2><p>C++ 标准库中的 <code>std::chrono_literals</code> 是 C++11 引入的一个命名空间，用于提供方便的时间单位字面量，使得在编写时间相关代码时更加直观和易读。</p>
+<p>这个命名空间中包含了各种时间单位的字面量，例如：</p>
+<ul>
+<li><code>1s</code>：表示一秒钟。</li>
+<li><code>1ms</code>：表示一毫秒（千分之一秒）。</li>
+<li><code>1us</code>：表示一微秒（百万分之一秒）。</li>
+<li><code>1ns</code>：表示一纳秒（十亿分之一秒）。</li>
+</ul>
+<p>通过使用这些字面量，你可以在代码中直接使用自然的时间单位，而不需要手动计算时间的毫秒、微秒或纳秒值，从而提高了代码的可读性和可维护性。</p>
+<p>例如，你可以这样使用 <code>std::chrono_literals</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> std::chrono_literals;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> duration = <span class="number">100</span>ms;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Duration: &quot;</span> &lt;&lt; duration.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; milliseconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> timeout = <span class="number">5</span>s;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Timeout: &quot;</span> &lt;&lt; timeout.<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot; seconds&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中，<code>100ms</code> 和 <code>5s</code> 就是使用 <code>std::chrono_literals</code> 提供的时间单位字面量，分别表示 100 毫秒和 5 秒。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppSTL/" rel="tag"># CppSTL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_42_semaphore/" rel="prev" title="C++_10_42_semaphore">
+      <i class="fa fa-chevron-left"></i> C++_10_42_semaphore
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_39_locale/" rel="next" title="C++_10_39_locale">
+      C++_10_39_locale <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-duration-%E6%97%B6%E9%97%B4%E6%AE%B5%E8%BD%AC%E4%B8%BA%E6%97%B6%E5%88%86%E7%A7%92%E7%9A%84%E5%BD%A2%E5%BC%8F%E8%BE%93%E5%87%BA"><span class="nav-number">2.</span> <span class="nav-text">std::chrono::duration 时间段转为时分秒的形式输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">代码示例：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">运行结果：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%EF%BC%9A"><span class="nav-number">5.1.</span> <span class="nav-text">解释：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E7%BB%AD%E6%97%B6%E9%97%B4%E7%9A%84%E8%A1%A8%E7%A4%BA-Duration-Representation"><span class="nav-number">6.</span> <span class="nav-text">持续时间的表示(Duration Representation)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">7.</span> <span class="nav-text">C++ 标准库是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%82%B9%EF%BC%88time-point%EF%BC%89%E5%92%8C%E6%8C%81%E7%BB%AD%E6%97%B6%E9%97%B4%EF%BC%88duration%EF%BC%89%EF%BC%9A"><span class="nav-number">7.1.</span> <span class="nav-text">时间点（time_point）和持续时间（duration）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%92%9F%EF%BC%88Clocks%EF%BC%89%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">时钟（Clocks）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7%E5%92%8C%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">7.3.</span> <span class="nav-text">时间相关工具和函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">7.4.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">C++ 标准库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E7%B1%BB%E5%9E%8B%E5%92%8C%E7%B1%BB%EF%BC%9A"><span class="nav-number">8.1.</span> <span class="nav-text">重要的类型和类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E6%97%B6%E9%92%9F%EF%BC%88Clocks%EF%BC%89%EF%BC%9A"><span class="nav-number">8.2.</span> <span class="nav-text">重要的时钟（Clocks）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%87%BD%E6%95%B0%E5%92%8C%E5%B7%A5%E5%85%B7%EF%BC%9A"><span class="nav-number">8.3.</span> <span class="nav-text">主要函数和工具：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">8.4.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">9.</span> <span class="nav-text">C++ 标准库 常用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%92%8C%E7%B1%BB%E5%9E%8B"><span class="nav-number">9.1.</span> <span class="nav-text">类和类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-number">9.2.</span> <span class="nav-text">函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">9.3.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-duration"><span class="nav-number">10.</span> <span class="nav-text">std::chrono::duration</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">10.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-time-point"><span class="nav-number">11.</span> <span class="nav-text">std::chrono::time_point</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-1"><span class="nav-number">11.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-system-clock"><span class="nav-number">12.</span> <span class="nav-text">std::chrono::system_clock</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-2"><span class="nav-number">12.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-steady-clock"><span class="nav-number">13.</span> <span class="nav-text">std::chrono::steady_clock</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-3"><span class="nav-number">13.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-high-resolution-clock"><span class="nav-number">14.</span> <span class="nav-text">std::chrono::high_resolution_clock</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-4"><span class="nav-number">14.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-duration-cast"><span class="nav-number">15.</span> <span class="nav-text">std::chrono::duration_cast</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-5"><span class="nav-number">15.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-time-point-cast"><span class="nav-number">16.</span> <span class="nav-text">std::chrono::time_point_cast</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-6"><span class="nav-number">16.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-system-clock-now"><span class="nav-number">17.</span> <span class="nav-text">std::chrono::system_clock::now</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-7"><span class="nav-number">17.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-steady-clock-now"><span class="nav-number">18.</span> <span class="nav-text">std::chrono::steady_clock::now</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-8"><span class="nav-number">18.1.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-chrono-duration-1"><span class="nav-number">19.</span> <span class="nav-text">std::chrono::duration</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="nav-number">19.1.</span> <span class="nav-text">模板定义：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-9"><span class="nav-number">19.2.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA%E5%B9%B4%E6%9C%88%E6%97%A5-%E6%97%B6%E5%88%86%E7%A7%92"><span class="nav-number">20.</span> <span class="nav-text">C++  格式化输出年月日-时分秒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-chrono-literals-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">21.</span> <span class="nav-text">C++ std::chrono_literals 是什么</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

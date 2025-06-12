@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 ln命令  linux ln命令 详解ln 命令用于在文件系统中创建链接。链接可以分为硬链接（hard link）和符号链接（symbolic link，也称为软链接）。硬链接是文件系统中同一索引节点（inode）上的多个文件名，它们共享相同的数据块。符号链接是一个指向另一个文件或目录的特殊文件，类似于 Windows 中的快捷方式。以下是关于 ln 命令的详细解释： 语法：1ln [选项]">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_63_ln">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_63_ln/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 ln命令  linux ln命令 详解ln 命令用于在文件系统中创建链接。链接可以分为硬链接（hard link）和符号链接（symbolic link，也称为软链接）。硬链接是文件系统中同一索引节点（inode）上的多个文件名，它们共享相同的数据块。符号链接是一个指向另一个文件或目录的特殊文件，类似于 Windows 中的快捷方式。以下是关于 ln 命令的详细解释： 语法：1ln [选项]">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_63_ln/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_63_ln | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_63_ln/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_63_ln
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>ln命令</li>
+</ul>
+<h2 id="linux-ln命令-详解"><a href="#linux-ln命令-详解" class="headerlink" title="linux ln命令 详解"></a>linux ln命令 详解</h2><p><code>ln</code> 命令用于在文件系统中创建链接。链接可以分为硬链接（hard link）和符号链接（symbolic link，也称为软链接）。硬链接是文件系统中同一索引节点（inode）上的多个文件名，它们共享相同的数据块。符号链接是一个指向另一个文件或目录的特殊文件，类似于 Windows 中的快捷方式。以下是关于 <code>ln</code> 命令的详细解释：</p>
+<h3 id="语法："><a href="#语法：" class="headerlink" title="语法："></a>语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> [选项] 源文件 目标文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用选项："><a href="#常用选项：" class="headerlink" title="常用选项："></a>常用选项：</h3><ul>
+<li><p><strong>-s, –symbolic：</strong> 创建符号链接。</p>
+</li>
+<li><p><strong>-b, –backup：</strong> 在覆盖目标文件之前创建备份。</p>
+</li>
+<li><p><strong>-i, –interactive：</strong> 在覆盖目标文件之前进行交互式确认。</p>
+</li>
+<li><p><strong>-v, –verbose：</strong> 显示详细的输出。</p>
+</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ol>
+<li><p><strong>创建硬链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> source_file hard_link</span><br></pre></td></tr></table></figure>
+<p>这会在文件系统上创建一个硬链接。</p>
+</li>
+<li><p><strong>创建符号链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s source_file symbolic_link</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-s</code> 选项，创建一个符号链接。</p>
+</li>
+<li><p><strong>创建符号链接到目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /path/to/directory symbolic_link_to_directory</span><br></pre></td></tr></table></figure>
+<p>创建符号链接指向目录。</p>
+</li>
+<li><p><strong>创建备份并覆盖目标文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -b source_file target_file</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-b</code> 选项，创建备份并覆盖目标文件。</p>
+</li>
+<li><p><strong>交互式创建链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -i source_file target_file</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-i</code> 选项，进行交互式确认。</p>
+</li>
+<li><p><strong>递归创建符号链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -sT /path/to/source_directory /path/to/symbolic_link_directory</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-sT</code> 选项，递归创建符号链接。</p>
+</li>
+</ol>
+<h3 id="示例解释："><a href="#示例解释：" class="headerlink" title="示例解释："></a>示例解释：</h3><ul>
+<li><p><strong>硬链接和符号链接：</strong> <code>ln</code> 命令可以创建硬链接或符号链接。硬链接是文件系统中同一索引节点上的多个文件名，它们共享相同的数据块。符号链接是一个特殊类型的文件，指向另一个文件或目录。</p>
+</li>
+<li><p><strong>创建符号链接到目录：</strong> 通过 <code>-s</code> 选项，可以创建符号链接指向目录。</p>
+</li>
+<li><p><strong>创建备份并覆盖目标文件：</strong> 使用 <code>-b</code> 选项，<code>ln</code> 在覆盖目标文件之前会创建一个备份。</p>
+</li>
+<li><p><strong>交互式创建链接：</strong> 使用 <code>-i</code> 选项，<code>ln</code> 在覆盖目标文件之前会进行交互式确认，避免误操作。</p>
+</li>
+<li><p><strong>递归创建符号链接：</strong> 使用 <code>-sT</code> 选项，可以递归创建符号链接，通常在创建指向目录的链接时使用。</p>
+</li>
+</ul>
+<h2 id="linux-ln命令-常用技巧"><a href="#linux-ln命令-常用技巧" class="headerlink" title="linux ln命令 常用技巧"></a>linux ln命令 常用技巧</h2><p><code>ln</code> 命令是在 Linux 中创建链接的强大工具，下面是一些 <code>ln</code> 命令的常用技巧：</p>
+<ol>
+<li><p><strong>创建硬链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> source_file hard_link</span><br></pre></td></tr></table></figure>
+<p>这会在文件系统上创建一个硬链接，硬链接与源文件共享相同的 inode 和数据块。</p>
+</li>
+<li><p><strong>创建符号链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s source_file symbolic_link</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-s</code> 选项创建符号链接，这是指向源文件的特殊文件。</p>
+</li>
+<li><p><strong>创建符号链接到目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /path/to/directory symbolic_link_to_directory</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-s</code> 选项，创建符号链接指向目录。</p>
+</li>
+<li><p><strong>创建链接时避免覆盖目标文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -b source_file target_file</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-b</code> 选项，在覆盖目标文件之前会创建备份。</p>
+</li>
+<li><p><strong>递归创建符号链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -sT /path/to/source_directory /path/to/symbolic_link_directory</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-sT</code> 选项，递归创建符号链接，通常在创建指向目录的链接时使用。</p>
+</li>
+<li><p><strong>创建链接时进行交互式确认：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -i source_file target_file</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-i</code> 选项，创建链接时进行交互式确认，以避免误操作。</p>
+</li>
+<li><p><strong>使用相对路径创建符号链接：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -sT ../source_file /path/to/symbolic_link</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-sT</code> 选项和相对路径，可以创建指向父目录中文件的符号链接。</p>
+</li>
+<li><p><strong>创建硬链接的数量统计：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -<span class="built_in">type</span> f -links +1 -<span class="built_in">exec</span> <span class="built_in">ls</span> -l &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>find</code> 命令和 <code>-links</code> 选项，可以列出硬链接数量大于1的文件。</p>
+</li>
+<li><p><strong>创建硬链接并保留原始文件的权限和时间戳：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> -p source_file hard_link</span><br></pre></td></tr></table></figure>
+<p>使用 <code>cp</code> 命令的 <code>-p</code> 选项，创建硬链接并保留原始文件的权限和时间戳。</p>
+</li>
+</ol>
+<p>这些技巧能够帮助你更灵活地使用 <code>ln</code> 命令，创建不同类型的链接，并在需要时进行一些额外的操作。</p>
+<h2 id="ln"><a href="#ln" class="headerlink" title="ln"></a>ln</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>它的功能是为某一个文件在另外一个位置建立一个同步的链接</li>
+<li>当我们需要在不同的目录，用到相同的文件时，我们不需要在每一个需要的目录下都放一个必须相同的文件，我们只要在某个固定的目录，放上该文件，然后在 其它的目录下用ln命令链接（link）它就可以，不必重复的占用磁盘空间。</li>
+</ul>
+</li>
+<li><p>语法：</p>
+<ul>
+<li><code>ln [参数][源文件或目录][目标文件或目录]</code></li>
+</ul>
+</li>
+<li><p>参数的格式为：</p>
+<ul>
+<li><code>[-bdfinsvF] [-S backup-suffix] [-V &#123;numbered,existing,simple&#125;]</code></li>
+<li><code>[--help] [--version] [--]</code></li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>Linux文件系统中，有所谓的链接(link)，我们可以将其视为档案的别名，而链接又可分为两种 : 硬链接(hard link)与软链接(symbolic link)，硬链接的意思是一个档案可以有多个名称，而软链接的方式则是产生一个特殊的档案，该档案的内容是指向另一个档案的位置。硬链接是存在同一个文件系统中，而软链接却可以跨越不同的文件系统。</li>
+<li>不论是硬链接或软链接都不会将原本的档案复制一份，只会占用非常少量的磁碟空间</li>
+<li>软链接：<ul>
+<li>软链接，以路径的形式存在。类似于Windows操作系统中的快捷方式</li>
+<li>软链接可以 跨文件系统 ，硬链接不可以</li>
+<li>软链接可以对一个不存在的文件名进行链接</li>
+<li>软链接可以对目录进行链接</li>
+</ul>
+</li>
+<li>硬链接<ul>
+<li>硬链接，以文件副本的形式存在。但不占用实际空间。</li>
+<li>不允许给目录创建硬链接</li>
+<li>硬链接只有在同一个文件系统中才能创建</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>参数</p>
+<ul>
+<li>必要参数<ul>
+<li><code>--backup[=CONTROL]</code> 备份已存在的目标文件</li>
+<li><code>-b</code> 类似 –backup ，但不接受参数</li>
+<li><code>-d</code> 允许超级用户制作目录的硬链接</li>
+<li><code>-f</code> 强制执行</li>
+<li><code>-i</code> 交互模式，文件存在则提示用户是否覆盖</li>
+<li><code>-n</code> 把符号链接视为一般目录</li>
+<li><code>-s</code> 软链接(符号链接)</li>
+<li><code>-v</code> 显示详细的处理过程</li>
+</ul>
+</li>
+<li>选择参数<ul>
+<li><code>-S &quot;-S&lt;字尾备份字符串&gt; &quot;</code>或 <code>&quot;--suffix=&lt;字尾备份字符串&gt;&quot;</code></li>
+<li><code>-V &quot;-V&lt;备份方式&gt;&quot;</code>或<code>&quot;--version-control=&lt;备份方式&gt;&quot;</code></li>
+<li><code>--help</code> 显示帮助信息</li>
+<li><code>--version</code> 显示版本信息</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_64_snap/" rel="prev" title="linux_2_64_snap">
+      <i class="fa fa-chevron-left"></i> linux_2_64_snap
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_66_dmesg/" rel="next" title="linux_2_66_dmesg">
+      linux_2_66_dmesg <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ln%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux ln命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常用选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E8%A7%A3%E9%87%8A%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">示例解释：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ln%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux ln命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ln"><span class="nav-number">4.</span> <span class="nav-text">ln</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

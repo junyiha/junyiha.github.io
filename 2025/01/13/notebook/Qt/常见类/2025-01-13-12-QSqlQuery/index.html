@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 QSqlQuery 类 相关学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QSqlQuery">
+<meta property="og:url" content="https://junyiha.github.io/2025/01/13/notebook/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2025-01-13-12-QSqlQuery/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 QSqlQuery 类 相关学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-01-13T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.490Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Qt-class">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/01/13/notebook/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2025-01-13-12-QSqlQuery/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>QSqlQuery | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/13/notebook/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2025-01-13-12-QSqlQuery/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          QSqlQuery
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-01-13 09:00:00" itemprop="dateCreated datePublished" datetime="2025-01-13T09:00:00+08:00">2025-01-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>QSqlQuery 类 相关学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="QSqlQuery-类-详解"><a href="#QSqlQuery-类-详解" class="headerlink" title="QSqlQuery 类 详解"></a>QSqlQuery 类 详解</h2><p><code>QSqlQuery</code> 是 Qt 中用于执行 SQL 查询的类。它允许您向数据库发送查询、插入、更新和删除等 SQL 语句，并且支持处理查询结果。</p>
+<h3 id="1-类概述"><a href="#1-类概述" class="headerlink" title="1. 类概述"></a><strong>1. 类概述</strong></h3><p><code>QSqlQuery</code> 使得与数据库的交互变得简单，通过它，您可以执行 SQL 查询并处理结果集。<code>QSqlQuery</code> 支持多种数据库（如 SQLite、MySQL、PostgreSQL 等）且在 Qt 支持的数据库驱动中通用。</p>
+<h3 id="2-常用方法"><a href="#2-常用方法" class="headerlink" title="2. 常用方法"></a><strong>2. 常用方法</strong></h3><h4 id="（1）构造函数"><a href="#（1）构造函数" class="headerlink" title="（1）构造函数"></a><strong>（1）构造函数</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery::<span class="built_in">QSqlQuery</span>();</span><br><span class="line">QSqlQuery::<span class="built_in">QSqlQuery</span>(<span class="type">const</span> QString &amp;query, QSqlDatabase db);</span><br><span class="line">QSqlQuery::<span class="built_in">QSqlQuery</span>(<span class="type">const</span> QSqlQuery &amp;other);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>无参数构造函数</strong>：构造一个空的查询对象，之后可以通过 <code>exec()</code> 设置 SQL 查询。</li>
+<li><strong>带查询字符串的构造函数</strong>：可以直接传入 SQL 查询语句并执行。</li>
+<li><strong>复制构造函数</strong>：复制另一个 <code>QSqlQuery</code> 对象。</li>
+</ul>
+<h4 id="（2）执行-SQL-查询"><a href="#（2）执行-SQL-查询" class="headerlink" title="（2）执行 SQL 查询"></a><strong>（2）执行 SQL 查询</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::exec</span><span class="params">(<span class="type">const</span> QString &amp;query)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>参数</strong>：<code>query</code> 是要执行的 SQL 查询语句。</li>
+<li><strong>返回值</strong>：<code>true</code> 表示查询执行成功，<code>false</code> 表示失败（可以使用 <code>lastError()</code> 获取详细错误信息）。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>(<span class="string">&quot;SELECT * FROM employees&quot;</span>)) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Query executed successfully&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="（3）查询结果处理"><a href="#（3）查询结果处理" class="headerlink" title="（3）查询结果处理"></a><strong>（3）查询结果处理</strong></h4><ul>
+<li><p>**<code>next()</code>**：移动到结果集中的下一行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">    <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();  <span class="comment">// 获取第一列的数据</span></span><br><span class="line">    QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第二列的数据</span></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**<code>value()</code>**：返回当前行中某列的值。索引从 0 开始。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QVariant value = query.<span class="built_in">value</span>(<span class="number">0</span>);  <span class="comment">// 获取第 0 列的值</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**<code>isValid()</code>**：判断当前的查询结果是否有效。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (query.<span class="built_in">isValid</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;The current query result is valid&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="（4）绑定查询参数"><a href="#（4）绑定查询参数" class="headerlink" title="（4）绑定查询参数"></a><strong>（4）绑定查询参数</strong></h4><p><code>QSqlQuery</code> 支持预处理语句，并允许将参数绑定到 SQL 查询中，从而防止 SQL 注入攻击。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO employees (name, age) VALUES (:name, :age)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);</span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Inserted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>**<code>prepare()</code>**：准备一个带有占位符的查询。</li>
+<li>**<code>bindValue()</code>**：绑定实际的值到查询中的占位符。</li>
+</ul>
+<h4 id="（5）获取查询结果的字段名"><a href="#（5）获取查询结果的字段名" class="headerlink" title="（5）获取查询结果的字段名"></a><strong>（5）获取查询结果的字段名</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QString fieldName = query.<span class="built_in">record</span>().<span class="built_in">fieldName</span>(<span class="number">0</span>);  <span class="comment">// 获取第 0 列的字段名称</span></span><br><span class="line"><span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Field name at index 0:&quot;</span> &lt;&lt; fieldName;</span><br></pre></td></tr></table></figure>
+
+<h4 id="（6）事务支持"><a href="#（6）事务支持" class="headerlink" title="（6）事务支持"></a><strong>（6）事务支持</strong></h4><p><code>QSqlQuery</code> 支持数据库事务操作，通过 <code>QSqlDatabase</code> 对象来控制事务的开始、提交和回滚。</p>
+<ul>
+<li>**<code>beginTransaction()</code>**：开始事务。</li>
+<li>**<code>commit()</code>**：提交事务。</li>
+<li>**<code>rollback()</code>**：回滚事务。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">QSqlDatabase::<span class="built_in">database</span>().<span class="built_in">transaction</span>();  <span class="comment">// 开始事务</span></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>(<span class="string">&quot;INSERT INTO employees (name, age) VALUES (&#x27;John&#x27;, 30)&quot;</span>)) &#123;</span><br><span class="line">    QSqlDatabase::<span class="built_in">database</span>().<span class="built_in">commit</span>();  <span class="comment">// 提交事务</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    QSqlDatabase::<span class="built_in">database</span>().<span class="built_in">rollback</span>();  <span class="comment">// 回滚事务</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-常用操作"><a href="#3-常用操作" class="headerlink" title="3. 常用操作"></a><strong>3. 常用操作</strong></h3><h4 id="（1）插入数据"><a href="#（1）插入数据" class="headerlink" title="（1）插入数据"></a><strong>（1）插入数据</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO employees (name, age) VALUES (:name, :age)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">25</span>);</span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data inserted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error inserting data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="（2）更新数据"><a href="#（2）更新数据" class="headerlink" title="（2）更新数据"></a><strong>（2）更新数据</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;UPDATE employees SET age = :age WHERE name = :name&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">26</span>);</span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data updated successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error updating data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="（3）删除数据"><a href="#（3）删除数据" class="headerlink" title="（3）删除数据"></a><strong>（3）删除数据</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;DELETE FROM employees WHERE name = :name&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data deleted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error deleting data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-事务支持"><a href="#4-事务支持" class="headerlink" title="4. 事务支持"></a><strong>4. 事务支持</strong></h3><p><code>QSqlQuery</code> 支持通过事务保证多个查询的原子性。可以通过 <code>QSqlDatabase::transaction()</code>, <code>QSqlDatabase::commit()</code> 和 <code>QSqlDatabase::rollback()</code> 来操作事务。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">QSqlDatabase db = QSqlDatabase::<span class="built_in">addDatabase</span>(<span class="string">&quot;QMYSQL&quot;</span>);</span><br><span class="line">db.<span class="built_in">setHostName</span>(<span class="string">&quot;localhost&quot;</span>);</span><br><span class="line">db.<span class="built_in">setDatabaseName</span>(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">db.<span class="built_in">setUserName</span>(<span class="string">&quot;user&quot;</span>);</span><br><span class="line">db.<span class="built_in">setPassword</span>(<span class="string">&quot;password&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!db.<span class="built_in">open</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error opening database:&quot;</span> &lt;&lt; db.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">QSqlQuery query;</span><br><span class="line">QSqlDatabase::<span class="built_in">database</span>().<span class="built_in">transaction</span>();  <span class="comment">// 开始事务</span></span><br><span class="line"></span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;UPDATE employees SET age = :age WHERE name = :name&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);</span><br><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    QSqlDatabase::<span class="built_in">database</span>().<span class="built_in">rollback</span>();  <span class="comment">// 出错时回滚事务</span></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    QSqlDatabase::<span class="built_in">database</span>().<span class="built_in">commit</span>();  <span class="comment">// 提交事务</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5-常见问题"><a href="#5-常见问题" class="headerlink" title="5. 常见问题"></a><strong>5. 常见问题</strong></h3><h4 id="（1）执行查询失败"><a href="#（1）执行查询失败" class="headerlink" title="（1）执行查询失败"></a><strong>（1）执行查询失败</strong></h4><p><strong>问题</strong>：<code>exec()</code> 返回 <code>false</code>，查询执行失败。<br><strong>原因</strong>：</p>
+<ul>
+<li>SQL 查询语法错误。</li>
+<li>数据库连接问题。</li>
+<li>查询中使用的字段、表名等无效。</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>使用 <code>lastError()</code> 查看错误信息。</li>
+<li>确保 SQL 查询的语法正确，字段、表名存在。</li>
+</ul>
+<h4 id="（2）绑定值失败"><a href="#（2）绑定值失败" class="headerlink" title="（2）绑定值失败"></a><strong>（2）绑定值失败</strong></h4><p><strong>问题</strong>：调用 <code>bindValue()</code> 绑定的参数值无效或查询不执行。<br><strong>原因</strong>：</p>
+<ul>
+<li>占位符名称与 <code>bindValue()</code> 中的参数名不匹配。</li>
+<li>未正确调用 <code>prepare()</code> 方法。</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>确保 SQL 查询中占位符与 <code>bindValue()</code> 中的参数名匹配。</li>
+<li>在调用 <code>exec()</code> 前确保 <code>prepare()</code> 已正确执行。</li>
+</ul>
+<h4 id="（3）事务未提交"><a href="#（3）事务未提交" class="headerlink" title="（3）事务未提交"></a><strong>（3）事务未提交</strong></h4><p><strong>问题</strong>：事务中的操作未生效。<br><strong>原因</strong>：</p>
+<ul>
+<li>未调用 <code>commit()</code> 提交事务。</li>
+<li>在事务中遇到错误时未进行 <code>rollback()</code> 回滚操作。</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>在事务执行完成后调用 <code>commit()</code>。</li>
+<li>如果发生错误，确保调用 <code>rollback()</code> 进行回滚。</li>
+</ul>
+<hr>
+<h3 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h3><p><code>QSqlQuery</code> 是 Qt 中进行数据库操作的核心类之一，它提供了执行 SQL 查询、插入、更新、删除数据等功能，并且支持事务、查询结果处理和参数绑定等高级特性。使用 <code>QSqlQuery</code> 时需要特别注意以下几点：</p>
+<ol>
+<li>始终使用 <code>prepare()</code> 和 <code>bindValue()</code> 防止 SQL 注入攻击。</li>
+<li>使用 <code>next()</code> 和 <code>value()</code> 获取查询结果。</li>
+<li>在处理多个 SQL 操作时，使用事务确保操作的原子性。</li>
+</ol>
+<p>通过合理使用 <code>QSqlQuery</code>，可以方便地与数据库进行交互。</p>
+<h2 id="QSqlQuery-exec-函数-详解"><a href="#QSqlQuery-exec-函数-详解" class="headerlink" title="QSqlQuery::exec() 函数 详解"></a>QSqlQuery::exec() 函数 详解</h2><p><code>QSqlQuery::exec()</code> 是 <code>QSqlQuery</code> 类中的一个非常重要的函数，用于执行 SQL 查询。它可以执行各种 SQL 语句，包括 <code>SELECT</code>、<code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code> 等。<code>exec()</code> 是与数据库交互时最常用的函数之一。</p>
+<hr>
+<h2 id="1-函数定义"><a href="#1-函数定义" class="headerlink" title="1. 函数定义"></a><strong>1. 函数定义</strong></h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::exec</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::exec</span><span class="params">(<span class="type">const</span> QString &amp;query)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a><strong>参数</strong></h3><ol>
+<li><p><strong>无参数版本</strong>：</p>
+<ul>
+<li>执行通过 <code>QSqlQuery</code> 对象之前设置的查询语句（通过 <code>prepare()</code> 设置）。</li>
+<li><code>exec()</code> 会执行 <code>prepare()</code> 中指定的 SQL 查询，并返回执行结果。</li>
+</ul>
+</li>
+<li><p><strong>带查询语句版本</strong>：</p>
+<ul>
+<li>直接将 SQL 查询语句作为字符串传递给 <code>exec()</code> 执行。</li>
+<li>例如：<code>SELECT * FROM users</code>，<code>INSERT INTO table ...</code> 等。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li>**<code>true</code>**：查询成功，执行无错误。</li>
+<li>**<code>false</code>**：查询失败，执行过程中发生错误。可以使用 <code>lastError()</code> 来获取详细的错误信息。</li>
+</ul>
+<hr>
+<h2 id="2-功能说明"><a href="#2-功能说明" class="headerlink" title="2. 功能说明"></a><strong>2. 功能说明</strong></h2><h3 id="执行查询"><a href="#执行查询" class="headerlink" title="执行查询"></a><strong>执行查询</strong></h3><ul>
+<li><code>exec()</code> 会根据 SQL 语句的类型执行相应的操作。对于 <code>SELECT</code> 语句，它将返回一个结果集；对于 <code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code> 语句，它会返回受影响的行数。</li>
+<li>对于非 <code>SELECT</code> 查询，<code>exec()</code> 主要返回是否成功执行操作，而不会返回数据。</li>
+</ul>
+<h3 id="查询参数"><a href="#查询参数" class="headerlink" title="查询参数"></a><strong>查询参数</strong></h3><ul>
+<li>如果在查询中使用了占位符（如 <code>?</code> 或 <code>:parameter</code>），可以通过 <code>bindValue()</code> 绑定参数值。在调用 <code>exec()</code> 前，需要通过 <code>prepare()</code> 设置 SQL 查询模板。</li>
+</ul>
+<hr>
+<h2 id="3-使用示例"><a href="#3-使用示例" class="headerlink" title="3. 使用示例"></a><strong>3. 使用示例</strong></h2><h3 id="（1）执行-SELECT-查询"><a href="#（1）执行-SELECT-查询" class="headerlink" title="（1）执行 SELECT 查询"></a><strong>（1）执行 <code>SELECT</code> 查询</strong></h3><p>对于 <code>SELECT</code> 查询，<code>exec()</code> 执行 SQL 查询后，您可以通过 <code>next()</code> 遍历结果集。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>(<span class="string">&quot;SELECT id, name FROM users&quot;</span>)) &#123;</span><br><span class="line">    <span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">        <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();  <span class="comment">// 获取第 0 列（id）</span></span><br><span class="line">        QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第 1 列（name）</span></span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（2）执行-INSERT-查询"><a href="#（2）执行-INSERT-查询" class="headerlink" title="（2）执行 INSERT 查询"></a><strong>（2）执行 <code>INSERT</code> 查询</strong></h3><p>对于 <code>INSERT</code> 等查询，<code>exec()</code> 返回值表示查询是否成功执行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO users (name, age) VALUES (:name, :age)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data inserted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error inserting data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（3）执行-UPDATE-查询"><a href="#（3）执行-UPDATE-查询" class="headerlink" title="（3）执行 UPDATE 查询"></a><strong>（3）执行 <code>UPDATE</code> 查询</strong></h3><p><code>UPDATE</code> 查询也是通过 <code>exec()</code> 执行的，返回 <code>true</code> 或 <code>false</code> 表示执行成功与否。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;UPDATE users SET age = :age WHERE name = :name&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">31</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data updated successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error updating data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（4）执行-DELETE-查询"><a href="#（4）执行-DELETE-查询" class="headerlink" title="（4）执行 DELETE 查询"></a><strong>（4）执行 <code>DELETE</code> 查询</strong></h3><p>执行 <code>DELETE</code> 查询时，可以通过 <code>exec()</code> 删除指定的数据。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;DELETE FROM users WHERE name = :name&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data deleted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error deleting data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-错误处理"><a href="#4-错误处理" class="headerlink" title="4. 错误处理"></a><strong>4. 错误处理</strong></h2><h3 id="（1）查询失败"><a href="#（1）查询失败" class="headerlink" title="（1）查询失败"></a><strong>（1）查询失败</strong></h3><ul>
+<li>如果 <code>exec()</code> 返回 <code>false</code>，表示查询失败。此时，可以通过 <code>lastError()</code> 获取详细的错误信息。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（2）获取详细错误信息"><a href="#（2）获取详细错误信息" class="headerlink" title="（2）获取详细错误信息"></a><strong>（2）获取详细错误信息</strong></h3><ul>
+<li><code>lastError()</code> 返回一个 <code>QSqlError</code> 对象，它包含了失败的错误类型和详细错误消息。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    QSqlError error = query.<span class="built_in">lastError</span>();</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;SQL Error:&quot;</span> &lt;&lt; error.<span class="built_in">text</span>();</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error type:&quot;</span> &lt;&lt; error.<span class="built_in">type</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>QSqlError</code> 提供了以下常用方法：</p>
+<ul>
+<li>**<code>text()</code>**：返回错误消息。</li>
+<li>**<code>type()</code>**：返回错误类型，例如 <code>QSqlError::NoError</code>、<code>QSqlError::ConnectionError</code>、<code>QSqlError::StatementError</code> 等。</li>
+<li>**<code>nativeErrorCode()</code>**：返回数据库提供的原生错误代码。</li>
+</ul>
+<hr>
+<h2 id="5-使用-prepare-和-bindValue"><a href="#5-使用-prepare-和-bindValue" class="headerlink" title="5. 使用 prepare() 和 bindValue()"></a><strong>5. 使用 <code>prepare()</code> 和 <code>bindValue()</code></strong></h2><p>为了防止 SQL 注入攻击，<code>QSqlQuery</code> 支持使用预处理语句和参数绑定。通过 <code>prepare()</code> 设置 SQL 查询模板，并通过 <code>bindValue()</code> 绑定实际参数值。</p>
+<h3 id="（1）准备语句"><a href="#（1）准备语句" class="headerlink" title="（1）准备语句"></a><strong>（1）准备语句</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE age &gt; :age&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">        <span class="comment">// 处理查询结果</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（2）绑定参数"><a href="#（2）绑定参数" class="headerlink" title="（2）绑定参数"></a><strong>（2）绑定参数</strong></h3><p><code>bindValue()</code> 将占位符与实际值绑定。例如，<code>&quot;:age&quot;</code> 被绑定为 25。</p>
+<hr>
+<h2 id="6-查询类型总结"><a href="#6-查询类型总结" class="headerlink" title="6. 查询类型总结"></a><strong>6. 查询类型总结</strong></h2><ul>
+<li><strong><code>SELECT</code> 查询</strong>：返回结果集，可以通过 <code>next()</code> 遍历。</li>
+<li><strong><code>INSERT</code> 查询</strong>：插入数据，返回是否成功执行。</li>
+<li><strong><code>UPDATE</code> 查询</strong>：更新数据，返回是否成功执行。</li>
+<li><strong><code>DELETE</code> 查询</strong>：删除数据，返回是否成功执行。</li>
+<li><strong>其他 SQL 语句</strong>：如 <code>CREATE</code>, <code>DROP</code>, <code>ALTER</code> 等，一般用于数据库结构修改，也通过 <code>exec()</code> 执行。</li>
+</ul>
+<hr>
+<h2 id="7-注意事项"><a href="#7-注意事项" class="headerlink" title="7. 注意事项"></a><strong>7. 注意事项</strong></h2><ol>
+<li><strong>SQL 注入</strong>：始终使用 <code>prepare()</code> 和 <code>bindValue()</code> 来避免 SQL 注入攻击。</li>
+<li><strong>事务管理</strong>：如果需要执行多个查询，并确保原子性，可以使用数据库事务。通过 <code>QSqlDatabase::transaction()</code> 开始事务，<code>QSqlDatabase::commit()</code> 提交，<code>QSqlDatabase::rollback()</code> 回滚。</li>
+<li><strong>查询执行顺序</strong>：确保 SQL 查询没有语法错误，查询语句执行时要按顺序进行（对于 <code>SELECT</code> 查询，一般需要调用 <code>next()</code> 逐行读取结果）。</li>
+<li><strong>数据库连接</strong>：执行查询前，确保数据库已经成功打开。</li>
+</ol>
+<hr>
+<h2 id="8-总结"><a href="#8-总结" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h2><p><code>QSqlQuery::exec()</code> 是 Qt 中执行 SQL 查询的核心方法，可以执行 <code>SELECT</code>、<code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code> 等 SQL 操作。对于查询操作，返回值表示执行是否成功，并且可以通过 <code>next()</code> 获取查询结果。对于修改数据的操作（如 <code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code>），返回值表示操作是否成功。</p>
+<p>通过 <code>exec()</code> 执行 SQL 查询时，务必使用 <code>prepare()</code> 和 <code>bindValue()</code> 进行参数绑定，以防止 SQL 注入攻击，并确保查询操作的安全性和稳定性。</p>
+<h2 id="QSqlQuery-prepare-函数-详解"><a href="#QSqlQuery-prepare-函数-详解" class="headerlink" title="QSqlQuery::prepare() 函数 详解"></a>QSqlQuery::prepare() 函数 详解</h2><p><code>QSqlQuery::prepare()</code> 是 <code>QSqlQuery</code> 类中的一个重要函数，用于准备一个带有占位符的 SQL 查询语句。此方法是执行 SQL 查询的先决条件，尤其是当 SQL 查询语句中包含参数（占位符）时，<code>prepare()</code> 需要在调用 <code>exec()</code> 执行查询之前被调用。</p>
+<p><code>prepare()</code> 使得 SQL 查询可以预编译，并允许在执行时动态地将实际值绑定到占位符上，从而避免 SQL 注入攻击和提高查询效率。</p>
+<hr>
+<h2 id="1-函数定义-1"><a href="#1-函数定义-1" class="headerlink" title="1. 函数定义"></a><strong>1. 函数定义</strong></h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::prepare</span><span class="params">(<span class="type">const</span> QString &amp;query)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a><strong>参数</strong></h3><ul>
+<li>**<code>query</code>**：一个字符串，表示要执行的 SQL 查询语句，查询语句可以包含占位符（如 <code>?</code> 或 <code>:parameter_name</code>），这些占位符将在之后通过 <code>bindValue()</code> 方法绑定实际的值。</li>
+</ul>
+<h3 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li>**<code>true</code>**：表示查询语句成功准备好，接下来可以调用 <code>exec()</code> 执行查询。</li>
+<li>**<code>false</code>**：表示查询语句准备失败。此时，您可以通过 <code>lastError()</code> 获取详细的错误信息。</li>
+</ul>
+<hr>
+<h2 id="2-占位符和绑定值"><a href="#2-占位符和绑定值" class="headerlink" title="2. 占位符和绑定值"></a><strong>2. 占位符和绑定值</strong></h2><p>使用 <code>prepare()</code> 的主要目的是通过占位符避免 SQL 注入攻击。SQL 查询中占位符的位置可以通过 <code>bindValue()</code> 来绑定实际的值。</p>
+<h3 id="（1）占位符类型"><a href="#（1）占位符类型" class="headerlink" title="（1）占位符类型"></a><strong>（1）占位符类型</strong></h3><ol>
+<li><p>**问号占位符 (<code>?</code>)**：</p>
+<ul>
+<li><code>?</code> 是位置占位符，代表 SQL 查询中的一个值，按顺序进行绑定。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE name = ? AND age &gt; ?&quot;</span>);</span><br><span class="line">query.<span class="built_in">addBindValue</span>(<span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">addBindValue</span>(<span class="number">30</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**命名占位符 (<code>:name</code>)**：</p>
+<ul>
+<li><code>:name</code> 是命名占位符，允许使用更具可读性的名称来绑定参数。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE name = :name AND age &gt; :age&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="（2）绑定值"><a href="#（2）绑定值" class="headerlink" title="（2）绑定值"></a><strong>（2）绑定值</strong></h3><ul>
+<li><p>**<code>bindValue()</code>**：用于绑定命名占位符的实际值。</p>
+</li>
+<li><p>**<code>addBindValue()</code>**：用于绑定位置占位符的实际值。每个 <code>?</code> 占位符都需要按顺序使用 <code>addBindValue()</code> 来绑定相应的值。</p>
+</li>
+</ul>
+<hr>
+<h2 id="3-使用-prepare-的步骤"><a href="#3-使用-prepare-的步骤" class="headerlink" title="3. 使用 prepare() 的步骤"></a><strong>3. 使用 <code>prepare()</code> 的步骤</strong></h2><h3 id="（1）构建-SQL-查询"><a href="#（1）构建-SQL-查询" class="headerlink" title="（1）构建 SQL 查询"></a><strong>（1）构建 SQL 查询</strong></h3><p>首先，创建一个 <code>QSqlQuery</code> 对象，并通过 <code>prepare()</code> 方法为 SQL 查询语句提供占位符。</p>
+<h3 id="（2）绑定实际值"><a href="#（2）绑定实际值" class="headerlink" title="（2）绑定实际值"></a><strong>（2）绑定实际值</strong></h3><p>如果查询语句包含占位符（如 <code>?</code> 或 <code>:parameter</code>），接下来通过 <code>bindValue()</code> 或 <code>addBindValue()</code> 绑定实际的参数值。</p>
+<h3 id="（3）执行查询"><a href="#（3）执行查询" class="headerlink" title="（3）执行查询"></a><strong>（3）执行查询</strong></h3><p>最后，使用 <code>exec()</code> 来执行查询并获取结果。</p>
+<hr>
+<h2 id="4-示例"><a href="#4-示例" class="headerlink" title="4. 示例"></a><strong>4. 示例</strong></h2><h3 id="（1）使用-位置占位符"><a href="#（1）使用-位置占位符" class="headerlink" title="（1）使用 ? 位置占位符"></a><strong>（1）使用 <code>?</code> 位置占位符</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT id, name FROM users WHERE age &gt; ? AND country = ?&quot;</span>);</span><br><span class="line">query.<span class="built_in">addBindValue</span>(<span class="number">30</span>);  <span class="comment">// 绑定第一个问号占位符</span></span><br><span class="line">query.<span class="built_in">addBindValue</span>(<span class="string">&quot;USA&quot;</span>);  <span class="comment">// 绑定第二个问号占位符</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">        <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();  <span class="comment">// 获取第 0 列（id）</span></span><br><span class="line">        QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第 1 列（name）</span></span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（2）使用-parameter-命名占位符"><a href="#（2）使用-parameter-命名占位符" class="headerlink" title="（2）使用 :parameter 命名占位符"></a><strong>（2）使用 <code>:parameter</code> 命名占位符</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT id, name FROM users WHERE age &gt; :age AND country = :country&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);  <span class="comment">// 绑定命名占位符 :age</span></span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:country&quot;</span>, <span class="string">&quot;USA&quot;</span>);  <span class="comment">// 绑定命名占位符 :country</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">        <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();  <span class="comment">// 获取第 0 列（id）</span></span><br><span class="line">        QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第 1 列（name）</span></span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（3）插入数据"><a href="#（3）插入数据" class="headerlink" title="（3）插入数据"></a><strong>（3）插入数据</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO users (name, age) VALUES (:name, :age)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data inserted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error inserting data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-错误处理"><a href="#5-错误处理" class="headerlink" title="5. 错误处理"></a><strong>5. 错误处理</strong></h2><p>如果查询准备失败，<code>prepare()</code> 会返回 <code>false</code>，并且可以使用 <code>lastError()</code> 获取具体的错误信息。</p>
+<h3 id="获取错误信息"><a href="#获取错误信息" class="headerlink" title="获取错误信息"></a><strong>获取错误信息</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE age &gt; ?&quot;</span>)) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error preparing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>lastError()</code> 返回一个 <code>QSqlError</code> 对象，您可以通过 <code>text()</code> 获取错误消息，并通过 <code>type()</code> 获取错误类型。</p>
+<hr>
+<h2 id="6-prepare-和-bindValue-的配合使用"><a href="#6-prepare-和-bindValue-的配合使用" class="headerlink" title="6. prepare() 和 bindValue() 的配合使用"></a><strong>6. <code>prepare()</code> 和 <code>bindValue()</code> 的配合使用</strong></h2><ul>
+<li><strong><code>prepare()</code></strong> 用于设置 SQL 查询语句，其中包括占位符。</li>
+<li><strong><code>bindValue()</code></strong> 用于将实际值绑定到占位符。</li>
+<li><strong><code>exec()</code></strong> 用于执行查询，只有在执行前调用了 <code>prepare()</code> 和 <code>bindValue()</code>。</li>
+</ul>
+<hr>
+<h2 id="7-注意事项-1"><a href="#7-注意事项-1" class="headerlink" title="7. 注意事项"></a><strong>7. 注意事项</strong></h2><ol>
+<li><p><strong>占位符顺序</strong>：使用 <code>?</code> 位置占位符时，绑定值的顺序必须与占位符的顺序一致。使用 <code>:parameter</code> 命名占位符时，顺序不重要，但每个占位符必须被绑定相应的值。</p>
+</li>
+<li><p><strong>SQL 注入防护</strong>：使用占位符和绑定值可以防止 SQL 注入攻击。不要将用户输入直接拼接到 SQL 查询字符串中，应该始终使用 <code>prepare()</code> 和 <code>bindValue()</code>。</p>
+</li>
+<li><p><strong>性能优化</strong>：使用 <code>prepare()</code> 可以提高查询效率，特别是在需要执行相同 SQL 语句但参数不同的情况下，数据库可以使用预编译的查询计划。</p>
+</li>
+<li><p><strong>事务支持</strong>：<code>prepare()</code> 适用于事务内的查询，保证查询操作在一个事务内的原子性。</p>
+</li>
+</ol>
+<hr>
+<h2 id="8-总结-1"><a href="#8-总结-1" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h2><p><code>QSqlQuery::prepare()</code> 是在执行 SQL 查询之前非常重要的一步，特别是当 SQL 查询包含占位符时。它用于预编译 SQL 查询，提升效率并确保 SQL 注入防护。在使用 <code>prepare()</code> 后，必须通过 <code>bindValue()</code> 绑定实际值，最后通过 <code>exec()</code> 执行查询。</p>
+<p>通过合理使用 <code>prepare()</code> 和 <code>bindValue()</code>，可以确保 SQL 查询的安全性和高效性。</p>
+<h2 id="QSqlQuery-bindValue-函数-详解"><a href="#QSqlQuery-bindValue-函数-详解" class="headerlink" title="QSqlQuery::bindValue() 函数 详解"></a>QSqlQuery::bindValue() 函数 详解</h2><p><code>QSqlQuery::bindValue()</code> 是 <code>QSqlQuery</code> 类中的一个重要函数，用于将实际的值绑定到 SQL 查询语句中的占位符。该函数与 <code>prepare()</code> 方法一起使用，使得我们可以安全地执行带有占位符的 SQL 查询，从而防止 SQL 注入攻击。</p>
+<h3 id="1-函数定义-2"><a href="#1-函数定义-2" class="headerlink" title="1. 函数定义"></a><strong>1. 函数定义</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::bindValue</span><span class="params">(<span class="type">int</span> pos, <span class="type">const</span> QVariant &amp;value)</span></span>;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::bindValue</span><span class="params">(<span class="type">const</span> QString &amp;name, <span class="type">const</span> QVariant &amp;value)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数-2"><a href="#参数-2" class="headerlink" title="参数"></a><strong>参数</strong></h3><ol>
+<li><p>**<code>int pos</code>**（对于位置占位符）：</p>
+<ul>
+<li><code>pos</code> 是占位符的位置，通常是从 0 开始的整数索引。它表示 SQL 查询中 <code>?</code> 占位符的位置。</li>
+</ul>
+</li>
+<li><p>**<code>QString name</code>**（对于命名占位符）：</p>
+<ul>
+<li><code>name</code> 是占位符的名称，通常是 SQL 查询中使用的 <code>:parameter_name</code> 形式的占位符。</li>
+</ul>
+</li>
+<li><p>**<code>QVariant value</code>**：</p>
+<ul>
+<li><code>value</code> 是要绑定到占位符上的实际值，类型为 <code>QVariant</code>。<code>QVariant</code> 可以保存任何类型的数据（如 <code>int</code>、<code>QString</code>、<code>QDate</code> 等），在绑定值时，<code>QSqlQuery</code> 会自动将值转换为适当的数据库类型。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li>**<code>true</code>**：成功绑定值。</li>
+<li>**<code>false</code>**：绑定失败，通常是由于无效的占位符或其他问题。</li>
+</ul>
+<hr>
+<h3 id="2-功能说明-1"><a href="#2-功能说明-1" class="headerlink" title="2. 功能说明"></a><strong>2. 功能说明</strong></h3><p><code>bindValue()</code> 允许将实际的值绑定到 SQL 查询语句中的占位符，这对于防止 SQL 注入攻击和提高查询的效率至关重要。<code>QSqlQuery</code> 支持两种占位符类型：</p>
+<ol>
+<li><strong>位置占位符（<code>?</code>）</strong>：用于按位置绑定参数。</li>
+<li><strong>命名占位符（<code>:parameter</code>）</strong>：用于按名称绑定参数，允许更灵活的代码。</li>
+</ol>
+<p>通过 <code>bindValue()</code>，查询语句中的占位符将被替换为实际的值，并且该查询语句将在调用 <code>exec()</code> 时执行。</p>
+<hr>
+<h3 id="3-使用示例-1"><a href="#3-使用示例-1" class="headerlink" title="3. 使用示例"></a><strong>3. 使用示例</strong></h3><h4 id="（1）绑定位置占位符（-）"><a href="#（1）绑定位置占位符（-）" class="headerlink" title="（1）绑定位置占位符（?）"></a><strong>（1）绑定位置占位符（<code>?</code>）</strong></h4><p>在 SQL 查询中使用位置占位符（<code>?</code>），然后按顺序绑定值。每个 <code>?</code> 占位符都需要通过 <code>addBindValue()</code> 或 <code>bindValue()</code> 绑定一个值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE age &gt; ? AND country = ?&quot;</span>);</span><br><span class="line">query.<span class="built_in">addBindValue</span>(<span class="number">30</span>);  <span class="comment">// 绑定第一个 ? 占位符</span></span><br><span class="line">query.<span class="built_in">addBindValue</span>(<span class="string">&quot;USA&quot;</span>);  <span class="comment">// 绑定第二个 ? 占位符</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">        <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();  <span class="comment">// 获取第 0 列（id）</span></span><br><span class="line">        QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第 1 列（name）</span></span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>query.prepare()</code> 中的 <code>?</code> 占位符依次被 <code>addBindValue()</code> 绑定的参数值替代。</p>
+<h4 id="（2）绑定命名占位符（-parameter）"><a href="#（2）绑定命名占位符（-parameter）" class="headerlink" title="（2）绑定命名占位符（:parameter）"></a><strong>（2）绑定命名占位符（<code>:parameter</code>）</strong></h4><p>命名占位符使用 <code>:parameter</code> 的形式，您可以使用 <code>bindValue()</code> 按名称绑定参数。命名占位符比位置占位符更直观，尤其是在查询中包含多个相同类型的占位符时。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE age &gt; :age AND country = :country&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);  <span class="comment">// 绑定 :age 占位符</span></span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:country&quot;</span>, <span class="string">&quot;USA&quot;</span>);  <span class="comment">// 绑定 :country 占位符</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">        <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();  <span class="comment">// 获取第 0 列（id）</span></span><br><span class="line">        QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第 1 列（name）</span></span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error executing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，查询语句中的 <code>:age</code> 和 <code>:country</code> 被绑定为 <code>30</code> 和 <code>&quot;USA&quot;</code>，在执行时，这些占位符将被相应的值替换。</p>
+<h4 id="（3）插入数据-1"><a href="#（3）插入数据-1" class="headerlink" title="（3）插入数据"></a><strong>（3）插入数据</strong></h4><p>对于 <code>INSERT</code> 查询，可以使用命名占位符或位置占位符来插入数据：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO users (name, age) VALUES (:name, :age)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">25</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data inserted successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error inserting data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="（4）更新数据"><a href="#（4）更新数据" class="headerlink" title="（4）更新数据"></a><strong>（4）更新数据</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;UPDATE users SET age = :age WHERE name = :name&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">31</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (query.<span class="built_in">exec</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data updated successfully!&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error updating data:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-常见用法"><a href="#4-常见用法" class="headerlink" title="4. 常见用法"></a><strong>4. 常见用法</strong></h3><ol>
+<li><p><strong>绑定多个值</strong>：在 SQL 查询中如果包含多个占位符，可以逐一使用 <code>bindValue()</code> 绑定实际值。例如，多个 <code>?</code> 或 <code>:parameter</code> 占位符都可以通过 <code>bindValue()</code> 按顺序绑定值。</p>
+</li>
+<li><p><strong>绑定各种类型的值</strong>：</p>
+<ul>
+<li><code>QVariant</code> 可以保存任何类型的数据，包括 <code>int</code>、<code>QString</code>、<code>double</code>、<code>QDate</code>、<code>QTime</code> 等。通过 <code>QVariant</code>，<code>QSqlQuery</code> 可以自动将这些类型转换为数据库可接受的格式。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO users (name, age, registration_date) VALUES (:name, :age, :date)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Alice&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="number">30</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:date&quot;</span>, QDate::<span class="built_in">currentDate</span>());</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>NULL 值绑定</strong>：如果需要绑定 <code>NULL</code> 值，可以使用 <code>QVariant()</code>（默认构造函数返回一个空的 <code>QVariant</code>，表示 <code>NULL</code>）。</p>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;INSERT INTO users (name, age) VALUES (:name, :age)&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;Bob&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:age&quot;</span>, <span class="built_in">QVariant</span>());  <span class="comment">// 绑定 NULL 值</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>批量查询</strong>：通过多次绑定不同的值，可以执行批量查询或插入操作，减少多次 SQL 执行的开销。</p>
+</li>
+</ol>
+<hr>
+<h3 id="5-错误处理-1"><a href="#5-错误处理-1" class="headerlink" title="5. 错误处理"></a><strong>5. 错误处理</strong></h3><ul>
+<li>如果绑定值失败，<code>bindValue()</code> 会返回 <code>false</code>，通常是由于占位符无效或不匹配。要查看具体的错误信息，可以通过 <code>lastError()</code> 获取。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM users WHERE age &gt; ?&quot;</span>)) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error preparing query:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">bindValue</span>(<span class="number">0</span>, <span class="number">30</span>)) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Error binding value:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="6-总结-1"><a href="#6-总结-1" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h3><ul>
+<li><code>QSqlQuery::bindValue()</code> 是将实际的值绑定到 SQL 查询语句中的占位符的关键方法。</li>
+<li>它支持位置占位符（<code>?</code>）和命名占位符（<code>:parameter_name</code>）。</li>
+<li>通过 <code>bindValue()</code>，可以安全地为查询语句的占位符绑定数据，避免 SQL 注入。</li>
+<li>支持绑定各种类型的值，包括 <code>int</code>、<code>QString</code>、<code>QDate</code>、<code>QVariant()</code>（NULL 值）等。</li>
+<li><code>bindValue()</code> 是与 <code>prepare()</code> 和 <code>exec()</code> 配合使用的，确保 SQL 查询的安全性和效率。</li>
+</ul>
+<h2 id="QSqlQuery-next-函数-详解"><a href="#QSqlQuery-next-函数-详解" class="headerlink" title="QSqlQuery::next() 函数 详解"></a>QSqlQuery::next() 函数 详解</h2><p><code>QSqlQuery::next()</code> 是 <code>QSqlQuery</code> 类中的一个函数，主要用于在执行 SQL 查询后，逐行访问查询结果集中的数据。每次调用 <code>next()</code>，<code>QSqlQuery</code> 会移动到查询结果中的下一行。如果查询结果中还有更多行，<code>next()</code> 会返回 <code>true</code>，否则返回 <code>false</code>。</p>
+<h3 id="1-函数定义-3"><a href="#1-函数定义-3" class="headerlink" title="1. 函数定义"></a><strong>1. 函数定义</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QSqlQuery::next</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数-3"><a href="#参数-3" class="headerlink" title="参数"></a><strong>参数</strong></h3><ul>
+<li><strong>无参数</strong>。</li>
+</ul>
+<h3 id="返回值-3"><a href="#返回值-3" class="headerlink" title="返回值"></a><strong>返回值</strong></h3><ul>
+<li>**<code>true</code>**：成功移动到下一行，查询结果中仍有更多行。</li>
+<li>**<code>false</code>**：查询结果集没有更多的行，通常是当结果集已遍历完或查询失败时。</li>
+</ul>
+<hr>
+<h3 id="2-功能说明-2"><a href="#2-功能说明-2" class="headerlink" title="2. 功能说明"></a><strong>2. 功能说明</strong></h3><p><code>next()</code> 函数是查询结果集中数据访问的基础。通常，<code>QSqlQuery</code> 执行查询后，会获得一个结果集，该结果集包含多行数据。通过调用 <code>next()</code>，可以按顺序访问每一行数据。每次调用 <code>next()</code>，查询结果指针会移动到下一行，直到遍历完所有的结果行。</p>
+<ul>
+<li><strong>移动指针</strong>：每次调用 <code>next()</code>，查询结果集的指针就会向前移动一行。</li>
+<li><strong>获取当前行的数据</strong>：可以通过 <code>value()</code> 函数来获取当前行的各列数据。</li>
+<li><strong>查询结果遍历</strong>：在循环中通常与 <code>next()</code> 配合使用，直到返回 <code>false</code>，表示已经遍历完所有结果。</li>
+</ul>
+<hr>
+<h3 id="3-使用示例-2"><a href="#3-使用示例-2" class="headerlink" title="3. 使用示例"></a><strong>3. 使用示例</strong></h3><h4 id="（1）简单的查询遍历"><a href="#（1）简单的查询遍历" class="headerlink" title="（1）简单的查询遍历"></a><strong>（1）简单的查询遍历</strong></h4><p>假设我们有一个名为 <code>users</code> 的数据库表，其中包含 <code>id</code>、<code>name</code> 和 <code>age</code> 列。以下是一个常见的查询例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">exec</span>(<span class="string">&quot;SELECT id, name, age FROM users&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">    <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="number">0</span>).<span class="built_in">toInt</span>();        <span class="comment">// 获取第 0 列（id）</span></span><br><span class="line">    QString name = query.<span class="built_in">value</span>(<span class="number">1</span>).<span class="built_in">toString</span>();  <span class="comment">// 获取第 1 列（name）</span></span><br><span class="line">    <span class="type">int</span> age = query.<span class="built_in">value</span>(<span class="number">2</span>).<span class="built_in">toInt</span>();       <span class="comment">// 获取第 2 列（age）</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name &lt;&lt; <span class="string">&quot;Age:&quot;</span> &lt;&lt; age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>query.next()</code> 每次调用时将移动到查询结果的下一行。当没有更多的行时，<code>next()</code> 会返回 <code>false</code>，循环结束。</p>
+<h4 id="（2）使用-next-处理查询结果"><a href="#（2）使用-next-处理查询结果" class="headerlink" title="（2）使用 next() 处理查询结果"></a><strong>（2）使用 <code>next()</code> 处理查询结果</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">prepare</span>(<span class="string">&quot;SELECT * FROM employees WHERE department = :dept&quot;</span>);</span><br><span class="line">query.<span class="built_in">bindValue</span>(<span class="string">&quot;:dept&quot;</span>, <span class="string">&quot;Sales&quot;</span>);</span><br><span class="line">query.<span class="built_in">exec</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">    <span class="type">int</span> id = query.<span class="built_in">value</span>(<span class="string">&quot;id&quot;</span>).<span class="built_in">toInt</span>();  <span class="comment">// 通过列名获取数据</span></span><br><span class="line">    QString name = query.<span class="built_in">value</span>(<span class="string">&quot;name&quot;</span>).<span class="built_in">toString</span>();</span><br><span class="line">    QString department = query.<span class="built_in">value</span>(<span class="string">&quot;department&quot;</span>).<span class="built_in">toString</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;ID:&quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;Name:&quot;</span> &lt;&lt; name &lt;&lt; <span class="string">&quot;Department:&quot;</span> &lt;&lt; department;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们使用命名占位符 <code>:dept</code> 来执行查询，并通过列名（如 <code>&quot;id&quot;</code>, <code>&quot;name&quot;</code>）访问当前行的列数据。</p>
+<hr>
+<h3 id="4-next-与-first-和-last"><a href="#4-next-与-first-和-last" class="headerlink" title="4. next() 与 first() 和 last()"></a><strong>4. <code>next()</code> 与 <code>first()</code> 和 <code>last()</code></strong></h3><ul>
+<li>**<code>first()</code>**：将查询指针移动到结果集的第一行。</li>
+<li>**<code>last()</code>**：将查询指针移动到结果集的最后一行。</li>
+<li>**<code>next()</code>**：将查询指针移动到下一行，通常用于在 <code>while</code> 循环中逐行访问结果。</li>
+</ul>
+<p><code>next()</code> 通常在循环中与其他方法（如 <code>first()</code>、<code>last()</code>）配合使用，以方便控制查询结果的遍历。</p>
+<hr>
+<h3 id="5-错误处理-2"><a href="#5-错误处理-2" class="headerlink" title="5. 错误处理"></a><strong>5. 错误处理</strong></h3><ul>
+<li><code>next()</code> 本身不会导致错误，但它的返回值可以反映是否成功读取数据。如果返回 <code>false</code>，说明查询结果集没有更多数据。</li>
+<li>在执行查询之前，可以使用 <code>lastError()</code> 方法检查 SQL 查询是否成功。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">exec</span>(<span class="string">&quot;SELECT id, name FROM users&quot;</span>)) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Query execution failed:&quot;</span> &lt;&lt; query.<span class="built_in">lastError</span>().<span class="built_in">text</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">    <span class="comment">// 处理数据</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中，查询失败时，<code>lastError()</code> 会提供详细的错误信息。</p>
+<hr>
+<h3 id="6-注意事项"><a href="#6-注意事项" class="headerlink" title="6. 注意事项"></a><strong>6. 注意事项</strong></h3><ul>
+<li><strong>查询失败的情况</strong>：如果 <code>next()</code> 返回 <code>false</code>，可能是因为查询没有返回任何结果，或者查询执行失败。可以通过 <code>lastError()</code> 获取更多信息。</li>
+<li><strong>访问无效行</strong>：在调用 <code>next()</code> 之前，应该确保查询已成功执行。如果查询失败，调用 <code>next()</code> 会返回 <code>false</code>，导致无法获取任何数据。</li>
+<li><strong>列的索引和名称</strong>：在 <code>query.value()</code> 中可以使用列索引或列名称来访问查询结果。对于位置占位符的查询，通常使用列索引（如 <code>0</code>、<code>1</code> 等）；对于命名占位符的查询，通常使用列名称（如 <code>&quot;id&quot;</code>, <code>&quot;name&quot;</code>）。</li>
+</ul>
+<hr>
+<h3 id="7-示例：处理无结果的情况"><a href="#7-示例：处理无结果的情况" class="headerlink" title="7. 示例：处理无结果的情况"></a><strong>7. 示例：处理无结果的情况</strong></h3><p>如果查询没有返回任何结果，<code>next()</code> 会立即返回 <code>false</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">QSqlQuery query;</span><br><span class="line">query.<span class="built_in">exec</span>(<span class="string">&quot;SELECT * FROM non_existing_table&quot;</span>);  <span class="comment">// 查询一个不存在的表</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!query.<span class="built_in">next</span>()) &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;No data found or query execution failed.&quot;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Data found.&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的例子中，如果查询没有返回任何数据，<code>next()</code> 会返回 <code>false</code>，并输出 “No data found or query execution failed.”。</p>
+<hr>
+<h3 id="8-总结-2"><a href="#8-总结-2" class="headerlink" title="8. 总结"></a><strong>8. 总结</strong></h3><ul>
+<li><code>QSqlQuery::next()</code> 是用于在执行查询后逐行读取查询结果的函数。</li>
+<li>每次调用 <code>next()</code>，查询结果指针会向前移动一行，直到没有更多数据时返回 <code>false</code>。</li>
+<li><code>next()</code> 在循环中广泛使用，通常与 <code>while</code> 或 <code>for</code> 循环一起使用，逐行处理查询结果。</li>
+<li><code>next()</code> 与 <code>first()</code>、<code>last()</code> 方法搭配使用时，可以灵活地控制查询指针的位置。</li>
+<li>使用 <code>query.value()</code> 方法获取当前行的列数据时，可以根据需要使用列索引或列名。</li>
+</ul>
+<p><code>next()</code> 是处理查询结果集时的重要函数，帮助开发者顺序遍历查询结果并访问数据。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Qt-class/" rel="tag"># Qt-class</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/01/13/notebook/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2025-01-13-10-QLineEdit/" rel="prev" title="QLineEdit">
+      <i class="fa fa-chevron-left"></i> QLineEdit
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/13/notebook/Compiler/2025-01-13-%E8%A7%A3%E5%86%B3Windows%E4%B8%8BVSCode+CMake%E9%A1%B9%E7%9B%AE%E7%BC%96%E8%AF%91%E9%80%9F%E5%BA%A6%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98/" rel="next" title="解决Windows下VSCode+CMake的C++项目编译慢的问题">
+      解决Windows下VSCode+CMake的C++项目编译慢的问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QSqlQuery-%E7%B1%BB-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">QSqlQuery 类 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%B1%BB%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">1. 类概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">2. 常用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.1.</span> <span class="nav-text">（1）构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E6%89%A7%E8%A1%8C-SQL-%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.2.2.</span> <span class="nav-text">（2）执行 SQL 查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C%E5%A4%84%E7%90%86"><span class="nav-number">2.2.3.</span> <span class="nav-text">（3）查询结果处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%BB%91%E5%AE%9A%E6%9F%A5%E8%AF%A2%E5%8F%82%E6%95%B0"><span class="nav-number">2.2.4.</span> <span class="nav-text">（4）绑定查询参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%885%EF%BC%89%E8%8E%B7%E5%8F%96%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C%E7%9A%84%E5%AD%97%E6%AE%B5%E5%90%8D"><span class="nav-number">2.2.5.</span> <span class="nav-text">（5）获取查询结果的字段名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%886%EF%BC%89%E4%BA%8B%E5%8A%A1%E6%94%AF%E6%8C%81"><span class="nav-number">2.2.6.</span> <span class="nav-text">（6）事务支持</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C"><span class="nav-number">2.3.</span> <span class="nav-text">3. 常用操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">2.3.1.</span> <span class="nav-text">（1）插入数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="nav-number">2.3.2.</span> <span class="nav-text">（2）更新数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="nav-number">2.3.3.</span> <span class="nav-text">（3）删除数据</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BA%8B%E5%8A%A1%E6%94%AF%E6%8C%81"><span class="nav-number">2.4.</span> <span class="nav-text">4. 事务支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">2.5.</span> <span class="nav-text">5. 常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2%E5%A4%B1%E8%B4%A5"><span class="nav-number">2.5.1.</span> <span class="nav-text">（1）执行查询失败</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BB%91%E5%AE%9A%E5%80%BC%E5%A4%B1%E8%B4%A5"><span class="nav-number">2.5.2.</span> <span class="nav-text">（2）绑定值失败</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E4%BA%8B%E5%8A%A1%E6%9C%AA%E6%8F%90%E4%BA%A4"><span class="nav-number">2.5.3.</span> <span class="nav-text">（3）事务未提交</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">2.6.</span> <span class="nav-text">6. 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QSqlQuery-exec-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">QSqlQuery::exec() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">4.</span> <span class="nav-text">1. 函数定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0"><span class="nav-number">4.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">4.2.</span> <span class="nav-text">返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E"><span class="nav-number">5.</span> <span class="nav-text">2. 功能说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"><span class="nav-number">5.1.</span> <span class="nav-text">执行查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E5%8F%82%E6%95%B0"><span class="nav-number">5.2.</span> <span class="nav-text">查询参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">6.</span> <span class="nav-text">3. 使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%89%A7%E8%A1%8C-SELECT-%E6%9F%A5%E8%AF%A2"><span class="nav-number">6.1.</span> <span class="nav-text">（1）执行 SELECT 查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E6%89%A7%E8%A1%8C-INSERT-%E6%9F%A5%E8%AF%A2"><span class="nav-number">6.2.</span> <span class="nav-text">（2）执行 INSERT 查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%89%A7%E8%A1%8C-UPDATE-%E6%9F%A5%E8%AF%A2"><span class="nav-number">6.3.</span> <span class="nav-text">（3）执行 UPDATE 查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E6%89%A7%E8%A1%8C-DELETE-%E6%9F%A5%E8%AF%A2"><span class="nav-number">6.4.</span> <span class="nav-text">（4）执行 DELETE 查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">4. 错误处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%9F%A5%E8%AF%A2%E5%A4%B1%E8%B4%A5"><span class="nav-number">7.1.</span> <span class="nav-text">（1）查询失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E8%8E%B7%E5%8F%96%E8%AF%A6%E7%BB%86%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF"><span class="nav-number">7.2.</span> <span class="nav-text">（2）获取详细错误信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E4%BD%BF%E7%94%A8-prepare-%E5%92%8C-bindValue"><span class="nav-number">8.</span> <span class="nav-text">5. 使用 prepare() 和 bindValue()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%87%86%E5%A4%87%E8%AF%AD%E5%8F%A5"><span class="nav-number">8.1.</span> <span class="nav-text">（1）准备语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BB%91%E5%AE%9A%E5%8F%82%E6%95%B0"><span class="nav-number">8.2.</span> <span class="nav-text">（2）绑定参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%9F%A5%E8%AF%A2%E7%B1%BB%E5%9E%8B%E6%80%BB%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">6. 查询类型总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">10.</span> <span class="nav-text">7. 注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">8. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QSqlQuery-prepare-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">QSqlQuery::prepare() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89-1"><span class="nav-number">13.</span> <span class="nav-text">1. 函数定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0-1"><span class="nav-number">13.1.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-1"><span class="nav-number">13.2.</span> <span class="nav-text">返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8D%A0%E4%BD%8D%E7%AC%A6%E5%92%8C%E7%BB%91%E5%AE%9A%E5%80%BC"><span class="nav-number">14.</span> <span class="nav-text">2. 占位符和绑定值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%8D%A0%E4%BD%8D%E7%AC%A6%E7%B1%BB%E5%9E%8B"><span class="nav-number">14.1.</span> <span class="nav-text">（1）占位符类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BB%91%E5%AE%9A%E5%80%BC"><span class="nav-number">14.2.</span> <span class="nav-text">（2）绑定值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8-prepare-%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="nav-number">15.</span> <span class="nav-text">3. 使用 prepare() 的步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E6%9E%84%E5%BB%BA-SQL-%E6%9F%A5%E8%AF%A2"><span class="nav-number">15.1.</span> <span class="nav-text">（1）构建 SQL 查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BB%91%E5%AE%9A%E5%AE%9E%E9%99%85%E5%80%BC"><span class="nav-number">15.2.</span> <span class="nav-text">（2）绑定实际值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"><span class="nav-number">15.3.</span> <span class="nav-text">（3）执行查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%A4%BA%E4%BE%8B"><span class="nav-number">16.</span> <span class="nav-text">4. 示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E4%BD%BF%E7%94%A8-%E4%BD%8D%E7%BD%AE%E5%8D%A0%E4%BD%8D%E7%AC%A6"><span class="nav-number">16.1.</span> <span class="nav-text">（1）使用 ? 位置占位符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E4%BD%BF%E7%94%A8-parameter-%E5%91%BD%E5%90%8D%E5%8D%A0%E4%BD%8D%E7%AC%A6"><span class="nav-number">16.2.</span> <span class="nav-text">（2）使用 :parameter 命名占位符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">16.3.</span> <span class="nav-text">（3）插入数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-number">17.</span> <span class="nav-text">5. 错误处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF"><span class="nav-number">17.1.</span> <span class="nav-text">获取错误信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-prepare-%E5%92%8C-bindValue-%E7%9A%84%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8"><span class="nav-number">18.</span> <span class="nav-text">6. prepare() 和 bindValue() 的配合使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-1"><span class="nav-number">19.</span> <span class="nav-text">7. 注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93-1"><span class="nav-number">20.</span> <span class="nav-text">8. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QSqlQuery-bindValue-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">21.</span> <span class="nav-text">QSqlQuery::bindValue() 函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89-2"><span class="nav-number">21.1.</span> <span class="nav-text">1. 函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0-2"><span class="nav-number">21.2.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-2"><span class="nav-number">21.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E-1"><span class="nav-number">21.4.</span> <span class="nav-text">2. 功能说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">21.5.</span> <span class="nav-text">3. 使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E7%BB%91%E5%AE%9A%E4%BD%8D%E7%BD%AE%E5%8D%A0%E4%BD%8D%E7%AC%A6%EF%BC%88-%EF%BC%89"><span class="nav-number">21.5.1.</span> <span class="nav-text">（1）绑定位置占位符（?）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BB%91%E5%AE%9A%E5%91%BD%E5%90%8D%E5%8D%A0%E4%BD%8D%E7%AC%A6%EF%BC%88-parameter%EF%BC%89"><span class="nav-number">21.5.2.</span> <span class="nav-text">（2）绑定命名占位符（:parameter）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE-1"><span class="nav-number">21.5.3.</span> <span class="nav-text">（3）插入数据</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="nav-number">21.6.</span> <span class="nav-text">（4）更新数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95"><span class="nav-number">21.7.</span> <span class="nav-text">4. 常见用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86-1"><span class="nav-number">21.8.</span> <span class="nav-text">5. 错误处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93-1"><span class="nav-number">21.9.</span> <span class="nav-text">6. 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QSqlQuery-next-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">22.</span> <span class="nav-text">QSqlQuery::next() 函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89-3"><span class="nav-number">22.1.</span> <span class="nav-text">1. 函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0-3"><span class="nav-number">22.2.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-3"><span class="nav-number">22.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E-2"><span class="nav-number">22.4.</span> <span class="nav-text">2. 功能说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-2"><span class="nav-number">22.5.</span> <span class="nav-text">3. 使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E7%AE%80%E5%8D%95%E7%9A%84%E6%9F%A5%E8%AF%A2%E9%81%8D%E5%8E%86"><span class="nav-number">22.5.1.</span> <span class="nav-text">（1）简单的查询遍历</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E4%BD%BF%E7%94%A8-next-%E5%A4%84%E7%90%86%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C"><span class="nav-number">22.5.2.</span> <span class="nav-text">（2）使用 next() 处理查询结果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-next-%E4%B8%8E-first-%E5%92%8C-last"><span class="nav-number">22.6.</span> <span class="nav-text">4. next() 与 first() 和 last()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86-2"><span class="nav-number">22.7.</span> <span class="nav-text">5. 错误处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">22.8.</span> <span class="nav-text">6. 注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%A4%84%E7%90%86%E6%97%A0%E7%BB%93%E6%9E%9C%E7%9A%84%E6%83%85%E5%86%B5"><span class="nav-number">22.9.</span> <span class="nav-text">7. 示例：处理无结果的情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93-2"><span class="nav-number">22.10.</span> <span class="nav-text">8. 总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

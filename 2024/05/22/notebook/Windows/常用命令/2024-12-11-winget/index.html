@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要本文介绍了 Windows 的包管理工具 winget，包括其基本功能、常用命令、安装方法、使用优点以及一些常用技巧。winget 允许用户通过命令行高效地安装、升级、配置、删除和搜索软件包。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="winget">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-11-winget/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要本文介绍了 Windows 的包管理工具 winget，包括其基本功能、常用命令、安装方法、使用优点以及一些常用技巧。winget 允许用户通过命令行高效地安装、升级、配置、删除和搜索软件包。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.584Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-11-winget/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>winget | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-11-winget/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          winget
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows/" itemprop="url" rel="index"><span itemprop="name">Windows</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文介绍了 Windows 的包管理工具 <code>winget</code>，包括其基本功能、常用命令、安装方法、使用优点以及一些常用技巧。<code>winget</code> 允许用户通过命令行高效地安装、升级、配置、删除和搜索软件包。</p>
+<span id="more"></span>
+
+<h2 id="windows-winget-命令-是什么"><a href="#windows-winget-命令-是什么" class="headerlink" title="windows winget 命令 是什么"></a>windows winget 命令 是什么</h2><p><code>winget</code> 是 Windows 的包管理工具，全称为 <strong>Windows Package Manager</strong>。它允许用户通过命令行安装、升级、配置、删除和搜索软件包（应用程序）。它类似于 Linux 上的包管理工具，比如 <code>apt</code> 和 <code>yum</code>，但专为 Windows 平台设计。</p>
+<p><code>winget</code> 是由 Microsoft 开发的，并从 Windows 10 的 2004 版本开始逐步推出。如果你的系统是较新的 Windows 10 或 Windows 11，<code>winget</code> 应该已经可用。</p>
+<hr>
+<h3 id="如何使用-winget"><a href="#如何使用-winget" class="headerlink" title="如何使用 winget"></a>如何使用 <code>winget</code></h3><p>以下是一些常见的 <code>winget</code> 命令及其用途：</p>
+<h4 id="1-检查是否安装了-winget"><a href="#1-检查是否安装了-winget" class="headerlink" title="1. 检查是否安装了 winget"></a>1. 检查是否安装了 <code>winget</code></h4><p>在命令提示符或 PowerShell 中运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget --version</span><br></pre></td></tr></table></figure>
+<p>如果已安装，系统会显示 <code>winget</code> 的版本号。</p>
+<h4 id="2-搜索软件包"><a href="#2-搜索软件包" class="headerlink" title="2. 搜索软件包"></a>2. 搜索软件包</h4><p>要查找可用的软件，可以使用以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget search 软件名</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget search vscode</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-安装软件"><a href="#3-安装软件" class="headerlink" title="3. 安装软件"></a>3. 安装软件</h4><p>使用 <code>winget install</code> 命令安装软件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install 软件名</span><br></pre></td></tr></table></figure>
+<p>例如，安装 Visual Studio Code：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install Microsoft.VisualStudioCode</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-卸载软件"><a href="#4-卸载软件" class="headerlink" title="4. 卸载软件"></a>4. 卸载软件</h4><p>要卸载已安装的软件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget uninstall 软件名</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget uninstall Microsoft.VisualStudioCode</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-查看已安装的软件"><a href="#5-查看已安装的软件" class="headerlink" title="5. 查看已安装的软件"></a>5. 查看已安装的软件</h4><p>列出所有已安装的软件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget list</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-升级软件"><a href="#6-升级软件" class="headerlink" title="6. 升级软件"></a>6. 升级软件</h4><p>升级特定的软件或系统中所有可升级的软件：</p>
+<ul>
+<li>升级特定软件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget upgrade 软件名</span><br></pre></td></tr></table></figure></li>
+<li>升级所有软件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget upgrade --all</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="7-获取软件包信息"><a href="#7-获取软件包信息" class="headerlink" title="7. 获取软件包信息"></a>7. 获取软件包信息</h4><p>查看某个软件的详细信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget show 软件名</span><br></pre></td></tr></table></figure>
+
+<h4 id="8-导入和导出软件包列表"><a href="#8-导入和导出软件包列表" class="headerlink" title="8. 导入和导出软件包列表"></a>8. 导入和导出软件包列表</h4><ul>
+<li>导出当前系统的已安装软件列表：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">export</span> -o 软件列表.json</span><br></pre></td></tr></table></figure></li>
+<li>从导出的列表中安装软件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget import -i 软件列表.json</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="9-查看帮助信息"><a href="#9-查看帮助信息" class="headerlink" title="9. 查看帮助信息"></a>9. 查看帮助信息</h4><p>查看 <code>winget</code> 支持的所有命令和选项：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="安装-Winget"><a href="#安装-Winget" class="headerlink" title="安装 Winget"></a>安装 Winget</h3><p>如果你的系统中没有安装 <code>winget</code>，可以通过以下方式获取：</p>
+<ol>
+<li><p><strong>通过 Microsoft Store 更新 App Installer</strong>：</p>
+<ul>
+<li>在 Microsoft Store 中搜索 <code>App Installer</code> 并安装最新版本。</li>
+</ul>
+</li>
+<li><p><strong>从 GitHub 下载安装</strong>：</p>
+<ul>
+<li>转到 <a target="_blank" rel="noopener" href="https://github.com/microsoft/winget-cli">Windows Package Manager GitHub 页面</a> 并下载最新的安装包。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="使用-Winget-的优点"><a href="#使用-Winget-的优点" class="headerlink" title="使用 Winget 的优点"></a>使用 Winget 的优点</h3><ol>
+<li><strong>快速安装</strong>：无需手动搜索和下载安装包，命令行即可完成安装。</li>
+<li><strong>一致性</strong>：所有软件包通过统一的方式安装和管理。</li>
+<li><strong>批量操作</strong>：可通过脚本批量安装、升级和卸载软件。</li>
+<li><strong>开源社区支持</strong>：Winget 支持用户贡献软件包信息。</li>
+</ol>
+<p><code>winget</code> 是一个非常高效的工具，尤其适合开发人员或需要经常配置系统环境的用户。</p>
+<h2 id="winget-常用参数-详解"><a href="#winget-常用参数-详解" class="headerlink" title="winget 常用参数 详解"></a>winget 常用参数 详解</h2><p>以下是 <strong>Winget（Windows Package Manager）</strong> 的常用命令及参数的详解，帮助用户高效安装、管理和卸载软件。</p>
+<hr>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a><strong>常用命令</strong></h3><ol>
+<li><p><strong><code>install</code> - 安装软件</strong><br>安装指定的软件包。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install &lt;软件名称或ID&gt;</span><br></pre></td></tr></table></figure>
+<p>常用参数：</p>
+<ul>
+<li><code>--id</code>：指定软件的唯一标识符（如 <code>Git.Git</code>）。</li>
+<li><code>--name</code>：通过名称查找软件包。</li>
+<li><code>--exact/-e</code>：精确匹配软件名称。</li>
+<li><code>--silent/-h</code>：静默安装，无需用户交互。</li>
+</ul>
+</li>
+<li><p><strong><code>upgrade</code> - 升级软件</strong><br>升级已安装的软件到最新版本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget upgrade [软件名称]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>--all</code>：升级所有可升级的软件。</li>
+<li><code>--version</code>：指定要升级到的版本。</li>
+</ul>
+</li>
+<li><p><strong><code>uninstall</code> - 卸载软件</strong><br>卸载已安装的软件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget uninstall &lt;软件名称&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>list</code> - 查看已安装的软件</strong><br>列出所有已安装的软件包及其版本信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget list</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>search</code> - 搜索软件</strong><br>搜索可用的软件包。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget search &lt;关键字&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>show</code> - 显示软件信息</strong><br>查看软件包的详细信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget show &lt;软件名称或ID&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>export</code> 和 <code>import</code></strong>  </p>
+<ul>
+<li>导出已安装的软件列表：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">export</span> -o &lt;文件路径&gt;</span><br></pre></td></tr></table></figure></li>
+<li>批量安装软件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget import -i &lt;文件路径&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong><code>source</code> - 管理包源</strong><br>管理软件包来源。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">source</span> list</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>settings</code> - 调整设置</strong><br>打开配置文件以修改 Winget 的行为。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget settings</span><br></pre></td></tr></table></figure></li>
+</ol>
+<hr>
+<h3 id="辅助参数"><a href="#辅助参数" class="headerlink" title="辅助参数"></a><strong>辅助参数</strong></h3><ul>
+<li><code>--help/-h</code>：显示指定命令的帮助文档。</li>
+<li><code>--version</code>：显示 Winget 的版本号。</li>
+<li><code>--accept-source-agreements</code>：跳过许可协议提示。</li>
+</ul>
+<hr>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a><strong>示例</strong></h3><ol>
+<li>安装 Git：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install --<span class="built_in">id</span> Git.Git -e</span><br></pre></td></tr></table></figure></li>
+<li>升级所有软件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget upgrade --all</span><br></pre></td></tr></table></figure></li>
+<li>搜索 VLC：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget search VLC</span><br></pre></td></tr></table></figure></li>
+</ol>
+<hr>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ul>
+<li>Winget 会尝试使用本地存储的清单来管理软件，部分软件可能需要手动干预，例如弹出窗口确认卸载【7】【8】【9】。</li>
+</ul>
+<p>更多信息可参考：  </p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ashet/p/18220413">Winget 使用指南 - 博客园</a>【7】  </li>
+<li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/package-manager">Winget 官方文档</a></li>
+</ul>
+<h2 id="winget-常用技巧-详解"><a href="#winget-常用技巧-详解" class="headerlink" title="winget 常用技巧 详解"></a>winget 常用技巧 详解</h2><p>以下是使用 Winget（Windows 包管理工具）的一些常用技巧，帮助用户高效管理系统软件：</p>
+<hr>
+<h3 id="1-快速安装软件"><a href="#1-快速安装软件" class="headerlink" title="1. 快速安装软件"></a><strong>1. 快速安装软件</strong></h3><ul>
+<li><strong>精准安装</strong>：使用软件 ID 来避免名称冲突。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install --<span class="built_in">id</span> &lt;软件ID&gt;</span><br></pre></td></tr></table></figure>
+示例：安装 Git<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install --<span class="built_in">id</span> Git.Git</span><br></pre></td></tr></table></figure></li>
+<li><strong>静默安装</strong>：用于批量部署。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget install &lt;软件ID&gt; --silent</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="2-管理已安装的软件"><a href="#2-管理已安装的软件" class="headerlink" title="2. 管理已安装的软件"></a><strong>2. 管理已安装的软件</strong></h3><ul>
+<li><strong>批量升级所有软件</strong>：一条命令更新所有可升级的软件。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget upgrade --all</span><br></pre></td></tr></table></figure></li>
+<li><strong>卸载未使用的软件</strong>：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget uninstall &lt;软件名称&gt;</span><br></pre></td></tr></table></figure>
+可配合 <code>winget list</code> 查找目标软件。</li>
+</ul>
+<hr>
+<h3 id="3-导出和导入软件列表"><a href="#3-导出和导入软件列表" class="headerlink" title="3. 导出和导入软件列表"></a><strong>3. 导出和导入软件列表</strong></h3><ul>
+<li><strong>导出列表</strong>：将当前安装的软件导出为文件，用于重装或迁移系统。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">export</span> -o software-list.json</span><br></pre></td></tr></table></figure></li>
+<li><strong>批量安装</strong>：根据导出的文件重装软件。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget import -i software-list.json</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="4-高效搜索"><a href="#4-高效搜索" class="headerlink" title="4. 高效搜索"></a><strong>4. 高效搜索</strong></h3><ul>
+<li>使用关键字快速定位软件包：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget search &lt;关键词&gt;</span><br></pre></td></tr></table></figure>
+示例：搜索 VLC 播放器<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget search VLC</span><br></pre></td></tr></table></figure></li>
+<li><strong>查看软件详情</strong>：帮助确认软件信息是否符合需求。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget show &lt;软件名称或ID&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="5-自定义包源"><a href="#5-自定义包源" class="headerlink" title="5. 自定义包源"></a><strong>5. 自定义包源</strong></h3><ul>
+<li>查看当前包源：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">source</span> list</span><br></pre></td></tr></table></figure></li>
+<li>添加本地或网络包源：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">source</span> add --name &lt;源名称&gt; --arg &lt;URL&gt;</span><br></pre></td></tr></table></figure></li>
+<li>删除无用包源：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget <span class="built_in">source</span> remove &lt;源名称&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="6-调试和优化"><a href="#6-调试和优化" class="headerlink" title="6. 调试和优化"></a><strong>6. 调试和优化</strong></h3><ul>
+<li>查看 Winget 的日志：帮助排查错误。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget --info</span><br></pre></td></tr></table></figure></li>
+<li>打开设置文件，调整行为。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget settings</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="7-使用技巧"><a href="#7-使用技巧" class="headerlink" title="7. 使用技巧"></a><strong>7. 使用技巧</strong></h3><ul>
+<li><strong>脚本化管理</strong>：将常用的安装或更新命令写入脚本，方便批量执行。</li>
+<li><strong>结合实验性功能</strong>：启用实验性功能如可配置清单，使用更强大的包管理功能。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winget features</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ul>
+<li>Winget 需要管理员权限才能执行某些操作。</li>
+<li>部分软件可能会弹出交互窗口，影响静默操作【7】【8】【9】。</li>
+</ul>
+<p>通过这些技巧，您可以利用 Winget 快速部署和管理系统中的软件，提高效率。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"># Windows</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-30-dotnet/" rel="prev" title="dotnet">
+      <i class="fa fa-chevron-left"></i> dotnet
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Windows/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-12-14-nmake/" rel="next" title="nmake">
+      nmake <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-winget-%E5%91%BD%E4%BB%A4-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">windows winget 命令 是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-winget"><span class="nav-number">2.1.</span> <span class="nav-text">如何使用 winget</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E4%BA%86-winget"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 检查是否安装了 winget</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%90%9C%E7%B4%A2%E8%BD%AF%E4%BB%B6%E5%8C%85"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 搜索软件包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85%E8%BD%AF%E4%BB%B6"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 安装软件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%8D%B8%E8%BD%BD%E8%BD%AF%E4%BB%B6"><span class="nav-number">2.1.4.</span> <span class="nav-text">4. 卸载软件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%9F%A5%E7%9C%8B%E5%B7%B2%E5%AE%89%E8%A3%85%E7%9A%84%E8%BD%AF%E4%BB%B6"><span class="nav-number">2.1.5.</span> <span class="nav-text">5. 查看已安装的软件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E5%8D%87%E7%BA%A7%E8%BD%AF%E4%BB%B6"><span class="nav-number">2.1.6.</span> <span class="nav-text">6. 升级软件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-%E8%8E%B7%E5%8F%96%E8%BD%AF%E4%BB%B6%E5%8C%85%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.7.</span> <span class="nav-text">7. 获取软件包信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-%E5%AF%BC%E5%85%A5%E5%92%8C%E5%AF%BC%E5%87%BA%E8%BD%AF%E4%BB%B6%E5%8C%85%E5%88%97%E8%A1%A8"><span class="nav-number">2.1.8.</span> <span class="nav-text">8. 导入和导出软件包列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-%E6%9F%A5%E7%9C%8B%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.9.</span> <span class="nav-text">9. 查看帮助信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Winget"><span class="nav-number">2.2.</span> <span class="nav-text">安装 Winget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-Winget-%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">2.3.</span> <span class="nav-text">使用 Winget 的优点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#winget-%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">winget 常用参数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">3.1.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%85%E5%8A%A9%E5%8F%82%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">辅助参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">3.4.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#winget-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">winget 常用技巧 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E8%BD%AF%E4%BB%B6"><span class="nav-number">4.1.</span> <span class="nav-text">1. 快速安装软件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%AE%A1%E7%90%86%E5%B7%B2%E5%AE%89%E8%A3%85%E7%9A%84%E8%BD%AF%E4%BB%B6"><span class="nav-number">4.2.</span> <span class="nav-text">2. 管理已安装的软件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AF%BC%E5%87%BA%E5%92%8C%E5%AF%BC%E5%85%A5%E8%BD%AF%E4%BB%B6%E5%88%97%E8%A1%A8"><span class="nav-number">4.3.</span> <span class="nav-text">3. 导出和导入软件列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E9%AB%98%E6%95%88%E6%90%9C%E7%B4%A2"><span class="nav-number">4.4.</span> <span class="nav-text">4. 高效搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8C%85%E6%BA%90"><span class="nav-number">4.5.</span> <span class="nav-text">5. 自定义包源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E8%B0%83%E8%AF%95%E5%92%8C%E4%BC%98%E5%8C%96"><span class="nav-number">4.6.</span> <span class="nav-text">6. 调试和优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">4.7.</span> <span class="nav-text">7. 使用技巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-1"><span class="nav-number">4.8.</span> <span class="nav-text">注意事项</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

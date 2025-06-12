@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 mongoose核心api笔记  struct mg_addr 简介：  该结构包含网络地址。它可以被认为sockaddr结构在Mongoose中的等价结构体   原型： 123456struct mg_addr &#123;  uint16_t port;    &#x2F;&#x2F; TCP or UDP port in network byte order  uint32_t ip;      &#x2F;&#x2F; I">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoose_core">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_core/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 mongoose核心api笔记  struct mg_addr 简介：  该结构包含网络地址。它可以被认为sockaddr结构在Mongoose中的等价结构体   原型： 123456struct mg_addr &#123;  uint16_t port;    &#x2F;&#x2F; TCP or UDP port in network byte order  uint32_t ip;      &#x2F;&#x2F; I">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.411Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Mongoose">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_core/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mongoose_core | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_core/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mongoose_core
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>mongoose核心api笔记</li>
+</ul>
+<h2 id="struct-mg-addr"><a href="#struct-mg-addr" class="headerlink" title="struct mg_addr"></a>struct mg_addr</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>该结构包含网络地址。它可以被认为<code>sockaddr</code>结构在Mongoose中的等价结构体</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_addr</span> &#123;</span></span><br><span class="line">  <span class="type">uint16_t</span> port;    <span class="comment">// TCP or UDP port in network byte order</span></span><br><span class="line">  <span class="type">uint32_t</span> ip;      <span class="comment">// IP address in network byte order</span></span><br><span class="line">  <span class="type">uint8_t</span> ip6[<span class="number">16</span>];  <span class="comment">// IPv6 address</span></span><br><span class="line">  <span class="type">bool</span> is_ip6;      <span class="comment">// True when address is IPv6 address</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="struct-mg-mgr"><a href="#struct-mg-mgr" class="headerlink" title="struct mg_mgr"></a>struct mg_mgr</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>它是一个事件管理结构体，能够保存一个正在活动的连接列表，以及一些维持管理的信息</li>
+</ul>
+</li>
+<li><p>原型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_mgr</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_connection</span> *<span class="title">conns</span>;</span>  <span class="comment">// List of active connections  结构体数组</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_dns</span> <span class="title">dns4</span>;</span>           <span class="comment">// DNS for IPv4</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_dns</span> <span class="title">dns6</span>;</span>           <span class="comment">// DNS for IPv6</span></span><br><span class="line">  <span class="type">int</span> dnstimeout;               <span class="comment">// DNS resolve timeout in milliseconds</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">long</span> nextid;         <span class="comment">// Next connection ID</span></span><br><span class="line">  <span class="type">void</span> *userdata;               <span class="comment">// Arbitrary user data pointer</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="struct-mg-connection"><a href="#struct-mg-connection" class="headerlink" title="struct mg_connection"></a>struct mg_connection</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>它是一个连接：可能是一个监听连接，或者是一个已接收连接，或者是一个出站连接</li>
+</ul>
+</li>
+<li><p>原型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_connection</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_connection</span> *<span class="title">next</span>;</span>  <span class="comment">// Linkage in struct mg_mgr :: connections</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_mgr</span> *<span class="title">mgr</span>;</span>          <span class="comment">// Our container</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_addr</span> <span class="title">loc</span>;</span>          <span class="comment">// Local address</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_addr</span> <span class="title">rem</span>;</span>          <span class="comment">// Remote address</span></span><br><span class="line">  <span class="type">void</span> *fd;                    <span class="comment">// Connected socket, or LWIP data</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">long</span> id;            <span class="comment">// Auto-incrementing unique connection ID</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_iobuf</span> <span class="title">recv</span>;</span>        <span class="comment">// Incoming data</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_iobuf</span> <span class="title">send</span>;</span>        <span class="comment">// Outgoing data</span></span><br><span class="line">  <span class="type">mg_event_handler_t</span> fn;       <span class="comment">// User-specified event handler function</span></span><br><span class="line">  <span class="type">void</span> *fn_data;               <span class="comment">// User-specified function parameter</span></span><br><span class="line">  <span class="type">mg_event_handler_t</span> pfn;      <span class="comment">// Protocol-specific handler function</span></span><br><span class="line">  <span class="type">void</span> *pfn_data;              <span class="comment">// Protocol-specific function parameter</span></span><br><span class="line">  <span class="type">char</span> label[<span class="number">50</span>];              <span class="comment">// Arbitrary label</span></span><br><span class="line">  <span class="type">void</span> *tls;                   <span class="comment">// TLS specific data</span></span><br><span class="line">  <span class="type">unsigned</span> is_listening : <span class="number">1</span>;   <span class="comment">// Listening connection</span></span><br><span class="line">  <span class="type">unsigned</span> is_client : <span class="number">1</span>;      <span class="comment">// Outbound (client) connection</span></span><br><span class="line">  <span class="type">unsigned</span> is_accepted : <span class="number">1</span>;    <span class="comment">// Accepted (server) connection</span></span><br><span class="line">  <span class="type">unsigned</span> is_resolving : <span class="number">1</span>;   <span class="comment">// Non-blocking DNS resolve is in progress</span></span><br><span class="line">  <span class="type">unsigned</span> is_connecting : <span class="number">1</span>;  <span class="comment">// Non-blocking connect is in progress</span></span><br><span class="line">  <span class="type">unsigned</span> is_tls : <span class="number">1</span>;         <span class="comment">// TLS-enabled connection</span></span><br><span class="line">  <span class="type">unsigned</span> is_tls_hs : <span class="number">1</span>;      <span class="comment">// TLS handshake is in progress</span></span><br><span class="line">  <span class="type">unsigned</span> is_udp : <span class="number">1</span>;         <span class="comment">// UDP connection</span></span><br><span class="line">  <span class="type">unsigned</span> is_websocket : <span class="number">1</span>;   <span class="comment">// WebSocket connection</span></span><br><span class="line">  <span class="type">unsigned</span> is_hexdumping : <span class="number">1</span>;  <span class="comment">// Hexdump in/out traffic</span></span><br><span class="line">  <span class="type">unsigned</span> is_draining : <span class="number">1</span>;    <span class="comment">// Send remaining data, then close and free</span></span><br><span class="line">  <span class="type">unsigned</span> is_closing : <span class="number">1</span>;     <span class="comment">// Close and free the connection immediately</span></span><br><span class="line">  <span class="type">unsigned</span> is_full : <span class="number">1</span>;        <span class="comment">// Stop reads, until cleared</span></span><br><span class="line">  <span class="type">unsigned</span> is_resp : <span class="number">1</span>;        <span class="comment">// Response is still being generated</span></span><br><span class="line">  <span class="type">unsigned</span> is_readable : <span class="number">1</span>;    <span class="comment">// Connection is ready to read</span></span><br><span class="line">  <span class="type">unsigned</span> is_writable : <span class="number">1</span>;    <span class="comment">// Connection is ready to write</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-mgr-init"><a href="#mg-mgr-init" class="headerlink" title="mg_mgr_init"></a>mg_mgr_init</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>初始化事件管理器结构体变量，它所做的工作：<ul>
+<li>将活动连接的列表设置为null</li>
+<li>设置IPv4和IPv6的默认DNS服务器</li>
+<li>设置默认DNS查找超时</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_mgr_init</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>mgr : 需要初始化的<code>mg_mgr</code>结构体指针</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_mgr</span> <span class="title">mgr</span>;</span></span><br><span class="line">mg_mgr_init(&amp;mgr);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-mgr-poll"><a href="#mg-mgr-poll" class="headerlink" title="mg_mgr_poll"></a>mg_mgr_poll</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>在所有连接中迭代，接受新的连接，发送和接收数据，关闭连接并调用事件处理程序的功能，以适用于各自事件。</li>
+<li>执行一次池迭代(poll iteration)。对在<code>mgr-&gt;conns</code>列表中的每一个连接进行如下操作<ul>
+<li>查看是否有传入数据。如果有，将数据读入到<code>c-&gt;recv</code>缓冲区，并发出一个<code>MG_EV_READ</code>事件</li>
+<li>查看<code>c-&gt;send</code>缓冲区是否有数据。如果有，写入数据，并发送<code>MG_EV_WRITE</code>事件</li>
+<li>如果一个连接处于监听状态，或已接收一个进入的连接状态，发送一个<code>MG_EV_ACCEPT</code>事件</li>
+<li>发送<code>MG_EV_POLL</code>事件</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_mgr_poll</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">int</span> ms)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>mgr :  使用的事件管理结构体</li>
+<li>ms : 超时时间，单位为毫秒</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (running == <span class="literal">true</span>) mg_mgr_poll(&amp;mgr, <span class="number">1000</span> <span class="comment">/*1 second*/</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-mgr-free"><a href="#mg-mgr-free" class="headerlink" title="mg_mgr_free"></a>mg_mgr_free</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>关闭所有连接，释放所有资源</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_mgr_free</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>mgr : 需要被清除的事件管理结构体</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_mgr</span> <span class="title">mgr</span>;</span></span><br><span class="line">mg_mgr_init(&amp;mgr);</span><br><span class="line"><span class="keyword">while</span> (running == <span class="literal">true</span>) mg_mgr_poll(&amp;mgr, <span class="number">1000</span>);   <span class="comment">// Event loop</span></span><br><span class="line">mg_mgr_free(&amp;mgr);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-listen"><a href="#mg-listen" class="headerlink" title="mg_listen"></a>mg_listen</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>创建一个监听连接，并将这个连接追加到<code>mgr-&gt;conns</code>连接列表中</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> mg_connection *<span class="title function_">mg_listen</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">const</span> <span class="type">char</span> *url, <span class="type">mg_event_handler_t</span> fn, <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>mgr : 使用的事件管理结构体</li>
+<li>url : URL。指定监听的本地IP地址和端口，例如：<code>tcp://127.0.0.1:1234</code>或<code>udp://0.0.0.0:9000</code></li>
+<li>fn :  事件处理函数</li>
+<li>fn_data : 一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功，返回创建的连接 </li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_connection</span> *<span class="title">c</span> =</span> mg_listen(&amp;mgr, <span class="string">&quot;tcp://127.0.0.1:8080&quot;</span>, fn, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-connect"><a href="#mg-connect" class="headerlink" title="mg_connect"></a>mg_connect</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>创建一个出站连接，并将这个连接追加到<code>mgr-&gt;conns</code>队列中</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> mg_connection *<span class="title function_">mg_connect</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">const</span> <span class="type">char</span> *url, <span class="type">mg_event_handler_t</span> fn, <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数</p>
+<ul>
+<li>mgr : 使用的事件管理结构体</li>
+<li>url : URL，指定需要连接的远程IP地址和端口。例如：<code>http://a.com</code></li>
+<li>fn : 一个事件处理函数</li>
+<li>fn_data :  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功，返回创建的连接 </li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_connection</span> *<span class="title">c</span> =</span> mg_connect(&amp;mgr, <span class="string">&quot;http://example.org&quot;</span>, fn, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-send"><a href="#mg-send" class="headerlink" title="mg_send"></a>mg_send</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>将大小为<code>size</code>的数据追加到<code>c-&gt;send</code>缓冲区。返回追加的字节数</li>
+</ul>
+</li>
+<li><p>原型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">mg_send</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">const</span> <span class="type">void</span> *data, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>c : 一个连接指针</li>
+<li>data : 一个指向需要增加到输出缓冲区的数据指针</li>
+<li>size : 数据大小</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功， true</li>
+<li>失败， false</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>这个函数不会将数据推送到网络。它仅仅是将数据追加到输出缓冲区。</li>
+<li>只有当<code>mg_mgr_poll()</code>被调用时，才会将数据发送出去。</li>
+<li>如果<code>mg_send()</code>被多次调用，则输出缓冲区会增长</li>
+</ul>
+</li>
+<li><p>示例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mg_send(c, <span class="string">&quot;hi&quot;</span>, <span class="number">2</span>);  <span class="comment">// Append string &quot;hi&quot; to the output buffer</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-printf"><a href="#mg-printf" class="headerlink" title="mg_printf"></a>mg_printf</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>与<code>mg_send()</code>相同，但是使用<code>printf()</code>语义格式化数据。返回追加到输出缓冲区的字节数。有关支持格式规范列表，参见<code>mg_snprintf</code></li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">mg_printf</span><span class="params">(<span class="keyword">struct</span> mg_connection *, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>c : 一个连接指针</li>
+<li>fmt : <code>printf()</code>语义中的格式字符串</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>返回追加到输出缓冲区的字节数</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mg_printf(c, <span class="string">&quot;Hello, %s!&quot;</span>, <span class="string">&quot;world&quot;</span>); <span class="comment">// Add &quot;Hello, world!&quot; to output buffer</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-wrapfd"><a href="#mg-wrapfd" class="headerlink" title="mg_wrapfd"></a>mg_wrapfd</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>将给定的文件描述符<code>fd</code>包装到连接中，然后将该连接添加到事件管理器中。这个<code>fd</code>文件描述符必须支持<code>send(), recv(), select()</code>系统调用，而且是非阻塞的。Mongoose将把它当做TCP套接字使用。<code>c-&gt;rem</code>和<code>c-&gt;loc</code>地址将会变为空的</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> mg_connection *<span class="title function_">mg_wrapfd</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">int</span> fd, <span class="type">mg_event_handler_t</span> fn, <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>fd : 需要包装的文件描述符</li>
+<li>mgr : 一个事件管理结构体</li>
+<li>fn : 一个指向事件处理函数的指针</li>
+<li>ud : 一个用户数据指针。它将被当做<code>fn_data</code>参数传递给<code>fn</code></li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功，返回创建的连接</li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+</ul>
+<h2 id="mg-mkpipe"><a href="#mg-mkpipe" class="headerlink" title="mg_mkpipe"></a>mg_mkpipe</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>创建两个互相连接的套接字，用于线程间通信。其中一个套接字被包装到一个Mongoose连接，并被添加到事件管理结构体中。另一个套接字将会被返回，且它应该被传递给工作线程。当一个工作线程使用<code>send()</code>发送任何数据到这个套接字，都将唤醒<code>mgr</code>和<code>fn</code>事件处理函数接收一个<code>MG_EV_READ</code>事件。另外，<code>fn</code>向工作线程发送的任何数据，都被由工作线程使用<code>recv()</code>接收</li>
+</ul>
+</li>
+<li><p>原型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">mg_mkpipe</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">mg_event_handler_t</span> fn, <span class="type">void</span> *fn_data, <span class="type">bool</span> udp)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>mgr : 一个事件管理结构体</li>
+<li>fn : 一个指向事件处理函数的指针</li>
+<li>fn_data : 一个指向用户数据的指针。它将会被当做<code>fn_data</code>参数传递给<code>fn</code></li>
+<li>udp : 告知创建一个UDP，还是创建一个TCP socketpair</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>成功，返回创建的套接字</li>
+<li>失败，返回-1</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<ul>
+<li>参考examples&#x2F;multi-threaded</li>
+</ul>
+</li>
+</ul>
+<h2 id="mg-hello"><a href="#mg-hello" class="headerlink" title="mg_hello"></a>mg_hello</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>便利功能，在给定的监听URL上启动一个简单的Web服务器。这个函数只有在接收到一个<code>/quit</code>请求才会返回。服务器处理以下URI<ul>
+<li><code>/quit</code>  –  退出服务，且退出函数</li>
+<li><code>/debug</code> –  设置调试级别，作为POST负载，<code>&#123;&quot;level&quot; : 3&#125;</code>是有效的</li>
+<li>对其他所有的URI，都将返回一个<code>hi</code>作为响应</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_hello</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *url)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>url : 一个监听的URL，例如：<code>http://0.0.0.0:8000</code></li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mongoose/" rel="tag"># Mongoose</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_http/" rel="prev" title="mongoose_http">
+      <i class="fa fa-chevron-left"></i> mongoose_http
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_file_system/" rel="next" title="mongoose_file_system">
+      mongoose_file_system <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-addr"><span class="nav-number">2.</span> <span class="nav-text">struct mg_addr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-mgr"><span class="nav-number">3.</span> <span class="nav-text">struct mg_mgr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-connection"><span class="nav-number">4.</span> <span class="nav-text">struct mg_connection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-mgr-init"><span class="nav-number">5.</span> <span class="nav-text">mg_mgr_init</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-mgr-poll"><span class="nav-number">6.</span> <span class="nav-text">mg_mgr_poll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-mgr-free"><span class="nav-number">7.</span> <span class="nav-text">mg_mgr_free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-listen"><span class="nav-number">8.</span> <span class="nav-text">mg_listen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-connect"><span class="nav-number">9.</span> <span class="nav-text">mg_connect</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-send"><span class="nav-number">10.</span> <span class="nav-text">mg_send</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-printf"><span class="nav-number">11.</span> <span class="nav-text">mg_printf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-wrapfd"><span class="nav-number">12.</span> <span class="nav-text">mg_wrapfd</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-mkpipe"><span class="nav-number">13.</span> <span class="nav-text">mg_mkpipe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-hello"><span class="nav-number">14.</span> <span class="nav-text">mg_hello</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

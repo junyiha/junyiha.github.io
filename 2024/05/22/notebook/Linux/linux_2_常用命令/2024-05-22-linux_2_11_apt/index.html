@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 apt相关命令笔记  linux apt-file命令 详解apt-file 是一个用于查询 APT 软件包中包含的文件的命令行工具。它不仅可以帮助你查找已安装软件包中的文件，还可以查找尚未安装但包含在软件包中的文件。使用 apt-file 可以帮助你找到特定文件属于哪个软件包。 以下是一些常见的 apt-file 命令及其说明：  安装 apt-file： 1sudo apt instal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_11_apt">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_11_apt/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 apt相关命令笔记  linux apt-file命令 详解apt-file 是一个用于查询 APT 软件包中包含的文件的命令行工具。它不仅可以帮助你查找已安装软件包中的文件，还可以查找尚未安装但包含在软件包中的文件。使用 apt-file 可以帮助你找到特定文件属于哪个软件包。 以下是一些常见的 apt-file 命令及其说明：  安装 apt-file： 1sudo apt instal">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.326Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_11_apt/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_11_apt | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_11_apt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_11_apt
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>apt相关命令笔记</li>
+</ul>
+<h2 id="linux-apt-file命令-详解"><a href="#linux-apt-file命令-详解" class="headerlink" title="linux apt-file命令 详解"></a>linux apt-file命令 详解</h2><p><code>apt-file</code> 是一个用于查询 APT 软件包中包含的文件的命令行工具。它不仅可以帮助你查找已安装软件包中的文件，还可以查找尚未安装但包含在软件包中的文件。使用 <code>apt-file</code> 可以帮助你找到特定文件属于哪个软件包。</p>
+<p>以下是一些常见的 <code>apt-file</code> 命令及其说明：</p>
+<ol>
+<li><p><strong>安装 apt-file：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install apt-file</span><br></pre></td></tr></table></figure>
+<p>在使用 <code>apt-file</code> 之前，你需要安装它。</p>
+</li>
+<li><p><strong>更新文件数据库：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-file update</span><br></pre></td></tr></table></figure>
+<p>在查询之前，你需要先更新文件数据库，以确保它包含最新的信息。</p>
+</li>
+<li><p><strong>搜索已安装软件包中的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-file list 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令列出指定已安装软件包中包含的文件。</p>
+</li>
+<li><p><strong>搜索未安装软件包中的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-file search 文件名</span><br></pre></td></tr></table></figure>
+<p>该命令搜索未安装软件包中包含指定文件名的软件包。</p>
+</li>
+<li><p><strong>显示与正则表达式匹配的所有软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-file search --regexp <span class="string">&#x27;正则表达式&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>该命令显示与指定正则表达式匹配的所有软件包。</p>
+</li>
+<li><p><strong>查找包含某个目录的软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-file search /path/to/directory</span><br></pre></td></tr></table></figure>
+<p>该命令搜索包含指定目录的软件包。</p>
+</li>
+<li><p><strong>显示文件属于哪个软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-file search --package-only 文件名</span><br></pre></td></tr></table></figure>
+<p>该命令仅显示包含指定文件名的软件包。</p>
+</li>
+<li><p><strong>在所有已知软件包中搜索文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-file search --all 文件名</span><br></pre></td></tr></table></figure>
+<p>该命令在所有已知的软件包中搜索指定文件名，包括未安装的软件包。</p>
+</li>
+</ol>
+<p>使用 <code>apt-file</code> 可以方便地查找软件包中的文件，这对于理解系统中的文件属于哪个软件包、找出软件包提供的特定文件等非常有用。</p>
+<h2 id="linux-apt-cache命令-详解"><a href="#linux-apt-cache命令-详解" class="headerlink" title="linux apt-cache命令 详解"></a>linux apt-cache命令 详解</h2><p><code>apt-cache</code> 是 Linux 中用于查询 APT (Advanced Package Tool) 缓存的命令行工具。它允许用户从本地软件包数据库中检索有关软件包的信息，包括依赖关系、版本、描述等。</p>
+<p>以下是一些常见的 <code>apt-cache</code> 命令及其说明：</p>
+<ol>
+<li><p><strong>查看软件包信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache show 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令显示有关指定软件包的详细信息，包括版本、大小、依赖关系、描述等。</p>
+</li>
+<li><p><strong>搜索软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache search 关键词</span><br></pre></td></tr></table></figure>
+<p>通过该命令可以搜索软件包。它会列出所有与指定关键词相关的软件包。</p>
+</li>
+<li><p><strong>显示软件包提供的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache showpkg 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于显示软件包提供的文件列表，以及该软件包所依赖的其他软件包。</p>
+</li>
+<li><p><strong>显示软件包的依赖关系：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache depends 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于显示指定软件包的依赖关系。</p>
+</li>
+<li><p><strong>显示软件包的反向依赖关系（被哪些软件包依赖）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache rdepends 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于显示指定软件包的反向依赖关系，即依赖于该软件包的其他软件包。</p>
+</li>
+<li><p><strong>显示 APT 缓存统计信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache stats</span><br></pre></td></tr></table></figure>
+<p>该命令用于显示有关 APT 缓存的统计信息，包括软件包的数量、大小等。</p>
+</li>
+<li><p><strong>显示软件包的提供者信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache showpkg -a 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令显示软件包在不同体系结构上的提供者信息。</p>
+</li>
+<li><p><strong>显示软件包的正则表达式匹配信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-cache showpkg --names-only <span class="string">&#x27;正则表达式&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>该命令显示与指定正则表达式匹配的软件包名称。</p>
+</li>
+</ol>
+<p>以上是一些常见的 <code>apt-cache</code> 命令。这些命令可以帮助你更好地了解软件包的信息和相互关系。</p>
+<h2 id="linux-apt-apt-get"><a href="#linux-apt-apt-get" class="headerlink" title="linux apt apt-get"></a>linux apt apt-get</h2><p><code>apt</code> 和 <code>apt-get</code> 是 Linux 系统中用于管理软件包的两个命令，它们都属于 Advanced Package Tool（APT）工具集。</p>
+<ol>
+<li><p><strong>apt-get:</strong></p>
+<ul>
+<li><code>apt-get</code> 是较早的软件包管理命令，用于安装、卸载、更新和管理软件包。它使用比较直接的命令语法，如 <code>apt-get install</code>、<code>apt-get remove</code> 等。</li>
+<li>示例：安装一个软件包<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install 软件包名称</span><br></pre></td></tr></table></figure></li>
+<li><code>apt-get</code> 在操作时需要使用 <code>sudo</code> 以管理员权限执行。</li>
+</ul>
+</li>
+<li><p><strong>apt:</strong></p>
+<ul>
+<li><code>apt</code> 是 <code>apt-get</code> 的新一代包装，提供了更简洁、友好的命令行接口，并且支持逐步更新。它整合了一些常用的 <code>apt-get</code> 子命令，使得用户在使用时更为方便。</li>
+<li>示例：安装一个软件包<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install 软件包名称</span><br></pre></td></tr></table></figure></li>
+<li><code>apt</code> 使用时同样需要 <code>sudo</code> 权限。</li>
+</ul>
+</li>
+</ol>
+<p>一些使用 <code>apt</code> 相对于 <code>apt-get</code> 的优点包括：</p>
+<ul>
+<li>更友好的输出和进度条。</li>
+<li>能够显示可用的自动修复指令。</li>
+<li>与 <code>apt</code> 命令一起使用的时候，不需要再运行 <code>apt-get update</code> 命令。</li>
+</ul>
+<p>两者的基本功能是相似的，但 <code>apt</code> 提供了更为现代和用户友好的界面。在新的 Ubuntu 版本中，推荐使用 <code>apt</code> 命令。在老的系统或某些特殊情况下，你可能会看到人们仍然使用 <code>apt-get</code>。</p>
+<h2 id="linux-apt命令-详解"><a href="#linux-apt命令-详解" class="headerlink" title="linux apt命令 详解"></a>linux apt命令 详解</h2><p><code>apt</code>（Advanced Package Tool）是用于在Debian及其衍生发行版（如Ubuntu）中进行软件包管理的工具。它提供了一组命令，用于搜索、安装、卸载、更新和管理软件包。以下是一些常用的<code>apt</code>命令及其说明：</p>
+<ol>
+<li><p><strong>更新软件包列表：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br></pre></td></tr></table></figure>
+<p>该命令用于从软件源服务器更新本地软件包列表，以获取最新的软件包信息。在执行其他<code>apt</code>命令之前，通常应该首先运行此命令。</p>
+</li>
+<li><p><strong>升级已安装的软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt upgrade</span><br></pre></td></tr></table></figure>
+<p>该命令用于升级已安装的所有软件包到最新可用的版本。在执行升级操作之前，建议先运行<code>apt update</code>以确保软件包列表是最新的。</p>
+</li>
+<li><p><strong>升级系统：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt dist-upgrade</span><br></pre></td></tr></table></figure>
+<p>该命令用于执行更大规模的系统升级，包括新内核的安装等。它会比<code>apt upgrade</code>更积极地解决依赖关系。</p>
+</li>
+<li><p><strong>安装软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于安装指定软件包。你可以同时安装多个软件包，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install 软件包1 软件包2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>卸载软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt remove 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于卸载指定软件包，但保留其配置文件。如果你希望同时删除配置文件，可以使用<code>purge</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt purge 软件包名称</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>搜索软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt search 关键词</span><br></pre></td></tr></table></figure>
+<p>该命令用于搜索与指定关键词相关的软件包。</p>
+</li>
+<li><p><strong>显示软件包信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt show 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于显示有关指定软件包的详细信息，包括版本、大小、依赖关系等。</p>
+</li>
+<li><p><strong>清理无用的软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt autoremove</span><br></pre></td></tr></table></figure>
+<p>该命令用于删除已安装但不再需要的软件包。</p>
+</li>
+</ol>
+<p>这些是一些<code>apt</code>命令的常见用法。你可以使用<code>man apt</code>查看<code>apt</code>的手册以获取更详细的信息。</p>
+<h2 id="linux-apt命令-常用技巧"><a href="#linux-apt命令-常用技巧" class="headerlink" title="linux apt命令 常用技巧"></a>linux apt命令 常用技巧</h2><p>在使用<code>apt</code>命令时，有一些常用的技巧和实用的选项，可以提高软件包管理的效率。以下是一些常见的技巧：</p>
+<ol>
+<li><p><strong>查看软件包信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt show 软件包名称</span><br></pre></td></tr></table></figure>
+<p>可以使用该命令查看软件包的详细信息，包括版本、大小、依赖关系等。</p>
+</li>
+<li><p><strong>查找软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt search 关键词</span><br></pre></td></tr></table></figure>
+<p>通过该命令可以搜索软件包。可以根据关键词查找与之相关的软件包。</p>
+</li>
+<li><p><strong>模糊搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt list | grep 关键词</span><br></pre></td></tr></table></figure>
+<p>使用<code>apt list</code>列出所有可用软件包，然后通过<code>grep</code>进行模糊搜索。</p>
+</li>
+<li><p><strong>列出已安装的软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt list --installed</span><br></pre></td></tr></table></figure>
+<p>该命令列出所有已经安装的软件包。</p>
+</li>
+<li><p><strong>列出可升级的软件包：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt list --upgradeable</span><br></pre></td></tr></table></figure>
+<p>该命令列出可以升级的所有软件包。</p>
+</li>
+<li><p><strong>查看软件包依赖关系：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt depends 软件包名称</span><br></pre></td></tr></table></figure>
+<p>该命令用于查看指定软件包的依赖关系。</p>
+</li>
+<li><p><strong>查看软件包提供的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dpkg -L 软件包名称</span><br></pre></td></tr></table></figure>
+<p>使用<code>dpkg</code>命令查看指定软件包提供的文件列表。</p>
+</li>
+<li><p><strong>使用代理服务器：</strong><br>如果你在使用代理服务器，可以在<code>/etc/apt/apt.conf</code>中设置代理配置，或者在命令行中使用<code>-o</code>选项：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt -o Acquire::http::Proxy=<span class="string">&quot;http://代理地址&quot;</span> update</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用多线程下载：</strong><br>在更新软件包时，可以使用多线程进行下载以提高速度。在<code>/etc/apt/apt.conf</code>中添加以下配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Acquire::http::Pipeline-Depth &quot;0&quot;;</span><br><span class="line">Acquire::http::No-Cache &quot;true&quot;;</span><br><span class="line">Acquire::http::Dl-Limit &quot;256&quot;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用国内镜像：</strong><br>将系统的软件源替换为国内镜像源可以加快下载速度。在<code>/etc/apt/sources.list</code>中修改软件源，将其替换为适合你的国内源。</p>
+</li>
+</ol>
+<p>这些技巧可以让你更方便、更高效地使用<code>apt</code>命令进行软件包管理。根据个人需要，你可以结合这些技巧执行不同的操作。</p>
+<h2 id="apt-家族"><a href="#apt-家族" class="headerlink" title="apt 家族"></a>apt 家族</h2><h3 id="apt"><a href="#apt" class="headerlink" title="apt"></a>apt</h3><ul>
+<li><p>update</p>
+<ul>
+<li>从所有配置的源中下载包信息。其他的命令对这些数据进行操作</li>
+</ul>
+</li>
+<li><p>upgrade</p>
+<ul>
+<li>upgrade 用于安装当前安装在系统上的所有软件包的可用升级，这些软件包来自于 sources.list(5) 配置的源的升级</li>
+<li>如果有需要满足的依赖关系，新的安装包将会被安装。但是现有的安装包永远都不会被删除。如果一个软件包的升级需要删除一个已安装的软件包，那么这个软件包的升级将不会被执行</li>
+</ul>
+</li>
+<li><p>full-upgrade</p>
+<ul>
+<li>full-upgrade执行升级的功能，但如果需要升级系统，它将删除当前安装的软件包，如果需要这样做来升级整个系统的话。</li>
+</ul>
+</li>
+<li><p>install, remove, purge</p>
+<ul>
+<li>install, 安装软件包</li>
+<li>remove, 仅删除软件包数据，会留下用户配置信息</li>
+<li>purge, 会既删除软件包数据，也会删除用户配置信息</li>
+</ul>
+</li>
+<li><p>autoremove</p>
+<ul>
+<li>autoremove是用来删除那些自动安装的软件包，以满足依赖的软件包，但现在不再需要了，因为依赖关系改变了或需要它们的软件包在这期间被删除，因此不再需要。</li>
+</ul>
+</li>
+<li><p>search</p>
+<ul>
+<li>搜索可以用来在可用的软件包列表中搜索给定包的列表中搜索，并显示匹配结果。</li>
+</ul>
+</li>
+<li><p>show</p>
+<ul>
+<li>显示有关给定软件包的信息，包括它的依赖性、安装和下载大小、软件包的可用来源以及对它的描述和下载大小，软件包的可用来源，软件包内容的描述等等。包的内容描述等等。</li>
+</ul>
+</li>
+<li><p>list</p>
+<ul>
+<li>list与dpkg-query –list有点类似，它可以显示满足特定条件的满足特定条件的软件包列表。</li>
+</ul>
+</li>
+<li><p>edit-sources</p>
+<ul>
+<li>edit-sources 可以让你在你喜欢的文本编辑器中编辑 sources.list(5) 文件。同时也提供基本的智能检查。</li>
+</ul>
+</li>
+</ul>
+<h3 id="apt-get"><a href="#apt-get" class="headerlink" title="apt-get"></a>apt-get</h3><ul>
+<li><p>update</p>
+</li>
+<li><p>upgrade</p>
+</li>
+<li><p>dist-upgrade</p>
+<ul>
+<li>dist-upgrade除了执行升级的功能外，还能智能地处理新版本软件包的依赖关系变化；apt-get有一个 “智能 “的冲突解决系统，它将尝试升级最重要的软件包如果有必要的话，它会尝试升级最重要的软件包，而牺牲掉不那么重要的软件包。</li>
+</ul>
+</li>
+<li><p>dselect-upgrade</p>
+<ul>
+<li>dselect-upgrade与传统的Debian packaging前端，即 dselect(1)。</li>
+</ul>
+</li>
+<li><p>install</p>
+</li>
+<li><p>remove</p>
+</li>
+<li><p>purge</p>
+</li>
+<li><p>source </p>
+<ul>
+<li>获取源码包</li>
+</ul>
+</li>
+<li><p>build-dep</p>
+<ul>
+<li>build-dep 导致 apt-get 安装&#x2F;移除软件包，以满足一个源代码软件包的构建的依赖性。</li>
+</ul>
+</li>
+<li><p>check</p>
+<ul>
+<li>检查是一个诊断工具；它更新软件包缓存并检查损坏的依赖关系。</li>
+</ul>
+</li>
+<li><p>download</p>
+<ul>
+<li>download将下载给定的二进制包到当前目录。</li>
+</ul>
+</li>
+<li><p>clean</p>
+<ul>
+<li>清理本地存储库中检索到的软件包文件。它删除了除锁文件外的所有文件都从 &#x2F;var&#x2F;cache&#x2F;apt&#x2F;archives&#x2F; 和&#x2F;var&#x2F;cache&#x2F;apt&#x2F;archives&#x2F;partial&#x2F;。</li>
+</ul>
+</li>
+<li><p>autoclean</p>
+<ul>
+<li>和clean一样，autoclean也会清除本地仓库中检索到的软件包文件。不同的是不同的是，它只删除那些不能再被下载的软件包文件，并且基本上是无用的。</li>
+</ul>
+</li>
+<li><p>changelog</p>
+<ul>
+<li>changelog试图下载一个软件包的更新日志并通过sensible-pager。</li>
+</ul>
+</li>
+<li><p>indextargets</p>
+<ul>
+<li>默认情况下，显示一个deb822格式的所有数据文件的信息列表(又称索引目标) apt-get update 会下载。</li>
+</ul>
+</li>
+</ul>
+<h3 id="apt-cache"><a href="#apt-cache" class="headerlink" title="apt-cache"></a>apt-cache</h3><p>在Linux中，<code>apt-cache</code>是一个用于查询APT（Advanced Package Tool）软件包管理器缓存的命令行工具。它允许您查看已安装软件包和可用软件包的详细信息，以及搜索软件包的相关信息。</p>
+<p>下面是一些常见的<code>apt-cache</code>命令选项和用法：</p>
+<ol>
+<li><p>查询软件包信息：</p>
+<ul>
+<li><code>apt-cache show &lt;package&gt;</code>：显示指定软件包的详细信息，包括版本、描述、作者、依赖关系等。</li>
+<li><code>apt-cache showpkg &lt;package&gt;</code>：显示软件包的包信息以及其相关的依赖关系和依赖它的软件包信息。</li>
+</ul>
+</li>
+<li><p>搜索软件包：</p>
+<ul>
+<li><code>apt-cache search &lt;pattern&gt;</code>：根据模式搜索可用的软件包。模式可以是软件包名称、关键字或描述的一部分。</li>
+<li><code>apt-cache search &lt;keyword1&gt; &lt;keyword2&gt;</code>：根据多个关键字搜索软件包。这将返回同时包含这些关键字的软件包。</li>
+<li><code>apt-cache search --names-only &lt;pattern&gt;</code>：只搜索软件包的名称而不搜索描述或关键字。</li>
+</ul>
+</li>
+<li><p>显示依赖关系：</p>
+<ul>
+<li><code>apt-cache depends &lt;package&gt;</code>：显示指定软件包的依赖关系，包括它所依赖的软件包和被它所依赖的软件包。</li>
+<li><code>apt-cache rdepends &lt;package&gt;</code>：显示依赖于指定软件包的其他软件包。</li>
+</ul>
+</li>
+<li><p>清除软件包缓存：</p>
+<ul>
+<li><code>apt-cache clean</code>：清除APT软件包管理器的本地软件包缓存。这将删除已下载的软件包文件，但不会删除已安装的软件包。</li>
+</ul>
+</li>
+</ol>
+<p>这些是<code>apt-cache</code>命令的一些常见选项和用法。您可以使用<code>apt-cache</code>命令来获取关于软件包的信息、搜索软件包以及查看软件包的依赖关系。在使用这些命令时，请确保以管理员权限运行，例如使用<code>sudo</code>命令。</p>
+<h3 id="apt-file"><a href="#apt-file" class="headerlink" title="apt-file"></a>apt-file</h3><ul>
+<li>查找包文件<ul>
+<li><code>apt-file find libopenssh.so</code></li>
+</ul>
+</li>
+</ul>
+<p>在Linux中，<code>apt-file</code>是一个用于查询软件包文件的命令行工具。它可以帮助您查找特定文件属于哪个软件包，并可以搜索软件包中的文件。</p>
+<p>以下是一些常见的<code>apt-file</code>命令选项和用法：</p>
+<ol>
+<li><p>初始化数据库：<br>在第一次使用<code>apt-file</code>之前，需要初始化文件数据库。使用以下命令进行初始化：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-file update</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询文件所属的软件包：</p>
+<ul>
+<li><code>apt-file search &lt;filename&gt;</code>：查询指定文件所属的软件包。文件名可以是绝对路径或相对路径。</li>
+<li>例如：<code>apt-file search /bin/ls</code>将返回包含<code>/bin/ls</code>的软件包。</li>
+</ul>
+</li>
+<li><p>列出软件包中的文件：</p>
+<ul>
+<li><code>apt-file list &lt;package&gt;</code>：列出指定软件包中的所有文件。</li>
+<li>例如：<code>apt-file list coreutils</code>将列出<code>coreutils</code>软件包中的所有文件。</li>
+</ul>
+</li>
+<li><p>搜索文件名：</p>
+<ul>
+<li><code>apt-file search &lt;pattern&gt;</code>：根据模式搜索文件名。模式可以是文件名的一部分或关键字。</li>
+<li>例如：<code>apt-file search libstdc++.so</code>将返回包含<code>libstdc++.so</code>的软件包。</li>
+</ul>
+</li>
+</ol>
+<p>请注意，<code>apt-file</code>命令需要根据您的系统安装软件包文件的索引数据库。因此，在使用<code>apt-file</code>之前，需要确保数据库已经初始化并更新。您可以使用<code>sudo apt-file update</code>命令来更新数据库。</p>
+<p>使用<code>apt-file</code>命令可以帮助您轻松地查找软件包文件和软件包中的文件。这对于解决缺少文件或查找特定文件所属的软件包非常有用。</p>
+<h3 id="apt-mark"><a href="#apt-mark" class="headerlink" title="apt-mark"></a>apt-mark</h3><p>在Linux中，<code>apt-mark</code>是一个用于标记和操作APT软件包状态的命令行工具。它可以用于设置、清除和查询软件包的各种标记，以及管理软件包的状态。</p>
+<p>以下是一些常见的<code>apt-mark</code>命令选项和用法：</p>
+<ol>
+<li><p>标记软件包状态：</p>
+<ul>
+<li><code>apt-mark hold &lt;package&gt;</code>：将指定软件包标记为”hold”状态，阻止其被升级或删除。</li>
+<li><code>apt-mark unhold &lt;package&gt;</code>：取消指定软件包的”hold”标记。</li>
+</ul>
+</li>
+<li><p>设置软件包自动安装状态：</p>
+<ul>
+<li><code>apt-mark auto &lt;package&gt;</code>：将指定软件包标记为”auto”状态，允许APT自动安装和升级。</li>
+<li><code>apt-mark manual &lt;package&gt;</code>：将指定软件包标记为”manual”状态，阻止APT自动安装和升级。</li>
+</ul>
+</li>
+<li><p>查询软件包状态：</p>
+<ul>
+<li><code>apt-mark showhold</code>：显示所有被标记为”hold”状态的软件包。</li>
+<li><code>apt-mark showauto</code>：显示所有被标记为”auto”状态的软件包。</li>
+</ul>
+</li>
+<li><p>清除软件包状态：</p>
+<ul>
+<li><code>apt-mark unmarkauto &lt;package&gt;</code>：取消指定软件包的”auto”标记。</li>
+<li><code>apt-mark unmarkhold &lt;package&gt;</code>：取消指定软件包的”hold”标记。</li>
+<li><code>apt-mark unmarkall</code>：清除所有软件包的标记。</li>
+</ul>
+</li>
+</ol>
+<p>这些是<code>apt-mark</code>命令的一些常见选项和用法。您可以使用<code>apt-mark</code>命令来设置软件包的状态标记，以控制APT软件包管理器的行为。这对于防止软件包被升级或删除、手动管理软件包状态以及自定义软件包安装行为非常有用。请注意，在使用这些命令时，需要以管理员权限运行，例如使用<code>sudo</code>命令。</p>
+<h2 id="aptitude"><a href="#aptitude" class="headerlink" title="aptitude"></a>aptitude</h2><p><code>aptitude</code>是Linux系统中的一个交互式软件包管理器，用于安装、升级、删除和管理软件包。它提供了一个用户友好的命令行界面，可以方便地浏览、搜索和操作软件包。</p>
+<p>下面是一些常见的<code>aptitude</code>命令选项和用法：</p>
+<ol>
+<li><p>浏览软件包列表：</p>
+<ul>
+<li><code>aptitude</code>：启动<code>aptitude</code>界面，显示可用软件包列表。</li>
+<li>使用箭头键或快捷键浏览软件包列表。</li>
+<li>输入软件包名或关键字进行搜索。</li>
+</ul>
+</li>
+<li><p>安装和卸载软件包：</p>
+<ul>
+<li>使用<code>+</code>号标记软件包以进行安装。</li>
+<li>使用<code>-</code>号标记软件包以进行卸载。</li>
+<li>按下<code>g</code>键执行所有标记的操作。</li>
+</ul>
+</li>
+<li><p>查看软件包详细信息：</p>
+<ul>
+<li>在软件包列表中选中一个软件包，按下<code>Enter</code>键以查看详细信息。</li>
+<li>显示软件包的描述、版本、依赖关系和其他相关信息。</li>
+</ul>
+</li>
+<li><p>搜索软件包：</p>
+<ul>
+<li>按下<code>/</code>键进行搜索，然后输入要搜索的软件包名称或关键字。</li>
+<li>使用箭头键浏览搜索结果。</li>
+</ul>
+</li>
+<li><p>进阶命令：</p>
+<ul>
+<li><code>aptitude update</code>：更新软件包列表。</li>
+<li><code>aptitude upgrade</code>：升级可用的软件包。</li>
+<li><code>aptitude dist-upgrade</code>：执行发行版升级，包括软件包和系统组件的升级。</li>
+<li><code>aptitude clean</code>：清理软件包缓存。</li>
+<li><code>aptitude autoclean</code>：清理旧版本的软件包。</li>
+</ul>
+</li>
+</ol>
+<p>请注意，<code>aptitude</code>命令提供了更多功能和选项，可以根据您的需求进行更高级的软件包管理操作。在使用<code>aptitude</code>时，请仔细阅读相关文档和手册，以了解更多命令和选项的详细信息。</p>
+<p>总体而言，<code>aptitude</code>是一个功能强大且易于使用的软件包管理器，提供了交互式的方式来管理和控制Linux系统上的软件包。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_12_dpkg/" rel="prev" title="linux_2_12_dpkg">
+      <i class="fa fa-chevron-left"></i> linux_2_12_dpkg
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_02_other/" rel="next" title="linux_2_02_other">
+      linux_2_02_other <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-apt-file%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux apt-file命令 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-apt-cache%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">linux apt-cache命令 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-apt-apt-get"><span class="nav-number">4.</span> <span class="nav-text">linux apt apt-get</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-apt%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">linux apt命令 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-apt%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">6.</span> <span class="nav-text">linux apt命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apt-%E5%AE%B6%E6%97%8F"><span class="nav-number">7.</span> <span class="nav-text">apt 家族</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#apt"><span class="nav-number">7.1.</span> <span class="nav-text">apt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apt-get"><span class="nav-number">7.2.</span> <span class="nav-text">apt-get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apt-cache"><span class="nav-number">7.3.</span> <span class="nav-text">apt-cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apt-file"><span class="nav-number">7.4.</span> <span class="nav-text">apt-file</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apt-mark"><span class="nav-number">7.5.</span> <span class="nav-text">apt-mark</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-number">8.</span> <span class="nav-text">aptitude</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 点云相关的理论基础笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PointCloud_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/PointCloud/2024-05-22-PointCloud_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 点云相关的理论基础笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.449Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="PCL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/PointCloud/2024-05-22-PointCloud_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>PointCloud_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/PointCloud/2024-05-22-PointCloud_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PointCloud_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PointCloud/" itemprop="url" rel="index"><span itemprop="name">PointCloud</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>点云相关的理论基础笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="详细解释像素坐标"><a href="#详细解释像素坐标" class="headerlink" title="详细解释像素坐标"></a>详细解释像素坐标</h2><h1 id="像素坐标（Pixel-Coordinates）详解"><a href="#像素坐标（Pixel-Coordinates）详解" class="headerlink" title="像素坐标（Pixel Coordinates）详解"></a><strong>像素坐标（Pixel Coordinates）详解</strong></h1><h2 id="1-什么是像素坐标？"><a href="#1-什么是像素坐标？" class="headerlink" title="1. 什么是像素坐标？"></a><strong>1. 什么是像素坐标？</strong></h2><p><strong>像素坐标（Pixel Coordinates）</strong>是用于描述<strong>图像中的点（像素）位置</strong>的坐标系统。它以<strong>图像的左上角为原点 (0,0)<strong>，使用</strong>横坐标 (u)（列号）和纵坐标 (v)（行号）</strong>来表示像素的位置。</p>
+<p>在一个 <strong>宽度为 (W)、高度为 (H)</strong> 的图像中：</p>
+<ul>
+<li><strong>(u) 轴（X 方向，水平）</strong>：从左向右递增，范围为 (0 \leq u &lt; W)</li>
+<li><strong>(v) 轴（Y 方向，垂直）</strong>：从上向下递增，范围为 (0 \leq v &lt; H)</li>
+</ul>
+<p>例如：</p>
+<ul>
+<li><strong>左上角像素</strong>坐标为 ( (0,0) )</li>
+<li><strong>右上角像素</strong>坐标为 ( (W-1, 0) )</li>
+<li><strong>左下角像素</strong>坐标为 ( (0, H-1) )</li>
+<li><strong>右下角像素</strong>坐标为 ( (W-1, H-1) )</li>
+</ul>
+<h3 id="像素坐标示意图"><a href="#像素坐标示意图" class="headerlink" title="像素坐标示意图"></a><strong>像素坐标示意图</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(0,0)       → u  (X轴)</span><br><span class="line"> +----------------→</span><br><span class="line"> |  ● (u,v)  </span><br><span class="line"> |  </span><br><span class="line"> |  </span><br><span class="line"> ↓ v (Y轴)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-像素坐标-vs-其他坐标系"><a href="#2-像素坐标-vs-其他坐标系" class="headerlink" title="2. 像素坐标 vs 其他坐标系"></a><strong>2. 像素坐标 vs 其他坐标系</strong></h2><p>在计算机视觉和 3D 视觉应用中，像素坐标与其他几种常见的坐标系统相关：</p>
+<ul>
+<li><strong>像素坐标（Pixel Coordinates）</strong>：图像中的像素位置，单位是像素。</li>
+<li><strong>图像坐标（Normalized Coordinates）</strong>：归一化的坐标，范围通常是 ([-1, 1]) 或 ([0, 1])。</li>
+<li><strong>相机坐标系（Camera Coordinates）</strong>：相机坐标系中的 3D 位置，单位是米（m）或毫米（mm）。</li>
+<li><strong>世界坐标系（World Coordinates）</strong>：相对于全局参考坐标系的 3D 位置，通常用于 SLAM、AR&#x2F;VR 等应用。</li>
+</ul>
+<hr>
+<h2 id="3-像素坐标的计算"><a href="#3-像素坐标的计算" class="headerlink" title="3. 像素坐标的计算"></a><strong>3. 像素坐标的计算</strong></h2><h3 id="（1）像素访问"><a href="#（1）像素访问" class="headerlink" title="（1）像素访问"></a><strong>（1）像素访问</strong></h3><p>在 Python 中，可以使用 OpenCV 读取并访问像素：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取图像</span></span><br><span class="line">image = cv2.imread(<span class="string">&quot;image.jpg&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取图像的尺寸</span></span><br><span class="line">height, width, channels = image.shape</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;图像宽度: <span class="subst">&#123;width&#125;</span>, 高度: <span class="subst">&#123;height&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 访问像素值</span></span><br><span class="line">u, v = <span class="number">100</span>, <span class="number">50</span>  <span class="comment"># (列, 行)</span></span><br><span class="line">pixel_value = image[v, u]  <span class="comment"># 访问 (u, v) 处的像素值</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;像素值: <span class="subst">&#123;pixel_value&#125;</span>&quot;</span>)  <span class="comment"># 输出 (B, G, R)</span></span><br></pre></td></tr></table></figure>
+<p><strong>注意：</strong></p>
+<ul>
+<li>OpenCV 读取的图像是 <strong>BGR 格式</strong>（而非 RGB）。</li>
+<li>访问像素时，<strong>先行后列</strong>，即 <code>image[v, u]</code>（而不是 <code>image[u, v]</code>）。</li>
+</ul>
+<hr>
+<h3 id="（2）像素坐标到图像归一化坐标"><a href="#（2）像素坐标到图像归一化坐标" class="headerlink" title="（2）像素坐标到图像归一化坐标"></a><strong>（2）像素坐标到图像归一化坐标</strong></h3><p>为了让坐标独立于分辨率，我们通常将像素坐标<strong>归一化</strong>到 ([0,1]) 或 ([-1,1])：</p>
+<ul>
+<li><strong>归一化坐标（0到1）</strong>：<br>[<br>x_n &#x3D; \frac{u}{W}, \quad y_n &#x3D; \frac{v}{H}<br>]</li>
+<li><strong>归一化坐标（-1到1）</strong>：<br>[<br>x_n &#x3D; \frac{2u}{W} - 1, \quad y_n &#x3D; \frac{2v}{H} - 1<br>]</li>
+</ul>
+<hr>
+<h3 id="（3）像素坐标到相机坐标"><a href="#（3）像素坐标到相机坐标" class="headerlink" title="（3）像素坐标到相机坐标"></a><strong>（3）像素坐标到相机坐标</strong></h3><p><strong>从像素坐标转换到 3D 相机坐标系</strong>，需要知道<strong>相机的内参（Intrinsic Parameters）</strong>：</p>
+<ul>
+<li><strong>焦距 ( (f_x, f_y) )</strong>：表示相机的放大倍数</li>
+<li><strong>主点 ( (c_x, c_y) )</strong>：相机光轴在图像中的投影位置</li>
+</ul>
+<p>通过相机内参，我们可以从像素坐标 ((u,v)) 和深度值 (Z) 计算其 3D 坐标：<br>[<br>X &#x3D; \frac{(u - c_x) \cdot Z}{f_x}<br>]<br>[<br>Y &#x3D; \frac{(v - c_y) \cdot Z}{f_y}<br>]<br>[<br>Z &#x3D; \text{depth}(u, v)<br>]</p>
+<p>Python 示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fx, fy = <span class="number">525.0</span>, <span class="number">525.0</span>  <span class="comment"># 焦距</span></span><br><span class="line">cx, cy = <span class="number">319.5</span>, <span class="number">239.5</span>  <span class="comment"># 主点</span></span><br><span class="line">depth = <span class="number">1000</span>  <span class="comment"># 假设深度值为 1000mm</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算相机坐标</span></span><br><span class="line">X = (u - cx) * depth / fx</span><br><span class="line">Y = (v - cy) * depth / fy</span><br><span class="line">Z = depth</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;相机坐标: X=<span class="subst">&#123;X&#125;</span>, Y=<span class="subst">&#123;Y&#125;</span>, Z=<span class="subst">&#123;Z&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-像素坐标的实际应用"><a href="#4-像素坐标的实际应用" class="headerlink" title="4. 像素坐标的实际应用"></a><strong>4. 像素坐标的实际应用</strong></h2><h3 id="（1）计算机视觉"><a href="#（1）计算机视觉" class="headerlink" title="（1）计算机视觉"></a><strong>（1）计算机视觉</strong></h3><ul>
+<li><strong>图像处理（Image Processing）</strong>：图像的滤波、边缘检测、形态学变换等都依赖像素坐标。</li>
+<li><strong>目标检测（Object Detection）</strong>：例如在 YOLO、Faster R-CNN 等目标检测网络中，bounding box 采用像素坐标表示。</li>
+</ul>
+<h3 id="（2）3D-视觉"><a href="#（2）3D-视觉" class="headerlink" title="（2）3D 视觉"></a><strong>（2）3D 视觉</strong></h3><ul>
+<li><strong>深度估计（Depth Estimation）</strong>：RGB-D 相机生成的深度图使用像素坐标索引。</li>
+<li><strong>点云生成（Point Cloud Generation）</strong>：从像素坐标和深度值计算 3D 点云。</li>
+</ul>
+<h3 id="（3）AR-VR"><a href="#（3）AR-VR" class="headerlink" title="（3）AR&#x2F;VR"></a><strong>（3）AR&#x2F;VR</strong></h3><ul>
+<li><strong>增强现实（AR）</strong>：通过像素坐标估计摄像机姿态，实现虚拟物体的叠加。</li>
+<li><strong>虚拟现实（VR）</strong>：使用像素坐标进行光线追踪（Ray Tracing）。</li>
+</ul>
+<hr>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a><strong>5. 总结</strong></h2><ul>
+<li><strong>像素坐标表示图像中的点，原点在左上角，(u, v) 分别表示列号和行号。</strong></li>
+<li><strong>像素坐标与相机坐标、世界坐标密切相关，可以通过相机内参进行转换。</strong></li>
+<li><strong>像素坐标广泛用于图像处理、目标检测、3D 视觉、AR&#x2F;VR 等领域。</strong></li>
+</ul>
+<p>如果你对<strong>像素坐标转换、3D 计算或实际应用</strong>有更深入的问题，欢迎继续讨论！ 🚀</p>
+<h2 id="RGB-D相机生成点云的逻辑-详细解释"><a href="#RGB-D相机生成点云的逻辑-详细解释" class="headerlink" title="RGB-D相机生成点云的逻辑 详细解释"></a>RGB-D相机生成点云的逻辑 详细解释</h2><h1 id="RGB-D-相机生成点云的详细解析"><a href="#RGB-D-相机生成点云的详细解析" class="headerlink" title="RGB-D 相机生成点云的详细解析"></a><strong>RGB-D 相机生成点云的详细解析</strong></h1><h2 id="1-什么是-RGB-D-相机？"><a href="#1-什么是-RGB-D-相机？" class="headerlink" title="1. 什么是 RGB-D 相机？"></a><strong>1. 什么是 RGB-D 相机？</strong></h2><p><strong>RGB-D 相机（RGB-Depth Camera）</strong>是一种能够同时捕捉<strong>RGB（颜色信息）</strong>和<strong>深度（Depth）信息</strong>的 3D 传感器。相比普通的 RGB 摄像头，RGB-D 相机可以直接提供场景的 3D 结构信息，因此广泛用于<strong>机器人导航、3D 重建、AR&#x2F;VR、手势识别</strong>等领域。</p>
+<hr>
+<h2 id="2-RGB-D-相机的工作原理"><a href="#2-RGB-D-相机的工作原理" class="headerlink" title="2. RGB-D 相机的工作原理"></a><strong>2. RGB-D 相机的工作原理</strong></h2><p>RGB-D 相机的核心在于<strong>如何获取深度信息</strong>。常见的 RGB-D 相机通常使用以下三种方式之一：</p>
+<h3 id="（1）结构光（Structured-Light）"><a href="#（1）结构光（Structured-Light）" class="headerlink" title="（1）结构光（Structured Light）"></a><strong>（1）结构光（Structured Light）</strong></h3><ul>
+<li><strong>原理</strong>：向场景投射<strong>特定的光模式（如点阵、条纹）</strong>，相机捕捉这些模式在物体表面的<strong>变形</strong>，并通过三角测量计算深度。</li>
+<li><strong>优点</strong>：精度较高，适用于近距离扫描（0.5m-3m）。</li>
+<li><strong>缺点</strong>：对环境光敏感，在室外或强光下表现较差。</li>
+<li><strong>代表设备</strong>：<ul>
+<li><strong>Microsoft Kinect v1</strong></li>
+<li><strong>Apple Face ID</strong></li>
+<li><strong>Intel RealSense（部分型号）</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="（2）飞行时间（Time-of-Flight-ToF）"><a href="#（2）飞行时间（Time-of-Flight-ToF）" class="headerlink" title="（2）飞行时间（Time-of-Flight, ToF）"></a><strong>（2）飞行时间（Time-of-Flight, ToF）</strong></h3><ul>
+<li><strong>原理</strong>：发射<strong>红外光</strong>（或激光），测量光信号返回的<strong>时间差</strong>来计算深度，类似于<strong>雷达</strong>的测距方式。</li>
+<li><strong>优点</strong>：适用于中远距离（0.2m-10m），受环境光影响较小。</li>
+<li><strong>缺点</strong>：受<strong>多径效应</strong>（光线反射后到达传感器的路径不同）影响，可能导致测量误差。</li>
+<li><strong>代表设备</strong>：<ul>
+<li><strong>Microsoft Kinect v2</strong></li>
+<li><strong>Intel RealSense（部分型号）</strong></li>
+<li><strong>Apple LiDAR Scanner</strong></li>
+<li><strong>三星、华为 ToF 摄像头（用于人脸识别、AR）</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="（3）双目立体视觉（Stereo-Vision）"><a href="#（3）双目立体视觉（Stereo-Vision）" class="headerlink" title="（3）双目立体视觉（Stereo Vision）"></a><strong>（3）双目立体视觉（Stereo Vision）</strong></h3><ul>
+<li><strong>原理</strong>：使用<strong>两个摄像头</strong>模拟人眼，通过视差计算深度。相机计算同一点在左右两幅图像中的<strong>像素偏移量（视差 Disparity）</strong>，然后利用<strong>三角测量</strong>计算该点的实际深度。</li>
+<li><strong>优点</strong>：不依赖额外光源，适用于室外环境。</li>
+<li><strong>缺点</strong>：对<strong>纹理丰富的场景</strong>表现较好，但对于<strong>光滑表面、无纹理区域（如白墙）</strong>会失效。</li>
+<li><strong>代表设备</strong>：<ul>
+<li><strong>ZED Camera</strong></li>
+<li><strong>Intel RealSense（双目立体部分）</strong></li>
+<li><strong>OpenCV Stereo Vision 处理</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-RGB-D-相机如何生成点云"><a href="#3-RGB-D-相机如何生成点云" class="headerlink" title="3. RGB-D 相机如何生成点云"></a><strong>3. RGB-D 相机如何生成点云</strong></h2><p>RGB-D 相机的核心任务是将<strong>深度图（Depth Map）</strong>和<strong>RGB 图像</strong>转换成<strong>3D 点云</strong>。这个过程包括以下几个关键步骤：</p>
+<h3 id="（1）获取原始数据"><a href="#（1）获取原始数据" class="headerlink" title="（1）获取原始数据"></a><strong>（1）获取原始数据</strong></h3><p>RGB-D 相机会输出两个主要数据：</p>
+<ul>
+<li><strong>RGB 图像</strong>（二维彩色图像，分辨率通常为 640×480 或 1280×720）</li>
+<li><strong>深度图</strong>（Depth Map，每个像素表示到相机的距离，单位通常是毫米 mm）</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 读取 RGB 和 深度图</span></span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">rgb_image = cv2.imread(<span class="string">&quot;rgb.png&quot;</span>)      <span class="comment"># 读取 RGB 图像</span></span><br><span class="line">depth_image = cv2.imread(<span class="string">&quot;depth.png&quot;</span>, cv2.IMREAD_UNCHANGED)  <span class="comment"># 读取深度图（以灰度形式存储）</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="（2）相机内参（Camera-Intrinsics）"><a href="#（2）相机内参（Camera-Intrinsics）" class="headerlink" title="（2）相机内参（Camera Intrinsics）"></a><strong>（2）相机内参（Camera Intrinsics）</strong></h3><p>为了将 2D 深度图转换成 3D 坐标，我们需要知道相机的<strong>内参矩阵</strong>（Intrinsic Parameters），主要包括：</p>
+<ul>
+<li><strong>焦距（fx, fy）</strong>：相机的光学焦距（单位：像素）</li>
+<li><strong>主点（cx, cy）</strong>：光轴在图像坐标系中的位置（单位：像素）</li>
+</ul>
+<p>相机内参矩阵通常表示为：<br>[<br>K &#x3D;<br>\begin{bmatrix}<br>f_x &amp; 0 &amp; c_x \<br>0 &amp; f_y &amp; c_y \<br>0 &amp; 0 &amp; 1<br>\end{bmatrix}<br>]</p>
+<p>在 OpenCV 或 ROS 中，可以通过标定文件获取这些参数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fx = <span class="number">525.0</span>  <span class="comment"># X 方向焦距（像素）</span></span><br><span class="line">fy = <span class="number">525.0</span>  <span class="comment"># Y 方向焦距（像素）</span></span><br><span class="line">cx = <span class="number">319.5</span>  <span class="comment"># 主点 X 坐标（像素）</span></span><br><span class="line">cy = <span class="number">239.5</span>  <span class="comment"># 主点 Y 坐标（像素）</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="（3）从像素坐标转换为-3D-坐标"><a href="#（3）从像素坐标转换为-3D-坐标" class="headerlink" title="（3）从像素坐标转换为 3D 坐标"></a><strong>（3）从像素坐标转换为 3D 坐标</strong></h3><p>对于深度图中的每个像素 ((u, v))，它的深度值 (Z) 表示该点到相机的距离。我们可以用以下公式计算世界坐标：</p>
+<p>[<br>X &#x3D; \frac{(u - c_x) \cdot Z}{f_x}<br>]<br>[<br>Y &#x3D; \frac{(v - c_y) \cdot Z}{f_y}<br>]<br>[<br>Z &#x3D; \text{depth}(u, v)<br>]</p>
+<p>Python 代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算 3D 点云</span></span><br><span class="line">h, w = depth_image.shape</span><br><span class="line">point_cloud = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> v <span class="keyword">in</span> <span class="built_in">range</span>(h):</span><br><span class="line">    <span class="keyword">for</span> u <span class="keyword">in</span> <span class="built_in">range</span>(w):</span><br><span class="line">        Z = depth_image[v, u] / <span class="number">1000.0</span>  <span class="comment"># 深度值转换为米</span></span><br><span class="line">        <span class="keyword">if</span> Z == <span class="number">0</span>:  <span class="comment"># 深度值无效</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        X = (u - cx) * Z / fx</span><br><span class="line">        Y = (v - cy) * Z / fy</span><br><span class="line">        point_cloud.append((X, Y, Z))</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="（4）结合-RGB-颜色信息"><a href="#（4）结合-RGB-颜色信息" class="headerlink" title="（4）结合 RGB 颜色信息"></a><strong>（4）结合 RGB 颜色信息</strong></h3><ul>
+<li>由于 RGB 图像和深度图是对齐的，我们可以直接获取每个点的颜色值（R, G, B）。</li>
+<li>生成的点云数据格式为：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X Y Z R G B</span><br></pre></td></tr></table></figure>
+Python 代码：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">colored_point_cloud = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> v <span class="keyword">in</span> <span class="built_in">range</span>(h):</span><br><span class="line">    <span class="keyword">for</span> u <span class="keyword">in</span> <span class="built_in">range</span>(w):</span><br><span class="line">        Z = depth_image[v, u] / <span class="number">1000.0</span></span><br><span class="line">        <span class="keyword">if</span> Z == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        X = (u - cx) * Z / fx</span><br><span class="line">        Y = (v - cy) * Z / fy</span><br><span class="line">        R, G, B = rgb_image[v, u]</span><br><span class="line">        colored_point_cloud.append((X, Y, Z, R, G, B))</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="（5）存储为-PCD-PLY-点云格式"><a href="#（5）存储为-PCD-PLY-点云格式" class="headerlink" title="（5）存储为 PCD&#x2F;PLY 点云格式"></a><strong>（5）存储为 PCD&#x2F;PLY 点云格式</strong></h3><p>可以使用 <strong>PCL（Point Cloud Library）</strong> 或 <strong>Open3D</strong> 进行点云存储：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> open3d <span class="keyword">as</span> o3d</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建点云对象</span></span><br><span class="line">pcd = o3d.geometry.PointCloud()</span><br><span class="line">pcd.points = o3d.utility.Vector3dVector(np.array(point_cloud))</span><br><span class="line">pcd.colors = o3d.utility.Vector3dVector(np.array(rgb_colors) / <span class="number">255.0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存点云</span></span><br><span class="line">o3d.io.write_point_cloud(<span class="string">&quot;output.ply&quot;</span>, pcd)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a><strong>4. 总结</strong></h2><ol>
+<li><strong>RGB-D 相机</strong>提供<strong>RGB 图像 + 深度图</strong>，可以直接生成点云。</li>
+<li><strong>深度计算方式</strong>包括：<strong>结构光（Kinect v1）</strong>、<strong>ToF（Kinect v2, RealSense）</strong>、<strong>双目立体（ZED）</strong>。</li>
+<li><strong>核心步骤</strong>：<ul>
+<li>获取 <strong>RGB 和深度数据</strong></li>
+<li>通过<strong>相机内参</strong>计算 3D 坐标</li>
+<li>结合 <strong>RGB 颜色信息</strong></li>
+<li><strong>存储</strong>和<strong>可视化</strong>点云</li>
+</ul>
+</li>
+</ol>
+<p>如果你有更具体的问题，比如 <strong>如何优化点云质量？如何在 ROS 里处理点云？</strong>，欢迎深入讨论！ 🚀</p>
+<h2 id="详细解释关于点云的概念"><a href="#详细解释关于点云的概念" class="headerlink" title="详细解释关于点云的概念"></a>详细解释关于点云的概念</h2><h2 id="点云（Point-Cloud）的详细概述"><a href="#点云（Point-Cloud）的详细概述" class="headerlink" title="点云（Point Cloud）的详细概述"></a><strong>点云（Point Cloud）的详细概述</strong></h2><h3 id="1-什么是点云？"><a href="#1-什么是点云？" class="headerlink" title="1. 什么是点云？"></a><strong>1. 什么是点云？</strong></h3><p><strong>点云（Point Cloud）</strong>是一种三维数据表示方式，它由大量的<strong>离散点（Points）</strong>组成，每个点都有<strong>空间坐标（X, Y, Z）</strong>，可能还包括<strong>颜色（RGB）、法向量（Normals）、强度（Intensity）</strong>等信息。点云通常用于描述三维物体或环境。</p>
+<p>点云主要来源于<strong>3D 传感器</strong>，如：</p>
+<ul>
+<li><strong>激光雷达（LiDAR）</strong></li>
+<li><strong>RGB-D 摄像头（如 Kinect, RealSense）</strong></li>
+<li><strong>结构光扫描仪</strong></li>
+<li><strong>立体视觉（双目相机）</strong></li>
+<li><strong>计算机合成数据（如 3D 渲染）</strong></li>
+</ul>
+<hr>
+<h3 id="2-点云的基本特点"><a href="#2-点云的基本特点" class="headerlink" title="2. 点云的基本特点"></a><strong>2. 点云的基本特点</strong></h3><ol>
+<li><strong>无拓扑结构</strong>：点云是离散的点集，没有直接的拓扑关系（不像网格模型有三角面）。</li>
+<li><strong>数据量大</strong>：点云通常包含数百万甚至数十亿个点，数据量庞大。</li>
+<li><strong>分辨率不均匀</strong>：点的密度可能随距离或扫描方式变化。</li>
+<li><strong>可能存在噪声</strong>：由于传感器误差或环境干扰，点云数据可能包含噪声点或错误点。</li>
+</ol>
+<hr>
+<h3 id="3-点云的数据结构"><a href="#3-点云的数据结构" class="headerlink" title="3. 点云的数据结构"></a><strong>3. 点云的数据结构</strong></h3><p>点云通常存储为一组 3D 坐标点，每个点可以包含额外的信息：</p>
+<table>
+<thead>
+<tr>
+<th><strong>属性</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(X, Y, Z)</strong></td>
+<td>每个点的三维坐标</td>
+</tr>
+<tr>
+<td><strong>RGB (R, G, B)</strong></td>
+<td>颜色信息（如果有）</td>
+</tr>
+<tr>
+<td><strong>Intensity</strong></td>
+<td>反射强度（用于 LiDAR 数据）</td>
+</tr>
+<tr>
+<td><strong>Normal (Nx, Ny, Nz)</strong></td>
+<td>法向量（表示点的表面方向）</td>
+</tr>
+<tr>
+<td><strong>Time</strong></td>
+<td>时间戳（用于动态点云）</td>
+</tr>
+<tr>
+<td><strong>Classification</strong></td>
+<td>语义类别（如地面、建筑、行人等）</td>
+</tr>
+</tbody></table>
+<p><strong>点云的文件格式：</strong></p>
+<ul>
+<li><strong>.PCD</strong>（Point Cloud Data）：PCL（Point Cloud Library）使用的格式</li>
+<li><strong>.PLY</strong>（Polygon File Format）：可以存储点云和网格</li>
+<li><strong>.LAS &#x2F; .LAZ</strong>：LiDAR 数据的标准格式，LAZ 为压缩版</li>
+<li><strong>.XYZ &#x2F; .TXT &#x2F; .CSV</strong>：简单的文本格式，存储 X, Y, Z 坐标</li>
+</ul>
+<hr>
+<h3 id="4-点云的采集方式"><a href="#4-点云的采集方式" class="headerlink" title="4. 点云的采集方式"></a><strong>4. 点云的采集方式</strong></h3><h4 id="（1）LiDAR（光探测和测距）"><a href="#（1）LiDAR（光探测和测距）" class="headerlink" title="（1）LiDAR（光探测和测距）"></a><strong>（1）LiDAR（光探测和测距）</strong></h4><ul>
+<li>通过激光脉冲测量物体的<strong>距离和形状</strong>。</li>
+<li>典型应用：<strong>自动驾驶、3D 地图、遥感测绘</strong></li>
+<li>主要特点：<ul>
+<li><strong>高精度、高密度</strong></li>
+<li>受光照影响小，可用于<strong>夜间</strong></li>
+<li>可直接获取<strong>深度信息</strong></li>
+</ul>
+</li>
+<li>代表设备：Velodyne、Ouster、Hesai、Livox</li>
+</ul>
+<h4 id="（2）RGB-D-传感器"><a href="#（2）RGB-D-传感器" class="headerlink" title="（2）RGB-D 传感器"></a><strong>（2）RGB-D 传感器</strong></h4><ul>
+<li>使用<strong>红外投影和摄像头</strong>获取<strong>深度信息</strong>。</li>
+<li>典型应用：<strong>机器人、手势识别、AR&#x2F;VR</strong></li>
+<li>主要特点：<ul>
+<li><strong>短距离</strong>（通常小于 10m）</li>
+<li>受环境光影响大</li>
+<li>获取<strong>RGB 颜色信息</strong></li>
+</ul>
+</li>
+<li>代表设备：Microsoft Kinect、Intel RealSense、Orbbec Astra</li>
+</ul>
+<h4 id="（3）立体视觉（双目相机）"><a href="#（3）立体视觉（双目相机）" class="headerlink" title="（3）立体视觉（双目相机）"></a><strong>（3）立体视觉（双目相机）</strong></h4><ul>
+<li>通过<strong>两个摄像头</strong>的视差计算深度。</li>
+<li>典型应用：<strong>自动驾驶、机器人导航</strong></li>
+<li>主要特点：<ul>
+<li>需要<strong>良好的纹理环境</strong></li>
+<li>深度精度<strong>随距离增加而降低</strong></li>
+</ul>
+</li>
+<li>代表设备：ZED Camera、OpenCV Stereo Matching</li>
+</ul>
+<h4 id="（4）结构光扫描"><a href="#（4）结构光扫描" class="headerlink" title="（4）结构光扫描"></a><strong>（4）结构光扫描</strong></h4><ul>
+<li>通过<strong>投影光栅图案</strong>计算深度。</li>
+<li>典型应用：<strong>3D 扫描、面部识别</strong></li>
+<li>代表设备：Apple Face ID、Structured Light Scanners</li>
+</ul>
+<hr>
+<h3 id="5-点云的主要应用"><a href="#5-点云的主要应用" class="headerlink" title="5. 点云的主要应用"></a><strong>5. 点云的主要应用</strong></h3><h4 id="（1）自动驾驶"><a href="#（1）自动驾驶" class="headerlink" title="（1）自动驾驶"></a><strong>（1）自动驾驶</strong></h4><ul>
+<li>LiDAR 生成<strong>高精度 3D 地图</strong>，用于车辆定位、障碍物检测、路径规划。</li>
+<li>点云处理任务：<strong>地面分割、物体检测、语义分割</strong>。</li>
+</ul>
+<h4 id="（2）机器人导航"><a href="#（2）机器人导航" class="headerlink" title="（2）机器人导航"></a><strong>（2）机器人导航</strong></h4><ul>
+<li>机器人使用点云进行<strong>SLAM（Simultaneous Localization and Mapping）</strong>，实现自主定位和避障。</li>
+<li>传感器：<strong>LiDAR、RGB-D 相机</strong>。</li>
+</ul>
+<h4 id="（3）3D-重建"><a href="#（3）3D-重建" class="headerlink" title="（3）3D 重建"></a><strong>（3）3D 重建</strong></h4><ul>
+<li>通过多个视角的点云拼接，生成<strong>高精度 3D 模型</strong>。</li>
+<li>典型应用：<strong>建筑扫描、考古、医疗 CT 影像</strong>。</li>
+</ul>
+<h4 id="（4）AR-VR-和游戏"><a href="#（4）AR-VR-和游戏" class="headerlink" title="（4）AR&#x2F;VR 和游戏"></a><strong>（4）AR&#x2F;VR 和游戏</strong></h4><ul>
+<li>3D 点云可用于<strong>虚拟现实（VR）和增强现实（AR）</strong>，创建真实感强的虚拟环境。</li>
+<li>设备：<strong>微软 HoloLens、苹果 LiDAR Scanner</strong>。</li>
+</ul>
+<h4 id="（5）工业检测"><a href="#（5）工业检测" class="headerlink" title="（5）工业检测"></a><strong>（5）工业检测</strong></h4><ul>
+<li>点云可用于<strong>产品质量检测</strong>，如汽车制造中的焊接质量检查、PCB 线路检测。</li>
+<li>3D 传感器扫描工件，检测<strong>尺寸误差、表面缺陷</strong>。</li>
+</ul>
+<h4 id="（6）遥感测绘"><a href="#（6）遥感测绘" class="headerlink" title="（6）遥感测绘"></a><strong>（6）遥感测绘</strong></h4><ul>
+<li>机载 LiDAR 获取<strong>城市、森林、地形</strong>数据，用于<strong>GIS、环境监测、城市规划</strong>。</li>
+</ul>
+<hr>
+<h3 id="6-点云的处理"><a href="#6-点云的处理" class="headerlink" title="6. 点云的处理"></a><strong>6. 点云的处理</strong></h3><p>点云数据通常<strong>未经处理</strong>，需要进行<strong>预处理、降噪、分割、配准、重建</strong>等步骤。</p>
+<h4 id="（1）降噪"><a href="#（1）降噪" class="headerlink" title="（1）降噪"></a><strong>（1）降噪</strong></h4><ul>
+<li><strong>滤波方法</strong>：<ul>
+<li>统计滤波（Statistical Outlier Removal）</li>
+<li>半径滤波（Radius Outlier Removal）</li>
+<li>体素滤波（Voxel Grid）</li>
+</ul>
+</li>
+</ul>
+<h4 id="（2）配准（Registration）"><a href="#（2）配准（Registration）" class="headerlink" title="（2）配准（Registration）"></a><strong>（2）配准（Registration）</strong></h4><ul>
+<li>目的：将多个点云<strong>对齐</strong>，形成完整的 3D 结构。</li>
+<li>经典算法：<ul>
+<li><strong>ICP（Iterative Closest Point）</strong></li>
+<li><strong>NDT（Normal Distributions Transform）</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="（3）分割"><a href="#（3）分割" class="headerlink" title="（3）分割"></a><strong>（3）分割</strong></h4><ul>
+<li>目标：提取感兴趣的物体，如<strong>地面、建筑、车辆</strong>。</li>
+<li>经典方法：<ul>
+<li><strong>RANSAC（随机采样一致性算法）</strong>：提取平面、圆柱体等几何形状</li>
+<li><strong>欧几里得聚类（Euclidean Clustering）</strong>：将点云分成多个簇</li>
+</ul>
+</li>
+</ul>
+<h4 id="（4）特征提取"><a href="#（4）特征提取" class="headerlink" title="（4）特征提取"></a><strong>（4）特征提取</strong></h4><ul>
+<li>提取局部几何信息，如法向量、曲率、关键点。</li>
+<li>经典方法：<ul>
+<li><strong>FPFH（Fast Point Feature Histogram）</strong></li>
+<li><strong>SHOT（Signature of Histograms of Orientations）</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="（5）点云分类"><a href="#（5）点云分类" class="headerlink" title="（5）点云分类"></a><strong>（5）点云分类</strong></h4><ul>
+<li><strong>深度学习</strong>：PointNet, PointNet++, PointCNN, Point Transformer</li>
+<li>目标：自动分割<strong>道路、行人、车辆、树木</strong>等类别。</li>
+</ul>
+<hr>
+<h3 id="7-相关工具和库"><a href="#7-相关工具和库" class="headerlink" title="7. 相关工具和库"></a><strong>7. 相关工具和库</strong></h3><ul>
+<li><strong>PCL（Point Cloud Library）</strong>：C++ 库，提供各种点云处理算法（ICP、滤波、分割等）。</li>
+<li><strong>Open3D</strong>：Python&#x2F;C++ 库，支持点云可视化、配准、重建等功能。</li>
+<li><strong>Meshlab</strong>：用于点云和 3D 网格处理的软件。</li>
+<li><strong>CloudCompare</strong>：开源点云处理软件，支持可视化、滤波、配准等功能。</li>
+</ul>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><ul>
+<li><strong>点云是 3D 空间中的离散点集合</strong>，用于表示物体或环境。</li>
+<li><strong>主要来源</strong>：LiDAR、RGB-D 相机、双目相机、结构光扫描。</li>
+<li><strong>主要应用</strong>：自动驾驶、机器人导航、3D 重建、遥感测绘、工业检测。</li>
+<li><strong>关键处理技术</strong>：降噪、配准、分割、特征提取、分类。</li>
+</ul>
+<p>如果你对某个具体的点云处理技术感兴趣，可以深入探讨！ 😊</p>
+<h2 id="存储为PLY点云文件格式常用的第三方库有哪些？"><a href="#存储为PLY点云文件格式常用的第三方库有哪些？" class="headerlink" title="存储为PLY点云文件格式常用的第三方库有哪些？"></a>存储为PLY点云文件格式常用的第三方库有哪些？</h2><p>许多第三方库支持PLY（Polygon File Format）点云文件格式的读写和处理。这些库可以帮助你轻松地在不同编程语言中处理PLY格式的点云数据。以下是一些常用的第三方库，用于处理PLY点云文件格式：</p>
+<ol>
+<li><p>**Point Cloud Library (PCL)**：PCL 是一个功能强大的开源库，主要用于点云处理。它提供了丰富的点云数据结构和算法，并支持多种点云文件格式，包括PLY。PCL 提供了用于读取和写入PLY文件的函数，以及用于点云处理的各种工具和算法。</p>
+</li>
+<li><p><strong>Open3D</strong>：Open3D 是另一个开源的库，用于三维数据处理，包括点云。它支持PLY格式以及其他格式，提供了点云的读写和可视化功能，同时还提供了各种点云处理算法。</p>
+</li>
+<li><p><strong>VTK（Visualization Toolkit）</strong>：VTK 是一个开源的可视化库，它也支持PLY点云文件格式的读写。VTK 不仅用于可视化，还提供了点云数据处理的一些功能，可以在各种应用中使用。</p>
+</li>
+<li><p><strong>libigl</strong>：libigl 是一个用于几何处理和可视化的C++库，它支持PLY格式以及其他各种几何数据格式。虽然它主要用于三维模型处理，但也可以用于点云数据。</p>
+</li>
+<li><p><strong>Pyply</strong>：Pyply 是一个用于Python的库，专门用于读写和处理PLY点云文件。它提供了简单的接口，适用于快速处理PLY格式的点云数据。</p>
+</li>
+<li><p>**Assimp (Open Asset Import Library)**：Assimp 是一个用于导入和导出3D模型和场景的库，它支持多种3D数据格式，包括PLY格式。虽然主要用于模型导入，但也可以用于点云数据。</p>
+</li>
+</ol>
+<p>这些库提供了在不同编程语言中处理PLY点云文件格式的方式，具体的选择取决于你的编程语言偏好和项目需求。无论你使用哪个库，它们都可以帮助你轻松读取、写入和处理PLY格式的点云数据。</p>
+<h2 id="常见的点云文件格式有哪些-详解"><a href="#常见的点云文件格式有哪些-详解" class="headerlink" title="常见的点云文件格式有哪些 详解"></a>常见的点云文件格式有哪些 详解</h2><p>点云文件格式是用于存储和交换点云数据的规范化文件格式。这些格式具有不同的特性，包括数据结构、支持的属性、压缩方式和应用范围。以下是一些常见的点云文件格式：</p>
+<ol>
+<li><p><strong>PLY（Polygon File Format）</strong>：PLY 格式是一种通用的文件格式，用于存储三维模型和点云数据。它支持多种属性，包括坐标、颜色、法线、纹理坐标等。PLY 格式非常灵活，可适应各种应用，包括计算机图形学、三维建模和点云处理。</p>
+</li>
+<li><p><strong>LAS&#x2F;LAZ（LiDAR Data Exchange）</strong>：LAS 格式和其压缩版本 LAZ 通常用于存储激光雷达数据。这些格式支持点云的坐标、强度、分类、时间戳等信息，同时支持数据的索引和压缩。LAS 格式经常用于地理信息系统（GIS）和激光雷达数据。</p>
+</li>
+<li><p><strong>PCD（Point Cloud Data）</strong>：PCD 格式是 Point Cloud Library (PCL) 的默认文件格式，用于存储点云数据。它支持点云的坐标和颜色信息，同时支持多种数据类型。PCD 格式通常用于点云处理和机器视觉应用。</p>
+</li>
+<li><p><strong>XYZ 格式</strong>：XYZ 格式是一种非常简单的格式，其中每行包含一个点的 x、y、z 坐标。这种格式特别适用于小型点云数据的快速存储和交换。它通常不包括其他属性信息。</p>
+</li>
+<li><p><strong>ASC（ASCII）格式</strong>：ASCII 格式是一种文本文件格式，其中点的坐标和属性信息以文本形式存储。这种格式易于阅读和编辑，通常包括 x、y、z 坐标以及可能的其他属性，如颜色、法线、强度等。ASCII 格式适用于简单的点云数据或进行手动编辑和调试。</p>
+</li>
+<li><p><strong>PTS 格式</strong>：PTS 格式是一种使用于粒子云（点云）数据的格式，通常用于科学和工程领域。PTS 格式支持点的坐标、颜色和法线信息。</p>
+</li>
+<li><p><strong>OBJ（Wavefront .obj）</strong>：OBJ 格式通常用于存储三维模型数据，但也可以用于存储点云数据。它支持点的坐标、颜色和纹理坐标，是一种通用的三维数据交换格式。</p>
+</li>
+</ol>
+<p>这些格式的选择通常取决于数据的来源、用途、处理工具和库的支持。不同的格式可能适用于不同的应用领域，因此在选择格式时要考虑与特定应用和工具的兼容性。此外，有一些格式支持附加信息，如颜色、法线和纹理，使其更适合于多用途的点云数据存储。</p>
+<h2 id="点云数据一般的存储工具有什么-详解"><a href="#点云数据一般的存储工具有什么-详解" class="headerlink" title="点云数据一般的存储工具有什么 详解"></a>点云数据一般的存储工具有什么 详解</h2><p>点云数据的存储工具是用于创建、管理、读取和写入点云数据的软件或库。这些工具有助于在计算机视觉、机器学习、三维建模、虚拟现实等领域中处理点云数据。以下是一些常见的点云数据存储工具：</p>
+<ol>
+<li><p>**Point Cloud Library (PCL)**：PCL 是一个功能强大的开源库，专门用于点云处理。它提供了丰富的点云数据结构和算法，以及用于点云数据的文件 I&#x2F;O（输入&#x2F;输出）功能，支持多种点云文件格式，如PLY、PCD、LAS 等。PCL 是一个非常受欢迎的点云处理工具，可用于点云的读取、写入、滤波、配准、分割和特征提取等操作。</p>
+</li>
+<li><p>**PointCloud2 (ROS)**：ROS（Robot Operating System）中提供了 PointCloud2 消息类型，用于在机器人和机器视觉应用中传输点云数据。ROS 的 PointCloud2 消息类型允许在ROS系统中轻松传输、发布和订阅点云数据，使其成为机器人和自动化应用中的强大工具。</p>
+</li>
+<li><p><strong>LasPy</strong>：LasPy 是一个用于处理 LAS 格式点云数据的 Python 库。LAS 格式通常用于激光雷达数据，而 LasPy 可以用于读取和写入 LAS 文件，以及进行基本的点云处理操作。</p>
+</li>
+<li><p><strong>Potree</strong>：Potree 是一个用于将点云数据转换为Web浏览器可视化的开源工具。它可以将点云数据转换为点云切片格式，以实现高性能的在线点云可视化。Potree支持多种点云格式，包括LAS、PLY和PCD。</p>
+</li>
+<li><p><strong>CloudCompare</strong>：CloudCompare是一个开源的点云处理和三维建模工具，它具有强大的点云文件处理功能，可以导入、导出和转换多种点云格式，如PLY、LAS、XYZ等。它还提供了许多点云处理工具，用于可视化、滤波、配准和分析点云数据。</p>
+</li>
+<li><p><strong>Blender</strong>：Blender 是一个开源的三维建模和渲染软件，它具有强大的点云导入和处理功能，用于将点云数据与建模和渲染操作集成。Blender支持多种点云格式，如PLY和LAS。</p>
+</li>
+<li><p><strong>Velodyne LiDAR Software Suite</strong>：Velodyne LiDAR提供的软件套件包括用于处理激光雷达点云数据的工具，这些工具专门用于Velodyne激光雷达数据的读取、处理和分析。</p>
+</li>
+</ol>
+<p>这些工具和库可以根据需要进行点云数据的读取、写入、处理和分析。具体选择哪个工具通常取决于数据的来源、应用场景和开发环境。不同的工具可能支持不同的点云文件格式，因此在选择工具时要考虑与特定数据格式的兼容性。</p>
+<h2 id="点云是什么-详解"><a href="#点云是什么-详解" class="headerlink" title="点云是什么 详解"></a>点云是什么 详解</h2><p>点云是一种用来表示三维空间中对象或场景的数据结构，它由大量的点构成，每个点都包含有关其在三维坐标空间中的位置和其他属性的信息。点云通常以坐标值的形式存储，表示空间中的离散点。这些点可以包含额外的信息，如颜色、法线方向、强度、反射率等，取决于点云的来源和应用领域。</p>
+<p>以下是有关点云的详细解释：</p>
+<ol>
+<li><p>数据来源：点云数据通常通过各种传感器和技术来获取，包括激光雷达、立体摄影、深度相机、超声波传感器等。这些传感器可以在不同领域中使用，例如地理信息系统、机器视觉、自动驾驶、建筑信息模型（BIM）等。</p>
+</li>
+<li><p>点的属性：每个点云中的点可以包含不同的属性信息，具体取决于数据的来源和应用。通常，点的主要属性是其三维坐标，但还可以包含颜色信息（RGB或RGBA）、法线向量、反射率、强度等。这些属性有助于描述点在空间中的位置、外观和其他特征。</p>
+</li>
+<li><p>用途：点云在许多领域中都有广泛的应用，包括但不限于：</p>
+<ul>
+<li>地理信息系统（GIS）：用于地形建模、城市规划、资源管理和环境监测。</li>
+<li>计算机视觉：用于物体识别、三维重建、姿态估计和物体分割。</li>
+<li>自动驾驶：用于车辆感知和环境建模。</li>
+<li>工业制造和质量控制：用于检测和分析制造过程中的缺陷和形状。</li>
+<li>建筑信息建模（BIM）：用于建筑和基础设施项目中的设计和监测。</li>
+<li>虚拟现实和增强现实：用于创建沉浸式虚拟环境和互动应用。</li>
+</ul>
+</li>
+<li><p>数据处理：点云数据通常需要进行处理和分析，以便进一步的应用。这包括点云的滤波、去噪、配准（将不同视角或时间的点云对齐）、分割（将点云分为不同的对象或部分）、特征提取（寻找点云中的关键特征点或曲面）、可视化等操作。这些处理步骤有助于点云数据更好地用于特定应用。</p>
+</li>
+</ol>
+<p>总之，点云是一种强大的三维数据表示形式，可用于多种应用领域，以捕捉和分析真实世界中的三维信息。点云技术在科学、工程和计算机图形学中具有重要作用，可以帮助人们理解和处理三维空间中的复杂数据。</p>
+<h2 id="计算机视觉中的点云是什么-详解"><a href="#计算机视觉中的点云是什么-详解" class="headerlink" title="计算机视觉中的点云是什么 详解"></a>计算机视觉中的点云是什么 详解</h2><p>计算机视觉中的点云是一种用于表示和处理三维空间信息的数据结构。点云由大量的三维点构成，每个点都包含有关其在三维坐标空间中的位置和其他属性的信息。这些点通常以坐标值的形式存储，表示了物体或场景的离散采样点。计算机视觉中的点云广泛应用于多个领域，如物体识别、三维重建、姿态估计、物体分割、虚拟现实和增强现实等。</p>
+<p>以下是有关计算机视觉中的点云的详细解释：</p>
+<ol>
+<li><p>数据来源：点云数据可以通过各种传感器和技术来获取，如激光扫描、深度相机、双目摄影、结构光扫描等。这些传感器用于捕捉现实世界中的物体或场景，并将其转换为三维点的集合。这些点可以包含有关物体的几何信息以及其他属性，如颜色、法线向量或强度。</p>
+</li>
+<li><p>应用领域：计算机视觉中的点云在多个应用领域中发挥作用，包括但不限于：</p>
+<ul>
+<li>物体识别和分类：点云可用于识别和分类三维物体。通过提取点云的特征，可以训练机器学习模型来识别不同类别的物体。</li>
+<li>三维重建：通过融合从不同视角或传感器获得的点云数据，可以创建物体或场景的三维模型，用于虚拟现实、游戏开发、建筑信息建模等。</li>
+<li>姿态估计：点云可用于估计物体或人体的姿态。这在动作捕捉、手势识别和机器人视觉中有广泛应用。</li>
+<li>物体分割：通过分析点云数据的几何特征，可以将物体分割成不同的部分，从而更好地理解物体的结构。</li>
+<li>虚拟现实和增强现实：点云用于创建沉浸式虚拟环境和实时跟踪现实世界物体的位置和姿态，以实现增强现实应用。</li>
+</ul>
+</li>
+<li><p>数据处理：点云数据通常需要进行处理和分析，以适应特定的计算机视觉任务。这包括点云的滤波、去噪、配准（将多个点云对齐）、特征提取、分割、物体识别等操作。这些处理步骤有助于从点云中提取有用的信息，并用于机器学习或计算机视觉算法。</p>
+</li>
+</ol>
+<p>总之，计算机视觉中的点云是一个重要的三维数据表示形式，用于处理和分析三维空间中的信息。它在许多应用中发挥关键作用，帮助计算机理解和处理现实世界中的三维数据。</p>
+<h2 id="点云和RGB图之间的关系是什么-详解"><a href="#点云和RGB图之间的关系是什么-详解" class="headerlink" title="点云和RGB图之间的关系是什么 详解"></a>点云和RGB图之间的关系是什么 详解</h2><p>点云和RGB图像之间存在密切的关系，它们通常一起使用，以提供更全面的关于三维世界的信息。下面详细解释了点云和RGB图像之间的关系：</p>
+<ol>
+<li><p><strong>点云数据</strong>：点云是一个三维数据结构，由许多离散的点组成，每个点包含了其在三维坐标空间中的位置信息。这些点通常来自激光扫描、深度相机、结构光扫描等传感器，或通过三维重建技术生成。点云数据用于精确表示和捕捉物体和场景的三维几何信息，包括形状、大小和位置。</p>
+</li>
+<li><p><strong>RGB图像</strong>：RGB图像是二维图像，由红、绿和蓝三个颜色通道组成，每个像素都有对应的颜色信息。这种图像通常来自标准的彩色相机，可以捕捉物体的外观和颜色信息。RGB图像提供了在二维平面上的物体外观信息，但没有提供深度信息。</p>
+</li>
+</ol>
+<p>点云和RGB图像之间的关系如下：</p>
+<ol>
+<li><p><strong>融合信息</strong>：点云和RGB图像通常一起使用，以提供更全面的关于物体或场景的信息。点云提供了三维几何信息，包括物体的形状和位置，而RGB图像提供了外观和颜色信息。通过将它们结合起来，可以更好地理解和描述三维世界。</p>
+</li>
+<li><p><strong>视觉感知</strong>：结合点云和RGB图像可以实现更高级的视觉感知任务，如物体识别、姿态估计、物体跟踪等。通过将点云的深度信息与RGB图像的颜色信息相结合，计算机可以更准确地理解物体的位置和形状，并执行更精确的任务。</p>
+</li>
+<li><p><strong>虚拟环境和增强现实</strong>：点云和RGB图像的结合对于虚拟现实（VR）和增强现实（AR）应用非常有用。通过将点云数据与实时捕获的RGB图像进行比对，可以在虚拟环境中放置虚拟对象，并更自然地与真实世界互动。</p>
+</li>
+<li><p><strong>三维重建</strong>：点云通常用于三维重建应用，其中它们与RGB图像结合以创建真实世界的三维模型。这对于建筑信息建模、文化遗产保护和地理信息系统等领域非常有用。</p>
+</li>
+</ol>
+<p>总之，点云和RGB图像之间的关系是一种互补关系，它们共同提供了关于物体和场景的深度、形状、位置和颜色等方面的信息，使计算机能够更全面地理解和处理三维世界的数据。这对于许多计算机视觉和虚拟现实应用非常重要。</p>
+<h2 id="点云和深度图之间的关系是什么-详解"><a href="#点云和深度图之间的关系是什么-详解" class="headerlink" title="点云和深度图之间的关系是什么 详解"></a>点云和深度图之间的关系是什么 详解</h2><p>点云和深度图之间有密切的关系，它们都提供了关于三维世界的信息，但它们以不同的方式表示和捕捉这些信息。下面详细解释了点云和深度图之间的关系：</p>
+<ol>
+<li><p><strong>点云数据</strong>：点云是一个三维数据结构，由大量离散的点组成，每个点包含有关其在三维坐标空间中的位置信息。这些点通常来自激光扫描、深度相机、结构光扫描等传感器，或通过三维重建技术生成。点云数据用于精确表示和捕捉物体和场景的三维几何信息，包括形状、大小和位置。</p>
+</li>
+<li><p><strong>深度图</strong>：深度图是一种二维图像，其中每个像素值表示从相机或传感器到物体表面的距离，也称为深度值或距离值。深度图是一种灰度图像，其中每个像素的灰度级别对应于物体的距离，通常以米为单位。深度图通常由深度传感器或双目相机生成。</p>
+</li>
+</ol>
+<p>点云和深度图之间的关系如下：</p>
+<ol>
+<li><p><strong>深度信息</strong>：深度图提供了关于场景中各个点的距离信息，它们通常以灰度值表示。这些距离信息是点云数据的一部分，因为点云中的每个点都包含其在三维空间中的位置，这可以根据深度信息计算得出。</p>
+</li>
+<li><p><strong>点云的生成</strong>：点云数据通常是通过从深度图中提取三维坐标来生成的。对于每个深度图像素，根据深度信息，可以将其转换为三维坐标（x、y、z），并将这些坐标组成点云。这些点的坐标是从深度图像到三维空间的反投影。</p>
+</li>
+<li><p><strong>信息补充</strong>：点云提供了比深度图更丰富的信息，因为它不仅包括距离信息，还包括有关每个点的几何和形状信息。深度图缺乏物体的外观和纹理信息，而点云可以提供这些信息，使计算机能够更全面地理解三维场景。</p>
+</li>
+<li><p><strong>应用</strong>：点云和深度图通常一起使用，以支持各种计算机视觉和机器视觉任务，如物体识别、物体定位、姿态估计、三维重建、虚拟现实和增强现实等。通过结合点云和深度图，计算机能够更准确地感知和理解三维世界。</p>
+</li>
+</ol>
+<p>总之，点云和深度图都是用于捕捉和表示三维世界信息的工具，它们互补并在各种应用中协同工作，以提供更详细和全面的三维数据。深度图提供距离信息，而点云提供了几何和形状信息，结合使用可实现更多的视觉和机器视觉任务。</p>
+<h2 id="深度图和RGB图之间的关系是什么-详解"><a href="#深度图和RGB图之间的关系是什么-详解" class="headerlink" title="深度图和RGB图之间的关系是什么 详解"></a>深度图和RGB图之间的关系是什么 详解</h2><p>深度图（Depth Map）和RGB图（RGB Image）之间有密切的关系，它们通常一起使用以提供有关三维世界的更全面信息。深度图提供了关于场景中各个点的距离信息，而RGB图提供了有关物体的颜色和外观信息。以下是深度图和RGB图之间的关系的详细解释：</p>
+<ol>
+<li><p><strong>深度图</strong>：深度图是一种二维图像，其每个像素包含有关场景中对应点距离相机的信息，通常以灰度值表示。这些深度值通常以米（或其他长度单位）为单位，并表示每个像素距离相机的距离。深度图通常是由深度传感器、双目相机或结构光等设备生成的。</p>
+</li>
+<li><p><strong>RGB图</strong>：RGB图是一种二维图像，由红、绿和蓝三个颜色通道组成，每个像素有相应的颜色信息。RGB图捕捉物体的颜色、纹理和外观信息，但通常不包含关于物体距离的信息。</p>
+</li>
+</ol>
+<p>深度图和RGB图之间的关系如下：</p>
+<ol>
+<li><p><strong>对应关系</strong>：深度图和RGB图像通常具有相同的分辨率，这意味着每个深度图的像素都与RGB图像的像素相对应。这意味着你可以通过像素位置来匹配深度图中的深度值与RGB图像中的颜色信息。</p>
+</li>
+<li><p><strong>信息补充</strong>：深度图提供了有关场景中物体距离的信息，这是RGB图所没有的。通过结合深度图和RGB图，你可以获得更全面的信息，既包括物体的颜色、纹理和外观，又包括它们的三维位置和距离。</p>
+</li>
+<li><p><strong>深度感知</strong>：深度图用于感知场景的三维几何，如物体之间的距离和相对位置。这对于物体识别、物体定位、姿态估计和避障等任务非常有用。</p>
+</li>
+<li><p><strong>视觉效果</strong>：深度图和RGB图的结合可用于在计算机图形中实现更逼真的视觉效果。例如，它们可用于实现景深效果，其中前景和背景的模糊程度根据深度信息进行调整。</p>
+</li>
+</ol>
+<p>总之，深度图和RGB图在计算机视觉和计算机图形学中常常一起使用，以提供更完整的三维世界信息。它们的结合可以用于多种应用，包括虚拟现实、增强现实、物体识别、三维重建和模拟等领域。深度信息和颜色信息的结合可以帮助计算机更好地理解和模拟现实世界。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PCL/" rel="tag"># PCL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Qt/2024-05-22-qt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="qt_1_理论基础">
+      <i class="fa fa-chevron-left"></i> qt_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Network/2024-05-22-network_2_%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" rel="next" title="network_2_网络协议">
+      network_2_网络协议 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text">详细解释像素坐标</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%EF%BC%88Pixel-Coordinates%EF%BC%89%E8%AF%A6%E8%A7%A3"><span class="nav-number"></span> <span class="nav-text">像素坐标（Pixel Coordinates）详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">1. 什么是像素坐标？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%E7%A4%BA%E6%84%8F%E5%9B%BE"><span class="nav-number">1.1.</span> <span class="nav-text">像素坐标示意图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87-vs-%E5%85%B6%E4%BB%96%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">2.</span> <span class="nav-text">2. 像素坐标 vs 其他坐标系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%E7%9A%84%E8%AE%A1%E7%AE%97"><span class="nav-number">3.</span> <span class="nav-text">3. 像素坐标的计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%83%8F%E7%B4%A0%E8%AE%BF%E9%97%AE"><span class="nav-number">3.1.</span> <span class="nav-text">（1）像素访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%E5%88%B0%E5%9B%BE%E5%83%8F%E5%BD%92%E4%B8%80%E5%8C%96%E5%9D%90%E6%A0%87"><span class="nav-number">3.2.</span> <span class="nav-text">（2）像素坐标到图像归一化坐标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%E5%88%B0%E7%9B%B8%E6%9C%BA%E5%9D%90%E6%A0%87"><span class="nav-number">3.3.</span> <span class="nav-text">（3）像素坐标到相机坐标</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">4. 像素坐标的实际应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89"><span class="nav-number">4.1.</span> <span class="nav-text">（1）计算机视觉</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%893D-%E8%A7%86%E8%A7%89"><span class="nav-number">4.2.</span> <span class="nav-text">（2）3D 视觉</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89AR-VR"><span class="nav-number">4.3.</span> <span class="nav-text">（3）AR&#x2F;VR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RGB-D%E7%9B%B8%E6%9C%BA%E7%94%9F%E6%88%90%E7%82%B9%E4%BA%91%E7%9A%84%E9%80%BB%E8%BE%91-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">6.</span> <span class="nav-text">RGB-D相机生成点云的逻辑 详细解释</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RGB-D-%E7%9B%B8%E6%9C%BA%E7%94%9F%E6%88%90%E7%82%B9%E4%BA%91%E7%9A%84%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90"><span class="nav-number"></span> <span class="nav-text">RGB-D 相机生成点云的详细解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF-RGB-D-%E7%9B%B8%E6%9C%BA%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">1. 什么是 RGB-D 相机？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-RGB-D-%E7%9B%B8%E6%9C%BA%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2. RGB-D 相机的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E7%BB%93%E6%9E%84%E5%85%89%EF%BC%88Structured-Light%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">（1）结构光（Structured Light）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E9%A3%9E%E8%A1%8C%E6%97%B6%E9%97%B4%EF%BC%88Time-of-Flight-ToF%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">（2）飞行时间（Time-of-Flight, ToF）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E5%8F%8C%E7%9B%AE%E7%AB%8B%E4%BD%93%E8%A7%86%E8%A7%89%EF%BC%88Stereo-Vision%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">（3）双目立体视觉（Stereo Vision）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-RGB-D-%E7%9B%B8%E6%9C%BA%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90%E7%82%B9%E4%BA%91"><span class="nav-number">3.</span> <span class="nav-text">3. RGB-D 相机如何生成点云</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E8%8E%B7%E5%8F%96%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE"><span class="nav-number">3.1.</span> <span class="nav-text">（1）获取原始数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%9B%B8%E6%9C%BA%E5%86%85%E5%8F%82%EF%BC%88Camera-Intrinsics%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">（2）相机内参（Camera Intrinsics）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E4%BB%8E%E5%83%8F%E7%B4%A0%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2%E4%B8%BA-3D-%E5%9D%90%E6%A0%87"><span class="nav-number">3.3.</span> <span class="nav-text">（3）从像素坐标转换为 3D 坐标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%BB%93%E5%90%88-RGB-%E9%A2%9C%E8%89%B2%E4%BF%A1%E6%81%AF"><span class="nav-number">3.4.</span> <span class="nav-text">（4）结合 RGB 颜色信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%885%EF%BC%89%E5%AD%98%E5%82%A8%E4%B8%BA-PCD-PLY-%E7%82%B9%E4%BA%91%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.5.</span> <span class="nav-text">（5）存储为 PCD&#x2F;PLY 点云格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">4. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A%E5%85%B3%E4%BA%8E%E7%82%B9%E4%BA%91%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">5.</span> <span class="nav-text">详细解释关于点云的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E4%BA%91%EF%BC%88Point-Cloud%EF%BC%89%E7%9A%84%E8%AF%A6%E7%BB%86%E6%A6%82%E8%BF%B0"><span class="nav-number">6.</span> <span class="nav-text">点云（Point Cloud）的详细概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF%E7%82%B9%E4%BA%91%EF%BC%9F"><span class="nav-number">6.1.</span> <span class="nav-text">1. 什么是点云？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%82%B9%E4%BA%91%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%89%B9%E7%82%B9"><span class="nav-number">6.2.</span> <span class="nav-text">2. 点云的基本特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%82%B9%E4%BA%91%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">6.3.</span> <span class="nav-text">3. 点云的数据结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%82%B9%E4%BA%91%E7%9A%84%E9%87%87%E9%9B%86%E6%96%B9%E5%BC%8F"><span class="nav-number">6.4.</span> <span class="nav-text">4. 点云的采集方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89LiDAR%EF%BC%88%E5%85%89%E6%8E%A2%E6%B5%8B%E5%92%8C%E6%B5%8B%E8%B7%9D%EF%BC%89"><span class="nav-number">6.4.1.</span> <span class="nav-text">（1）LiDAR（光探测和测距）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89RGB-D-%E4%BC%A0%E6%84%9F%E5%99%A8"><span class="nav-number">6.4.2.</span> <span class="nav-text">（2）RGB-D 传感器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E7%AB%8B%E4%BD%93%E8%A7%86%E8%A7%89%EF%BC%88%E5%8F%8C%E7%9B%AE%E7%9B%B8%E6%9C%BA%EF%BC%89"><span class="nav-number">6.4.3.</span> <span class="nav-text">（3）立体视觉（双目相机）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%BB%93%E6%9E%84%E5%85%89%E6%89%AB%E6%8F%8F"><span class="nav-number">6.4.4.</span> <span class="nav-text">（4）结构光扫描</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%82%B9%E4%BA%91%E7%9A%84%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8"><span class="nav-number">6.5.</span> <span class="nav-text">5. 点云的主要应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E8%87%AA%E5%8A%A8%E9%A9%BE%E9%A9%B6"><span class="nav-number">6.5.1.</span> <span class="nav-text">（1）自动驾驶</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AF%BC%E8%88%AA"><span class="nav-number">6.5.2.</span> <span class="nav-text">（2）机器人导航</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%893D-%E9%87%8D%E5%BB%BA"><span class="nav-number">6.5.3.</span> <span class="nav-text">（3）3D 重建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%884%EF%BC%89AR-VR-%E5%92%8C%E6%B8%B8%E6%88%8F"><span class="nav-number">6.5.4.</span> <span class="nav-text">（4）AR&#x2F;VR 和游戏</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%885%EF%BC%89%E5%B7%A5%E4%B8%9A%E6%A3%80%E6%B5%8B"><span class="nav-number">6.5.5.</span> <span class="nav-text">（5）工业检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%886%EF%BC%89%E9%81%A5%E6%84%9F%E6%B5%8B%E7%BB%98"><span class="nav-number">6.5.6.</span> <span class="nav-text">（6）遥感测绘</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E7%82%B9%E4%BA%91%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">6.6.</span> <span class="nav-text">6. 点云的处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E9%99%8D%E5%99%AA"><span class="nav-number">6.6.1.</span> <span class="nav-text">（1）降噪</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E9%85%8D%E5%87%86%EF%BC%88Registration%EF%BC%89"><span class="nav-number">6.6.2.</span> <span class="nav-text">（2）配准（Registration）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E5%88%86%E5%89%B2"><span class="nav-number">6.6.3.</span> <span class="nav-text">（3）分割</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%89%B9%E5%BE%81%E6%8F%90%E5%8F%96"><span class="nav-number">6.6.4.</span> <span class="nav-text">（4）特征提取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%885%EF%BC%89%E7%82%B9%E4%BA%91%E5%88%86%E7%B1%BB"><span class="nav-number">6.6.5.</span> <span class="nav-text">（5）点云分类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7%E5%92%8C%E5%BA%93"><span class="nav-number">6.7.</span> <span class="nav-text">7. 相关工具和库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E4%B8%BAPLY%E7%82%B9%E4%BA%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E5%B8%B8%E7%94%A8%E7%9A%84%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">存储为PLY点云文件格式常用的第三方库有哪些？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E7%82%B9%E4%BA%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B-%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">常见的点云文件格式有哪些 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E4%BA%91%E6%95%B0%E6%8D%AE%E4%B8%80%E8%88%AC%E7%9A%84%E5%AD%98%E5%82%A8%E5%B7%A5%E5%85%B7%E6%9C%89%E4%BB%80%E4%B9%88-%E8%AF%A6%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">点云数据一般的存储工具有什么 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E4%BA%91%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E8%A7%A3"><span class="nav-number">11.</span> <span class="nav-text">点云是什么 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E4%B8%AD%E7%9A%84%E7%82%B9%E4%BA%91%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">计算机视觉中的点云是什么 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E4%BA%91%E5%92%8CRGB%E5%9B%BE%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E8%A7%A3"><span class="nav-number">13.</span> <span class="nav-text">点云和RGB图之间的关系是什么 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E4%BA%91%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%9B%BE%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E8%A7%A3"><span class="nav-number">14.</span> <span class="nav-text">点云和深度图之间的关系是什么 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%9B%BE%E5%92%8CRGB%E5%9B%BE%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E8%A7%A3"><span class="nav-number">15.</span> <span class="nav-text">深度图和RGB图之间的关系是什么 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

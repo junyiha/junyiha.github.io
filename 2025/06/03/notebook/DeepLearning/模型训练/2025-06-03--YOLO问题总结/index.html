@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 图像标注">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图像标注">
+<meta property="og:url" content="https://junyiha.github.io/2025/06/03/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-06-03--YOLO%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 图像标注">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-06-03T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-09T01:43:42.988Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="AI部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/06/03/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-06-03--YOLO%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>图像标注 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/06/03/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-06-03--YOLO%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图像标注
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-06-03 09:00:00" itemprop="dateCreated datePublished" datetime="2025-06-03T09:00:00+08:00">2025-06-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-06-09 09:43:42" itemprop="dateModified" datetime="2025-06-09T09:43:42+08:00">2025-06-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>图像标注</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="YOLO算法启用GPU时，出现-CUDA-out-of-memory-错误如何解决"><a href="#YOLO算法启用GPU时，出现-CUDA-out-of-memory-错误如何解决" class="headerlink" title="YOLO算法启用GPU时，出现 CUDA out of memory 错误如何解决"></a>YOLO算法启用GPU时，出现 CUDA out of memory 错误如何解决</h2><ul>
+<li>出现该问题的原因通常是因为显存不足。常见的解决办法如下：<ul>
+<li>减小批量大小(batch size)</li>
+<li>降低输入图像分辨率，减少模型处理的数据量</li>
+<li>使用更小的模型，例如YOLOv5s代替YOLOv5l [有效]</li>
+<li>清理不必要的张量和缓存，通过torch.cuda.empty_cache()释放显存</li>
+<li>如果条件允许，可采用梯度累计(Gradient Accumulation)替代大批次训练</li>
+<li>考虑分布式训练或数据并行(DataParallel&#x2F;DistributedDataParallel)</li>
+</ul>
+</li>
+</ul>
+<h2 id="YOLO模型训练后的-best-pt-和-last-pt-区别"><a href="#YOLO模型训练后的-best-pt-和-last-pt-区别" class="headerlink" title="YOLO模型训练后的 best.pt 和 last.pt 区别"></a>YOLO模型训练后的 best.pt 和 last.pt 区别</h2><ul>
+<li><p>best.pt </p>
+<ul>
+<li>这个文件保存的是在训练过程中表现最好的模型权重。</li>
+<li>通常用于推理和部署阶段，因为它包含了在验证集上表现最好的模型权重，能够获得最佳的性能。</li>
+</ul>
+</li>
+<li><p>last.pt</p>
+<ul>
+<li>这个文件保存的是最后一次训练迭代结束后的模型权重。</li>
+<li>通常用于继续训练模型，因为它包含了最后一次训练迭代结束时的模型权重，可以继续从上一次训练结束的地方继续训练模型</li>
+</ul>
+</li>
+</ul>
+<h2 id="YOLO模型训练时，出现-Closing-dataloader-mosaic"><a href="#YOLO模型训练时，出现-Closing-dataloader-mosaic" class="headerlink" title="YOLO模型训练时，出现 Closing dataloader mosaic"></a>YOLO模型训练时，出现 Closing dataloader mosaic</h2><ul>
+<li><p>close_mosaic:</p>
+<ul>
+<li>禁用 mosaic 增强的最后第几个轮次。可以指定一个数值，表示在训练的最后第几个轮次中禁用 mosaic 增强</li>
+</ul>
+</li>
+<li><p>Mosaic数据增强方法</p>
+<ul>
+<li>是YOLOv4论文中提出来的，主要思想是将四张图片进行随机裁剪，再拼接到一张图上作为训练数据，这样做的好处是丰富了图片的背景，并且四张图片拼接在一起变相的提高了batch_size，在进行 batch normalization的时候也会计算四张图片，所以对本身batch_size不是很依赖，单块GPU就可以训练YOLOv4</li>
+</ul>
+</li>
+</ul>
+<h2 id="yolo-早停法怎么实现"><a href="#yolo-早停法怎么实现" class="headerlink" title="yolo 早停法怎么实现"></a>yolo 早停法怎么实现</h2><p>在 YOLOv8 中，早停（Early Stopping）是内置机制，只要在训练时指定合适的 <code>patience</code>（耐心轮数）参数，就能让训练在验证指标（如 mAP 或 loss）在连续若干个 epoch 内没有提升时提前终止。下面给出具体步骤和示例：</p>
+<ol>
+<li><p><strong>理解 <code>patience</code> 参数</strong></p>
+<ul>
+<li>YOLOv8 会在每个 epoch 结束后计算一次“fitness”指标（通常是 mAP、precision、recall 等的加权组合），并与历史最优值对比。如果在连续 <code>patience</code> 个 epoch 中都没有出现更好的 fitness，就会自动触发早停。</li>
+<li>默认情况下，<code>patience=50</code>，也就是说如果验证 fitness 在 50 个 epoch 内一直没提高，就结束训练。你可以根据数据集大小、类别数、以及模型收敛速度自行调整此值(<a target="_blank" rel="noopener" href="https://docs.ultralytics.com/reference/utils/torch_utils/?utm_source=chatgpt.com" title="Reference for ultralytics/utils/torch_utils.py - Ultralytics YOLO Docs">docs.ultralytics.com</a>, <a target="_blank" rel="noopener" href="https://github.com/ultralytics/ultralytics/issues/3892?utm_source=chatgpt.com" title="How you can change patience value when continuous training yolov8 ...">github.com</a>)。</li>
+</ul>
+</li>
+<li><p><strong>通过命令行实现早停</strong></p>
+<ul>
+<li><p>如果你直接使用 Ultralytics 提供的 CLI 脚本（通常是 <code>yolo train …</code>），只需在命令里加上 <code>--patience</code> 参数即可。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yolo train \</span><br><span class="line">  data=custom_data.yaml \</span><br><span class="line">  model=yolov8s.pt \</span><br><span class="line">  epochs=200 \</span><br><span class="line">  batch=16 \</span><br><span class="line">  patience=10</span><br></pre></td></tr></table></figure>
+
+<p>这行命令表示：在最多训练 200 个 epoch，若验证 fitness 在连续 10 个 epoch 里没有提升，就自动停止训练(<a target="_blank" rel="noopener" href="https://github.com/ultralytics/ultralytics/issues/3892?utm_source=chatgpt.com" title="How you can change patience value when continuous training yolov8 ...">github.com</a>, <a target="_blank" rel="noopener" href="https://blog.csdn.net/apple_59275002/article/details/132181112?utm_source=chatgpt.com" title="UltralyticsYOLOv8训练与验证参数详解-CSDN博客">blog.csdn.net</a>)。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>通过 Python API 实现早停</strong></p>
+<ul>
+<li><p>如果你是用 Python 脚本调用 Ultralytics 的 <code>YOLO</code> 类，也同样可以传递 <code>patience</code> 参数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ultralytics <span class="keyword">import</span> YOLO</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载模型（可以是 .pt 或 .yaml 格式）</span></span><br><span class="line">model = YOLO(<span class="string">&#x27;yolov8s.pt&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开始训练，指定 patience=10</span></span><br><span class="line">results = model.train(</span><br><span class="line">    data=<span class="string">&#x27;custom_data.yaml&#x27;</span>,</span><br><span class="line">    epochs=<span class="number">200</span>,</span><br><span class="line">    batch=<span class="number">16</span>,</span><br><span class="line">    patience=<span class="number">10</span>,</span><br><span class="line">    imgsz=<span class="number">640</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>这样配置后，如果在连续 10 个 epoch 里验证集上的 fitness 不再提升，训练会自动结束(<a target="_blank" rel="noopener" href="https://blog.csdn.net/apple_59275002/article/details/132181112?utm_source=chatgpt.com" title="UltralyticsYOLOv8训练与验证参数详解-CSDN博客">blog.csdn.net</a>, <a target="_blank" rel="noopener" href="https://docs.ultralytics.com/reference/utils/torch_utils/?utm_source=chatgpt.com" title="Reference for ultralytics/utils/torch_utils.py - Ultralytics YOLO Docs">docs.ultralytics.com</a>)。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>如何查看早停触发</strong></p>
+<ul>
+<li>在训练日志中，你会看到类似 “EarlyStopping: no improvement in last 10 epochs, stopping” 的提示。此时模型会保留在“最优 epoch”对应的权重文件（比如 <code>weights/best.pt</code>），避免后续过度训练导致过拟合。</li>
+</ul>
+</li>
+<li><p><strong>调整 <code>patience</code> 的建议</strong></p>
+<ul>
+<li>如果数据集较小、noise 较多，可以适当缩小 <code>patience</code>（如 5–10），避免模型在噪声上反复“打转”。</li>
+<li>如果数据集复杂、或想让模型多找找更优解，也可以适当增大（如 20–50），以免过早停止而错过收敛好时机。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p><strong>小结</strong>：</p>
+<ul>
+<li>只要在训练命令或 Python 接口中加上 <code>patience=&lt;N&gt;</code>，YOLOv8 就会启用内置的 EarlyStopping 机制；</li>
+<li>当验证指标在连续 N 个 epoch 中没提升时，训练自动终止，并保留最佳权重。</li>
+</ul>
+<p>通过调整 <code>patience</code>，你可以很好地在训练速度和防止过拟合之间做平衡。</p>
+<h2 id="过拟合和欠拟合-怎么理解"><a href="#过拟合和欠拟合-怎么理解" class="headerlink" title="过拟合和欠拟合 怎么理解"></a>过拟合和欠拟合 怎么理解</h2><p>在机器学习和深度学习中，“过拟合”（overfitting）和“欠拟合”（underfitting）是两个经常出现的概念，它们反映了模型在训练数据与未见数据（验证集&#x2F;测试集）上的表现差异。下面从定义、成因、表现、判断方法以及如何避免&#x2F;缓解等方面来阐释这两个概念。</p>
+<hr>
+<h2 id="1-定义"><a href="#1-定义" class="headerlink" title="1. 定义"></a>1. 定义</h2><ol>
+<li><p><strong>欠拟合（Underfitting）</strong></p>
+<ul>
+<li><strong>直观理解</strong>：模型太“简单”，连训练集本身都学不好，无法捕捉数据的基本规律。</li>
+<li><strong>结果表现</strong>：训练误差（training error）和验证误差（validation error）都很高。</li>
+<li><strong>本质</strong>：模型的容量（capacity）或表达能力不足，无法拟合数据里的主要特征。</li>
+</ul>
+</li>
+<li><p><strong>过拟合（Overfitting）</strong></p>
+<ul>
+<li><strong>直观理解</strong>：模型太“复杂”，把训练数据中的噪声或偶然关联也当成了“规律”学进去，因而在训练集上表现极好，但在新数据上泛化能力差。</li>
+<li><strong>结果表现</strong>：训练误差很低，但验证误差较高，二者出现很明显的差距。</li>
+<li><strong>本质</strong>：模型容量太大或者对训练数据的记忆过度，以至于失去了对未见数据的泛化能力。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="2-为什么会出现欠拟合或过拟合"><a href="#2-为什么会出现欠拟合或过拟合" class="headerlink" title="2. 为什么会出现欠拟合或过拟合"></a>2. 为什么会出现欠拟合或过拟合</h2><h3 id="2-1-欠拟合的原因"><a href="#2-1-欠拟合的原因" class="headerlink" title="2.1 欠拟合的原因"></a>2.1 欠拟合的原因</h3><ol>
+<li><p><strong>模型太简单</strong></p>
+<ul>
+<li>例如：用线性模型（如线性回归）去拟合一个明显非线性的关系，模型本身无法表达目标函数的复杂度。</li>
+<li>例：在图像分类任务里，用参数非常少的神经网络（如只有一两层、很小的隐藏单元数）去识别复杂场景，很难提取足够特征。</li>
+</ul>
+</li>
+<li><p><strong>特征不够&#x2F;信息不足</strong></p>
+<ul>
+<li>如果输入特征本身不能很好地反映目标类别（比如分类时只用了图像的平均像素强度作为特征），即使模型更复杂也难以学到规律。</li>
+</ul>
+</li>
+<li><p><strong>训练不充分</strong></p>
+<ul>
+<li>训练轮数（epochs）太少或者优化超参数（如学习率）设置不合理，导致模型还没来得及“收敛”到较优解。此时训练误差没降下来，本质也是欠拟合。</li>
+</ul>
+</li>
+<li><p><strong>正则化&#x2F;约束过强</strong></p>
+<ul>
+<li>如果人为在模型里加了很强的正则化（例如 L2 惩罚系数太大、dropout 率过高），就会限制模型权重的更新幅度，导致模型只能简单拟合，无法学到数据的细节。</li>
+</ul>
+</li>
+</ol>
+<h3 id="2-2-过拟合的原因"><a href="#2-2-过拟合的原因" class="headerlink" title="2.2 过拟合的原因"></a>2.2 过拟合的原因</h3><ol>
+<li><p><strong>模型太复杂&#x2F;容量太大</strong></p>
+<ul>
+<li>参数量远大于训练样本量时，模型很容易对训练集“记忆”过度。比如在只有几千张图片时，用上亿参数的深度网络，很容易 memorize 那些样本中的噪声特征。</li>
+</ul>
+</li>
+<li><p><strong>训练数据噪声或异常样本</strong></p>
+<ul>
+<li>如果训练数据中含有标签噪声（标签标错、误标）以及一些离群点，模型将努力去拟合这些异常，导致学到对新数据无意义的“规律”。</li>
+</ul>
+</li>
+<li><p><strong>训练轮数&#x2F;训练时间过长</strong></p>
+<ul>
+<li>当训练轮次（epochs）太多，如果不加以控制（如没有及时使用早停法 Early Stopping），模型会在训练集上把误差压得很低，但此时可能已经开始在噪声点上“过度记忆”。</li>
+</ul>
+</li>
+<li><p><strong>数据量太少</strong></p>
+<ul>
+<li>样本不足时，模型能用的有效信息较少，一旦模型容量（参数量）很大，就极容易把这有限的数据“啃”得面面俱到，从而丧失泛化能力。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-在训练曲线上如何辨别"><a href="#3-在训练曲线上如何辨别" class="headerlink" title="3. 在训练曲线上如何辨别"></a>3. 在训练曲线上如何辨别</h2><p>通常借助“学习曲线”（Learning Curves）——在训练过程中不断记录训练误差和验证误差随 epoch 的变化，能够比较直观地看出欠拟合&#x2F;过拟合。</p>
+<ol>
+<li><p><strong>欠拟合情形</strong></p>
+<ul>
+<li><p>训练误差高且下降缓慢，验证误差几乎和训练误差保持一致，也很高。</p>
+</li>
+<li><p>曲线示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">训练误差：|\</span><br><span class="line">          | \</span><br><span class="line">          |  \</span><br><span class="line">          |   \</span><br><span class="line">          |    \</span><br><span class="line">          |     \</span><br><span class="line">          ————————&gt; epoch</span><br><span class="line">验证误差：|\</span><br><span class="line">          | \</span><br><span class="line">          |  \</span><br><span class="line">          |   \</span><br><span class="line">          |    \</span><br><span class="line">          |     \</span><br><span class="line">          —————————&gt; epoch</span><br></pre></td></tr></table></figure></li>
+<li><p>训练集和验证集都没学好，说明模型容量或训练强度不够。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>过拟合情形</strong></p>
+<ul>
+<li><p>训练误差迅速下降到很低，而验证误差先下降到某个最低点后又开始回升，两者出现“分叉”。</p>
+</li>
+<li><p>曲线示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">训练误差：|\__________（很快下降到低值后持平）</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          ————————————&gt; epoch</span><br><span class="line">验证误差：|\_____/‾‾‾‾‾</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          ————————————&gt; epoch</span><br></pre></td></tr></table></figure></li>
+<li><p>训练集表现优秀，验证集开始出现误差回升，说明模型开始对训练集特征（包括噪声）过度拟合。</p>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="4-如何改善欠拟合"><a href="#4-如何改善欠拟合" class="headerlink" title="4. 如何改善欠拟合"></a>4. 如何改善欠拟合</h2><ol>
+<li><p><strong>增加模型的容量</strong></p>
+<ul>
+<li>对于神经网络，增大网络深度或宽度（如更多层数、更多神经元）。</li>
+<li>对于树模型（如决策树、随机森林），可以放宽树的深度限制；对线性模型，可以尝试添加多项式特征或使用更复杂的核函数（对于 SVM）。</li>
+</ul>
+</li>
+<li><p><strong>增加训练轮数&#x2F;提升优化能力</strong></p>
+<ul>
+<li>增加训练 epoch，让模型有更多机会去拟合数据。</li>
+<li>检查并调试超参数：适当提高学习率（如果学习率过小、网络收敛速度慢也会导致欠拟合），或者换用更合适的优化器（如从 SGD 换成 Adam）。</li>
+</ul>
+</li>
+<li><p><strong>减少正则化强度</strong></p>
+<ul>
+<li>如果使用了 L1&#x2F;L2 正则化或 dropout，尝试减小正则化系数或降低 dropout 率，以让模型有更大自由度去拟合数据。</li>
+</ul>
+</li>
+<li><p><strong>改进特征工程</strong></p>
+<ul>
+<li>从输入角度丰富信息：增加更多有用特征、进行特征组合、做多尺度&#x2F;多角度提取。</li>
+<li>对于图像，可以进行更丰富的数据增强，让模型见到更多多样化样本，从而学到更充足的特征。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-如何改善过拟合"><a href="#5-如何改善过拟合" class="headerlink" title="5. 如何改善过拟合"></a>5. 如何改善过拟合</h2><ol>
+<li><p><strong>增加训练数据量</strong></p>
+<ul>
+<li>这是最有效的手段：更多的数据能让模型学习到更丰富的真实分布，弱化噪声的影响。</li>
+<li>如果收集新数据成本高，可以考虑数据增强（Data Augmentation）：对图像做随机裁剪、旋转、色彩抖动、噪声叠加等，让“虚拟数据量”增多。</li>
+</ul>
+</li>
+<li><p><strong>使用更强的正则化手段</strong></p>
+<ul>
+<li><strong>L1&#x2F;L2 正则化</strong>：在损失函数中加入权重惩罚，抑制权重过大，从而防止网络过度拟合。</li>
+<li><strong>Dropout</strong>：在训练时随机“屏蔽”一部分神经元，迫使网络不要过度依赖某个通道。</li>
+<li><strong>Early Stopping（早停法）</strong>：在训练过程中监控验证集误差，当验证误差连续若干 epoch 不再下降时，就提前终止训练。</li>
+</ul>
+</li>
+<li><p><strong>减少模型复杂度</strong></p>
+<ul>
+<li>选用容量更小的模型：如果之前是 YOLOv8l 或 YOLOv8x，可以尝试降到 YOLOv8s；如果是 ResNet-152，可以考虑切换到 ResNet-50。</li>
+<li>对于树模型，可以缩减树深度、控制叶子节点最小样本数、减少基学习器数量（对于集成方法）。</li>
+</ul>
+</li>
+<li><p><strong>特征选择或降维</strong></p>
+<ul>
+<li>对于高维特征空间，可以用 PCA、LDA 等降维方法去掉冗余维度，减少噪声。</li>
+<li>在特征工程中去除与目标相关度低或与其他特征高度共线的特征，也能减少过拟合。</li>
+</ul>
+</li>
+<li><p><strong>交叉验证（Cross-validation）</strong></p>
+<ul>
+<li>通过 k 折交叉验证，可以更充分地使用数据来评估模型性能，发现是否存在严重的过拟合倾向。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="6-典型示例与直观类比"><a href="#6-典型示例与直观类比" class="headerlink" title="6. 典型示例与直观类比"></a>6. 典型示例与直观类比</h2><ol>
+<li><p><strong>拟合一元二次曲线的例子</strong></p>
+<ul>
+<li>假设真实关系是 $y &#x3D; 3x^2 + \epsilon$，但你只用一阶线性模型 $y &#x3D; wx + b$ 去拟合，结果即使在训练集上也可能拟合不好，就是欠拟合。</li>
+<li>如果你用高次多项式（比如 10 次多项式）去拟合少量带噪声样本，模型曲线会在每个点都“过度弯折”来追踪噪声——训练误差几乎为零，但在新 x 值上预测极差，就是过拟合。</li>
+</ul>
+</li>
+<li><p><strong>考试答题的类比</strong></p>
+<ul>
+<li><strong>欠拟合</strong>：就像只背了最基础的几页笔记，考试题一多出现一些变形题就不会做。</li>
+<li><strong>过拟合</strong>：为了背书，你把所有历年考卷一题都记住了，连错误选项都牢牢记在脑子里。结果一旦考试题型有一点变化，你就不知道如何应用核心思路，反而答不出新题。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><ul>
+<li><strong>欠拟合</strong>：模型“不够强” → 训练误差高、验证误差高 → 解决方案是增加模型容量、增多训练数据&#x2F;训练时间、减弱正则化、改进特征。</li>
+<li><strong>过拟合</strong>：模型“太强”且对训练数据记忆过度 → 训练误差低、验证误差高 → 解决方案是增加数据、加正则化、降低模型复杂度、使用早停、做交叉验证。</li>
+</ul>
+<p>在实际项目中，往往需要在“欠拟合”和“过拟合”之间做权衡（bias–variance trade-off）。通过不断地观察训练&#x2F;验证曲线，以及在调参过程中逐步进行对比，才能找到让模型在新数据上表现最优的“黄金中点”。</p>
+<h2 id="yolo训练完成后获取模型的路径"><a href="#yolo训练完成后获取模型的路径" class="headerlink" title="yolo训练完成后获取模型的路径"></a>yolo训练完成后获取模型的路径</h2><p>在使用 <strong>YOLOv5&#x2F;YOLOv8（Ultralytics）系列模型训练完成后</strong>，训练过程会自动将模型权重（<code>.pt</code> 文件）保存到默认的目录中。以下是详细说明：</p>
+<hr>
+<h2 id="✅-默认保存路径"><a href="#✅-默认保存路径" class="headerlink" title="✅ 默认保存路径"></a>✅ 默认保存路径</h2><h3 id="对于-YOLOv5："><a href="#对于-YOLOv5：" class="headerlink" title="对于 YOLOv5："></a>对于 YOLOv5：</h3><p>训练完成后，权重文件通常保存在：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runs/train/exp/weights/best.pt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>exp/</code> 是实验编号目录，如果已有 <code>exp</code> 目录，会自动创建 <code>exp1</code>, <code>exp2</code> …</li>
+<li><code>best.pt</code>：是验证集上性能最好的模型（自动保存）</li>
+<li><code>last.pt</code>：是最后一个 epoch 保存的模型（也会保存）</li>
+</ul>
+<h3 id="对于-YOLOv8（Ultralytics）："><a href="#对于-YOLOv8（Ultralytics）：" class="headerlink" title="对于 YOLOv8（Ultralytics）："></a>对于 YOLOv8（Ultralytics）：</h3><p>YOLOv8 使用 <code>ultralytics</code> 包训练，默认保存位置类似：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runs/detect/train/weights/best.pt</span><br></pre></td></tr></table></figure>
+
+<p>或者如果你运行的是实例分割任务（<code>task=segment</code>）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runs/segment/train/weights/best.pt</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🛠️-如何自定义保存路径"><a href="#🛠️-如何自定义保存路径" class="headerlink" title="🛠️ 如何自定义保存路径"></a>🛠️ 如何自定义保存路径</h2><p>你可以通过 <code>--project</code> 和 <code>--name</code> 参数指定保存位置，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yolo task=detect mode=train model=yolov8n.pt data=data.yaml epochs=100 project=my_project name=my_exp</span><br></pre></td></tr></table></figure>
+
+<p>这将保存到：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_project/my_exp/weights/best.pt</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🔍-查找路径技巧（Python-示例）"><a href="#🔍-查找路径技巧（Python-示例）" class="headerlink" title="🔍 查找路径技巧（Python 示例）"></a>🔍 查找路径技巧（Python 示例）</h2><p>如果你用的是脚本训练，可以这样捕获路径：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ultralytics <span class="keyword">import</span> YOLO</span><br><span class="line"></span><br><span class="line">model = YOLO(<span class="string">&quot;yolov8n.yaml&quot;</span>)</span><br><span class="line">results = model.train(data=<span class="string">&quot;data.yaml&quot;</span>, epochs=<span class="number">50</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Model saved at:&quot;</span>, model.ckpt_path)</span><br></pre></td></tr></table></figure>
+
+<p>或者查看 <code>results.save_dir</code> 属性获取整个输出目录路径：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Results saved in:&quot;</span>, results.save_dir)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>如果你告诉我你是用哪种 YOLO（v5 &#x2F; v8 &#x2F; 其他），我可以给你更精确的文件路径或查找方式。</p>
+<h2 id="AMP-running-Automatic-Mixed-Precision-AMP-checks…"><a href="#AMP-running-Automatic-Mixed-Precision-AMP-checks…" class="headerlink" title="AMP: running Automatic Mixed Precision (AMP) checks…"></a>AMP: running Automatic Mixed Precision (AMP) checks…</h2><ul>
+<li>这个 AMP 只是为了在训练开始之前进行AMP检查，以决定是否允许此训练模式。</li>
+<li>官方回答：<ul>
+<li>YOLOv8n is used for AMPP checks prior to training start to decide whether to allow this training mode(as your console printout clearly displays). Your YOLOv8m model will train as normal.</li>
+</ul>
+</li>
+</ul>
+<h2 id="目标检测-一个标签标注不同目标有什么影响吗"><a href="#目标检测-一个标签标注不同目标有什么影响吗" class="headerlink" title="目标检测 一个标签标注不同目标有什么影响吗"></a>目标检测 一个标签标注不同目标有什么影响吗</h2><p>这里需要先理清“标签”（label）在目标检测中的语义：在常规的目标检测流程里，<strong>同一个标签（即同一个 class_id）通常会用于标注“同一类别”的所有目标实例</strong>；如果你把本应属于不同类别的目标都用同一个标签标注，就等于在训练数据里告诉模型“这些其实是同一个东西”，那么会带来一系列的问题。下面从几种可能的情况来讨论它的影响：</p>
+<hr>
+<h2 id="1-把不同类别的目标都标成同一个标签"><a href="#1-把不同类别的目标都标成同一个标签" class="headerlink" title="1. 把不同类别的目标都标成同一个标签"></a>1. 把不同类别的目标都标成同一个标签</h2><p>假设你有“自行车”（bicycle）和“摩托车”（motorbike）两个类别，但在标注时一律都打成了“bicycle”，这样会导致：</p>
+<ol>
+<li><p><strong>模型无法学习到类别区分</strong></p>
+<ul>
+<li>训练时，模型会把所有被标注为“bicycle” 的框都当作同一种东西来看待，包括外观、形状、纹理甚至比例都很不一样的自行车和摩托车。</li>
+<li>由于标签里没有“motorbike” 这一类的监督信号，模型在推理时就永远不可能学会“摩托车该怎么叫”——它只能学到“凡是我见到像两轮、有人骑、轮廓有把手的，都叫 bicycle”。</li>
+</ul>
+</li>
+<li><p><strong>类别内部差异（Intra-class variance）过大</strong></p>
+<ul>
+<li>正常情况下，每个类别在训练中应该尽可能地“内聚”：同一类的样本特征相对相似（形状、纹理、尺度大致相近）。但是把两类生物学上或者语义上有区别的东西（比如“猫” vs “狗”）硬生生地归到一起，会让模型“迷惑”：它得同时兼顾猫和狗两套“长相、走路姿态、耳朵形状”等特征，而这往往会让模型收敛困难，甚至最终连“框住它们”的能力都不稳定。</li>
+</ul>
+</li>
+<li><p><strong>召回（Recall）和精度（Precision）都可能下降</strong></p>
+<ul>
+<li>对外界来说，摩托车再怎么像单车，如果标注里全当单车了，那么当你在测试集里输入一张摩托车的图片，模型也只能输出“bicycle”。这时候你在做“先验真实标签 vs 模型预测”对比时，就会被算作“漏检”或者“误检”。</li>
+<li>反过来，如果遇到实际的自行车，模型有时会把它分辨成“像摩托车那一套”的特征（因为摩托车的特征也被强制“灌输”到 bicycle 中），结果模型既可能把真实自行车漏掉，也可能把背景里其它两个轮子类似的物体误当“bicycle”检测出来，Precision、Recall 都打折扣。</li>
+</ul>
+</li>
+<li><p><strong>mAP（mean Average Precision）严重偏低</strong></p>
+<ul>
+<li>最后，模型在评估集上的各类指标（特别是 mAP、per-class AP）都会失去意义。因为你根本没有给模型“区分摩托车 vs 自行车”的监督信号，它只会把它们都当作同一类。即使从检测的 “框” 角度看，模型可能还能把它们框出来，但从分类的角度，分错类是一定的。</li>
+</ul>
+</li>
+</ol>
+<p>总结：<strong>如果本应属于不同语义类别的目标，却被统一用一个标签来标注，那么模型就失去了区分的依据，最终检测效果必然大打折扣。</strong></p>
+<hr>
+<h2 id="2-把同一类别下看起来差异较大的目标都打成一个标签"><a href="#2-把同一类别下看起来差异较大的目标都打成一个标签" class="headerlink" title="2. 把同一类别下看起来差异较大的目标都打成一个标签"></a>2. 把同一类别下看起来差异较大的目标都打成一个标签</h2><p>比如你想检测“椅子”（chair），但实际标注时却把“椅子（chair）”、“凳子（stool）”甚至“沙发（sofa）”都强行归到“chair” 这一类。虽然它们都算家具有点相关，但外观差异还是挺大的，这种“强行合并” 会导致：</p>
+<ol>
+<li><p><strong>类别内部方差过高</strong></p>
+<ul>
+<li>椅子、凳子、沙发在形态、尺寸、轮廓上都不一样。模型在训练里看到一个“chair”标签下既要学“靠背＋四条腿的小矮凳”，也要学“双人坐的大沙发”，就会让网络在“特征提取”层面表现出很高的内部冲突——它需要同时拟合多种长相迥异的形状。</li>
+<li>导致训练容易出现欠拟合：网络很难把这几个结构差异巨大的物体都学好，尤其是在尺寸和纹理特征对模型决策影响很大时，最终往往对任何一个“真正的椅子”判别得不够精准。</li>
+</ul>
+</li>
+<li><p><strong>类别判别边界模糊</strong></p>
+<ul>
+<li>一张图片里如果同属于“常见家居”场景，有沙发、凳子、椅子在一起，模型训练时只告诉它“都是 chair”，它就完全分不清哪部分是沙发边缘、哪部分是椅子靠背。</li>
+<li>在预测时，沙发轮廓被当成椅子的一部分，也很容易导致“检测框多重叠加”或“漏框”（假设它判定不出沙发的整体形状，就强行给它画一个很大的框去把沙发＋凳子一起包含进去）。</li>
+</ul>
+</li>
+<li><p><strong>业务效果折中</strong></p>
+<ul>
+<li><p>如果你的业务场景里只关心“家具都行，分得太细反而没意义”，那也许把它们都合并到一个大类“furniture” 也可以。但你要明确自己的后续用例：</p>
+<ul>
+<li>比如你开发一个“家具摆放识别”系统，如果用户只需要知道房间里有没有“坐具”存在，那“chair+sofa+stool→一个大类” 是可以接受的。</li>
+<li>但若后续要根据检测出的实体去做“沙发价格估算”或“凳子批量采购”，那你就必须在标注时区分，否则模型没法传递出“这张是三人沙发、那张是转椅”这种更细的语义信息。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>总结：<strong>同一标签对应的目标如果差异过大，模型在训练时就要在同一个 label 下同时兼顾它们的特点，往往会造成类别内部 “方差” 过大，导致分类+定位性能下降。除非你的业务层面本身就是把这些都当成同一类，否则一般不建议把明显不同的物体合并在一个标签下。</strong></p>
+<hr>
+<h2 id="3-把同一类别的目标标注多次（重复标注）"><a href="#3-把同一类别的目标标注多次（重复标注）" class="headerlink" title="3. 把同一类别的目标标注多次（重复标注）"></a>3. 把同一类别的目标标注多次（重复标注）</h2><p>虽然这不属于“一个标签标不同目标” 的说法，但在实际项目中也经常会遇到“同一个目标被打了两个高度重叠的框”、或者“不小心对同一只猫标了两次，class_id 都是 cat”。这对模型训练也会产生负面影响：</p>
+<ol>
+<li><p><strong>网络监督信号重复</strong></p>
+<ul>
+<li>当模型在某张图里看到同一个语义目标（同一个实例）出现两次完全重叠或者 IoU 很高的两个框，等于它在损失函数里收到两次“把这里当成正样本”的信号，导致梯度计算时某些区域被“重复强化”，加速过拟合。</li>
+<li>对应到损失函数上，像 YOLO 这样既有“定位损失 + 置信度损失 + 类别损失” 的结构，就会在同一个位置重复计算好几次正样本，权重更新方向被扭曲，最终影响整个网络的稳定收敛。</li>
+</ul>
+</li>
+<li><p><strong>NMS（非极大值抑制）阶段混乱</strong></p>
+<ul>
+<li>训练时如果存在重复框，模型会更倾向于把这一片区域判断出很多“候选框”，到了推理阶段再做 NMS，可能会出现“多个很接近的框都被留了下来” 或者“把一个最优框误删”，最终得分情况变得不稳定。</li>
+<li>这在评估时会让 Precision 曲线和 Recall 曲线都发生“抖动”，尤其当你计算 mAP 时，如果测试集里也出现同样的重复标注，就会被算成“多次预测正确”或“漏检”，都不利于综合度量。</li>
+</ul>
+</li>
+</ol>
+<p>总结：<strong>同一个实例只标一次框就好，重复标注会让网络拿同一位置的梯度信号“刷屏”，拖累模型的定位与分类收敛。尽量保证一张图里，每个真实实例只对应一个标注框。</strong></p>
+<hr>
+<h2 id="4-“一个标签标注不同目标”对下游指标的具体影响"><a href="#4-“一个标签标注不同目标”对下游指标的具体影响" class="headerlink" title="4. “一个标签标注不同目标”对下游指标的具体影响"></a>4. “一个标签标注不同目标”对下游指标的具体影响</h2><p>无论是把不同类别误合并到同一个标签，还是在同一张图中对同一个实例重复标注，都会在下面几个方面对模型带来负面影响：</p>
+<ol>
+<li><p><strong>分类准确率下降（Classification Accuracy）</strong></p>
+<ul>
+<li>不同类别的数据混在一起，模型就学不到如何把它们分得开，导致测试集上“预测类别 vs 真实类别” 的混淆矩阵（confusion matrix）里出现大量交叉。例如本来应该判断为“motorbike”的，却被当成“bicycle”；或者你本来想分 chair&#x2F;sofa&#x2F;stool 三个类，结果训练出来只会分“furniture”，根本无法支撑后续更细粒度业务。</li>
+</ul>
+</li>
+<li><p><strong>定位误差增大（Localization Error）</strong></p>
+<ul>
+<li>类别内部方差过大，让模型在学习“边界框回归（bbox regression）” 时也很吃力，因为网络要在同一个类下同时兼顾不同尺寸、不同长宽比的物体。这样训练出来的锚框（anchors）或预测框就容易偏离最优，导致平均 IoU 下降，Recall 率降低。</li>
+</ul>
+</li>
+<li><p><strong>精度与召回曲线（Precision&#x2F;Recall）抖动</strong></p>
+<ul>
+<li>因为不同目标混在同一个标签下，训练集里的正负样本划分就会混乱：模型不知道到底哪些是真正的“正样本”，哪些算“负样本”。尤其在 NMS 阶段，重复标注会让候选框堆叠、阈值筛选不稳，导致 Precision&#x2F;Recall 都不会收敛到一个合理曲线，mAP 也会掉。</li>
+</ul>
+</li>
+<li><p><strong>训练收敛速度变慢，容易陷入局部最优</strong></p>
+<ul>
+<li>清晰、一致的标签有助于模型快速学习类别间的边界；而当同一标签对应形形色色的目标时，网络在“哪个特征应该归哪一类”这个任务上就容易左右摇摆，梯度方向不稳定，往往要更多轮训练才能收敛，效果还不一定好。</li>
+</ul>
+</li>
+<li><p><strong>对后续数据集扩充与迭代升级造成阻碍</strong></p>
+<ul>
+<li>如果后期想把“motorbike”独立出来、做更细分类，你就不得不重新标注整个数据集（把之前打错标签的都改回来），付出高昂的时间成本。而如果当初按正确类别分开标注，就能沿用已有标注做迁移学习或增量训练，效率会高很多。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="5-何时可以把不同目标“归为同一标签”？"><a href="#5-何时可以把不同目标“归为同一标签”？" class="headerlink" title="5. 何时可以把不同目标“归为同一标签”？"></a>5. 何时可以把不同目标“归为同一标签”？</h2><p>尽管上面都说了负面影响，但在某些场景下，你确实会出于业务需求或数据稀缺等原因，把看似不同的目标放到一个大标签里。正确的做法和理由包括：</p>
+<ol>
+<li><p><strong>业务本身只需要一个“粗略”结果</strong></p>
+<ul>
+<li>例如在“工地安全监控”场景下，只要检测出“危险机械”出现就行，不用细分“挖掘机”“推土机”“压路机”。此时可把这几种都打成一个“heavy_machine” 类别。</li>
+<li>这样模型就只需要分辨“它是危险机械 vs 它不是危险机械”，而不是细粒度去区分具体型号。只要明确业务场景做的是“大类别检测”，就可以接受多目标合一的标签。</li>
+</ul>
+</li>
+<li><p><strong>数据量极度不平衡</strong></p>
+<ul>
+<li>某些类别本身样本极少（比如某个“电动滑板车” 只有几十张图），而且你也不指望模型专门去检测它。为了防止过度拟合，可能会把它合并到一个大类 “small_vehicles” 里，再去做数据增强。</li>
+<li>这种做法的前提是：你知道模型不会在少量样本上学出独立类，而合并后让它学一个“总体特征”反而更稳定。此时只要在业务上“你不关心它是电动滑板车还是自行车，只要算作一类就行”，就没问题。</li>
+</ul>
+</li>
+<li><p><strong>迁移&#x2F;增量学习时做“类别映射”</strong></p>
+<ul>
+<li>比如你先做了一个粗粒度的“动物检测”（只分“猫”“狗”“其他动物”），后续想拆“其他动物” 里的“鸟”“猪”“马” 等子类，就需要把“其他动物”注释拆分。</li>
+<li>这时要有专门的“映射规则”去把“其他动物” 里原来混杂的样本分离出来，否则你合并标签的阶段模型就只能学“其他动物是一个大类”，没有细分类的能力。但是“迁移”之前，如果业务上只需要“动物 vs 非动物” 这一层级，合并标签也是可行的。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="6-实践建议"><a href="#6-实践建议" class="headerlink" title="6. 实践建议"></a>6. 实践建议</h2><ol>
+<li><p><strong>务必先梳理好业务需求，再决定标签层级</strong></p>
+<ul>
+<li>在动手标注之前，要明确“到底需要细粒度到几类？”、“合并几个子类到同一标签，对业务是否没太大影响？”，否则后期改标签会付出很高的重标代价。</li>
+<li>如果你不知道后续会不会需要更细粒度，建议“多留一层级”：即先把可能会用到的子类都单独标出来，再根据业务需求决定训练时用哪几个类别做 loss。这样以后若要拆开子类，也能直接用已有标注。</li>
+</ul>
+</li>
+<li><p><strong>保持标签一致性，写好“标注手册”</strong></p>
+<ul>
+<li>一旦团队里有人决定把“cat”和“dog” 合并到“pet”，就要在标注手册里写清楚“所有毛绒玩具、布偶猫、雕像狗这些都按 pet 统一打 0 号标签，不再细分”。</li>
+<li>同时约定好哪些“边缘样本”归哪个标签，比如“玩具狗” 归“pet”，不要有人独自把它标成“toy” 而另一个人标成“dog”，否则就会出现同一张图、两个互相矛盾的标注。</li>
+</ul>
+</li>
+<li><p><strong>检查常见错误</strong></p>
+<ul>
+<li>标注完毕后运行脚本检查“是否有某个标签下的 bbox 宽高比例分布异常”，比如某个标签的尺寸、长宽比跨度特别大，就有必要人工复核：这是不是把两个本来该分开的类别混到一起了？</li>
+<li>对于每个 class_id，可以简单画出其 bbox 面积分布直方图，如果发现“某个标签既有几百万像素的大框，也有几百像素的小框”，说明这个标签里可能混入了两个尺度差异很大的子类别，需要进一步检查。</li>
+</ul>
+</li>
+<li><p><strong>后期可通过“增量标注”来细化</strong></p>
+<ul>
+<li><p>如果后续决定要把“motorbike”从“bicycle”中拆出来，只需在已有数据基础上：</p>
+<ol>
+<li>用脚本批量提取出所有标注为 bicycle 的样本，保存到一个文件夹。</li>
+<li>让标注人员再看一遍，把真的是“自行车”的留下 class_id&#x3D;0，把“摩托车”改为 class_id&#x3D;1。</li>
+<li>再把原来遗漏的摩托车样本也补充进去。</li>
+</ol>
+</li>
+<li><p>这种“分层标注+增量细化”的思路比一次性把所有子类都标出来，更能兼顾项目初期的进度与后期的可扩展性。</p>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
+<li><strong>如果你把原本就属于不同语义类别的目标都打成同一个标签（class_id），那么模型就学不到区分这些类别的能力</strong>，最终会导致分类混淆、定位精度下降、mAP 降低等问题。</li>
+<li><strong>只有当业务场景本身就要求“粗粒度分类”或“某些子类不重要”时，才适合把多个目标合并到一个标签下</strong>；否则一般要在标注阶段就把各个类别分清楚，才能保证检测模型有较好的泛化能力和准确度。</li>
+<li><strong>同一个实例不要打重复的框，同一个类里不要把相差太大的目标硬生生合在一起</strong>，要么做成大类时就要确保业务可行，要么就细分标签，否则都会对模型训练造成负面影响。</li>
+</ul>
+<p>希望以上心得能帮助你理解“一个标签标注不同目标”在目标检测训练里会带来的各种后果，以及怎样根据业务需求和数据分布来合理地制定标注策略。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E9%83%A8%E7%BD%B2/" rel="tag"># AI部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/24/notebook/DeepLearning/2025-05-24--%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="prev" title="深度学习基本概念">
+      <i class="fa fa-chevron-left"></i> 深度学习基本概念
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/06/04/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2025-06-04--yaml%E6%A8%A1%E5%9D%97/" rel="next" title="yaml模块">
+      yaml模块 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO%E7%AE%97%E6%B3%95%E5%90%AF%E7%94%A8GPU%E6%97%B6%EF%BC%8C%E5%87%BA%E7%8E%B0-CUDA-out-of-memory-%E9%94%99%E8%AF%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text">YOLO算法启用GPU时，出现 CUDA out of memory 错误如何解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E5%90%8E%E7%9A%84-best-pt-%E5%92%8C-last-pt-%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">YOLO模型训练后的 best.pt 和 last.pt 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%97%B6%EF%BC%8C%E5%87%BA%E7%8E%B0-Closing-dataloader-mosaic"><span class="nav-number">4.</span> <span class="nav-text">YOLO模型训练时，出现 Closing dataloader mosaic</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yolo-%E6%97%A9%E5%81%9C%E6%B3%95%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">yolo 早停法怎么实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E6%8B%9F%E5%90%88%E5%92%8C%E6%AC%A0%E6%8B%9F%E5%90%88-%E6%80%8E%E4%B9%88%E7%90%86%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">过拟合和欠拟合 怎么理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AE%9A%E4%B9%89"><span class="nav-number">7.</span> <span class="nav-text">1. 定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%87%BA%E7%8E%B0%E6%AC%A0%E6%8B%9F%E5%90%88%E6%88%96%E8%BF%87%E6%8B%9F%E5%90%88"><span class="nav-number">8.</span> <span class="nav-text">2. 为什么会出现欠拟合或过拟合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%AC%A0%E6%8B%9F%E5%90%88%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">8.1.</span> <span class="nav-text">2.1 欠拟合的原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E8%BF%87%E6%8B%9F%E5%90%88%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">8.2.</span> <span class="nav-text">2.2 过拟合的原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%9C%A8%E8%AE%AD%E7%BB%83%E6%9B%B2%E7%BA%BF%E4%B8%8A%E5%A6%82%E4%BD%95%E8%BE%A8%E5%88%AB"><span class="nav-number">9.</span> <span class="nav-text">3. 在训练曲线上如何辨别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%A6%82%E4%BD%95%E6%94%B9%E5%96%84%E6%AC%A0%E6%8B%9F%E5%90%88"><span class="nav-number">10.</span> <span class="nav-text">4. 如何改善欠拟合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%A6%82%E4%BD%95%E6%94%B9%E5%96%84%E8%BF%87%E6%8B%9F%E5%90%88"><span class="nav-number">11.</span> <span class="nav-text">5. 如何改善过拟合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%85%B8%E5%9E%8B%E7%A4%BA%E4%BE%8B%E4%B8%8E%E7%9B%B4%E8%A7%82%E7%B1%BB%E6%AF%94"><span class="nav-number">12.</span> <span class="nav-text">6. 典型示例与直观类比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%80%BB%E7%BB%93"><span class="nav-number">13.</span> <span class="nav-text">7. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yolo%E8%AE%AD%E7%BB%83%E5%AE%8C%E6%88%90%E5%90%8E%E8%8E%B7%E5%8F%96%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%B7%AF%E5%BE%84"><span class="nav-number">14.</span> <span class="nav-text">yolo训练完成后获取模型的路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-%E9%BB%98%E8%AE%A4%E4%BF%9D%E5%AD%98%E8%B7%AF%E5%BE%84"><span class="nav-number">15.</span> <span class="nav-text">✅ 默认保存路径</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-YOLOv5%EF%BC%9A"><span class="nav-number">15.1.</span> <span class="nav-text">对于 YOLOv5：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-YOLOv8%EF%BC%88Ultralytics%EF%BC%89%EF%BC%9A"><span class="nav-number">15.2.</span> <span class="nav-text">对于 YOLOv8（Ultralytics）：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%9B%A0%EF%B8%8F-%E5%A6%82%E4%BD%95%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BF%9D%E5%AD%98%E8%B7%AF%E5%BE%84"><span class="nav-number">16.</span> <span class="nav-text">🛠️ 如何自定义保存路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%94%8D-%E6%9F%A5%E6%89%BE%E8%B7%AF%E5%BE%84%E6%8A%80%E5%B7%A7%EF%BC%88Python-%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">17.</span> <span class="nav-text">🔍 查找路径技巧（Python 示例）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AMP-running-Automatic-Mixed-Precision-AMP-checks%E2%80%A6"><span class="nav-number">18.</span> <span class="nav-text">AMP: running Automatic Mixed Precision (AMP) checks…</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E4%B8%80%E4%B8%AA%E6%A0%87%E7%AD%BE%E6%A0%87%E6%B3%A8%E4%B8%8D%E5%90%8C%E7%9B%AE%E6%A0%87%E6%9C%89%E4%BB%80%E4%B9%88%E5%BD%B1%E5%93%8D%E5%90%97"><span class="nav-number">19.</span> <span class="nav-text">目标检测 一个标签标注不同目标有什么影响吗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%8A%8A%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%88%AB%E7%9A%84%E7%9B%AE%E6%A0%87%E9%83%BD%E6%A0%87%E6%88%90%E5%90%8C%E4%B8%80%E4%B8%AA%E6%A0%87%E7%AD%BE"><span class="nav-number">20.</span> <span class="nav-text">1. 把不同类别的目标都标成同一个标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%8A%8A%E5%90%8C%E4%B8%80%E7%B1%BB%E5%88%AB%E4%B8%8B%E7%9C%8B%E8%B5%B7%E6%9D%A5%E5%B7%AE%E5%BC%82%E8%BE%83%E5%A4%A7%E7%9A%84%E7%9B%AE%E6%A0%87%E9%83%BD%E6%89%93%E6%88%90%E4%B8%80%E4%B8%AA%E6%A0%87%E7%AD%BE"><span class="nav-number">21.</span> <span class="nav-text">2. 把同一类别下看起来差异较大的目标都打成一个标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%8A%8A%E5%90%8C%E4%B8%80%E7%B1%BB%E5%88%AB%E7%9A%84%E7%9B%AE%E6%A0%87%E6%A0%87%E6%B3%A8%E5%A4%9A%E6%AC%A1%EF%BC%88%E9%87%8D%E5%A4%8D%E6%A0%87%E6%B3%A8%EF%BC%89"><span class="nav-number">22.</span> <span class="nav-text">3. 把同一类别的目标标注多次（重复标注）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E2%80%9C%E4%B8%80%E4%B8%AA%E6%A0%87%E7%AD%BE%E6%A0%87%E6%B3%A8%E4%B8%8D%E5%90%8C%E7%9B%AE%E6%A0%87%E2%80%9D%E5%AF%B9%E4%B8%8B%E6%B8%B8%E6%8C%87%E6%A0%87%E7%9A%84%E5%85%B7%E4%BD%93%E5%BD%B1%E5%93%8D"><span class="nav-number">23.</span> <span class="nav-text">4. “一个标签标注不同目标”对下游指标的具体影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E4%BD%95%E6%97%B6%E5%8F%AF%E4%BB%A5%E6%8A%8A%E4%B8%8D%E5%90%8C%E7%9B%AE%E6%A0%87%E2%80%9C%E5%BD%92%E4%B8%BA%E5%90%8C%E4%B8%80%E6%A0%87%E7%AD%BE%E2%80%9D%EF%BC%9F"><span class="nav-number">24.</span> <span class="nav-text">5. 何时可以把不同目标“归为同一标签”？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%AE%9E%E8%B7%B5%E5%BB%BA%E8%AE%AE"><span class="nav-number">25.</span> <span class="nav-text">6. 实践建议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">25.1.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

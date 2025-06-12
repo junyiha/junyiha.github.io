@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解  Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解&lt;sys&#x2F;stat.h&gt; 是 POSIX 操作系统中的一个头文件，用于处理文件状态信息和文件系统属性。它包含了一些在文件和文件系统方面的函数、宏和数据结构的定义。 一些常见的函数和宏： **stat() 和 fstat()**">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C_5_11_sys_stat_h">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_11_sys_stat_h/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解  Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解&lt;sys&#x2F;stat.h&gt; 是 POSIX 操作系统中的一个头文件，用于处理文件状态信息和文件系统属性。它包含了一些在文件和文件系统方面的函数、宏和数据结构的定义。 一些常见的函数和宏： **stat() 和 fstat()**">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.239Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CPOSIX">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_11_sys_stat_h/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C_5_11_sys_stat_h | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_11_sys_stat_h/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C_5_11_sys_stat_h
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解</li>
+</ul>
+<h2 id="Linux-POSIX-详解"><a href="#Linux-POSIX-详解" class="headerlink" title="Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解"></a>Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解</h2><p><code>&lt;sys/stat.h&gt;</code> 是 POSIX 操作系统中的一个头文件，用于处理文件状态信息和文件系统属性。它包含了一些在文件和文件系统方面的函数、宏和数据结构的定义。</p>
+<h3 id="一些常见的函数和宏："><a href="#一些常见的函数和宏：" class="headerlink" title="一些常见的函数和宏："></a>一些常见的函数和宏：</h3><ul>
+<li>**<code>stat()</code> 和 <code>fstat()</code>**：用于获取文件的状态信息，包括文件的大小、权限、所有者信息等。</li>
+<li><strong><code>S_IFMT</code>、<code>S_IFREG</code>、<code>S_IFDIR</code></strong> 等宏：用于检查文件类型（常规文件、目录等）的位掩码。</li>
+<li><strong><code>chmod()</code>、<code>chown()</code>、<code>utime()</code></strong> 等函数：用于改变文件的权限、所有者或者修改文件的访问和修改时间。</li>
+<li><strong>文件访问权限掩码（例如 <code>S_IRUSR</code>、<code>S_IWGRP</code> 等）</strong>：用于设置文件的读、写、执行权限。</li>
+</ul>
+<h3 id="一些常见的数据结构："><a href="#一些常见的数据结构：" class="headerlink" title="一些常见的数据结构："></a>一些常见的数据结构：</h3><ul>
+<li>**<code>struct stat</code>**：用于存储文件的状态信息。该结构包含了文件的各种属性，如大小、权限、时间戳等。</li>
+</ul>
+<h3 id="示例（使用-stat-获取文件状态信息）："><a href="#示例（使用-stat-获取文件状态信息）：" class="headerlink" title="示例（使用 stat() 获取文件状态信息）："></a>示例（使用 <code>stat()</code> 获取文件状态信息）：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">fileInfo</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>; <span class="comment">// 假设存在的文件名</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取文件状态信息并存储在 fileInfo 结构体中</span></span><br><span class="line">    <span class="keyword">if</span> (stat(filename, &amp;fileInfo) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;文件大小：%lld 字节\n&quot;</span>, (<span class="type">long</span> <span class="type">long</span>)fileInfo.st_size);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;访问权限：%o\n&quot;</span>, fileInfo.st_mode &amp; (S_IRWXU | S_IRWXG | S_IRWXO));</span><br><span class="line">        <span class="comment">// 更多的文件状态信息可通过 struct stat 中的其他成员获取，如 st_mode、st_uid、st_gid、st_atime 等</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;stat&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>&lt;sys/stat.h&gt;</code> 中包含的函数和数据结构允许程序员获取和修改文件的属性信息，如权限、所有者、文件大小等。</li>
+<li>该头文件中定义了一些宏，用于检查文件类型和设置文件权限，以及一些函数，用于修改文件的属性信息。</li>
+<li>使用这些函数和数据结构可以在编写文件处理相关的程序时获取文件的状态信息，并进行相应的操作。</li>
+</ul>
+<p>总的来说，<code>&lt;sys/stat.h&gt;</code> 提供了一系列函数、宏和数据结构，用于获取和修改文件的状态信息，对文件的操作和文件系统属性进行处理。</p>
+<h2 id="Linux-POSIX-stat-详解"><a href="#Linux-POSIX-stat-详解" class="headerlink" title="Linux POSIX &lt;sys&#x2F;stat.h&gt; stat() 详解"></a>Linux POSIX &lt;sys&#x2F;stat.h&gt; stat() 详解</h2><p><code>stat()</code> 是 POSIX 操作系统中 <code>&lt;sys/stat.h&gt;</code> 头文件中定义的一个函数，用于获取指定文件的状态信息，并将其存储在 <code>struct stat</code> 结构体中。</p>
+<h3 id="函数签名："><a href="#函数签名：" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *statbuf)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：若成功，返回 0；失败则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>pathname</code>：字符串，表示要查询状态的文件路径。</li>
+<li><code>statbuf</code>：<code>struct stat</code> 类型的指针，用于存储获取到的文件状态信息。</li>
+</ul>
+</li>
+</ul>
+<h3 id="struct-stat-结构体："><a href="#struct-stat-结构体：" class="headerlink" title="struct stat 结构体："></a><code>struct stat</code> 结构体：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>     st_dev;         <span class="comment">// 设备 ID</span></span><br><span class="line">    <span class="type">ino_t</span>     st_ino;         <span class="comment">// inode 号</span></span><br><span class="line">    <span class="type">mode_t</span>    st_mode;        <span class="comment">// 文件类型和访问权限</span></span><br><span class="line">    <span class="type">nlink_t</span>   st_nlink;       <span class="comment">// 链接数</span></span><br><span class="line">    <span class="type">uid_t</span>     st_uid;         <span class="comment">// 用户 ID</span></span><br><span class="line">    <span class="type">gid_t</span>     st_gid;         <span class="comment">// 组 ID</span></span><br><span class="line">    <span class="type">off_t</span>     st_size;        <span class="comment">// 文件大小（字节数）</span></span><br><span class="line">    <span class="type">time_t</span>    st_atime;       <span class="comment">// 最后访问时间</span></span><br><span class="line">    <span class="type">time_t</span>    st_mtime;       <span class="comment">// 最后修改时间</span></span><br><span class="line">    <span class="type">time_t</span>    st_ctime;       <span class="comment">// 最后状态改变时间</span></span><br><span class="line">    <span class="type">blksize_t</span> st_blksize;     <span class="comment">// 文件系统 I/O 缓冲区大小</span></span><br><span class="line">    <span class="type">blkcnt_t</span>  st_blocks;      <span class="comment">// 分配的文件块数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">fileInfo</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>; <span class="comment">// 假设存在的文件名</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取文件状态信息并存储在 fileInfo 结构体中</span></span><br><span class="line">    <span class="keyword">if</span> (stat(filename, &amp;fileInfo) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;文件大小：%lld 字节\n&quot;</span>, (<span class="type">long</span> <span class="type">long</span>)fileInfo.st_size);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;访问权限：%o\n&quot;</span>, fileInfo.st_mode &amp; (S_IRWXU | S_IRWXG | S_IRWXO));</span><br><span class="line">        <span class="comment">// 更多的文件状态信息可通过 struct stat 中的其他成员获取，如 st_mode、st_uid、st_gid、st_atime 等</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;stat&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项：-1"><a href="#注意事项：-1" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>stat()</code> 函数用于获取指定文件的详细状态信息，如文件大小、访问权限、所有者信息、最后访问时间等。</li>
+<li>要使用 <code>stat()</code> 函数，需要包含 <code>&lt;sys/stat.h&gt;</code> 头文件。</li>
+<li>在调用 <code>stat()</code> 函数时，需要传递文件路径和一个指向 <code>struct stat</code> 结构体的指针，该结构体将会被填充为文件的状态信息。</li>
+<li>如果函数执行成功，返回值为 0；否则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+</ul>
+<p><code>stat()</code> 函数是用于获取文件状态信息的重要函数之一，它允许程序员获取文件的详细属性和状态，以便在程序中进行相应的操作。</p>
+<h2 id="Linux-POSIX-fstat-详解"><a href="#Linux-POSIX-fstat-详解" class="headerlink" title="Linux POSIX &lt;sys&#x2F;stat.h&gt; fstat() 详解"></a>Linux POSIX &lt;sys&#x2F;stat.h&gt; fstat() 详解</h2><p><code>fstat()</code> 是 POSIX 操作系统中 <code>&lt;sys/stat.h&gt;</code> 头文件中定义的一个函数，用于获取一个已打开文件的状态信息，并将其存储在 <code>struct stat</code> 结构体中。</p>
+<h3 id="函数签名：-1"><a href="#函数签名：-1" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fstat</span><span class="params">(<span class="type">int</span> filedes, <span class="keyword">struct</span> stat *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：若成功，返回 0；失败则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>filedes</code>：文件描述符，表示已经打开的文件。</li>
+<li><code>buf</code>：<code>struct stat</code> 类型的指针，用于存储获取到的文件状态信息。</li>
+</ul>
+</li>
+</ul>
+<h3 id="struct-stat-结构体：-1"><a href="#struct-stat-结构体：-1" class="headerlink" title="struct stat 结构体："></a><code>struct stat</code> 结构体：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>     st_dev;         <span class="comment">// 设备 ID</span></span><br><span class="line">    <span class="type">ino_t</span>     st_ino;         <span class="comment">// inode 号</span></span><br><span class="line">    <span class="type">mode_t</span>    st_mode;        <span class="comment">// 文件类型和访问权限</span></span><br><span class="line">    <span class="type">nlink_t</span>   st_nlink;       <span class="comment">// 链接数</span></span><br><span class="line">    <span class="type">uid_t</span>     st_uid;         <span class="comment">// 用户 ID</span></span><br><span class="line">    <span class="type">gid_t</span>     st_gid;         <span class="comment">// 组 ID</span></span><br><span class="line">    <span class="type">off_t</span>     st_size;        <span class="comment">// 文件大小（字节数）</span></span><br><span class="line">    <span class="type">time_t</span>    st_atime;       <span class="comment">// 最后访问时间</span></span><br><span class="line">    <span class="type">time_t</span>    st_mtime;       <span class="comment">// 最后修改时间</span></span><br><span class="line">    <span class="type">time_t</span>    st_ctime;       <span class="comment">// 最后状态改变时间</span></span><br><span class="line">    <span class="type">blksize_t</span> st_blksize;     <span class="comment">// 文件系统 I/O 缓冲区大小</span></span><br><span class="line">    <span class="type">blkcnt_t</span>  st_blocks;      <span class="comment">// 分配的文件块数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">fileInfo</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>; <span class="comment">// 假设存在的文件名</span></span><br><span class="line">    <span class="type">int</span> fileDescriptor;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打开文件</span></span><br><span class="line">    fileDescriptor = open(filename, O_RDONLY);</span><br><span class="line">    <span class="keyword">if</span> (fileDescriptor &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取文件状态信息并存储在 fileInfo 结构体中</span></span><br><span class="line">    <span class="keyword">if</span> (fstat(fileDescriptor, &amp;fileInfo) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;文件大小：%lld 字节\n&quot;</span>, (<span class="type">long</span> <span class="type">long</span>)fileInfo.st_size);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;访问权限：%o\n&quot;</span>, fileInfo.st_mode &amp; (S_IRWXU | S_IRWXG | S_IRWXO));</span><br><span class="line">        <span class="comment">// 更多的文件状态信息可通过 struct stat 中的其他成员获取，如 st_mode、st_uid、st_gid、st_atime 等</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;fstat&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭文件</span></span><br><span class="line">    close(fileDescriptor);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项：-2"><a href="#注意事项：-2" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>fstat()</code> 函数用于获取一个已经打开文件的详细状态信息，如文件大小、访问权限、所有者信息、最后访问时间等。</li>
+<li>要使用 <code>fstat()</code> 函数，需要包含 <code>&lt;sys/stat.h&gt;</code> 和 <code>&lt;fcntl.h&gt;</code> 头文件。</li>
+<li>在调用 <code>fstat()</code> 函数时，需要传递文件描述符和一个指向 <code>struct stat</code> 结构体的指针，该结构体将会被填充为文件的状态信息。</li>
+<li>如果函数执行成功，返回值为 0；否则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+</ul>
+<p><code>fstat()</code> 函数允许程序员在已经打开的文件上获取详细的状态信息，这对于进行文件操作和管理非常有用。</p>
+<h2 id="Linux-POSIX-chmod-详解"><a href="#Linux-POSIX-chmod-详解" class="headerlink" title="Linux POSIX &lt;sys&#x2F;stat.h&gt; chmod() 详解"></a>Linux POSIX &lt;sys&#x2F;stat.h&gt; chmod() 详解</h2><p><code>chmod()</code> 是 POSIX 操作系统中 <code>&lt;sys/stat.h&gt;</code> 头文件中定义的一个函数，用于改变文件的访问权限。</p>
+<h3 id="函数签名：-2"><a href="#函数签名：-2" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">chmod</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：若成功，返回 0；失败则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>pathname</code>：字符串，表示要修改权限的文件路径。</li>
+<li><code>mode</code>：<code>mode_t</code> 类型，表示新的访问权限，使用八进制表示。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例：-2"><a href="#示例：-2" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>; <span class="comment">// 假设存在的文件名</span></span><br><span class="line">    <span class="type">mode_t</span> newMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH; <span class="comment">// 新的权限，只允许所有者读写，组和其他用户只允许读</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 修改文件权限</span></span><br><span class="line">    <span class="keyword">if</span> (chmod(filename, newMode) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;文件权限修改成功\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;chmod&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项：-3"><a href="#注意事项：-3" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>chmod()</code> 函数用于改变指定文件的访问权限。</li>
+<li><code>mode</code> 参数用 <code>mode_t</code> 类型表示，可以使用 <code>S_IRUSR</code>（所有者读权限）、<code>S_IWUSR</code>（所有者写权限）、<code>S_IXUSR</code>（所有者执行权限）等宏定义。</li>
+<li>使用位掩码运算符 <code>|</code> 来组合权限选项，然后传递给 <code>chmod()</code> 函数来设置文件的新权限。</li>
+<li>要使用 <code>chmod()</code> 函数，需要对指定的文件有合适的权限。</li>
+</ul>
+<p><code>chmod()</code> 函数允许程序员根据需要修改文件的访问权限，以控制文件的读、写、执行等操作，对于安全性和权限管理非常重要。</p>
+<h2 id="Linux-POSIX-chown-详解"><a href="#Linux-POSIX-chown-详解" class="headerlink" title="Linux POSIX &lt;sys&#x2F;stat.h&gt; chown() 详解"></a>Linux POSIX &lt;sys&#x2F;stat.h&gt; chown() 详解</h2><p><code>chown()</code> 是 POSIX 操作系统中 <code>&lt;sys/stat.h&gt;</code> 头文件中定义的一个函数，用于修改文件的所有者和所属组。</p>
+<h3 id="函数签名：-3"><a href="#函数签名：-3" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">chown</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">uid_t</span> owner, <span class="type">gid_t</span> group)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：若成功，返回 0；失败则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>pathname</code>：字符串，表示要修改所有者和所属组的文件路径。</li>
+<li><code>owner</code>：<code>uid_t</code> 类型，表示文件的新所有者 ID。</li>
+<li><code>group</code>：<code>gid_t</code> 类型，表示文件的新所属组 ID。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例：-3"><a href="#示例：-3" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>; <span class="comment">// 假设存在的文件名</span></span><br><span class="line">    <span class="type">uid_t</span> newOwner = <span class="number">1000</span>; <span class="comment">// 新的所有者 ID</span></span><br><span class="line">    <span class="type">gid_t</span> newGroup = <span class="number">1000</span>; <span class="comment">// 新的所属组 ID</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 修改文件所有者和所属组</span></span><br><span class="line">    <span class="keyword">if</span> (chown(filename, newOwner, newGroup) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;文件所有者和所属组修改成功\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;chown&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项：-4"><a href="#注意事项：-4" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>chown()</code> 函数用于修改指定文件的所有者和所属组。</li>
+<li><code>owner</code> 参数表示文件的新所有者 ID，<code>group</code> 参数表示文件的新所属组 ID。</li>
+<li>要使用 <code>chown()</code> 函数，需要对指定的文件有适当的权限，通常只有超级用户或文件的当前所有者可以修改文件的所有者和所属组。</li>
+</ul>
+<p><code>chown()</code> 函数允许程序员根据需要更改文件的所有者和所属组，这对于管理文件系统权限和安全性是非常重要的。</p>
+<h2 id="Linux-POSIX-utime-详解"><a href="#Linux-POSIX-utime-详解" class="headerlink" title="Linux POSIX &lt;sys&#x2F;stat.h&gt; utime() 详解"></a>Linux POSIX &lt;sys&#x2F;stat.h&gt; utime() 详解</h2><p><code>utime()</code> 是 POSIX 操作系统中 <code>&lt;sys/stat.h&gt;</code> 头文件中定义的一个函数，用于修改文件的访问时间和修改时间。</p>
+<h3 id="函数签名：-4"><a href="#函数签名：-4" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：若成功，返回 0；失败则返回 -1，并设置 <code>errno</code> 表示错误类型。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>filename</code>：字符串，表示要修改访问时间和修改时间的文件路径。</li>
+<li><code>times</code>：<code>struct utimbuf</code> 类型的指针，指向包含访问时间和修改时间信息的结构体。</li>
+</ul>
+</li>
+</ul>
+<h3 id="struct-utimbuf-结构体："><a href="#struct-utimbuf-结构体：" class="headerlink" title="struct utimbuf 结构体："></a><code>struct utimbuf</code> 结构体：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span> actime;  <span class="comment">// 访问时间</span></span><br><span class="line">    <span class="type">time_t</span> modtime; <span class="comment">// 修改时间</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例：-4"><a href="#示例：-4" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>; <span class="comment">// 假设存在的文件名</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> <span class="title">newTimes</span>;</span></span><br><span class="line"></span><br><span class="line">    newTimes.actime = <span class="number">1640260800</span>; <span class="comment">// 2022-12-24 00:00:00 的时间戳，作为新的访问时间</span></span><br><span class="line">    newTimes.modtime = <span class="number">1640264400</span>; <span class="comment">// 2022-12-24 01:00:00 的时间戳，作为新的修改时间</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 修改文件的访问时间和修改时间</span></span><br><span class="line">    <span class="keyword">if</span> (utime(filename, &amp;newTimes) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;文件访问时间和修改时间修改成功\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;utime&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项：-5"><a href="#注意事项：-5" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>utime()</code> 函数用于修改指定文件的访问时间和修改时间。</li>
+<li><code>struct utimbuf</code> 结构体包含了要设置的访问时间和修改时间的值，以秒为单位。</li>
+<li>要使用 <code>utime()</code> 函数，需要对指定的文件有适当的权限。</li>
+</ul>
+<p><code>utime()</code> 函数允许程序员根据需要更改文件的访问时间和修改时间，这对于模拟文件访问和修改时间、文件同步等操作是非常有用的。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CPOSIX/" rel="tag"># CPOSIX</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_1_posix_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="C_5_1_posix_理论基础">
+      <i class="fa fa-chevron-left"></i> C_5_1_posix_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_10_sys_types_h/" rel="next" title="C_5_10_sys_types_h">
+      C_5_10_sys_types_h <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">Linux POSIX &lt;sys&#x2F;stat.h&gt; 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%B8%B8%E8%A7%81%E7%9A%84%E5%87%BD%E6%95%B0%E5%92%8C%E5%AE%8F%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">一些常见的函数和宏：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%B8%B8%E8%A7%81%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">一些常见的数据结构：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%88%E4%BD%BF%E7%94%A8-stat-%E8%8E%B7%E5%8F%96%E6%96%87%E4%BB%B6%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%EF%BC%89%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例（使用 stat() 获取文件状态信息）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-stat-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Linux POSIX &lt;sys&#x2F;stat.h&gt; stat() 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-stat-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">struct stat 结构体：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-1"><span class="nav-number">3.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-fstat-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">Linux POSIX &lt;sys&#x2F;stat.h&gt; fstat() 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-1"><span class="nav-number">4.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-stat-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9A-1"><span class="nav-number">4.2.</span> <span class="nav-text">struct stat 结构体：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">4.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-2"><span class="nav-number">4.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-chmod-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">Linux POSIX &lt;sys&#x2F;stat.h&gt; chmod() 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-2"><span class="nav-number">5.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">5.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-3"><span class="nav-number">5.3.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-chown-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">Linux POSIX &lt;sys&#x2F;stat.h&gt; chown() 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-3"><span class="nav-number">6.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-3"><span class="nav-number">6.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-4"><span class="nav-number">6.3.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-utime-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">Linux POSIX &lt;sys&#x2F;stat.h&gt; utime() 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-4"><span class="nav-number">7.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-utimbuf-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">struct utimbuf 结构体：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-4"><span class="nav-number">7.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A-5"><span class="nav-number">7.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

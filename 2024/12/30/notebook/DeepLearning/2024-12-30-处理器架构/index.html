@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 常见处理器架构 CPU&#x2F;GPU&#x2F;FPGA 相关学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="处理器架构">
+<meta property="og:url" content="https://junyiha.github.io/2024/12/30/notebook/DeepLearning/2024-12-30-%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 常见处理器架构 CPU&#x2F;GPU&#x2F;FPGA 相关学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-12-30T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.285Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="AI部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/12/30/notebook/DeepLearning/2024-12-30-%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>处理器架构 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/30/notebook/DeepLearning/2024-12-30-%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          处理器架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-30 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-30T09:00:00+08:00">2024-12-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>常见处理器架构 CPU&#x2F;GPU&#x2F;FPGA 相关学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="常见处理器架构"><a href="#常见处理器架构" class="headerlink" title="常见处理器架构"></a>常见处理器架构</h2><p>处理器架构是指处理器的设计和实现方式，决定了其性能、功能和适用场景。以下是常见的处理器架构及其特点：</p>
+<hr>
+<h3 id="1-CISC（复杂指令集计算）"><a href="#1-CISC（复杂指令集计算）" class="headerlink" title="1. CISC（复杂指令集计算）"></a><strong>1. CISC（复杂指令集计算）</strong></h3><h4 id="特点"><a href="#特点" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>指令集复杂，每条指令可以完成多个操作。</li>
+<li>一条指令可以访问内存和寄存器，减少指令数。</li>
+<li>适合开发者，因其提供高级的指令抽象。</li>
+</ul>
+<h4 id="代表架构"><a href="#代表架构" class="headerlink" title="代表架构"></a><strong>代表架构</strong></h4><ul>
+<li><strong>x86</strong>: <ul>
+<li>由 Intel 和 AMD 主导。</li>
+<li>广泛应用于个人电脑和服务器领域。</li>
+<li>强调向后兼容性，支持几十年的软件。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-RISC（精简指令集计算）"><a href="#2-RISC（精简指令集计算）" class="headerlink" title="2. RISC（精简指令集计算）"></a><strong>2. RISC（精简指令集计算）</strong></h3><h4 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>指令集简单，每条指令只完成一个操作。</li>
+<li>执行速度快，依赖流水线技术提升性能。</li>
+<li>功耗较低，适合移动设备。</li>
+</ul>
+<h4 id="代表架构-1"><a href="#代表架构-1" class="headerlink" title="代表架构"></a><strong>代表架构</strong></h4><ul>
+<li><p><strong>ARM</strong>: </p>
+<ul>
+<li>广泛用于手机、平板和嵌入式设备。</li>
+<li>强调低功耗与高性能的平衡。</li>
+<li>代表芯片：Apple M1&#x2F;M2、Snapdragon、Exynos。</li>
+</ul>
+</li>
+<li><p><strong>RISC-V</strong>: </p>
+<ul>
+<li>开放指令集架构，允许免费使用和扩展。</li>
+<li>在学术界和嵌入式领域受到关注。</li>
+<li>开放性为芯片定制化提供了可能。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="3-MIPS（微处理器无关指令集）"><a href="#3-MIPS（微处理器无关指令集）" class="headerlink" title="3. MIPS（微处理器无关指令集）"></a><strong>3. MIPS（微处理器无关指令集）</strong></h3><h4 id="特点-2"><a href="#特点-2" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>早期采用 RISC 原则，设计简洁高效。</li>
+<li>在嵌入式系统和网络设备中广泛使用。</li>
+<li>近年来被 RISC-V 部分取代。</li>
+</ul>
+<h4 id="应用"><a href="#应用" class="headerlink" title="应用"></a><strong>应用</strong></h4><ul>
+<li>路由器、交换机、消费级电子产品。</li>
+</ul>
+<hr>
+<h3 id="4-PowerPC"><a href="#4-PowerPC" class="headerlink" title="4. PowerPC"></a><strong>4. PowerPC</strong></h3><h4 id="特点-3"><a href="#特点-3" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>由 IBM、Motorola 和 Apple 联合开发。</li>
+<li>使用 RISC 原则，性能强大。</li>
+<li>曾用于 Apple Mac 电脑（后被 Intel 替代）。</li>
+</ul>
+<h4 id="应用-1"><a href="#应用-1" class="headerlink" title="应用"></a><strong>应用</strong></h4><ul>
+<li>服务器、高性能计算和嵌入式设备（如游戏主机）。</li>
+</ul>
+<hr>
+<h3 id="5-SPARC（可扩展处理器架构）"><a href="#5-SPARC（可扩展处理器架构）" class="headerlink" title="5. SPARC（可扩展处理器架构）"></a><strong>5. SPARC（可扩展处理器架构）</strong></h3><h4 id="特点-4"><a href="#特点-4" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>由 Sun Microsystems 开发，基于 RISC。</li>
+<li>适用于高性能计算和服务器。</li>
+<li>现在主要由 Oracle 维护。</li>
+</ul>
+<h4 id="应用-2"><a href="#应用-2" class="headerlink" title="应用"></a><strong>应用</strong></h4><ul>
+<li>数据中心、企业级服务器。</li>
+</ul>
+<hr>
+<h3 id="6-x86-64（64-位扩展）"><a href="#6-x86-64（64-位扩展）" class="headerlink" title="6. x86-64（64 位扩展）"></a><strong>6. x86-64（64 位扩展）</strong></h3><h4 id="特点-5"><a href="#特点-5" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>x86 的 64 位扩展，增加了内存寻址能力。</li>
+<li>支持更多寄存器和更大的虚拟地址空间。</li>
+<li>兼容 x86，广泛用于现代 PC 和服务器。</li>
+</ul>
+<h4 id="代表产品"><a href="#代表产品" class="headerlink" title="代表产品"></a><strong>代表产品</strong></h4><ul>
+<li>Intel Core 系列、AMD Ryzen 系列。</li>
+</ul>
+<hr>
+<h3 id="7-GPU-架构"><a href="#7-GPU-架构" class="headerlink" title="7. GPU 架构"></a><strong>7. GPU 架构</strong></h3><h4 id="特点-6"><a href="#特点-6" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>大量并行处理单元，适合矩阵计算和图形渲染。</li>
+<li>越来越多地用于 AI 和深度学习任务。</li>
+</ul>
+<h4 id="代表架构-2"><a href="#代表架构-2" class="headerlink" title="代表架构"></a><strong>代表架构</strong></h4><ul>
+<li><strong>NVIDIA CUDA</strong>: 专注于 AI 和高性能计算。</li>
+<li><strong>AMD RDNA&#x2F;CDNA</strong>: 强调游戏和计算性能。</li>
+<li><strong>Intel Xe</strong>: 跨领域支持，包括图形和 AI 加速。</li>
+</ul>
+<hr>
+<h3 id="8-专用处理器架构"><a href="#8-专用处理器架构" class="headerlink" title="8. 专用处理器架构"></a><strong>8. 专用处理器架构</strong></h3><h4 id="1-DSP（数字信号处理器）"><a href="#1-DSP（数字信号处理器）" class="headerlink" title="(1) DSP（数字信号处理器）"></a><strong>(1) DSP（数字信号处理器）</strong></h4><ul>
+<li>优化用于实时信号处理（如音频、视频、通信）。</li>
+<li>代表：Qualcomm Hexagon。</li>
+</ul>
+<h4 id="2-ASIC（专用集成电路）"><a href="#2-ASIC（专用集成电路）" class="headerlink" title="(2) ASIC（专用集成电路）"></a><strong>(2) ASIC（专用集成电路）</strong></h4><ul>
+<li>针对特定任务设计，性能高但不灵活。</li>
+<li>代表：比特币矿机芯片。</li>
+</ul>
+<h4 id="3-FPGA（现场可编程门阵列）"><a href="#3-FPGA（现场可编程门阵列）" class="headerlink" title="(3) FPGA（现场可编程门阵列）"></a><strong>(3) FPGA（现场可编程门阵列）</strong></h4><ul>
+<li>可编程逻辑单元，适合自定义硬件加速。</li>
+<li>应用于高性能计算和 AI 推理。</li>
+</ul>
+<hr>
+<h3 id="9-AI-专用架构"><a href="#9-AI-专用架构" class="headerlink" title="9. AI 专用架构"></a><strong>9. AI 专用架构</strong></h3><h4 id="特点-7"><a href="#特点-7" class="headerlink" title="特点"></a><strong>特点</strong></h4><ul>
+<li>针对深度学习模型优化，支持大规模矩阵运算。</li>
+<li>低功耗、高效能。</li>
+</ul>
+<h4 id="代表架构-3"><a href="#代表架构-3" class="headerlink" title="代表架构"></a><strong>代表架构</strong></h4><ul>
+<li><strong>Google TPU</strong>: 专为 AI 推理和训练设计。</li>
+<li><strong>Apple Neural Engine</strong>: 集成在 A 系列和 M 系列芯片中。</li>
+<li><strong>Tesla D1（Dojo）</strong>: 高效 AI 训练芯片。</li>
+</ul>
+<hr>
+<h3 id="10-老旧或特定架构"><a href="#10-老旧或特定架构" class="headerlink" title="10. 老旧或特定架构"></a><strong>10. 老旧或特定架构</strong></h3><h4 id="1-Itanium"><a href="#1-Itanium" class="headerlink" title="(1) Itanium"></a><strong>(1) Itanium</strong></h4><ul>
+<li>Intel 开发的 64 位架构，目标是替代 x86。</li>
+<li>市场接受度低，已逐渐淘汰。</li>
+</ul>
+<h4 id="2-Alpha"><a href="#2-Alpha" class="headerlink" title="(2) Alpha"></a><strong>(2) Alpha</strong></h4><ul>
+<li>DEC 开发，曾在高性能计算领域占据一席之地。</li>
+<li>被其他架构取代。</li>
+</ul>
+<h4 id="3-Z-Architecture"><a href="#3-Z-Architecture" class="headerlink" title="(3) Z-Architecture"></a><strong>(3) Z-Architecture</strong></h4><ul>
+<li>IBM 大型机架构，用于高可靠性事务处理。</li>
+</ul>
+<hr>
+<h3 id="选择架构时的考虑因素"><a href="#选择架构时的考虑因素" class="headerlink" title="选择架构时的考虑因素"></a><strong>选择架构时的考虑因素</strong></h3><ol>
+<li><strong>性能需求</strong>: 高性能计算选 x86 或 PowerPC；低功耗应用选 ARM 或 RISC-V。</li>
+<li><strong>功耗限制</strong>: 移动设备倾向 ARM。</li>
+<li><strong>生态系统</strong>: x86 和 ARM 拥有强大的软件和工具支持。</li>
+<li><strong>可扩展性</strong>: 开放架构（如 RISC-V）便于定制。</li>
+<li><strong>特定任务</strong>: 图形和 AI 选 GPU 或专用 AI 芯片。</li>
+</ol>
+<p>通过了解这些架构及其适用场景，可以更好地选择合适的硬件平台满足不同的计算需求。</p>
+<h2 id="CPU，GPU和FPGA-分别详细介绍"><a href="#CPU，GPU和FPGA-分别详细介绍" class="headerlink" title="CPU，GPU和FPGA 分别详细介绍"></a>CPU，GPU和FPGA 分别详细介绍</h2><p>以下是 <strong>CPU（中央处理器）</strong>、<strong>GPU（图形处理器）</strong> 和 <strong>FPGA（现场可编程门阵列）</strong> 的详细介绍，从架构、功能、应用场景等方面展开分析：</p>
+<hr>
+<h2 id="1-CPU（中央处理器）"><a href="#1-CPU（中央处理器）" class="headerlink" title="1. CPU（中央处理器）"></a><strong>1. CPU（中央处理器）</strong></h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a><strong>概述</strong></h3><ul>
+<li>CPU 是计算机的核心处理单元，负责执行操作系统和应用程序的指令。</li>
+<li>擅长处理通用计算任务，具有强大的单线程性能。</li>
+</ul>
+<h3 id="架构特点"><a href="#架构特点" class="headerlink" title="架构特点"></a><strong>架构特点</strong></h3><ol>
+<li><strong>复杂指令集（CISC）和精简指令集（RISC）</strong>：<ul>
+<li>x86 是 CISC 架构的代表。</li>
+<li>ARM 是 RISC 架构的代表，功耗低。</li>
+</ul>
+</li>
+<li><strong>多核设计</strong>：<ul>
+<li>现代 CPU 通常包含多个核心，支持多线程计算。</li>
+</ul>
+</li>
+<li><strong>高速缓存（Cache）</strong>：<ul>
+<li>分为 L1、L2 和 L3 缓存，加速数据访问。</li>
+</ul>
+</li>
+<li><strong>时钟频率</strong>：<ul>
+<li>CPU 的性能部分由其频率决定，高频率意味着更快的处理速度。</li>
+</ul>
+</li>
+</ol>
+<h3 id="优势"><a href="#优势" class="headerlink" title="优势"></a><strong>优势</strong></h3><ul>
+<li><strong>通用性</strong>：可以处理从数值计算到逻辑判断的各种任务。</li>
+<li><strong>高单线程性能</strong>：在需要强逻辑判断的任务中表现优异。</li>
+<li><strong>复杂指令处理</strong>：支持大量指令集扩展（如 SIMD 和 AVX）。</li>
+</ul>
+<h3 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a><strong>局限性</strong></h3><ul>
+<li><strong>并行性有限</strong>：核数较少，处理大规模并行计算任务效率低。</li>
+<li><strong>功耗较高</strong>：频率和复杂性导致发热量大。</li>
+</ul>
+<h3 id="典型应用"><a href="#典型应用" class="headerlink" title="典型应用"></a><strong>典型应用</strong></h3><ul>
+<li>个人计算机（PC）和服务器。</li>
+<li>操作系统和应用程序的主线程。</li>
+<li>编译、文件处理、数据库查询等任务。</li>
+</ul>
+<hr>
+<h2 id="2-GPU（图形处理器）"><a href="#2-GPU（图形处理器）" class="headerlink" title="2. GPU（图形处理器）"></a><strong>2. GPU（图形处理器）</strong></h2><h3 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a><strong>概述</strong></h3><ul>
+<li>GPU 是专门设计用于图形和并行处理的处理器。</li>
+<li>原本用于图形渲染，近年来广泛用于 AI、机器学习和科学计算领域。</li>
+</ul>
+<h3 id="架构特点-1"><a href="#架构特点-1" class="headerlink" title="架构特点"></a><strong>架构特点</strong></h3><ol>
+<li><strong>大规模并行计算单元</strong>：<ul>
+<li>数千个小型核心，专为并行计算设计。</li>
+</ul>
+</li>
+<li><strong>SIMD（单指令多数据）</strong>：<ul>
+<li>同时执行相同指令处理大量数据。</li>
+</ul>
+</li>
+<li><strong>高内存带宽</strong>：<ul>
+<li>快速读取大量数据以满足并行任务需求。</li>
+</ul>
+</li>
+</ol>
+<h3 id="优势-1"><a href="#优势-1" class="headerlink" title="优势"></a><strong>优势</strong></h3><ul>
+<li><strong>高度并行化</strong>：适合矩阵运算、大规模数据处理。</li>
+<li><strong>高吞吐量</strong>：在 AI 和深度学习任务中表现优异。</li>
+<li><strong>图形渲染优化</strong>：支持 3D 图形渲染和视频处理。</li>
+</ul>
+<h3 id="局限性-1"><a href="#局限性-1" class="headerlink" title="局限性"></a><strong>局限性</strong></h3><ul>
+<li><strong>通用性较弱</strong>：不适合逻辑判断密集的任务。</li>
+<li><strong>功耗高</strong>：尤其在执行高性能计算时。</li>
+<li><strong>编程复杂性</strong>：需要特殊的编程语言（如 CUDA 或 OpenCL）。</li>
+</ul>
+<h3 id="典型应用-1"><a href="#典型应用-1" class="headerlink" title="典型应用"></a><strong>典型应用</strong></h3><ul>
+<li>游戏图形渲染。</li>
+<li>深度学习训练和推理（如 TensorFlow、PyTorch 加速）。</li>
+<li>视频编码、科学模拟、区块链挖矿。</li>
+</ul>
+<hr>
+<h2 id="3-FPGA（现场可编程门阵列）-1"><a href="#3-FPGA（现场可编程门阵列）-1" class="headerlink" title="3. FPGA（现场可编程门阵列）"></a><strong>3. FPGA（现场可编程门阵列）</strong></h2><h3 id="概述-2"><a href="#概述-2" class="headerlink" title="概述"></a><strong>概述</strong></h3><ul>
+<li>FPGA 是一种可编程逻辑器件，用户可以在硬件层面配置其逻辑功能。</li>
+<li>特点是硬件加速、高度定制化。</li>
+</ul>
+<h3 id="架构特点-2"><a href="#架构特点-2" class="headerlink" title="架构特点"></a><strong>架构特点</strong></h3><ol>
+<li><strong>可编程逻辑单元（CLB）</strong>：<ul>
+<li>由查找表（LUT）、触发器和互连组成。</li>
+</ul>
+</li>
+<li><strong>片上存储器</strong>：<ul>
+<li>提供有限的高速存储，用于数据缓存。</li>
+</ul>
+</li>
+<li><strong>互连网络</strong>：<ul>
+<li>用户可以配置模块间的连接。</li>
+</ul>
+</li>
+<li><strong>DSP 块</strong>：<ul>
+<li>专用于加速数学运算（如乘法和加法）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="优势-2"><a href="#优势-2" class="headerlink" title="优势"></a><strong>优势</strong></h3><ul>
+<li><strong>高度灵活</strong>：可以根据需求自定义硬件行为。</li>
+<li><strong>实时性强</strong>：适合对延迟敏感的任务。</li>
+<li><strong>低功耗</strong>：相比 CPU 和 GPU，FPGA 更节能。</li>
+<li><strong>硬件级并行</strong>：并行性远高于 GPU，适合特定任务。</li>
+</ul>
+<h3 id="局限性-2"><a href="#局限性-2" class="headerlink" title="局限性"></a><strong>局限性</strong></h3><ul>
+<li><strong>开发复杂</strong>：需要硬件描述语言（如 Verilog、VHDL）编程。</li>
+<li><strong>成本高</strong>：初始设计和调试复杂。</li>
+<li><strong>通用性差</strong>：一次配置只能用于特定任务。</li>
+</ul>
+<h3 id="典型应用-2"><a href="#典型应用-2" class="headerlink" title="典型应用"></a><strong>典型应用</strong></h3><ul>
+<li>通信（如 5G 基站信号处理）。</li>
+<li>硬件加速（如视频编解码、AI 推理）。</li>
+<li>嵌入式系统和 IoT 设备。</li>
+</ul>
+<hr>
+<h2 id="比较总结"><a href="#比较总结" class="headerlink" title="比较总结"></a><strong>比较总结</strong></h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th><strong>CPU</strong></th>
+<th><strong>GPU</strong></th>
+<th><strong>FPGA</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>核心数量</strong></td>
+<td>数个核心</td>
+<td>数千个小型核心</td>
+<td>用户定义</td>
+</tr>
+<tr>
+<td><strong>并行性</strong></td>
+<td>低</td>
+<td>高</td>
+<td>极高</td>
+</tr>
+<tr>
+<td><strong>延迟</strong></td>
+<td>低</td>
+<td>中</td>
+<td>极低</td>
+</tr>
+<tr>
+<td><strong>灵活性</strong></td>
+<td>高</td>
+<td>中</td>
+<td>极高</td>
+</tr>
+<tr>
+<td><strong>功耗</strong></td>
+<td>较高</td>
+<td>高</td>
+<td>较低</td>
+</tr>
+<tr>
+<td><strong>开发难度</strong></td>
+<td>低</td>
+<td>中</td>
+<td>高</td>
+</tr>
+<tr>
+<td><strong>典型应用</strong></td>
+<td>通用计算任务</td>
+<td>图形渲染、AI、科学计算</td>
+<td>硬件加速、嵌入式系统</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="如何选择？"><a href="#如何选择？" class="headerlink" title="如何选择？"></a><strong>如何选择？</strong></h3><ul>
+<li><strong>选择 CPU</strong>：适合运行通用任务或需要灵活性的环境，如 PC 和服务器。</li>
+<li><strong>选择 GPU</strong>：用于图形渲染、大规模并行计算或深度学习任务。</li>
+<li><strong>选择 FPGA</strong>：在需要低延迟、高效率和硬件定制的场景（如通信和实时处理）表现最佳。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E9%83%A8%E7%BD%B2/" rel="tag"># AI部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/30/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-12-30-onnxruntime/" rel="prev" title="onnxruntime">
+      <i class="fa fa-chevron-left"></i> onnxruntime
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/30/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-12-30-Mat/" rel="next" title="Mat">
+      Mat <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">常见处理器架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-CISC%EF%BC%88%E5%A4%8D%E6%9D%82%E6%8C%87%E4%BB%A4%E9%9B%86%E8%AE%A1%E7%AE%97%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">1. CISC（复杂指令集计算）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">2.1.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E8%A1%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">2.1.2.</span> <span class="nav-text">代表架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-RISC%EF%BC%88%E7%B2%BE%E7%AE%80%E6%8C%87%E4%BB%A4%E9%9B%86%E8%AE%A1%E7%AE%97%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2. RISC（精简指令集计算）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E8%A1%A8%E6%9E%B6%E6%9E%84-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">代表架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-MIPS%EF%BC%88%E5%BE%AE%E5%A4%84%E7%90%86%E5%99%A8%E6%97%A0%E5%85%B3%E6%8C%87%E4%BB%A4%E9%9B%86%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">3. MIPS（微处理器无关指令集）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-2"><span class="nav-number">2.3.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">2.3.2.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-PowerPC"><span class="nav-number">2.4.</span> <span class="nav-text">4. PowerPC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-3"><span class="nav-number">2.4.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-1"><span class="nav-number">2.4.2.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-SPARC%EF%BC%88%E5%8F%AF%E6%89%A9%E5%B1%95%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">5. SPARC（可扩展处理器架构）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-4"><span class="nav-number">2.5.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-2"><span class="nav-number">2.5.2.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-x86-64%EF%BC%8864-%E4%BD%8D%E6%89%A9%E5%B1%95%EF%BC%89"><span class="nav-number">2.6.</span> <span class="nav-text">6. x86-64（64 位扩展）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-5"><span class="nav-number">2.6.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E8%A1%A8%E4%BA%A7%E5%93%81"><span class="nav-number">2.6.2.</span> <span class="nav-text">代表产品</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-GPU-%E6%9E%B6%E6%9E%84"><span class="nav-number">2.7.</span> <span class="nav-text">7. GPU 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-6"><span class="nav-number">2.7.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E8%A1%A8%E6%9E%B6%E6%9E%84-2"><span class="nav-number">2.7.2.</span> <span class="nav-text">代表架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E4%B8%93%E7%94%A8%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">2.8.</span> <span class="nav-text">8. 专用处理器架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-DSP%EF%BC%88%E6%95%B0%E5%AD%97%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%89"><span class="nav-number">2.8.1.</span> <span class="nav-text">(1) DSP（数字信号处理器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-ASIC%EF%BC%88%E4%B8%93%E7%94%A8%E9%9B%86%E6%88%90%E7%94%B5%E8%B7%AF%EF%BC%89"><span class="nav-number">2.8.2.</span> <span class="nav-text">(2) ASIC（专用集成电路）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-FPGA%EF%BC%88%E7%8E%B0%E5%9C%BA%E5%8F%AF%E7%BC%96%E7%A8%8B%E9%97%A8%E9%98%B5%E5%88%97%EF%BC%89"><span class="nav-number">2.8.3.</span> <span class="nav-text">(3) FPGA（现场可编程门阵列）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-AI-%E4%B8%93%E7%94%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">2.9.</span> <span class="nav-text">9. AI 专用架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-7"><span class="nav-number">2.9.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E8%A1%A8%E6%9E%B6%E6%9E%84-3"><span class="nav-number">2.9.2.</span> <span class="nav-text">代表架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E8%80%81%E6%97%A7%E6%88%96%E7%89%B9%E5%AE%9A%E6%9E%B6%E6%9E%84"><span class="nav-number">2.10.</span> <span class="nav-text">10. 老旧或特定架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Itanium"><span class="nav-number">2.10.1.</span> <span class="nav-text">(1) Itanium</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Alpha"><span class="nav-number">2.10.2.</span> <span class="nav-text">(2) Alpha</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Z-Architecture"><span class="nav-number">2.10.3.</span> <span class="nav-text">(3) Z-Architecture</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%9E%B6%E6%9E%84%E6%97%B6%E7%9A%84%E8%80%83%E8%99%91%E5%9B%A0%E7%B4%A0"><span class="nav-number">2.11.</span> <span class="nav-text">选择架构时的考虑因素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU%EF%BC%8CGPU%E5%92%8CFPGA-%E5%88%86%E5%88%AB%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">CPU，GPU和FPGA 分别详细介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-CPU%EF%BC%88%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">1. CPU（中央处理器）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">4.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E7%89%B9%E7%82%B9"><span class="nav-number">4.2.</span> <span class="nav-text">架构特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">4.3.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">4.4.</span> <span class="nav-text">局限性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8"><span class="nav-number">4.5.</span> <span class="nav-text">典型应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-GPU%EF%BC%88%E5%9B%BE%E5%BD%A2%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">2. GPU（图形处理器）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0-1"><span class="nav-number">5.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E7%89%B9%E7%82%B9-1"><span class="nav-number">5.2.</span> <span class="nav-text">架构特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-1"><span class="nav-number">5.3.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%99%90%E6%80%A7-1"><span class="nav-number">5.4.</span> <span class="nav-text">局限性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8-1"><span class="nav-number">5.5.</span> <span class="nav-text">典型应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-FPGA%EF%BC%88%E7%8E%B0%E5%9C%BA%E5%8F%AF%E7%BC%96%E7%A8%8B%E9%97%A8%E9%98%B5%E5%88%97%EF%BC%89-1"><span class="nav-number">6.</span> <span class="nav-text">3. FPGA（现场可编程门阵列）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0-2"><span class="nav-number">6.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E7%89%B9%E7%82%B9-2"><span class="nav-number">6.2.</span> <span class="nav-text">架构特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF-2"><span class="nav-number">6.3.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%99%90%E6%80%A7-2"><span class="nav-number">6.4.</span> <span class="nav-text">局限性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8-2"><span class="nav-number">6.5.</span> <span class="nav-text">典型应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">比较总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%EF%BC%9F"><span class="nav-number">7.1.</span> <span class="nav-text">如何选择？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

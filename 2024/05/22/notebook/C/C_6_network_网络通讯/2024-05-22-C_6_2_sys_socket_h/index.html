@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 &lt;sys&#x2F;socket.h&gt;头文件 笔记  linux &lt;sys&#x2F;socket.h&gt;是什么&lt;sys&#x2F;socket.h&gt; 是一个 C&#x2F;C++ 语言中的头文件，通常用于在 Linux 系统上进行网络编程。该头文件包含了一系列用于创建、操作网络套接字（socket）的函数、结构体和宏定义。 套接字是网络通信的基础，它允许进程通过网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C_6_2_sys_socket_h">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C/C_6_network_%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/2024-05-22-C_6_2_sys_socket_h/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 &lt;sys&#x2F;socket.h&gt;头文件 笔记  linux &lt;sys&#x2F;socket.h&gt;是什么&lt;sys&#x2F;socket.h&gt; 是一个 C&#x2F;C++ 语言中的头文件，通常用于在 Linux 系统上进行网络编程。该头文件包含了一系列用于创建、操作网络套接字（socket）的函数、结构体和宏定义。 套接字是网络通信的基础，它允许进程通过网络">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.255Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CNetwork">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C/C_6_network_%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/2024-05-22-C_6_2_sys_socket_h/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C_6_2_sys_socket_h | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C/C_6_network_%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/2024-05-22-C_6_2_sys_socket_h/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C_6_2_sys_socket_h
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>&lt;sys&#x2F;socket.h&gt;头文件 笔记</li>
+</ul>
+<h2 id="linux-是什么"><a href="#linux-是什么" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt;是什么"></a>linux &lt;sys&#x2F;socket.h&gt;是什么</h2><p><code>&lt;sys/socket.h&gt;</code> 是一个 C&#x2F;C++ 语言中的头文件，通常用于在 Linux 系统上进行网络编程。该头文件包含了一系列用于创建、操作网络套接字（socket）的函数、结构体和宏定义。</p>
+<p>套接字是网络通信的基础，它允许进程通过网络进行通信。<code>&lt;sys/socket.h&gt;</code> 中定义了创建套接字、绑定地址、监听连接、接受连接等操作所需的函数和相关的常量、数据结构。这些函数和常量允许开发者在 Linux 系统上编写网络应用程序，实现各种网络通信，如 TCP、UDP、IPv4、IPv6 等。</p>
+<p>一些常用的函数包括 <code>socket()</code>（创建套接字）、<code>bind()</code>（绑定套接字地址）、<code>listen()</code>（监听连接）、<code>accept()</code>（接受连接请求）、<code>connect()</code>（建立连接）、<code>send()</code> 和 <code>recv()</code>（发送和接收数据）等。</p>
+<p>这个头文件以及相关的系统调用和函数提供了程序员在 Linux 平台上进行网络编程的基础，使得开发者能够编写网络应用程序来实现数据通信和网络服务。</p>
+<h2 id="linux-详解"><a href="#linux-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt;详解"></a>linux &lt;sys&#x2F;socket.h&gt;详解</h2><p><code>&lt;sys/socket.h&gt;</code> 是 Linux 系统中用于网络编程的头文件之一，它包含了一系列用于处理套接字（socket）的系统调用、结构体和宏定义。</p>
+<p>套接字是一种抽象的通信端点，允许不同计算机之间进行数据通信。<code>&lt;sys/socket.h&gt;</code> 提供了创建、配置和操作套接字的函数和常量，使得开发者能够进行网络通信。以下是该头文件中常用的一些函数、数据结构和宏定义：</p>
+<h3 id="数据结构："><a href="#数据结构：" class="headerlink" title="数据结构："></a>数据结构：</h3><ul>
+<li><code>struct sockaddr</code>：用于表示通用的套接字地址信息。</li>
+<li><code>struct sockaddr_in</code>：用于表示 IPv4 的套接字地址信息。</li>
+<li><code>struct sockaddr_in6</code>：用于表示 IPv6 的套接字地址信息。</li>
+<li><code>struct sockaddr_storage</code>：用于存储任意类型套接字地址的结构体。</li>
+</ul>
+<h3 id="函数："><a href="#函数：" class="headerlink" title="函数："></a>函数：</h3><ul>
+<li><code>socket()</code>：创建一个新的套接字，返回一个文件描述符。</li>
+<li><code>bind()</code>：将一个套接字绑定到特定的地址和端口。</li>
+<li><code>listen()</code>：开始监听传入的连接请求。</li>
+<li><code>accept()</code>：接受传入的连接请求并返回新的套接字。</li>
+<li><code>connect()</code>：建立与远程套接字的连接。</li>
+<li><code>send()</code> 和 <code>recv()</code>：发送和接收数据。</li>
+<li><code>close()</code>：关闭套接字连接。</li>
+</ul>
+<h3 id="常量和宏定义："><a href="#常量和宏定义：" class="headerlink" title="常量和宏定义："></a>常量和宏定义：</h3><ul>
+<li>套接字类型：<code>SOCK_STREAM</code>（流套接字，提供面向连接的、可靠的字节流服务，如 TCP）、<code>SOCK_DGRAM</code>（数据报套接字，提供无连接的数据传输，如 UDP）等。</li>
+<li>地址族：<code>AF_INET</code>（IPv4 地址族）、<code>AF_INET6</code>（IPv6 地址族）等。</li>
+<li>套接字选项：如 <code>SO_REUSEADDR</code>（允许地址重用）、<code>SO_KEEPALIVE</code>（启用保活机制）等。</li>
+</ul>
+<p>使用 <code>&lt;sys/socket.h&gt;</code> 中提供的函数和常量，开发者可以实现各种网络应用，包括客户端-服务器模型、网络通信、数据传输等。这些函数和常量为 Linux 下的网络编程提供了基础设施。</p>
+<h2 id="linux-struct-sockaddr详解"><a href="#linux-struct-sockaddr详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; struct sockaddr详解"></a>linux &lt;sys&#x2F;socket.h&gt; struct sockaddr详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>struct sockaddr</code> 是用于表示通用的套接字地址信息的结构体。它是一个通用的地址结构，用于在网络编程中传递和存储各种类型的套接字地址信息，无论是 IPv4、IPv6 还是其他协议族的地址信息。</p>
+<p><code>struct sockaddr</code> 的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> sa_family; <span class="comment">// 地址族，例如 AF_INET、AF_INET6</span></span><br><span class="line">    <span class="type">char</span> sa_data[<span class="number">14</span>];         <span class="comment">// 实际的地址信息，大小取决于不同的协议族</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构体的主要成员有：</p>
+<ul>
+<li><p><code>sa_family</code>：表示地址族（address family），用于指示地址的类型，例如 <code>AF_INET</code> 表示 IPv4 地址族，<code>AF_INET6</code> 表示 IPv6 地址族。这个字段的大小为 2 个字节（<code>unsigned short</code>）。</p>
+</li>
+<li><p><code>sa_data</code>：这是一个包含实际地址信息的字符数组，大小为 14 字节。在实际使用中，这个字段会被强制转换为不同类型的结构体，以便于存储特定地址族的信息。例如，对于 IPv4 地址族 (<code>AF_INET</code>)，会将 <code>struct sockaddr</code> 转换为 <code>struct sockaddr_in</code>，而对于 IPv6 地址族 (<code>AF_INET6</code>)，会转换为 <code>struct sockaddr_in6</code>。</p>
+</li>
+</ul>
+<p>由于 <code>struct sockaddr</code> 是一个通用的结构体，它通常与类型转换结合使用，以适应不同的地址族和套接字操作。例如，在使用时，你可能会使用类型转换来将 <code>struct sockaddr</code> 转换为 <code>struct sockaddr_in</code> 或 <code>struct sockaddr_in6</code>，这样就可以操作 IPv4 或 IPv6 地址信息。</p>
+<p>网络编程中经常使用的函数，如 <code>bind()</code>、<code>connect()</code>、<code>accept()</code> 等，通常需要 <code>struct sockaddr</code> 类型的地址作为参数，以指定套接字的地址信息。在这些函数中，<code>struct sockaddr</code> 以及其不同的转换类型用于存储和传递相关的地址信息。</p>
+<h2 id="linux-struct-sockaddr-in详解"><a href="#linux-struct-sockaddr-in详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_in详解"></a>linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_in详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>struct sockaddr_in</code> 是用于表示 IPv4 套接字地址信息的结构体。它是对通用的 <code>struct sockaddr</code> 结构的扩展，专门用于存储和处理 IPv4 地址信息。</p>
+<p><code>struct sockaddr_in</code> 的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="type">sa_family_t</span> sin_family; <span class="comment">// 地址族，一般为 AF_INET</span></span><br><span class="line">    <span class="type">in_port_t</span> sin_port;     <span class="comment">// 16 位端口号</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span> <span class="comment">// IPv4 地址</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> sin_zero[<span class="keyword">sizeof</span>(<span class="keyword">struct</span> sockaddr) - <span class="keyword">sizeof</span>(<span class="type">sa_family_t</span>) - <span class="keyword">sizeof</span>(<span class="type">in_port_t</span>) - <span class="keyword">sizeof</span>(<span class="keyword">struct</span> in_addr)]; <span class="comment">// 用于填充使结构体大小与 sockaddr 一致</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构体的主要成员包括：</p>
+<ul>
+<li><p><code>sin_family</code>：与通用的 <code>struct sockaddr</code> 相同，表示地址族，通常设置为 <code>AF_INET</code> 表示 IPv4 地址族。</p>
+</li>
+<li><p><code>sin_port</code>：一个 16 位的整数，表示端口号。在网络编程中，端口号用于标识进程在主机上运行的服务。</p>
+</li>
+<li><p><code>sin_addr</code>：一个 <code>struct in_addr</code> 类型的结构体成员，用于存储 IPv4 地址信息。</p>
+</li>
+<li><p><code>sin_zero</code>：用于填充，使得 <code>struct sockaddr_in</code> 的大小与 <code>struct sockaddr</code> 保持一致。这样做是为了与旧版代码兼容，新的套接字地址结构体 <code>struct sockaddr_in</code> 虽然有自己的大小，但是要与通用的 <code>struct sockaddr</code> 大小一致以便于类型转换和处理。</p>
+</li>
+</ul>
+<p>在实际使用中，<code>struct sockaddr_in</code> 结构体通常与其他函数和数据类型一起使用，例如 <code>bind()</code>、<code>connect()</code> 和 <code>accept()</code> 等函数需要将 <code>struct sockaddr_in</code> 类型的地址信息作为参数传递。</p>
+<p>这个结构体和相关的函数使得开发者可以在 Linux 系统上进行 IPv4 网络编程，并能够方便地处理 IPv4 地址和端口信息。</p>
+<h2 id="linux-struct-sockaddr-in6详解"><a href="#linux-struct-sockaddr-in6详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_in6详解"></a>linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_in6详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>struct sockaddr_in6</code> 是用于表示 IPv6 套接字地址信息的结构体。与 <code>struct sockaddr_in</code> 类似，<code>struct sockaddr_in6</code> 是对通用的 <code>struct sockaddr</code> 结构的扩展，专门用于存储和处理 IPv6 地址信息。</p>
+<p><code>struct sockaddr_in6</code> 的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in6</span> &#123;</span></span><br><span class="line">    <span class="type">sa_family_t</span> sin6_family;   <span class="comment">// 地址族，一般为 AF_INET6</span></span><br><span class="line">    <span class="type">in_port_t</span> sin6_port;       <span class="comment">// 16 位端口号</span></span><br><span class="line">    <span class="type">uint32_t</span> sin6_flowinfo;    <span class="comment">// 流标识和流级别</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in6_addr</span> <span class="title">sin6_addr</span>;</span> <span class="comment">// IPv6 地址</span></span><br><span class="line">    <span class="type">uint32_t</span> sin6_scope_id;    <span class="comment">// 用于设置接口的标识符</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构体的主要成员包括：</p>
+<ul>
+<li><p><code>sin6_family</code>：与通用的 <code>struct sockaddr</code> 相同，表示地址族，通常设置为 <code>AF_INET6</code> 表示 IPv6 地址族。</p>
+</li>
+<li><p><code>sin6_port</code>：一个 16 位的整数，表示端口号。在网络编程中，端口号用于标识进程在主机上运行的服务。</p>
+</li>
+<li><p><code>sin6_flowinfo</code>：用于指定数据包的流信息。</p>
+</li>
+<li><p><code>sin6_addr</code>：一个 <code>struct in6_addr</code> 类型的结构体成员，用于存储 IPv6 地址信息。</p>
+</li>
+<li><p><code>sin6_scope_id</code>：用于设置接口的标识符，以标识某个特定接口。</p>
+</li>
+</ul>
+<p>与 <code>struct sockaddr_in</code> 类似，<code>struct sockaddr_in6</code> 结构体也会用于与各种函数和数据类型一起使用，例如 <code>bind()</code>、<code>connect()</code> 和 <code>accept()</code> 等函数需要将 <code>struct sockaddr_in6</code> 类型的地址信息作为参数传递。</p>
+<p>这个结构体和相关的函数使得开发者可以在 Linux 系统上进行 IPv6 网络编程，并能够方便地处理 IPv6 地址和端口信息。</p>
+<h2 id="linux-struct-sockaddr-storage详解"><a href="#linux-struct-sockaddr-storage详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_storage详解"></a>linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_storage详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>struct sockaddr_storage</code> 是一个通用的、足够大以容纳任何套接字地址结构的结构体。它被设计为一个泛型的套接字地址结构，可用于存储各种不同类型的套接字地址信息，包括 IPv4、IPv6 或其他协议族的地址信息。</p>
+<p><code>struct sockaddr_storage</code> 的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_storage</span> &#123;</span></span><br><span class="line">    <span class="type">sa_family_t</span> ss_family;  <span class="comment">// 地址族，用于指示地址的类型</span></span><br><span class="line">    <span class="type">char</span> __ss_pad1[_SS_PAD1SIZE]; <span class="comment">// 结构体填充，确保内存对齐</span></span><br><span class="line">    <span class="type">int64_t</span> __ss_align; <span class="comment">// 结构体对齐</span></span><br><span class="line">    <span class="type">char</span> __ss_pad2[_SS_PAD2SIZE]; <span class="comment">// 结构体填充，确保内存对齐</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>_SS_PAD1SIZE</code> 和 <code>_SS_PAD2SIZE</code> 是为了内存对齐而填充的大小。</p>
+<p><code>struct sockaddr_storage</code> 结构体最主要的成员是 <code>ss_family</code>，用于指示实际地址结构的类型。根据 <code>ss_family</code> 的值，可以进行类型转换，将 <code>struct sockaddr_storage</code> 转换为相应的地址结构（例如 <code>struct sockaddr_in</code> 或 <code>struct sockaddr_in6</code>），以便于处理特定类型的套接字地址。</p>
+<p><code>struct sockaddr_storage</code> 通常用于网络编程中，当你需要处理不同类型的套接字地址时，可以将不同的地址类型都转换为 <code>struct sockaddr_storage</code>，以便于统一地进行存储和传递。</p>
+<p>这个结构体的设计使得它成为一个通用的容器，可以存储不同类型的套接字地址，为网络编程提供了一定的灵活性和扩展性。</p>
+<h2 id="linux-setsockopt-详解"><a href="#linux-setsockopt-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; setsockopt()详解"></a>linux &lt;sys&#x2F;socket.h&gt; setsockopt()详解</h2><p><code>setsockopt()</code> 是 Linux 中 <code>&lt;sys/socket.h&gt;</code> 头文件中定义的函数，用于设置 socket 的选项参数。它允许对打开的 socket 进行配置和控制，以适应特定的网络通信需求。</p>
+<h3 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setsockopt</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> level, <span class="type">int</span> optname, <span class="type">const</span> <span class="type">void</span> *optval, <span class="type">socklen_t</span> optlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>sockfd</code> 是要设置选项的 socket 文件描述符。</li>
+<li><code>level</code> 是选项的协议级别，通常是 <code>SOL_SOCKET</code>（表示通用 socket 选项），也可以是特定协议的级别，如 <code>IPPROTO_TCP</code> 或 <code>IPPROTO_IP</code>。</li>
+<li><code>optname</code> 是要设置的选项名称。</li>
+<li><code>optval</code> 是一个指向存放选项值的缓冲区的指针。</li>
+<li><code>optlen</code> 是选项值的长度。</li>
+</ul>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>如果设置选项成功，返回值为 0。</li>
+<li>如果失败，返回值为 -1，并设置 <code>errno</code> 表示错误的原因。</li>
+</ul>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (sockfd == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;socket&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置 socket 选项，例如设置 SO_REUSEADDR 选项</span></span><br><span class="line">    <span class="type">int</span> optval = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &amp;optval, <span class="keyword">sizeof</span>(optval)) == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;setsockopt&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行其他操作</span></span><br><span class="line"></span><br><span class="line">    close(sockfd); <span class="comment">// 关闭 socket</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ul>
+<li><code>setsockopt()</code> 函数允许在创建 socket 后，通过设置选项对 socket 进行配置，如修改 socket 的属性、调整 socket 的行为等。</li>
+<li>例如，可以通过设置 <code>SO_REUSEADDR</code> 选项来允许地址重用，允许多个 socket 绑定到相同的地址和端口。</li>
+<li>还可以使用其他选项来调整缓冲区大小、设置超时、启用或禁用协议特性等。</li>
+</ul>
+<p>总之，<code>setsockopt()</code> 是一个用于设置 socket 选项的函数，可以根据需要配置和控制 socket 的行为，以满足特定的网络通信需求。</p>
+<h2 id="linux-socket详解"><a href="#linux-socket详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; socket详解"></a>linux &lt;sys&#x2F;socket.h&gt; socket详解</h2><p>在 Linux 中，<code>&lt;sys/socket.h&gt;</code> 头文件提供了在网络编程中使用的套接字（socket）相关的函数和宏定义。其中最重要的函数之一就是 <code>socket()</code>。</p>
+<p><code>socket()</code> 函数用于创建一个新的套接字，并返回一个文件描述符，该文件描述符用于后续对该套接字的操作，比如发送和接收数据、连接等。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>domain</code>：指定套接字的协议族（例如 <code>AF_INET</code> 表示 IPv4，<code>AF_INET6</code> 表示 IPv6 等）。</li>
+<li><code>type</code>：指定套接字的类型（例如 <code>SOCK_STREAM</code> 表示流套接字，提供可靠的、面向连接的服务，如 TCP；<code>SOCK_DGRAM</code> 表示数据报套接字，提供无连接的服务，如 UDP）。</li>
+<li><code>protocol</code>：指定协议，通常设置为 0，表示使用 <code>domain</code> 和 <code>type</code> 参数默认的协议。</li>
+</ul>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 对新创建的套接字进行后续操作，比如绑定地址、监听连接、接受连接等</span></span><br></pre></td></tr></table></figure>
+
+<p>通过 <code>socket()</code> 函数，你可以在 Linux 系统上创建不同类型的套接字，根据指定的协议族、类型和协议进行网络编程。接下来，可以使用返回的文件描述符对套接字进行各种操作，比如绑定地址、建立连接、发送和接收数据等。</p>
+<h2 id="linux-bind-详解"><a href="#linux-bind-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; bind()详解"></a>linux &lt;sys&#x2F;socket.h&gt; bind()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>bind()</code> 函数用于将一个套接字（socket）与一个特定的地址（IP 地址和端口号）绑定在一起。这个函数主要用于服务器端程序，在服务器启动时指定它所在的 IP 地址和端口号，以便客户端能够连接到该地址。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bind</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>sockfd</code>：套接字文件描述符，通过 <code>socket()</code> 函数创建的套接字描述符。</li>
+<li><code>addr</code>：指向 <code>struct sockaddr</code> 结构体的指针，包含要绑定的地址信息。</li>
+<li><code>addrlen</code>：<code>addr</code> 结构体的长度。</li>
+</ul>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">server_addr</span>;</span></span><br><span class="line">server_addr.sin_family = AF_INET;</span><br><span class="line">server_addr.sin_port = htons(PORT); <span class="comment">// 设置端口号</span></span><br><span class="line">server_addr.sin_addr.s_addr = INADDR_ANY; <span class="comment">// 将套接字绑定到任何可用的地址</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> bind_status = bind(sockfd, (<span class="keyword">struct</span> sockaddr *)&amp;server_addr, <span class="keyword">sizeof</span>(server_addr));</span><br><span class="line"><span class="keyword">if</span> (bind_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;bind failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>bind()</code> 函数将创建的套接字 <code>sockfd</code> 与 <code>struct sockaddr_in</code> 结构体中指定的 IP 地址和端口号绑定在一起。对于服务器程序，<code>bind()</code> 通常在 <code>socket()</code> 之后立即调用，以指定服务器将要监听的地址和端口。</p>
+<p>绑定成功后，服务器可以使用该地址接收来自客户端的连接请求。如果绑定失败，<code>bind()</code> 将返回一个负值，并且可以通过 <code>perror()</code> 函数打印错误信息。</p>
+<p>需要注意的是，在使用 <code>bind()</code> 函数之前，确保指定的端口号没有被其他进程占用，并且有足够的权限来绑定该地址。</p>
+<h2 id="linux-listen-详解"><a href="#linux-listen-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; listen()详解"></a>linux &lt;sys&#x2F;socket.h&gt; listen()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>listen()</code> 函数用于将指定的套接字（socket）转换为被动监听套接字，即将套接字用于接受连接请求，并指定服务器套接字可以排队等待的最大连接请求数量。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">listen</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> backlog)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>sockfd</code>：套接字文件描述符，通过 <code>socket()</code> 函数创建的套接字描述符。</li>
+<li><code>backlog</code>：指定等待连接队列的最大长度，即允许排队等待的最大连接请求数量。</li>
+</ul>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">server_addr</span>;</span></span><br><span class="line"><span class="comment">// 填充 server_addr 结构体...</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> bind_status = bind(sockfd, (<span class="keyword">struct</span> sockaddr *)&amp;server_addr, <span class="keyword">sizeof</span>(server_addr));</span><br><span class="line"><span class="keyword">if</span> (bind_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;bind failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> listen_status = listen(sockfd, <span class="number">5</span>); <span class="comment">// 允许最多 5 个连接请求排队等待处理</span></span><br><span class="line"><span class="keyword">if</span> (listen_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;listen failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>listen()</code> 函数将创建的套接字 <code>sockfd</code> 转换为一个被动监听套接字，允许最多 5 个连接请求排队等待处理。这表示如果有更多的连接请求到达服务器但尚未被处理，它们将被拒绝或者等待，直到服务器处理当前排队的连接请求。</p>
+<p><code>listen()</code> 函数通常在调用 <code>bind()</code> 函数之后，并且在调用 <code>accept()</code> 函数之前调用。当套接字处于监听状态时，服务器可以使用 <code>accept()</code> 函数接受连接请求并创建新的套接字用于与客户端通信。</p>
+<h2 id="linux-accept-详解"><a href="#linux-accept-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; accept()详解"></a>linux &lt;sys&#x2F;socket.h&gt; accept()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>accept()</code> 函数用于从被动监听套接字（listening socket）接受客户端的连接请求，创建一个新的连接套接字，并返回一个新的文件描述符，通过该文件描述符可以与客户端进行通信。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">accept</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> *addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>sockfd</code>：被监听的套接字文件描述符，通过 <code>socket()</code> 函数创建并经过 <code>bind()</code> 和 <code>listen()</code> 的设置。</li>
+<li><code>addr</code>：用于存储客户端地址信息的结构体指针，当成功建立连接时，此结构体将填充为客户端的地址信息。</li>
+<li><code>addrlen</code>：<code>addr</code> 结构体的长度指针，接受的客户端地址信息的长度。</li>
+</ul>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">server_addr</span>;</span></span><br><span class="line"><span class="comment">// 填充 server_addr 结构体...</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> bind_status = bind(sockfd, (<span class="keyword">struct</span> sockaddr *)&amp;server_addr, <span class="keyword">sizeof</span>(server_addr));</span><br><span class="line"><span class="keyword">if</span> (bind_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;bind failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> listen_status = listen(sockfd, <span class="number">5</span>);</span><br><span class="line"><span class="keyword">if</span> (listen_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;listen failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">client_addr</span>;</span></span><br><span class="line"><span class="type">socklen_t</span> client_addrlen = <span class="keyword">sizeof</span>(client_addr);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> new_socket = accept(sockfd, (<span class="keyword">struct</span> sockaddr *)&amp;client_addr, &amp;client_addrlen);</span><br><span class="line"><span class="keyword">if</span> (new_socket &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;accept failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>accept()</code> 函数从被监听套接字 <code>sockfd</code> 中接受连接请求，并创建了一个新的套接字 <code>new_socket</code>，用于与客户端进行通信。同时，<code>accept()</code> 将填充 <code>client_addr</code> 结构体，包含客户端的地址信息。</p>
+<p><code>accept()</code> 函数在服务器端通常用于循环中，每次调用 <code>accept()</code> 都会接受一个新的连接请求，返回一个新的套接字用于与新客户端进行通信。这样服务器可以同时处理多个客户端的连接请求。</p>
+<h2 id="linux-connect-详解"><a href="#linux-connect-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; connect()详解"></a>linux &lt;sys&#x2F;socket.h&gt; connect()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>connect()</code> 函数用于建立与远程服务器的连接。它被用于客户端程序，用于向服务器发起连接请求。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">connect</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>sockfd</code>：客户端套接字文件描述符，通过 <code>socket()</code> 函数创建的套接字描述符。</li>
+<li><code>addr</code>：指向 <code>struct sockaddr</code> 结构体的指针，包含要连接的目标地址信息。</li>
+<li><code>addrlen</code>：<code>addr</code> 结构体的长度。</li>
+</ul>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">server_addr</span>;</span></span><br><span class="line"><span class="comment">// 填充 server_addr 结构体...</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> connect_status = connect(sockfd, (<span class="keyword">struct</span> sockaddr *)&amp;server_addr, <span class="keyword">sizeof</span>(server_addr));</span><br><span class="line"><span class="keyword">if</span> (connect_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;connection failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>connect()</code> 函数用于将客户端套接字 <code>sockfd</code> 连接到指定的服务器地址 <code>server_addr</code>。如果连接成功，<code>connect()</code> 函数返回 0，如果连接失败，它会返回 -1，并可以通过 <code>perror()</code> 函数输出错误信息。</p>
+<p><code>connect()</code> 在客户端通常用于发起连接，如果连接成功建立，客户端可以随后使用 <code>send()</code> 和 <code>recv()</code> 函数发送和接收数据。连接失败可能由多种原因引起，例如服务器不可达、连接超时等，因此在实际使用时，通常需要适当处理连接失败的情况。</p>
+<h2 id="linux-send-详解"><a href="#linux-send-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; send()详解"></a>linux &lt;sys&#x2F;socket.h&gt; send()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>send()</code> 函数用于通过套接字发送数据到连接的另一端（对于面向连接的套接字，如 TCP 套接字）。这个函数通常用于客户端和服务器之间进行数据通信。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">send</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>sockfd</code>：套接字文件描述符，通过 <code>socket()</code> 函数创建的套接字描述符。</li>
+<li><code>buf</code>：指向包含要发送数据的缓冲区的指针。</li>
+<li><code>len</code>：要发送的数据的长度。</li>
+<li><code>flags</code>：用于指定发送操作的附加选项，通常设置为 0。</li>
+</ul>
+<p>返回值是发送的字节数。如果出现错误，返回 -1，并可以通过 <code>errno</code> 全局变量获取错误码。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 假设 buffer 已经包含了要发送的数据</span></span><br><span class="line"><span class="type">char</span> buffer[<span class="number">1024</span>] = <span class="string">&quot;Hello, server!&quot;</span>;</span><br><span class="line"><span class="type">int</span> send_status = send(sockfd, buffer, <span class="built_in">strlen</span>(buffer), <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (send_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;send failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>send()</code> 函数用于将存储在 <code>buffer</code> 中的数据通过套接字 <code>sockfd</code> 发送给连接的另一端。如果发送成功，<code>send()</code> 函数返回发送的字节数，如果发送失败，它会返回 -1，并可以通过 <code>perror()</code> 函数输出错误信息。</p>
+<p><code>send()</code> 函数通常与 <code>recv()</code> 函数一起使用，在客户端和服务器之间进行双向数据传输。</p>
+<h2 id="linux-recv-详解"><a href="#linux-recv-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; recv()详解"></a>linux &lt;sys&#x2F;socket.h&gt; recv()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>recv()</code> 函数用于从套接字接收数据，即从连接的另一端（对于面向连接的套接字，如 TCP 套接字）接收数据。这个函数通常用于客户端和服务器之间进行数据通信。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">recv</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><code>sockfd</code>：套接字文件描述符，通过 <code>socket()</code> 函数创建的套接字描述符。</li>
+<li><code>buf</code>：指向存储接收数据的缓冲区的指针。</li>
+<li><code>len</code>：缓冲区的长度，即要接收的数据的最大字节数。</li>
+<li><code>flags</code>：用于指定接收操作的附加选项，通常设置为 0。</li>
+</ul>
+<p>返回值是接收的字节数。如果出现错误，返回 -1，并可以通过 <code>errno</code> 全局变量获取错误码。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">char</span> buffer[<span class="number">1024</span>];</span><br><span class="line"><span class="type">int</span> recv_status = recv(sockfd, buffer, <span class="keyword">sizeof</span>(buffer), <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (recv_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;receive failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (recv_status == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Connection closed by peer\n&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Received data: %s\n&quot;</span>, buffer);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>recv()</code> 函数用于从套接字 <code>sockfd</code> 接收数据，并将接收到的数据存储在 <code>buffer</code> 缓冲区中。如果接收成功，<code>recv()</code> 函数返回接收到的字节数，如果接收失败，它会返回 -1，并可以通过 <code>perror()</code> 函数输出错误信息。</p>
+<p>需要注意的是，<code>recv()</code> 函数在接收数据时会阻塞程序的执行，直到有数据可用或者发生错误。因此，通常在实际应用中，需要结合其他逻辑或者循环来处理接收数据的情况。</p>
+<h2 id="linux-close-详解"><a href="#linux-close-详解" class="headerlink" title="linux &lt;sys&#x2F;socket.h&gt; close()详解"></a>linux &lt;sys&#x2F;socket.h&gt; close()详解</h2><p>在 Linux 的 <code>&lt;sys/socket.h&gt;</code> 头文件中，<code>close()</code> 函数用于关闭一个文件描述符，包括套接字描述符。在网络编程中，当不再需要使用一个套接字时，应该通过 <code>close()</code> 函数来关闭它，释放资源并结束与该套接字相关联的连接。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">close</span><span class="params">(<span class="type">int</span> sockfd)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>sockfd</code> 是要关闭的套接字文件描述符。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">if</span> (sockfd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;socket creation failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 其他操作，比如连接、数据传输等...</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> close_status = close(sockfd);</span><br><span class="line"><span class="keyword">if</span> (close_status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;close failed&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>close()</code> 函数被用于关闭之前通过 <code>socket()</code> 函数创建的套接字描述符 <code>sockfd</code>。如果关闭成功，<code>close()</code> 函数返回 0，如果关闭失败，它会返回 -1，并可以通过 <code>perror()</code> 函数输出错误信息。</p>
+<p>在网络编程中，及时关闭不再使用的套接字是很重要的，这可以防止资源泄漏和不必要的资源占用。</p>
+<h2 id="sys-socket-h"><a href="#sys-socket-h" class="headerlink" title="sys&#x2F;socket.h"></a>sys&#x2F;socket.h</h2><ul>
+<li>套接字常量、类型和函数的声明。</li>
+</ul>
+<h3 id="socket"><a href="#socket" class="headerlink" title="socket()"></a>socket()</h3><ul>
+<li>简述：创建一个<code>type</code>类型，<code>domain</code>协议簇，<code>protocol</code>通信协议的socket，并返回一个文件描述符</li>
+<li>声明：<code>int socket(int domain, int type, int protocol);</code></li>
+<li>参数：<ul>
+<li><code>domain</code>  –  选择所用的协议族<ul>
+<li><code>AF_INET</code>，代表IPv4</li>
+<li><code>AF_INET6</code>，代表IPv6</li>
+</ul>
+</li>
+<li><code>type</code>    –  <ul>
+<li><code>SOCK_STREAM</code>, 表示有序，可靠，双工，面向连接的字节流，通常由TCP实现</li>
+<li><code>SOCK_DGRAM</code>,  通过定长的，不可靠消息提供无连接通信，通常由UDP实现</li>
+</ul>
+</li>
+<li><code>protocol</code> – 指定特定的通信type使用的协议。<ul>
+<li>在大多数实现中，每个type参数只能使用一种协议。</li>
+<li><code>SOCK_STREAM</code>,使用<code>IPPROTO_TCP</code></li>
+<li><code>SOCK_DGRAM</code>, 使用<code>IPPROTO_UDP</code></li>
+<li>如果参数为0，则默认设置为1</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功  –  返回文件描述符</li>
+<li>失败  –</li>
+</ul>
+</li>
+</ul>
+<h3 id="socketpair"><a href="#socketpair" class="headerlink" title="socketpair()"></a>socketpair()</h3><ul>
+<li>简述：创建两个<code>type</code>类型，<code>domain</code>协议簇，<code>protocol</code>通信协议的，互相连接的socket，将文件描述符放在<code>fds[0]</code>和<code>fds[1]</code></li>
+<li>声明：<code>int socketpair(int domain, int type, int protocol, int fds[2]);</code></li>
+<li>参数：<ul>
+<li><code>domain</code>  –  选择所用的协议族<ul>
+<li><code>AF_INET</code>，代表IPv4</li>
+<li><code>AF_INET6</code>，代表IPv6</li>
+</ul>
+</li>
+<li><code>type</code>    –  <ul>
+<li><code>SOCK_STREAM</code>, 表示有序，可靠，双工，面向连接的字节流，通常由TCP实现</li>
+<li><code>SOCK_DGRAM</code>,  通过定长的，不可靠消息提供无连接通信，通常由UDP实现</li>
+</ul>
+</li>
+<li><code>protocol</code> – 指定特定的通信type使用的协议。<ul>
+<li>在大多数实现中，每个type参数只能使用一种协议。</li>
+<li><code>SOCK_STREAM</code>,使用<code>IPPROTO_TCP</code></li>
+<li><code>SOCK_DGRAM</code>, 使用<code>IPPROTO_UDP</code></li>
+<li>如果参数为0，则默认设置为1</li>
+</ul>
+</li>
+<li><code>fds[2]</code>  –  存放两个文件描述符的数组  –  Input&#x2F;Output</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功  –  返回0</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="bind"><a href="#bind" class="headerlink" title="bind()"></a>bind()</h3><ul>
+<li>简述：将套接字通信端点的句柄(<code>socket FD</code>)与一个特定的逻辑网络连接关联起来</li>
+<li>声明：<code>int bind(int fd, const struct sockaddr *address, socklen_t address_len);</code></li>
+<li>参数：<ul>
+<li><code>fd</code>       –  通信端点的文件描述符</li>
+<li><code>address</code>  –  关联的地址</li>
+<li><code>len</code>      –  地址字节长度(the local address which is LEN bytes long)</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功  –  返回0</li>
+<li>失败  –  返回-1，并设置errno</li>
+</ul>
+</li>
+</ul>
+<h3 id="getsockname"><a href="#getsockname" class="headerlink" title="getsockname()"></a>getsockname()</h3><ul>
+<li>简述：通过本地文件描述符的地址和长度(单位:byte)，获取socket名字</li>
+<li>声明：<code>int getsockname(int fd, const struct sockaddr *address, socklent *len);</code></li>
+<li>参数：<ul>
+<li><code>fd</code>  –  文件描述符</li>
+<li><code>address</code>  –  地址</li>
+<li><code>len</code>      –  长度</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功  – </li>
+<li>失败  –</li>
+</ul>
+</li>
+</ul>
+<h3 id="connect"><a href="#connect" class="headerlink" title="connect()"></a>connect()</h3><ul>
+<li>简述：创建一个socket文件描述符和地址的连接</li>
+<li>声明：<code>int connect(int fd, const struct sockaddr *addr, socklent_t len);</code></li>
+<li>参数：<ul>
+<li><code>fd</code>  –  文件描述符</li>
+<li><code>addr</code> –  要连接的地址</li>
+<li><code>len</code>  –  地址的长度(单位：字节)</li>
+</ul>
+</li>
+<li>返回值：  <ul>
+<li>成功  –  返回0</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="send"><a href="#send" class="headerlink" title="send()"></a>send()</h3><ul>
+<li>简述：发送N字节的BUF到socket FD。返回发送的数字或-1。</li>
+<li>声明：<code>ssize_t send (int fd, const void *buf, size_t n, int flags);</code></li>
+<li>参数：</li>
+<li>返回值：</li>
+</ul>
+<h3 id="recv"><a href="#recv" class="headerlink" title="recv()"></a>recv()</h3><ul>
+<li>简述：从socket FD中读取N个字节，并输入到BUF中</li>
+<li>声明：<code>ssize_t recv(int fd, void *buf, size_t n, int flags);</code></li>
+<li>参数：<ul>
+<li><code>fd</code>  –  文件描述符</li>
+<li><code>buf</code> –  要存放的缓冲区</li>
+<li><code>n</code>   –  读取的数据大小</li>
+<li><code>flags</code> –</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功  –  返回读取的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="sendto"><a href="#sendto" class="headerlink" title="sendto()"></a>sendto()</h3><ul>
+<li>简述：在socket FD上向地址ADDR(长度为ADDR_LEN)发送N个字节的BUF</li>
+<li>声明：<ul>
+<li><code>ssize_t sendto(int fd, const void *buf, size_t n, int flags, const struct *addr, socklen_t addr_len);</code></li>
+</ul>
+</li>
+<li>参数：</li>
+<li>返回值：<ul>
+<li>成功  –  返回发送的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="recvfrom"><a href="#recvfrom" class="headerlink" title="recvfrom()"></a>recvfrom()</h3><ul>
+<li>简述：通过socket FD读取N个字节到BUF</li>
+<li>声明：<code>ssize_t recvfrom(int fd, void *buf, size_t n, int flags, const struct *addr, socklen_t addr_len);</code></li>
+<li>参数：</li>
+<li>返回值：<ul>
+<li>成功  –  返回读取的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+<li>注意：<ul>
+<li>如果ADDR不为空，将其<code>*ADDR_LEN</code>字节填充为发送方的地址，并将地址的实际大小存储在<code>*ADDR_LEN</code>中。返回读取的字节数或-1错误</li>
+</ul>
+</li>
+</ul>
+<h3 id="sendmsg"><a href="#sendmsg" class="headerlink" title="sendmsg()"></a>sendmsg()</h3><ul>
+<li>简述：在socket FD上发送一个由MESSAGE描述的信息</li>
+<li>声明：<code>ssize_t sendmsg(int fd, const struct msghdr *message, int flags);</code></li>
+<li>参数：</li>
+<li>返回值：<ul>
+<li>成功  –  返回发送的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="recvmsg"><a href="#recvmsg" class="headerlink" title="recvmsg()"></a>recvmsg()</h3><ul>
+<li>简述：从socket FD接收一个由MESSAGE描述的信息</li>
+<li>声明：<code>ssize_t recvmsg(int fd, struct msghdr *message, int flags);</code></li>
+<li>参数：</li>
+<li>返回值：<ul>
+<li>成功  –  返回接收到的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="getsockopt"><a href="#getsockopt" class="headerlink" title="getsockopt()"></a>getsockopt()</h3><ul>
+<li>简述：将套接字<code>FD</code>的选项<code>OPTNAME</code>在协议级别<code>level</code>上的当前值放入<code>OPTVAL</code> (<code>*OPTLEN</code>字节长)，并将<code>*OPTLEN</code>设置为该值的实际长度</li>
+<li>声明：<code>int getsockopt(int fd, int level, int optname, void *optval, socklen_t *optlen);</code></li>
+<li>返回值：<ul>
+<li>成功  –  返回接收到的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="setsockopt"><a href="#setsockopt" class="headerlink" title="setsockopt()"></a>setsockopt()</h3><ul>
+<li>简述：设置套接字<code>FD</code>的选项<code>OPTNAME</code>在协议级别<code>level</code>为<code>*OPTVAL</code> (<code>OPTLEN</code>字节长)</li>
+<li>声明：<code>int setsockopt(int fd, int level, int optname, const void *optval, socklen_t optlen);</code></li>
+<li>返回值：<ul>
+<li>成功  –  返回接收到的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="listen"><a href="#listen" class="headerlink" title="listen()"></a>listen()</h3><ul>
+<li>简述：准备接受套接字FD上的连接。在进一步的请求被拒绝之前，将有N个连接请求排队</li>
+<li>声明：<code>int listen(int fd, int n);</code></li>
+<li>返回值：<ul>
+<li>成功  –  返回接收到的字节数</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="accept"><a href="#accept" class="headerlink" title="accept()"></a>accept()</h3><ul>
+<li>简述：在套接字FD上等待连接.<ul>
+<li>当连接到达时，打开一个新的套接字与之通信，将<code>*ADDR (*ADDR_LEN字节长)</code>设置为连接对等体的地址，将<code>*ADDR_LEN</code>设置为地址的实际长度，</li>
+<li>并返回新套接字的描述符，错误则返回-1</li>
+</ul>
+</li>
+<li>声明：<code>int accept(int fd, const struct sockaddr *addr, socklen_t *addr_len);</code></li>
+<li>返回值：<ul>
+<li>成功  –  新套接字的描述符</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+<h3 id="shutdown"><a href="#shutdown" class="headerlink" title="shutdown()"></a>shutdown()</h3><ul>
+<li>简述：关闭套接字FD上打开的全部或部分连接</li>
+<li>声明：<code>int shutdown(int fd, int how);</code></li>
+<li>参数：<ul>
+<li><code>fd</code>  –  套接字文件描述符</li>
+<li><code>how</code>  –<ul>
+<li><code>SHUT_RD</code>  –  不再接收连接</li>
+<li><code>SHUT_WR</code>  –  不再传输数据</li>
+<li><code>SHUT_RDWR</code>  –  不再传输数据和接收连接</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功  –  返回0</li>
+<li>失败  –  返回-1</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CNetwork/" rel="tag"># CNetwork</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_10_sys_types_h/" rel="prev" title="C_5_10_sys_types_h">
+      <i class="fa fa-chevron-left"></i> C_5_10_sys_types_h
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_6_network_%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/2024-05-22-C_6_4_sys_epoll_h/" rel="next" title="C_6_4_sys_epoll_h">
+      C_6_4_sys_epoll_h <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt;是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt;详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">数据结构：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E9%87%8F%E5%92%8C%E5%AE%8F%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">常量和宏定义：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-struct-sockaddr%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; struct sockaddr详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-struct-sockaddr-in%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_in详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-struct-sockaddr-in6%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_in6详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-struct-sockaddr-storage%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; struct sockaddr_storage详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-setsockopt-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; setsockopt()详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B"><span class="nav-number">8.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">8.2.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">8.3.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">8.4.</span> <span class="nav-text">作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-socket%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; socket详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-bind-%E8%AF%A6%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; bind()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-listen-%E8%AF%A6%E8%A7%A3"><span class="nav-number">11.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; listen()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-accept-%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; accept()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-connect-%E8%AF%A6%E8%A7%A3"><span class="nav-number">13.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; connect()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-send-%E8%AF%A6%E8%A7%A3"><span class="nav-number">14.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; send()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-recv-%E8%AF%A6%E8%A7%A3"><span class="nav-number">15.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; recv()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-close-%E8%AF%A6%E8%A7%A3"><span class="nav-number">16.</span> <span class="nav-text">linux &lt;sys&#x2F;socket.h&gt; close()详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sys-socket-h"><span class="nav-number">17.</span> <span class="nav-text">sys&#x2F;socket.h</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#socket"><span class="nav-number">17.1.</span> <span class="nav-text">socket()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#socketpair"><span class="nav-number">17.2.</span> <span class="nav-text">socketpair()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bind"><span class="nav-number">17.3.</span> <span class="nav-text">bind()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getsockname"><span class="nav-number">17.4.</span> <span class="nav-text">getsockname()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#connect"><span class="nav-number">17.5.</span> <span class="nav-text">connect()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#send"><span class="nav-number">17.6.</span> <span class="nav-text">send()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#recv"><span class="nav-number">17.7.</span> <span class="nav-text">recv()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sendto"><span class="nav-number">17.8.</span> <span class="nav-text">sendto()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#recvfrom"><span class="nav-number">17.9.</span> <span class="nav-text">recvfrom()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sendmsg"><span class="nav-number">17.10.</span> <span class="nav-text">sendmsg()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#recvmsg"><span class="nav-number">17.11.</span> <span class="nav-text">recvmsg()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getsockopt"><span class="nav-number">17.12.</span> <span class="nav-text">getsockopt()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setsockopt"><span class="nav-number">17.13.</span> <span class="nav-text">setsockopt()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#listen"><span class="nav-number">17.14.</span> <span class="nav-text">listen()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accept"><span class="nav-number">17.15.</span> <span class="nav-text">accept()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shutdown"><span class="nav-number">17.16.</span> <span class="nav-text">shutdown()</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

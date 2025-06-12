@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 C++ 标准库  C++ 标准库&lt;initializer_list&gt; 是 C++11 引入的头文件，用于支持初始化列表（Initializer List）功能。它提供了一个模板类 std::initializer_list，用于表示一个初始化列表，允许在容器和其他类型中以类似数组的形式初始化对象。 std::initializer_list 概述 std::initializer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_10_20_initializer_list">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_20_initializer_list/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 C++ 标准库  C++ 标准库&lt;initializer_list&gt; 是 C++11 引入的头文件，用于支持初始化列表（Initializer List）功能。它提供了一个模板类 std::initializer_list，用于表示一个初始化列表，允许在容器和其他类型中以类似数组的形式初始化对象。 std::initializer_list 概述 std::initializer">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.184Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppSTL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_20_initializer_list/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_10_20_initializer_list | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_20_initializer_list/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_10_20_initializer_list
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>C++ <initializer_list>标准库</li>
+</ul>
+<h2 id="C-标准库"><a href="#C-标准库" class="headerlink" title="C++ 标准库"></a>C++ <initializer_list>标准库</h2><p><code>&lt;initializer_list&gt;</code> 是 C++11 引入的头文件，用于支持初始化列表（Initializer List）功能。它提供了一个模板类 <code>std::initializer_list</code>，用于表示一个初始化列表，允许在容器和其他类型中以类似数组的形式初始化对象。</p>
+<h3 id="std-initializer-list-概述"><a href="#std-initializer-list-概述" class="headerlink" title="std::initializer_list 概述"></a>std::initializer_list 概述</h3><ul>
+<li><code>std::initializer_list</code> 是一个模板类，定义在 <code>&lt;initializer_list&gt;</code> 头文件中。</li>
+<li>它提供了一种轻便的语法，允许用花括号 <code>&#123;&#125;</code> 列表初始化特定类型的对象。</li>
+<li>这个类是一个轻量级的封装器，可以在构造函数或函数参数中方便地传递初始化列表。</li>
+</ul>
+<h3 id="基本用法示例："><a href="#基本用法示例：" class="headerlink" title="基本用法示例："></a>基本用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;initializer_list&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">printList</span><span class="params">(std::initializer_list&lt;<span class="type">int</span>&gt; list)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> elem : list) &#123;</span><br><span class="line">        std::cout &lt;&lt; elem &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::initializer_list&lt;<span class="type">int</span>&gt; numbers = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用 initializer_list 初始化对象</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Initialized list: &quot;</span>;</span><br><span class="line">    <span class="built_in">printList</span>(&#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主要特点和用途："><a href="#主要特点和用途：" class="headerlink" title="主要特点和用途："></a>主要特点和用途：</h3><ul>
+<li>允许以列表初始化的方式传递多个值给函数或容器。</li>
+<li>用于简化容器、类或函数的构造函数，使得初始化更为方便。</li>
+<li>可用于自定义函数或类的构造函数，以便更轻松地处理多个参数的初始化。</li>
+</ul>
+<p><code>std::initializer_list</code> 的出现使得初始化更加简洁和灵活，它适用于许多场景，例如容器初始化、函数参数传递等，使得代码更具可读性和易用性。</p>
+<h2 id="C-标准库-详解"><a href="#C-标准库-详解" class="headerlink" title="C++ 标准库 详解"></a>C++ <initializer_list>标准库 详解</h2><p><code>&lt;initializer_list&gt;</code> 是 C++11 引入的标准库头文件，其中定义了 <code>std::initializer_list</code> 类模板。它提供了初始化列表（initializer list）功能，允许以列表的形式初始化多个值，用于在构造函数或函数参数中传递多个值。</p>
+<h3 id="std-initializer-list-概述："><a href="#std-initializer-list-概述：" class="headerlink" title="std::initializer_list 概述："></a><code>std::initializer_list</code> 概述：</h3><ul>
+<li><strong>头文件：</strong> <code>&lt;initializer_list&gt;</code></li>
+<li><strong>类模板：</strong> <code>std::initializer_list&lt;T&gt;</code></li>
+</ul>
+<h3 id="主要特点和用途：-1"><a href="#主要特点和用途：-1" class="headerlink" title="主要特点和用途："></a>主要特点和用途：</h3><ol>
+<li><p><strong>初始化列表的表示：</strong></p>
+<ul>
+<li><code>std::initializer_list</code> 是一个轻量级容器，用于保存多个同类型元素的列表。</li>
+<li>使用花括号 <code>&#123;&#125;</code> 包围元素来构造初始化列表。</li>
+</ul>
+</li>
+<li><p><strong>在函数参数中使用：</strong></p>
+<ul>
+<li>可以作为函数的参数，允许以初始化列表的形式传递多个值给函数。</li>
+<li>通过此特性可以轻松传递多个参数给函数，方便进行函数调用。</li>
+</ul>
+</li>
+<li><p><strong>类和容器中的应用：</strong></p>
+<ul>
+<li>类的构造函数可以接受 <code>std::initializer_list</code> 作为参数，允许通过初始化列表对类的成员进行初始化。</li>
+<li>STL 容器如 <code>std::vector</code>、<code>std::array</code>、<code>std::map</code> 等也可以使用初始化列表来初始化元素。</li>
+</ul>
+</li>
+<li><p><strong>用于范围迭代：</strong></p>
+<ul>
+<li>提供了 begin() 和 end() 方法，允许通过迭代器访问初始化列表的元素。</li>
+</ul>
+</li>
+</ol>
+<h3 id="示例代码："><a href="#示例代码：" class="headerlink" title="示例代码："></a>示例代码：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;initializer_list&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数接受 initializer_list 作为参数</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">printList</span><span class="params">(std::initializer_list&lt;<span class="type">int</span>&gt; list)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> elem : list) &#123;</span><br><span class="line">        std::cout &lt;&lt; elem &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 初始化列表示例</span></span><br><span class="line">    std::initializer_list&lt;<span class="type">int</span>&gt; numbers = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 initializer_list 初始化对象</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Initialized list: &quot;</span>;</span><br><span class="line">    <span class="built_in">printList</span>(&#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::initializer_list</code> 在 C++ 中提供了一种便捷的方式来处理初始化列表，使得在构造函数或函数参数中传递多个值变得更加方便和直观。</p>
+<h2 id="C-标准库-常用的类和函数"><a href="#C-标准库-常用的类和函数" class="headerlink" title="C++ 标准库 常用的类和函数"></a>C++ <initializer_list>标准库 常用的类和函数</h2><p>在 <code>&lt;initializer_list&gt;</code> 头文件中主要定义了 <code>std::initializer_list</code> 类模板，该模板提供了一些常用的函数和方法来操作初始化列表。下面是 <code>std::initializer_list</code> 常用的类和方法：</p>
+<h3 id="类："><a href="#类：" class="headerlink" title="类："></a>类：</h3><ul>
+<li><strong><code>std::initializer_list&lt;T&gt;</code>：</strong> 这是一个类模板，表示一个初始化列表，其中 <code>T</code> 是元素的类型。</li>
+</ul>
+<h3 id="主要方法和功能："><a href="#主要方法和功能：" class="headerlink" title="主要方法和功能："></a>主要方法和功能：</h3><ul>
+<li><p><strong>构造函数：</strong></p>
+<ul>
+<li><code>initializer_list</code> 的构造函数没有公开的构造函数。它是一个轻量级的容器类，由编译器隐式创建和管理。</li>
+</ul>
+</li>
+<li><p><strong>成员函数：</strong></p>
+<ul>
+<li><strong><code>size()</code>：</strong> 返回初始化列表中元素的数量。</li>
+<li><strong><code>begin()</code>：</strong> 返回指向初始化列表第一个元素的指针或迭代器。</li>
+<li><strong><code>end()</code>：</strong> 返回指向初始化列表末尾（最后一个元素之后）的指针或迭代器。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例代码：-1"><a href="#示例代码：-1" class="headerlink" title="示例代码："></a>示例代码：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;initializer_list&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">printList</span><span class="params">(<span class="type">const</span> std::initializer_list&lt;<span class="type">int</span>&gt;&amp; list)</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Size of list: &quot;</span> &lt;&lt; list.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Elements: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = list.<span class="built_in">begin</span>(); it != list.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">        std::cout &lt;&lt; *it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::initializer_list&lt;<span class="type">int</span>&gt; numbers = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 size() 方法获取初始化列表的大小</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Size of numbers: &quot;</span> &lt;&lt; numbers.<span class="built_in">size</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 begin() 和 end() 方法进行迭代</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Elements of numbers: &quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = numbers.<span class="built_in">begin</span>(); it != numbers.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">        std::cout &lt;&lt; *it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用函数并传递初始化列表</span></span><br><span class="line">    <span class="built_in">printList</span>(&#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>std::initializer_list</code> 的 <code>size()</code>、<code>begin()</code> 和 <code>end()</code> 成员函数来访问和操作初始化列表的元素。</p>
+<h2 id="std-initializer-list"><a href="#std-initializer-list" class="headerlink" title="std::initializer_list"></a>std::initializer_list</h2><p><code>std::initializer_list</code> 是 C++ 标准库提供的模板类，位于 <code>&lt;initializer_list&gt;</code> 头文件中。它用于表示初始化列表，允许以列表的形式初始化多个值，通常用于构造函数或函数参数中传递多个值。</p>
+<h3 id="std-initializer-list-概述：-1"><a href="#std-initializer-list-概述：-1" class="headerlink" title="std::initializer_list 概述："></a>std::initializer_list 概述：</h3><ul>
+<li><strong>头文件：</strong> <code>&lt;initializer_list&gt;</code></li>
+<li><strong>类模板：</strong> <code>std::initializer_list&lt;T&gt;</code></li>
+</ul>
+<h3 id="主要特点和用途：-2"><a href="#主要特点和用途：-2" class="headerlink" title="主要特点和用途："></a>主要特点和用途：</h3><ol>
+<li><p><strong>初始化列表的表示：</strong></p>
+<ul>
+<li><code>std::initializer_list</code> 是一个轻量级容器，用于保存多个同类型元素的列表。</li>
+<li>使用花括号 <code>&#123;&#125;</code> 包围元素来构造初始化列表。</li>
+</ul>
+</li>
+<li><p><strong>在函数参数中使用：</strong></p>
+<ul>
+<li>可以作为函数的参数，允许以初始化列表的形式传递多个值给函数。</li>
+<li>通过此特性可以轻松传递多个参数给函数，方便进行函数调用。</li>
+</ul>
+</li>
+<li><p><strong>类和容器中的应用：</strong></p>
+<ul>
+<li>类的构造函数可以接受 <code>std::initializer_list</code> 作为参数，允许通过初始化列表对类的成员进行初始化。</li>
+<li>STL 容器如 <code>std::vector</code>、<code>std::array</code>、<code>std::map</code> 等也可以使用初始化列表来初始化元素。</li>
+</ul>
+</li>
+<li><p><strong>用于范围迭代：</strong></p>
+<ul>
+<li>提供了 <code>begin()</code> 和 <code>end()</code> 方法，允许通过迭代器访问初始化列表的元素。</li>
+</ul>
+</li>
+</ol>
+<h3 id="示例代码：-2"><a href="#示例代码：-2" class="headerlink" title="示例代码："></a>示例代码：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;initializer_list&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">printList</span><span class="params">(std::initializer_list&lt;<span class="type">int</span>&gt; list)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> elem : list) &#123;</span><br><span class="line">        std::cout &lt;&lt; elem &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 初始化列表示例</span></span><br><span class="line">    std::initializer_list&lt;<span class="type">int</span>&gt; numbers = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 initializer_list 初始化对象</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Initialized list: &quot;</span>;</span><br><span class="line">    <span class="built_in">printList</span>(&#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::initializer_list</code> 在 C++ 中提供了一种便捷的方式来处理初始化列表，使得在构造函数或函数参数中传递多个值变得更加方便和直观。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppSTL/" rel="tag"># CppSTL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_19_functional/" rel="prev" title="C++_10_19_functional">
+      <i class="fa fa-chevron-left"></i> C++_10_19_functional
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_17_fstream/" rel="next" title="C++_10_17_fstream">
+      C++_10_17_fstream <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">C++ 标准库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#std-initializer-list-%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">std::initializer_list 概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">基本用法示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%89%B9%E7%82%B9%E5%92%8C%E7%94%A8%E9%80%94%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">主要特点和用途：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">C++ 标准库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#std-initializer-list-%E6%A6%82%E8%BF%B0%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">std::initializer_list 概述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%89%B9%E7%82%B9%E5%92%8C%E7%94%A8%E9%80%94%EF%BC%9A-1"><span class="nav-number">3.2.</span> <span class="nav-text">主要特点和用途：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">示例代码：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B1%BB%E5%92%8C%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">C++ 标准库 常用的类和函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95%E5%92%8C%E5%8A%9F%E8%83%BD%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">主要方法和功能：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%9A-1"><span class="nav-number">4.3.</span> <span class="nav-text">示例代码：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-initializer-list"><span class="nav-number">5.</span> <span class="nav-text">std::initializer_list</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#std-initializer-list-%E6%A6%82%E8%BF%B0%EF%BC%9A-1"><span class="nav-number">5.1.</span> <span class="nav-text">std::initializer_list 概述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%89%B9%E7%82%B9%E5%92%8C%E7%94%A8%E9%80%94%EF%BC%9A-2"><span class="nav-number">5.2.</span> <span class="nav-text">主要特点和用途：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%9A-2"><span class="nav-number">5.3.</span> <span class="nav-text">示例代码：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

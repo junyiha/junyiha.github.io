@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 loginctl命令  linux loginctl命令 详解loginctl 是一个用于查看和管理用户登录会话的 systemd 工具。它提供了一种方式来检查和控制登录到系统的用户，以及相关的会话和底层的 seat、控制组（cgroup）等信息。以下是一些常用的 loginctl 命令以及它们的详解：  列出当前登录的用户： 1loginctl list-sessions 列出当前系统上的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_50_loginctl">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_50_loginctl/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 loginctl命令  linux loginctl命令 详解loginctl 是一个用于查看和管理用户登录会话的 systemd 工具。它提供了一种方式来检查和控制登录到系统的用户，以及相关的会话和底层的 seat、控制组（cgroup）等信息。以下是一些常用的 loginctl 命令以及它们的详解：  列出当前登录的用户： 1loginctl list-sessions 列出当前系统上的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_50_loginctl/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_50_loginctl | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_50_loginctl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_50_loginctl
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>loginctl命令</li>
+</ul>
+<h2 id="linux-loginctl命令-详解"><a href="#linux-loginctl命令-详解" class="headerlink" title="linux loginctl命令 详解"></a>linux loginctl命令 详解</h2><p><code>loginctl</code> 是一个用于查看和管理用户登录会话的 systemd 工具。它提供了一种方式来检查和控制登录到系统的用户，以及相关的会话和底层的 seat、控制组（cgroup）等信息。以下是一些常用的 <code>loginctl</code> 命令以及它们的详解：</p>
+<ol>
+<li><p><strong>列出当前登录的用户：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl list-sessions</span><br></pre></td></tr></table></figure>
+<p>列出当前系统上的用户登录会话。</p>
+</li>
+<li><p><strong>显示所有座位（seat）信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl list-seats</span><br></pre></td></tr></table></figure>
+<p>列出系统上所有的座位，一个座位通常对应一个物理控制台或虚拟控制台。</p>
+</li>
+<li><p><strong>显示指定用户的登录会话信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-session &lt;session_id&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定用户登录会话的详细信息，其中 <code>&lt;session_id&gt;</code> 是登录会话的 ID。</p>
+</li>
+<li><p><strong>显示座位的详细信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-seat &lt;seat_id&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定座位的详细信息，其中 <code>&lt;seat_id&gt;</code> 是座位的 ID。</p>
+</li>
+<li><p><strong>显示用户的座位信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-user &lt;user_name&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定用户的座位信息，其中 <code>&lt;user_name&gt;</code> 是用户名。</p>
+</li>
+<li><p><strong>显示所有活动的座位和登录会话：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl list-users</span><br></pre></td></tr></table></figure>
+<p>列出当前系统上所有活动的用户及其座位信息。</p>
+</li>
+<li><p><strong>结束用户的登录会话：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl terminate-session &lt;session_id&gt;</span><br></pre></td></tr></table></figure>
+<p>结束指定用户的登录会话，其中 <code>&lt;session_id&gt;</code> 是登录会话的 ID。</p>
+</li>
+<li><p><strong>结束座位上的所有登录会话：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl terminate-seat &lt;seat_id&gt;</span><br></pre></td></tr></table></figure>
+<p>结束指定座位上的所有登录会话，其中 <code>&lt;seat_id&gt;</code> 是座位的 ID。</p>
+</li>
+<li><p><strong>显示控制组（cgroup）信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-session &lt;session_id&gt; -p ControlGroup</span><br></pre></td></tr></table></figure>
+<p>显示指定用户登录会话所属的 cgroup。</p>
+</li>
+<li><p><strong>显示登录会话的相关进程信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl session-status &lt;session_id&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定用户登录会话的进程和资源信息。</p>
+</li>
+<li><p><strong>以树状结构显示用户登录信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl tree</span><br></pre></td></tr></table></figure>
+<p>以树状结构显示用户登录信息，包括座位、用户和登录会话的层次结构。</p>
+</li>
+</ol>
+<p><code>loginctl</code> 提供了一种方便的方式来查看和管理用户登录会话，尤其在多用户环境中或涉及到控制台切换的情况下非常有用。通过这些命令，管理员可以实时监控用户的登录情况，同时也可以进行会话的管理和控制。</p>
+<h2 id="linux-loginctl命令-常用技巧"><a href="#linux-loginctl命令-常用技巧" class="headerlink" title="linux loginctl命令 常用技巧"></a>linux loginctl命令 常用技巧</h2><p>以下是一些在使用 <code>loginctl</code> 命令时的常用技巧：</p>
+<ol>
+<li><p><strong>结合 <code>--output</code> 选项显示指定字段：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-session &lt;session_id&gt; --output=FIELD</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--output</code> 选项可以只显示指定的字段，替换 <code>&lt;session_id&gt;</code> 为相应的登录会话 ID，<code>FIELD</code> 为要显示的字段，例如 <code>State</code>、<code>User</code>、<code>Seat</code> 等。</p>
+</li>
+<li><p><strong>使用 <code>--value</code> 选项仅显示值而不显示字段名：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-session &lt;session_id&gt; --value</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--value</code> 选项可以只显示字段的值而不显示字段名。</p>
+</li>
+<li><p><strong>显示详细的用户信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-user &lt;user_name&gt; --all</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--all</code> 选项可以显示更详细的用户信息，包括座位、UID、GID 等。</p>
+</li>
+<li><p><strong>过滤显示活动用户的座位信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl list-users --property=Seats</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--property</code> 选项可以过滤显示用户信息中的特定属性，如 <code>Seats</code>。</p>
+</li>
+<li><p><strong>结合 <code>grep</code> 进行筛选：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl list-sessions | grep &lt;filter_condition&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>grep</code> 命令结合 <code>list-sessions</code> 可以根据某个条件过滤显示登录会话。</p>
+</li>
+<li><p><strong>使用 <code>--quiet</code> 选项减少输出：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl list-users --quiet</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--quiet</code> 选项可以减少输出，仅显示关键信息。</p>
+</li>
+<li><p><strong>显示登录会话的最近活动时间：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl show-session &lt;session_id&gt; -p IdletimeHint</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-p</code> 选项可以指定显示特定属性，例如 <code>IdletimeHint</code> 显示登录会话的最近空闲时间。</p>
+</li>
+<li><p><strong>显示用户登录会话的进程信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl session-status &lt;session_id&gt; --full</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--full</code> 选项可以显示更详细的用户登录会话进程信息。</p>
+</li>
+<li><p><strong>以 JSON 格式输出信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loginctl --quiet --output=json list-users</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--output=json</code> 选项可以以 JSON 格式输出信息，方便后续处理。</p>
+</li>
+<li><p><strong>结合 <code>watch</code> 实时监控：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch -n 1 loginctl list-sessions</span><br></pre></td></tr></table></figure>
+<p>使用 <code>watch</code> 命令可以实时监控登录会话的变化，每秒更新一次。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更灵活地使用 <code>loginctl</code> 命令，根据实际需求定制输出，过滤信息，以及实时监控用户登录情况。记住根据具体情况选择合适的选项和参数。</p>
+<h2 id="loginctl"><a href="#loginctl" class="headerlink" title="loginctl"></a>loginctl</h2><p><code>loginctl</code> 是一个用于管理登录会话和用户登录状态的命令行工具。它是 systemd 的一部分，用于控制 Linux 系统上的用户登录和会话管理。</p>
+<p>以下是一些常用的 <code>loginctl</code> 命令及其功能：</p>
+<ul>
+<li><code>loginctl list-sessions</code>：列出当前活动的登录会话。它会显示每个会话的 ID、用户、登录时间等信息。</li>
+<li><code>loginctl show-session &lt;session_id&gt;</code>：显示指定会话的详细信息，包括会话状态、登录用户、登录时间等。</li>
+<li><code>loginctl list-users</code>：列出当前活动的用户。它会显示每个用户的 ID、用户名等信息。</li>
+<li><code>loginctl show-user &lt;user_id&gt;</code>：显示指定用户的详细信息，包括用户状态、默认会话、上次登录时间等。</li>
+<li><code>loginctl session-status</code>：显示当前登录用户的会话状态和详细信息。</li>
+<li><code>loginctl user-status</code>：显示当前用户的状态和详细信息。</li>
+<li><code>loginctl lock-session</code>：锁定当前会话。这会使屏幕进入锁定状态，要解锁屏幕，需要提供用户密码。</li>
+<li><code>loginctl unlock-session</code>：解锁当前会话。这会解除屏幕锁定状态。</li>
+</ul>
+<p>除了上述命令之外，<code>loginctl</code> 还提供其他一些管理登录会话和用户的功能，如关闭用户会话、终止登录会话、设置默认会话等。你可以通过 <code>man loginctl</code> 命令查看更多详细信息和可用选项。</p>
+<p>需要注意的是，<code>loginctl</code> 命令需要 root 或具有适当权限的用户才能执行。它在使用 systemd 作为 init 系统的 Linux 发行版中可用。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_52_lsmod/" rel="prev" title="linux_2_52_lsmod">
+      <i class="fa fa-chevron-left"></i> linux_2_52_lsmod
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_46_dstat/" rel="next" title="linux_2_46_dstat">
+      linux_2_46_dstat <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-loginctl%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux loginctl命令 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-loginctl%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux loginctl命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loginctl"><span class="nav-number">4.</span> <span class="nav-text">loginctl</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

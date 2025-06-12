@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 Git常见的使用技巧  写了很多代码，发现写错了分支怎么办 未提交的情况下  git add . (把所有改动暂存) git stash (把暂存的文件提交到git的暂存栈) git checkout 本该提交代码的分支 git stash pop (将暂存栈中的代码放出来)   至于是继续改还是提交就随你了  已提交的情况下  git checkout 不该提交代码提交了代码的分支 git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git_3_常用技巧">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 Git常见的使用技巧  写了很多代码，发现写错了分支怎么办 未提交的情况下  git add . (把所有改动暂存) git stash (把暂存的文件提交到git的暂存栈) git checkout 本该提交代码的分支 git stash pop (将暂存栈中的代码放出来)   至于是继续改还是提交就随你了  已提交的情况下  git checkout 不该提交代码提交了代码的分支 git">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.301Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>git_3_常用技巧 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Git/2024-05-22-git_3_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          git_3_常用技巧
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Git常见的使用技巧</li>
+</ul>
+<h2 id="写了很多代码，发现写错了分支怎么办"><a href="#写了很多代码，发现写错了分支怎么办" class="headerlink" title="写了很多代码，发现写错了分支怎么办"></a>写了很多代码，发现写错了分支怎么办</h2><ul>
+<li><p>未提交的情况下</p>
+<ul>
+<li>git add . (把所有改动暂存)</li>
+<li>git stash (把暂存的文件提交到git的暂存栈)</li>
+<li>git checkout 本该提交代码的分支</li>
+<li>git stash pop (将暂存栈中的代码放出来)</li>
+</ul>
+</li>
+<li><p>至于是继续改还是提交就随你了</p>
+</li>
+<li><p>已提交的情况下</p>
+<ul>
+<li>git checkout 不该提交代码提交了代码的分支</li>
+<li>git reset HEAD~1 （最近一次提交放回暂存区, 并取消此次提交）</li>
+<li>git stash (把暂存的文件提交到git的暂存栈)</li>
+<li>git checkout 该提交代码的分支</li>
+<li>git stash pop</li>
+</ul>
+</li>
+<li><p>下面一顿操作随你猛了，等你把代码提交到了正确的分支后，再次切到刚刚错的分支</p>
+</li>
+</ul>
+<h2 id="git-迭代拉取子项目"><a href="#git-迭代拉取子项目" class="headerlink" title="git 迭代拉取子项目"></a>git 迭代拉取子项目</h2><p>在 Git 中，如果你有一个父项目，而该项目包含了子项目，你可能希望在父项目中拉取或更新这些子项目。这种情况下，通常会使用 Git 的子模块（submodule）功能。子模块允许你在一个 Git 仓库中引用另一个仓库。</p>
+<p>要拉取或更新子项目，可以按照以下步骤进行：</p>
+<ol>
+<li><p><strong>添加子模块</strong>：如果尚未添加子模块，可以使用以下命令将子模块添加到父项目中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add &lt;URL-of-submodule-repository&gt; &lt;path-to-store-submodule&gt;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add https://github.com/example/submodule.git path/to/submodule</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>初始化子模块</strong>：在克隆父项目后，子模块目录中可能还没有子模块的文件。要初始化子模块，可以运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule init</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>更新子模块</strong>：一旦子模块被添加并初始化，你可以使用以下命令更新子模块到父项目所引用的特定版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule update --remote</span><br></pre></td></tr></table></figure>
+<p>这会将每个子模块更新到它们在父项目中所引用的最新提交。</p>
+</li>
+</ol>
+<p>记住，当你拉取父项目时，子模块不会自动更新。你需要显式运行 <code>git submodule update --remote</code> 来更新子模块。</p>
+<p>这些是用于在 Git 中迭代拉取子项目的基本步骤。</p>
+<h2 id="git-仅检查指定项目-忽略子项目"><a href="#git-仅检查指定项目-忽略子项目" class="headerlink" title="git 仅检查指定项目 忽略子项目"></a>git 仅检查指定项目 忽略子项目</h2><p>在Git中，如果你想仅检查指定项目而忽略子项目，你可以使用<code>.gitignore</code>文件来指定哪些文件或目录应该被忽略。在<code>.gitignore</code>中，你可以列出你希望忽略的文件或目录的模式。</p>
+<p>以下是一些建议：</p>
+<ol>
+<li><p><strong>创建.gitignore文件：</strong> 在你的项目根目录下创建一个名为<code>.gitignore</code>的文件。</p>
+</li>
+<li><p><strong>编辑.gitignore文件：</strong> 打开<code>.gitignore</code>文件并添加你希望忽略的文件或目录的模式。如果你想忽略所有子项目，你可以使用通配符（如<code>/*</code>）来匹配所有直接子目录。例如：</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">!/指定项目/</span><br></pre></td></tr></table></figure>
+
+<p> 这将忽略根目录下的所有内容，但允许<code>指定项目</code>目录被追踪。</p>
+</li>
+<li><p><strong>将.gitignore文件添加到版本控制：</strong> 确保将<code>.gitignore</code>文件添加到Git版本控制中，这样其他人克隆你的仓库时也会遵循这些规则。</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add .gitignore</span><br><span class="line">git commit -m &quot;Add .gitignore to ignore subprojects&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>更新.gitignore：</strong> 如果在项目的后续开发中需要调整忽略规则，只需更新<code>.gitignore</code>文件并提交更改即可。</p>
+</li>
+</ol>
+<p>请记住，<code>.gitignore</code>文件中的模式是相对于<code>.gitignore</code>所在目录的相对路径的。确保你的规则符合你的项目结构。</p>
+<h2 id="git-config-查看默认编辑器"><a href="#git-config-查看默认编辑器" class="headerlink" title="git config 查看默认编辑器"></a>git config 查看默认编辑器</h2><p>要查看 Git 的默认文本编辑器，可以使用以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.editor</span><br></pre></td></tr></table></figure>
+
+<p>上述命令将显示全局配置中设置的默认编辑器。如果没有设置默认编辑器，它将不会返回任何输出。</p>
+<p>如果你在命令行中看到了输出，它将是你当前配置的默认编辑器的名称或路径。常见的编辑器包括 Vim、Emacs、Nano、Sublime Text、Visual Studio Code 等。</p>
+<h2 id="撤回本地修改"><a href="#撤回本地修改" class="headerlink" title="撤回本地修改"></a>撤回本地修改</h2><ul>
+<li>放弃对本地已经修改，但是尚未提交的文件的修改，还原到其未修改前的状态</li>
+<li>命令<ul>
+<li>撤回对所有已经修改，但是未提交的文件的修改，但不包括新增的文件<ul>
+<li><code>git checkout .</code></li>
+</ul>
+</li>
+<li>撤回对指定文件的修改，<code>[filename]</code>为文件名<ul>
+<li><code>git checkout [filename]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="git-reset-回退项目版本"><a href="#git-reset-回退项目版本" class="headerlink" title="git reset 回退项目版本"></a>git reset 回退项目版本</h2><ul>
+<li>可以回退到任意已经提交过的版本，已经add, commit但是没有push的文件也适用</li>
+<li>命令<ul>
+<li><code>git reset --hard [commit-hashcode]</code></li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>commit-hashcode</code> 是某个commit的哈希值，可以适用git log查看</li>
+<li>因此，一般用法是先用git log 查看具体commit的哈希值，然后reset到那个版本</li>
+</ul>
+</li>
+</ul>
+<h2 id="对于新增文件"><a href="#对于新增文件" class="headerlink" title="对于新增文件"></a>对于新增文件</h2><ul>
+<li>撤回本地修改和回退项目版本都不会对新增文件起作用。因为新增的文件是还未加到git的记录里面的，即属于未被<code>tracked</code>的状态，所以撤销修改和回退均对其不受影响。</li>
+<li>解决方法：<ul>
+<li>直接手动删除文件即可</li>
+</ul>
+</li>
+</ul>
+<h2 id="上游分支-upstream"><a href="#上游分支-upstream" class="headerlink" title="上游分支 upstream"></a>上游分支 upstream</h2><ul>
+<li><p>upstream意为上游，即本地分支所对应的远程分支。</p>
+</li>
+<li><p>一般，本地分支如果是从clone或者fetch得到的，都在远程库有一个upstream分支。</p>
+</li>
+<li><p>设置upstream的方法有两种：</p>
+<ul>
+<li>在push的时候指定：<code>git push --set-upstream origin my_remote_branch_name</code></li>
+<li>在新建分支的时候指定：<code>git branch --set-upstream my_local_branch_name origin/my_remote_branch_name</code>(错误)</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>在运行<code>git branch --set-upstream</code>命令时，出现错误(git –version: 2.17.1)</li>
+<li><code>fatal: the &#39;--set-upstream&#39; option is no longer supported. Please use &#39;--track&#39; or &#39;--set-upstream-to&#39; instead.</code></li>
+<li>设置方法：<code>git branch --set-upstream-to=origin/&lt;远程分支&gt; &lt;本地分支&gt;</code></li>
+</ul>
+</li>
+<li><p>实际上，上述命令，就是在修改本地的.git&#x2F;config文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[branch &quot;my_local_branch_name&quot;]</span><br><span class="line">	remote = origin</span><br><span class="line">	merge = refs/heads/my_remote_branch_name</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>取消分支上游</p>
+<ul>
+<li><code>git branch --inset-upstream</code></li>
+</ul>
+</li>
+<li><p>查看分支上游</p>
+<ul>
+<li><code>git status</code></li>
+<li><code>git checkout &lt;分支&gt;</code></li>
+<li><code>git branch -vv</code></li>
+</ul>
+</li>
+<li><p>设置完upstream后，就可以直接用 <code>git push/pull</code> 来拉取或推送相应的分支了。</p>
+</li>
+</ul>
+<h2 id="直接拉取远程分支"><a href="#直接拉取远程分支" class="headerlink" title="直接拉取远程分支"></a>直接拉取远程分支</h2><ul>
+<li>新建分支分支并切换到指定分支<ul>
+<li><code>git checkout -b dev origin/dev</code></li>
+<li><code>git checkout -b 本地分支名 origin/远程分支名</code></li>
+</ul>
+</li>
+<li>该命令可以将远程Git仓库里的指定分支拉取到本地，这样就在本地新建了一个dev分支，并和指定的远程分支<code>origin/dev</code>关联起来了。</li>
+<li>示例：<ul>
+<li><code>git checkout -b dev notes/dev</code> : 切换指定远程分支</li>
+</ul>
+</li>
+</ul>
+<h2 id="在本地使用指定提交id创建分支"><a href="#在本地使用指定提交id创建分支" class="headerlink" title="在本地使用指定提交id创建分支"></a>在本地使用指定提交id创建分支</h2><ul>
+<li><p>查看远程分支最新的commitSHA，例如：<code>aa4339fbe90f68bc82901d976a7c11fe92179ef3</code></p>
+</li>
+<li><p>使用命令直接从指定的commit新建分支：</p>
+<ul>
+<li><code>git branch [branch-name] [commit-id]</code></li>
+<li><code>git branch v1.x aa4339fbe90f68bc82901d976a7c11fe92179ef3</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="使用标签的方式"><a href="#使用标签的方式" class="headerlink" title="使用标签的方式"></a>使用标签的方式</h2><ul>
+<li><code>git clone [--branch tag-name/branch-name] &lt;git-url&gt; [dir]</code> 下载并绑定指定分支或下载指定标签</li>
+</ul>
+<h2 id="使用流程"><a href="#使用流程" class="headerlink" title="使用流程"></a>使用流程</h2><ul>
+<li><p>在本地仓库创建标签，并推送到远程：</p>
+<ul>
+<li><code>git tag -a v1.0 -m &quot;create tag&quot;</code></li>
+<li><code>git push origin v1.0</code></li>
+</ul>
+</li>
+<li><p>下载指定标签到本地：</p>
+<ul>
+<li><code>git clone --branch v1.0 http://192.169.4.28/zjy/clean_code.git</code></li>
+</ul>
+</li>
+<li><p>下载标签之后，出现的提示：</p>
+<ul>
+<li>你处于分离的HEAD状态。您可以环顾四周，进行实验性更改并提交它们，您可以放弃在此状态下所做的任何提交，而不会通过执行另一次签出影响任何分支。</li>
+<li>如果您想创建一个新的分支来保留您创建的提交，您可以(现在或以后)再次使用-b和chckout命令。</li>
+</ul>
+</li>
+</ul>
+<h2 id="git同步项目进度方法"><a href="#git同步项目进度方法" class="headerlink" title="git同步项目进度方法"></a>git同步项目进度方法</h2><ul>
+<li><p>创建三个分支：</p>
+<ul>
+<li>master </li>
+<li>dev</li>
+<li>local</li>
+</ul>
+</li>
+<li><p>master分支：</p>
+<ul>
+<li>存放稳定版本的代码，在这个分支上的项目，所有的功能都是经过测试，不再改动的</li>
+<li>这个是对外发行的分支</li>
+</ul>
+</li>
+<li><p>dev分支</p>
+<ul>
+<li>存放正在开发的代码，在这个分支上的项目，可能正在新加功能，需要经过反复修改的，或者是同步的</li>
+<li>这个是面向所有开发者的</li>
+<li>所有开发者通过拉取这个分支的代码来同步项目开发的进程</li>
+</ul>
+</li>
+<li><p>local分支</p>
+<ul>
+<li>存放本地的项目的代码，在这个分支上的项目，随时都有可能修改</li>
+<li>这个是存放在本地，面向的是自己</li>
+<li>其作用是，自己开发的时候，都在这个本地分支上修改，需要推送到远程git上或者拉取远程git上最新的代码时，需要进行如下几步<ul>
+<li>首先，将local分支的修改全部添加，并在本地提交</li>
+<li>其次，切换到本地的dev分支，然后拉取远程git上最新的dev分支</li>
+<li>最后，切换回local分支，将本地拉取到的最新的分支合并到local分支</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="git删除远程分支文件"><a href="#git删除远程分支文件" class="headerlink" title="git删除远程分支文件"></a>git删除远程分支文件</h2><ul>
+<li>git删除远程分支文件包括两种情况：<ul>
+<li>（1）仅仅删除远程分支文件，不删除本地的文件；</li>
+<li>（2）删除远程分支文件的同时，删除本地的文件。</li>
+</ul>
+</li>
+</ul>
+<h2 id="仅仅删除远程分支文件，不删除本地文件"><a href="#仅仅删除远程分支文件，不删除本地文件" class="headerlink" title="仅仅删除远程分支文件，不删除本地文件"></a>仅仅删除远程分支文件，不删除本地文件</h2><ul>
+<li><p>删除远程文件filename</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm --cached filename</span><br><span class="line">git commit -m &quot;delete remote file filename &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除远程文件夹directoryname</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r --cached directoryname</span><br><span class="line">git commit -m &quot;delete remote directory directoryname &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="删除本地文件与远程分支文件"><a href="#删除本地文件与远程分支文件" class="headerlink" title="删除本地文件与远程分支文件"></a>删除本地文件与远程分支文件</h2><ul>
+<li><p>删除文件filename</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm filename</span><br><span class="line">git commit -m &quot;delete file filename &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除文件夹directoryname</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r directoryname</span><br><span class="line">git commit -m &quot;delete directory directoryname &quot;</span><br><span class="line">git push -u origin master(此处是当前分支的名字)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="git常见错误"><a href="#git常见错误" class="headerlink" title="git常见错误"></a>git常见错误</h2><h2 id="fatal-refusing-to-merge-unrelated-histories"><a href="#fatal-refusing-to-merge-unrelated-histories" class="headerlink" title="fatal:refusing to merge unrelated histories"></a><code>fatal:refusing to merge unrelated histories</code></h2><ul>
+<li>在使用<code>git pull</code>命令拉取代码时出现这个错误</li>
+<li>原因：本地仓库和远程仓库实际上时独立的两个仓库</li>
+<li>解决方法：添加选项<code>--allow-unrelated-histories</code>解决问题<ul>
+<li><code>git pull zhuoer dev --allow-unrelated-histories</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h2><ul>
+<li><code>git clone &lt;url&gt;</code> : 克隆远程版本库</li>
+<li><code>git init</code> : 初始化本地版本库</li>
+</ul>
+<h2 id="修改和提交"><a href="#修改和提交" class="headerlink" title="修改和提交"></a>修改和提交</h2><ul>
+<li><code>git status</code> : 查看状态</li>
+<li><code>git diff</code> : 查看变更内容</li>
+<li><code>git add .</code> : 跟踪所有改动过的文件</li>
+<li><code>git add &lt;file&gt;</code> : 跟踪指定的文件</li>
+<li><code>git mv &lt;old&gt; &lt;new&gt;</code> : 文件改名</li>
+<li><code>git rm &lt;file&gt;</code> : 删除文件</li>
+<li><code>git commit -m &quot;commit message&quot;</code> : 提交所有更新过的文件</li>
+<li><code>git commit --amend</code> : 修改最后一次提交</li>
+</ul>
+<h2 id="查看提交历史"><a href="#查看提交历史" class="headerlink" title="查看提交历史"></a>查看提交历史</h2><ul>
+<li><code>git log</code> : 查看提交历史</li>
+<li><code>git log -p &lt;file&gt;</code> : 查看指定文件的提交历史</li>
+<li><code>git blame &lt;file&gt;</code> : 以列表方式查看指定文件的提交历史</li>
+</ul>
+<h2 id="撤销"><a href="#撤销" class="headerlink" title="撤销"></a>撤销</h2><ul>
+<li><code>git reset --     0  1.9G   0% /sys/fs/cgroup /dev/mmcblk0p7   16G   12G  3.1G  79% /data  HEAD</code> : 撤销工作目录中所有未提交文件的修改内容</li>
+<li><code>git checkout HEAD &lt;file&gt;</code> : 撤销指定的未提交的修改内容</li>
+<li><code>git revert &lt;commit&gt;</code> : 取消指定的提交</li>
+</ul>
+<h2 id="分支与标签"><a href="#分支与标签" class="headerlink" title="分支与标签"></a>分支与标签</h2><ul>
+<li><code>git branch</code> : 显示所有本地分支</li>
+<li><code>git checkout &lt;branch/tag&gt;</code> : 切换到指定分支或标签</li>
+<li><code>git branch &lt;new-branch&gt;</code> : 创建新分支</li>
+<li><code>git branch -d &lt;branch&gt;</code> : 删除本地分支</li>
+<li><code>git tag</code> : 列出所有本地标签</li>
+<li><code>git tag &lt;tagname&gt;</code> : 基于最新提交的创建标签</li>
+<li><code>git tag -d &lt;tagname&gt;</code> : 删除标签</li>
+<li><code>git checkout -b dev notes/dev</code> : 切换指定远程分支</li>
+</ul>
+<h2 id="合并和衍合"><a href="#合并和衍合" class="headerlink" title="合并和衍合"></a>合并和衍合</h2><ul>
+<li><code>git merge &lt;branch&gt;</code> : 合并指定分支到当前分支</li>
+<li><code>git rebase &lt;branch&gt;</code> : 衍合指定分支到当前分支</li>
+</ul>
+<h2 id="远程操作"><a href="#远程操作" class="headerlink" title="远程操作"></a>远程操作</h2><ul>
+<li><code>git remote -v</code> : 查看远程版本库信息</li>
+<li><code>git remote show &lt;remote&gt;</code> : 查看指定远程版本库信息</li>
+<li><code>git remote add &lt;remote&gt; &lt;url&gt;</code> : 添加远程版本库</li>
+<li><code>git fetch &lt;remote&gt;</code> : 从远程库获取代码</li>
+<li><code>git pull &lt;remote&gt; &lt;branch&gt;</code> : 下载代码及快速合并</li>
+<li><code>git push &lt;remote&gt; &lt;branch&gt;</code> : 上传代码及快速合并</li>
+<li><code>git push &lt;remote&gt; :&lt;branch/tag-name&gt;</code> : 删除远程分支或标签</li>
+<li><code>git push --tags</code> : 上传所有标签</li>
+</ul>
+<h2 id="拉取"><a href="#拉取" class="headerlink" title="拉取"></a>拉取</h2><ul>
+<li><code>git pull origin master</code><ul>
+<li><code>push</code> : 将本地仓库与远程仓库合并</li>
+<li><code>-u</code> : 将本地仓库分支与远程仓库分支一起合并，就是说将master的分支也提交上去，这样就可以在远程仓库上看到在本地仓库的master中创建了多少分支。不加这个参数，只将当前的master与远程的合并，没有分支的历史纪录，也不能切换分支</li>
+<li><code>origin</code> : 远程仓库的意思，如果这个仓库是远程的，那么必须使用这个选项</li>
+<li><code>master</code> : 提交本地master分支仓库</li>
+</ul>
+</li>
+</ul>
+<h2 id="递归克隆"><a href="#递归克隆" class="headerlink" title="递归克隆"></a>递归克隆</h2><ul>
+<li><code>git clone --recursive http://192.167.10.28/dagger/manager_node.git</code></li>
+<li><code>recursive</code>选项会递归克隆项目下的所有git项目</li>
+</ul>
+<h2 id="撤销-git-add-并保留修改的方法"><a href="#撤销-git-add-并保留修改的方法" class="headerlink" title="撤销 git add 并保留修改的方法"></a>撤销 <code>git add</code> 并保留修改的方法</h2><ul>
+<li><strong><code>git reset --mixed</code> – 撤销所有的已经<code>add</code>的文件</strong></li>
+<li><code>git reset HEAD .</code> – 复制撤销某个文件或文件夹</li>
+<li><code>git reset HEAD -filename</code> – 另外，可以使用<code>git status</code> ，git会告诉可以通过哪一个命令来执行操作</li>
+</ul>
+<h2 id="git从历史上的某一次提交处建立分支"><a href="#git从历史上的某一次提交处建立分支" class="headerlink" title="git从历史上的某一次提交处建立分支"></a>git从历史上的某一次提交处建立分支</h2><ul>
+<li><code>git log --oneline --all --graph --decorate</code></li>
+<li><code>git branch dev 3be5879</code></li>
+</ul>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><ul>
+<li><p><code>git remote add &lt;shortname&gt; &lt;url&gt;</code> ： 添加一个新的远程Git仓库，同时指定一个方便使用的简写.</p>
+<ul>
+<li><code>git remote add zhuoer http://192.167.10.28/dagger/zhuoer</code> ： 现在可以在命令行中使用字符串<code>zhuoer</code>来代替整个URL</li>
+</ul>
+</li>
+<li><p><code>git fetch &lt;remote&gt;</code> : 从远程仓库中获得数据。这个命令会访问远程仓库，从中拉取所有还没有的数据。执行完成后，将会拥有那个远程仓库中所有分支的引用，可以随时合并或者查看。</p>
+</li>
+<li><p><strong>如果使用<code>clone</code>命令克隆了一个仓库，命令会自动将其添加为远程仓库并且默认以<code>origin</code>为简写</strong>。所以，<code>git fetch origin</code>会抓取克隆（或上一次抓取）后新推送的所有工作。</p>
+<ul>
+<li>注意：<code>git fetch</code>命令只会将数据下在到本地仓库，它并不会自动合并或者修改当前的工作，当准备好时，必须要手动将其合并入你的工作。</li>
+</ul>
+</li>
+<li><p>如果当前分支设置了跟踪远程分支，那么可以使用<code>git pull</code>命令自动抓取后合并该远程分支到当前分支。</p>
+</li>
+<li><p>默认情况下，<code>git clone</code>命令会自动设置本地<code>master</code>分支跟踪克隆的远程仓库的<code>master</code>分支（或其他名字的默认分支）。运行<code>git pull</code>通常会从最初克隆的服务器上抓取数据并自动尝试合并到当前所在的分支。）</p>
+</li>
+</ul>
+<h2 id="推送到远程仓库"><a href="#推送到远程仓库" class="headerlink" title="推送到远程仓库"></a>推送到远程仓库</h2><ul>
+<li><code>git push &lt;remote&gt; &lt;branch&gt;</code><ul>
+<li>当你想要将<code>master</code>分支推送到<code>origin</code>服务器时（再次说明，克隆时通常会自动帮你设置好那两个名字），那么运行这个命令就可以将你所做的备份到服务器。</li>
+</ul>
+</li>
+</ul>
+<h2 id="查看某个远程仓库"><a href="#查看某个远程仓库" class="headerlink" title="查看某个远程仓库"></a>查看某个远程仓库</h2><ul>
+<li><code>git remote show &lt;remote&gt;</code><ul>
+<li>查看某一个远程仓库的更多信息</li>
+<li>它同样会列出远程仓库的URL与跟踪分支的信息。它告诉你正在处于<code>master</code>分支，并且如果运行<code>git pull</code>，就会抓取所有的远程引用，然后将远程<code>master</code>分支合并到本地<code>master</code>分支，</li>
+<li>它也会列出拉取到的所有远程引用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="远程仓库的重命名与移除"><a href="#远程仓库的重命名与移除" class="headerlink" title="远程仓库的重命名与移除"></a>远程仓库的重命名与移除</h2><ul>
+<li><p><code>git remote rename</code></p>
+<ul>
+<li>修改一个远程仓库的简写名</li>
+<li>这个操作也会修改所有远程跟踪的分支名字</li>
+</ul>
+</li>
+<li><p><code>git remote remove</code>或者<code>git remote rm</code></p>
+<ul>
+<li>移除一个远程仓库</li>
+<li>一旦使用这种方式删除了一个远程仓库，那么所有和这个远程仓库相关的远程跟踪分支以及配置信息也会一起被删除。</li>
+</ul>
+</li>
+</ul>
+<h2 id="打标签"><a href="#打标签" class="headerlink" title="打标签"></a>打标签</h2><ul>
+<li><p><code>git tag</code></p>
+<ul>
+<li>在Git中列出已有的标签</li>
+<li>按照通配符列出标签需要<code>-l</code>或者<code>--list</code>选项</li>
+<li>如果只想要完整的标签列表，那么运行<code>git tag</code>就会默认假定你想要一个列表，它会直接列出来</li>
+</ul>
+</li>
+<li><p>创建标签，Git支持两种标签：轻量标签(<code>lightweight</code>)与附注标签(<code>annotated</code>)</p>
+<ul>
+<li>轻量标签很像一个不会改变的分支–它只是某个特定提交的引用</li>
+<li>附注标签是存储在Git数据库中的一个完整对象，它们是可以被校验的，其中包括打标签者的名字，电子邮件，地址，日期时间，此外还有一个标签信息，并且可以使用GNU Privacy Guard（GTG）签名并验证。</li>
+</ul>
+</li>
+<li><p>通常会建议创建附注标签，这样可以拥有以上所有信息，但是如果只是想用一个临时的标签，或者因为某些原因不想要保存信息，那么也可以用轻量标签</p>
+</li>
+<li><p>附注标签的创建: <code>git tag -a v1.4 -m &quot;my version 1.4&quot;</code></p>
+<ul>
+<li><code>-m</code> : 指定了一条将会存储在标签中的信息。如果没有为附注标签指定一条信息，Git会启动编辑其要求你输入信息</li>
+</ul>
+</li>
+<li><p>推送标签</p>
+<ul>
+<li>git push origin v1.4</li>
+</ul>
+</li>
+<li><p>轻量标签，本质上是将提交校验和存储到一个文件中–没有保存任何其他信息。</p>
+</li>
+<li><p>创建轻量标签，不需要使用<code>-a</code>, <code>-s</code>, <code>-m</code>选项，只需要提供标签名字：<code>git tag v1.4-lw</code></p>
+</li>
+<li><p>后期打标签</p>
+<ul>
+<li>要在提交上打标签，需要在命令的末尾指定提交的校验和（或部分校验和）</li>
+<li><code>git tag -a v1.2 9fcaw1</code></li>
+</ul>
+</li>
+<li><p>删除标签</p>
+<ul>
+<li>删除本地仓库上的标签，可以使用命令<code>git tag -d &lt;tagname&gt;</code><ul>
+<li>注意：该命令并不会从任何远程仓库中移除这个标签，必须使用<code>git push &lt;remote&gt;:refs/tags/&lt;tagname&gt;</code>来更新远程仓库</li>
+<li>第一种变体是：<code>git push &lt;remote&gt; :refs/tags/&lt;tagname&gt;</code>，这种操作的含义是：将冒号前面的空值推送到远程标签名，从而高效地删除它</li>
+<li>第二种更加直观的删除远程标签的方式是：<code>git push &lt;remote&gt; --delete &lt;tagname&gt;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>通过使用<code>git show</code>可以看到标签信息和与之对应的提交信息</p>
+</li>
+</ul>
+<h2 id="Git别名"><a href="#Git别名" class="headerlink" title="Git别名"></a>Git别名</h2><ul>
+<li>Git并不会在输入部分命令时自动推断出想要的命令。如果不想每次都输入完整的Git命令，可以通过<code>git config</code>文件来轻松地为每一个命令设置一个别名。</li>
+<li>例如：<ul>
+<li><code>git config --global alias.co checkout</code></li>
+<li><code>git config --global alias.br branch</code></li>
+<li><code>git config --global alias.ci commit</code></li>
+<li><code>git config --global alias.st status</code></li>
+<li>这意味着，当要输入<code>git commit</code>时，只需要输入<code>git ci</code></li>
+</ul>
+</li>
+<li>在创建认为应该存在的命令时，这个技术会很有用。<ul>
+<li>例如：为了解决取消暂存文件的易用性问题，可以向Git中添加取消暂存别名,<code>git config --global alias.unstage &#39;reset HEAD --</code></li>
+<li>通常也会添加一个<code>last</code>命令：<code>git config --global alias.last &#39;log -l HEAD</code>。这样，可以很轻松地看到最后一次提交</li>
+</ul>
+</li>
+<li>Git只是简单地将别名替换为对应的命令。</li>
+</ul>
+<h2 id="Git分支"><a href="#Git分支" class="headerlink" title="Git分支"></a>Git分支</h2><ul>
+<li><p>几乎所有的版本控制系统都以某种形式支持分支。使用分支意味着可以把工作从开发主线上分离开来，以免影响开发主线。</p>
+</li>
+<li><p><strong>Git保存的不是文件的变化或者差异，而是一系列不同时刻的快照。</strong></p>
+</li>
+<li><p>Git的分支，其实质上仅仅是指向提交对象的可变指针。Git的默认分支名字是<code>master</code>，在多次提交操作之后，其实已经有一个指向最后哪个提交对象的<code>master</code>分支。<code>master</code>分支会在每次提交时自动向前移动。</p>
+<ul>
+<li>Git的<code>master</code>分支并不是一个特殊分支。它跟其他分支完全没有区别。之所以几乎每一个仓库都有<code>master</code>分支，是因为<code>git init</code>命令默认创建它，并且大多数人都懒得去改动它</li>
+</ul>
+</li>
+<li><p><code>git branch testing</code> : 创建分支<code>testing</code>，这会在当前所在的提交对象上创建一个指针。那么，Git又是怎么知道当前在哪一个分支上呢？</p>
+<ul>
+<li>也很简单，它有一个名为<code>HEAD</code>的特殊指针。它是一个指针，指向当前所在的本地分支（可以把<code>HEAD</code>想象为当前分支的别名）</li>
+<li>在本示例中，仍然在<code>master</code>分支上，因为<code>git branch</code>命令仅仅创建一个新分支，并不会自动切换到新分支中去</li>
+</ul>
+</li>
+<li><p><code>git log --decorate</code> ： 查看各个分支当前所指的对象</p>
+</li>
+<li><p>分支切换:<code>git checkout testing</code>。如此以来，<code>HEAD</code>就指向<code>testing</code>分支了。</p>
+</li>
+<li><p>由于Git的分支实质上仅是包含所指对象校验和（长度为40的SHA-1值字符串）的文件，所以它的创建和销毁都异常高效</p>
+</li>
+</ul>
+<h2 id="远程分支"><a href="#远程分支" class="headerlink" title="远程分支"></a>远程分支</h2><ul>
+<li><p>远程引用是对远程仓库的引用（指针），包括分支，标签等。</p>
+</li>
+<li><p>可以通过 <code>git ls-remote &lt;remote&gt;</code>来显示地获得远程引用的完整列表</p>
+</li>
+<li><p>或者通过<code>git remote show &lt;remote&gt;</code>获得远程分支的更多信息</p>
+</li>
+<li><p>更常见的做法是利用<strong>远程跟踪分支</strong>，远程跟踪分支是远程分支状态的引用，它们以<code>&lt;remote&gt;/&lt;branch&gt;</code>的形式命名</p>
+<ul>
+<li>例如：假设网络里由一个在<code>git.ourcompany.com</code>的Git服务器。如果从这里克隆，Git的<code>clone</code>命令会自动将其命名为<code>origin</code>，拉取它的所有数据，创建一个指向它的<code>master</code>分支的指针，并且在本地将其命名为<code>origin/master</code>。Git也会给你一个与<code>origin</code>的<code>master</code>分支在指向同一个地方的本地<code>master</code>分支，这样你就有工作的基础。</li>
+<li><code>origin</code>并无特殊含义。远程仓库名字<code>origin</code>与分支名字<code>master</code>一样，在Git中并没有任何特别的含义一样。同时,<code>master</code>是当你运行<code>git init</code>时默认的起始分支名字。如果你运行<code>git clone -o booyah</code>，那么默认的远程分支名字将会是<code>booyah/master</code></li>
+</ul>
+</li>
+<li><p><code>git push &lt;remote&gt; &lt;branch&gt;</code> ： 推送到某个分支</p>
+</li>
+<li><p>与给定的远程仓库同步数据，运行<code>git fetch &lt;remote&gt;</code>命令。</p>
+<ul>
+<li>示例：<code>git fetch a311d</code></li>
+<li>这个命令查找<code>a311d</code>是哪一个服务器，从中抓取本地没有的数据，并且更新本地数据库，移动<code>a311d/master</code>指针到更新之后的位置。</li>
+</ul>
+</li>
+<li><p><code>git pull</code> : 拉取</p>
+<ul>
+<li>当<code>git fetch</code>命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容，它只会获取数据然后让你自己合并</li>
+<li><code>git pull</code>命令在大多数情况下它的含义是一个<code>git fetch</code>紧接着一个<code>git merge</code>命令</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何避免每次输入密码"><a href="#如何避免每次输入密码" class="headerlink" title="如何避免每次输入密码"></a>如何避免每次输入密码</h2><ul>
+<li>如果正在使用<code>HTTPS URL</code>来推送，Git服务器会询问用户名与密码。默认情况下它会在终端中提示服务器是否允许你进行推送</li>
+<li>如果不想在每一个推送时都输入用户名与密码，可以设置一个<code>credential cache</code>。最简单的方式就是将其保存在内存中几分钟，可以简单地运行<code>git config --global credential.helper cache</code>来设置</li>
+</ul>
+<h2 id="跟踪分支"><a href="#跟踪分支" class="headerlink" title="跟踪分支"></a>跟踪分支</h2><ul>
+<li>从一个远程跟踪分支检出一个本地分支会自动创建所谓的“跟踪分支”（它跟踪的分支叫做“上游分支”）。</li>
+<li>跟踪分支是与远程分支有直接关系的本地分支。如果在一个跟踪分支上输入<code>git pull</code>，Git能够自动地识别去那个服务器上抓取，合并到哪个分支。</li>
+<li>当克隆一个仓库时，它通常会自动地创建一个跟踪<code>origin/master</code>的<code>master</code>分支。</li>
+<li>如果想设置其他的跟踪分支，或者是一个在其他远程仓库上的跟踪分支，简单的示例：<code>git checkout -b &lt;branch&gt; &lt;remote&gt;/&lt;branch&gt;</code>。这是一个十分常用的操作，所以Git提供了<code>--track</code>快捷方式</li>
+<li>如果想要将本地分支与远程分支设置为不同的名字，可以使用命令<code>git checkout -b sf origin/serverfix</code></li>
+</ul>
+<h2 id="删除远程分支"><a href="#删除远程分支" class="headerlink" title="删除远程分支"></a>删除远程分支</h2><ul>
+<li>运行带有<code>--delete</code>选项的<code>git push</code>命令，用来删除一个远程分支，例如:<code>git push zhuoer --delete docker-mqtt</code></li>
+<li>基本上这个命令做的只是从服务器上移除这个指针。Git服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。</li>
+</ul>
+<h2 id="Git-子模块"><a href="#Git-子模块" class="headerlink" title="Git 子模块"></a>Git 子模块</h2><ul>
+<li><p>使用场景：某个工作中的项目需要包含并使用另一个项目。也许是第三方库，或者独立开发的，用于多个父项目的库。现在问题是：把它们当作两个独立的项目，同时又想在一个项目中使用另一个</p>
+</li>
+<li><p>Git通过<strong>子模块</strong>来解决这个问题：子模块允许将一个Git仓库作为另一个Git仓库的子目录。它能够将另一个仓库克隆到自己的项目中，同时还可以保持提交的独立。</p>
+</li>
+<li><p>将一个已存在的Git仓库添加为正在工作的仓库的自模块：<code>git submodule add</code>命令后加上想要跟踪的项目的相对或者绝对URL来添加新的子模块。</p>
+<ul>
+<li>默认情况下，子模块会将子项目放到一个与仓库同名的目录中，如果想放到其他地方，可以在命令结尾添加一个不同的路径。</li>
+</ul>
+</li>
+<li><p><code>.gitmodules</code>配置文件，保存了项目URL与已经拉取的本地目录之间的映射</p>
+</li>
+<li><p>我们首先将一个已存在的 Git 仓库添加为正在工作的仓库的子模块。 你可以通过在 git submodule add 命令后面加上想要跟踪的项目的相对或绝对 URL 来添加新的子模块。 在本例中，我们将会添加一个名为 “DbConnector” 的库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git submodule add https://github.com/chaconinc/DbConnector</span><br><span class="line">Cloning into <span class="string">&#x27;DbConnector&#x27;</span>...</span><br><span class="line">remote: Counting objects: 11, <span class="keyword">done</span>.</span><br><span class="line">remote: Compressing objects: 100% (10/10), <span class="keyword">done</span>.</span><br><span class="line">remote: Total 11 (delta 0), reused 11 (delta 0)</span><br><span class="line">Unpacking objects: 100% (11/11), <span class="keyword">done</span>.</span><br><span class="line">Checking connectivity... <span class="keyword">done</span>.</span><br></pre></td></tr></table></figure></li>
+<li><p>默认情况下，子模块会将子项目放到一个与仓库同名的目录中，本例中是 “DbConnector”。 如果你想要放到其他地方，那么可以在命令结尾添加一个不同的路径。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Eigen3/2024-05-22-Eigen_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="Eigen_1_理论基础">
+      <i class="fa fa-chevron-left"></i> Eigen_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Docker/2024-05-22-docker_2_%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/" rel="next" title="docker_2_基础语法">
+      docker_2_基础语法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E4%BA%86%E5%BE%88%E5%A4%9A%E4%BB%A3%E7%A0%81%EF%BC%8C%E5%8F%91%E7%8E%B0%E5%86%99%E9%94%99%E4%BA%86%E5%88%86%E6%94%AF%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="nav-number">2.</span> <span class="nav-text">写了很多代码，发现写错了分支怎么办</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-%E8%BF%AD%E4%BB%A3%E6%8B%89%E5%8F%96%E5%AD%90%E9%A1%B9%E7%9B%AE"><span class="nav-number">3.</span> <span class="nav-text">git 迭代拉取子项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-%E4%BB%85%E6%A3%80%E6%9F%A5%E6%8C%87%E5%AE%9A%E9%A1%B9%E7%9B%AE-%E5%BF%BD%E7%95%A5%E5%AD%90%E9%A1%B9%E7%9B%AE"><span class="nav-number">4.</span> <span class="nav-text">git 仅检查指定项目 忽略子项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-config-%E6%9F%A5%E7%9C%8B%E9%BB%98%E8%AE%A4%E7%BC%96%E8%BE%91%E5%99%A8"><span class="nav-number">5.</span> <span class="nav-text">git config 查看默认编辑器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%A4%E5%9B%9E%E6%9C%AC%E5%9C%B0%E4%BF%AE%E6%94%B9"><span class="nav-number">6.</span> <span class="nav-text">撤回本地修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-reset-%E5%9B%9E%E9%80%80%E9%A1%B9%E7%9B%AE%E7%89%88%E6%9C%AC"><span class="nav-number">7.</span> <span class="nav-text">git reset 回退项目版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E6%96%B0%E5%A2%9E%E6%96%87%E4%BB%B6"><span class="nav-number">8.</span> <span class="nav-text">对于新增文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E6%B8%B8%E5%88%86%E6%94%AF-upstream"><span class="nav-number">9.</span> <span class="nav-text">上游分支 upstream</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%8B%89%E5%8F%96%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF"><span class="nav-number">10.</span> <span class="nav-text">直接拉取远程分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E6%9C%AC%E5%9C%B0%E4%BD%BF%E7%94%A8%E6%8C%87%E5%AE%9A%E6%8F%90%E4%BA%A4id%E5%88%9B%E5%BB%BA%E5%88%86%E6%94%AF"><span class="nav-number">11.</span> <span class="nav-text">在本地使用指定提交id创建分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%A0%87%E7%AD%BE%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">12.</span> <span class="nav-text">使用标签的方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">13.</span> <span class="nav-text">使用流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git%E5%90%8C%E6%AD%A5%E9%A1%B9%E7%9B%AE%E8%BF%9B%E5%BA%A6%E6%96%B9%E6%B3%95"><span class="nav-number">14.</span> <span class="nav-text">git同步项目进度方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git%E5%88%A0%E9%99%A4%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF%E6%96%87%E4%BB%B6"><span class="nav-number">15.</span> <span class="nav-text">git删除远程分支文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%85%E4%BB%85%E5%88%A0%E9%99%A4%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF%E6%96%87%E4%BB%B6%EF%BC%8C%E4%B8%8D%E5%88%A0%E9%99%A4%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6"><span class="nav-number">16.</span> <span class="nav-text">仅仅删除远程分支文件，不删除本地文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8E%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF%E6%96%87%E4%BB%B6"><span class="nav-number">17.</span> <span class="nav-text">删除本地文件与远程分支文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF"><span class="nav-number">18.</span> <span class="nav-text">git常见错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fatal-refusing-to-merge-unrelated-histories"><span class="nav-number">19.</span> <span class="nav-text">fatal:refusing to merge unrelated histories</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%89%88%E6%9C%AC%E5%BA%93"><span class="nav-number">20.</span> <span class="nav-text">创建版本库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%92%8C%E6%8F%90%E4%BA%A4"><span class="nav-number">21.</span> <span class="nav-text">修改和提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2"><span class="nav-number">22.</span> <span class="nav-text">查看提交历史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%A4%E9%94%80"><span class="nav-number">23.</span> <span class="nav-text">撤销</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E4%B8%8E%E6%A0%87%E7%AD%BE"><span class="nav-number">24.</span> <span class="nav-text">分支与标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E5%92%8C%E8%A1%8D%E5%90%88"><span class="nav-number">25.</span> <span class="nav-text">合并和衍合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E6%93%8D%E4%BD%9C"><span class="nav-number">26.</span> <span class="nav-text">远程操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%89%E5%8F%96"><span class="nav-number">27.</span> <span class="nav-text">拉取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E5%85%8B%E9%9A%86"><span class="nav-number">28.</span> <span class="nav-text">递归克隆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%A4%E9%94%80-git-add-%E5%B9%B6%E4%BF%9D%E7%95%99%E4%BF%AE%E6%94%B9%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">29.</span> <span class="nav-text">撤销 git add 并保留修改的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git%E4%BB%8E%E5%8E%86%E5%8F%B2%E4%B8%8A%E7%9A%84%E6%9F%90%E4%B8%80%E6%AC%A1%E6%8F%90%E4%BA%A4%E5%A4%84%E5%BB%BA%E7%AB%8B%E5%88%86%E6%94%AF"><span class="nav-number">30.</span> <span class="nav-text">git从历史上的某一次提交处建立分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">31.</span> <span class="nav-text">远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E9%80%81%E5%88%B0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">32.</span> <span class="nav-text">推送到远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%9F%90%E4%B8%AA%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">33.</span> <span class="nav-text">查看某个远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%E7%9A%84%E9%87%8D%E5%91%BD%E5%90%8D%E4%B8%8E%E7%A7%BB%E9%99%A4"><span class="nav-number">34.</span> <span class="nav-text">远程仓库的重命名与移除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E6%A0%87%E7%AD%BE"><span class="nav-number">35.</span> <span class="nav-text">打标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git%E5%88%AB%E5%90%8D"><span class="nav-number">36.</span> <span class="nav-text">Git别名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git%E5%88%86%E6%94%AF"><span class="nav-number">37.</span> <span class="nav-text">Git分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF"><span class="nav-number">38.</span> <span class="nav-text">远程分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E6%AF%8F%E6%AC%A1%E8%BE%93%E5%85%A5%E5%AF%86%E7%A0%81"><span class="nav-number">39.</span> <span class="nav-text">如何避免每次输入密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E5%88%86%E6%94%AF"><span class="nav-number">40.</span> <span class="nav-text">跟踪分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF"><span class="nav-number">41.</span> <span class="nav-text">删除远程分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-%E5%AD%90%E6%A8%A1%E5%9D%97"><span class="nav-number">42.</span> <span class="nav-text">Git 子模块</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

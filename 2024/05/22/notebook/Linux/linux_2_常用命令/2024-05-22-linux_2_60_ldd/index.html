@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 ldd命令  linux ldd命令 详解ldd 是 Linux 系统中的一个命令，用于显示可执行文件或共享库的动态链接依赖关系。它会列出程序运行时所需的共享库，并显示它们的完整路径。以下是关于 ldd 命令的详细解释： 语法：1ldd [选项] 可执行文件  常用选项： -v, –verbose： 显示详细的信息，包括库的版本号和调试信息。  -u, –unused： 仅显示未使用的直接依">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_60_ldd">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_60_ldd/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 ldd命令  linux ldd命令 详解ldd 是 Linux 系统中的一个命令，用于显示可执行文件或共享库的动态链接依赖关系。它会列出程序运行时所需的共享库，并显示它们的完整路径。以下是关于 ldd 命令的详细解释： 语法：1ldd [选项] 可执行文件  常用选项： -v, –verbose： 显示详细的信息，包括库的版本号和调试信息。  -u, –unused： 仅显示未使用的直接依">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_60_ldd/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_60_ldd | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_60_ldd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_60_ldd
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>ldd命令</li>
+</ul>
+<h2 id="linux-ldd命令-详解"><a href="#linux-ldd命令-详解" class="headerlink" title="linux ldd命令 详解"></a>linux ldd命令 详解</h2><p><code>ldd</code> 是 Linux 系统中的一个命令，用于显示可执行文件或共享库的动态链接依赖关系。它会列出程序运行时所需的共享库，并显示它们的完整路径。以下是关于 <code>ldd</code> 命令的详细解释：</p>
+<h3 id="语法："><a href="#语法：" class="headerlink" title="语法："></a>语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd [选项] 可执行文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用选项："><a href="#常用选项：" class="headerlink" title="常用选项："></a>常用选项：</h3><ul>
+<li><p><strong>-v, –verbose：</strong> 显示详细的信息，包括库的版本号和调试信息。</p>
+</li>
+<li><p><strong>-u, –unused：</strong> 仅显示未使用的直接依赖项。</p>
+</li>
+<li><p><strong>-d, –data-relocs：</strong> 显示数据的重定位信息。</p>
+</li>
+<li><p><strong>-r, –function-relocs：</strong> 显示函数的重定位信息。</p>
+</li>
+<li><p><strong>-s, –not-symbolic：</strong> 不解析符号链接，直接显示链接库的真实路径。</p>
+</li>
+<li><p><strong>-f, –list-file：</strong> 将输出写入到指定的文件而不是标准输出。</p>
+</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ol>
+<li><p><strong>显示可执行文件的动态链接依赖关系：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>这将列出可执行文件所需的共享库以及它们的完整路径。</p>
+</li>
+<li><p><strong>显示未使用的直接依赖项：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -u /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-u</code> 选项，仅显示未被程序使用的直接依赖项。</p>
+</li>
+<li><p><strong>显示详细信息和版本号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -v /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-v</code> 选项，可以显示详细的信息，包括库的版本号和调试信息。</p>
+</li>
+<li><p><strong>显示数据的重定位信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -d /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-d</code> 选项，可以显示数据的重定位信息。</p>
+</li>
+<li><p><strong>显示函数的重定位信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -r /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-r</code> 选项，可以显示函数的重定位信息。</p>
+</li>
+<li><p><strong>不解析符号链接，直接显示链接库的真实路径：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -s /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-s</code> 选项，将不解析符号链接，直接显示链接库的真实路径。</p>
+</li>
+<li><p><strong>将输出写入到文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -f /path/to/executable &gt; dependencies.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-f</code> 选项，可以将输出写入到指定的文件而不是标准输出。</p>
+</li>
+</ol>
+<h3 id="示例解释："><a href="#示例解释：" class="headerlink" title="示例解释："></a>示例解释：</h3><ul>
+<li><p><strong>动态链接依赖关系：</strong> <code>ldd</code> 命令会列出可执行文件所依赖的共享库，并显示它们的路径，以便操作系统在程序运行时能够正确加载这些库。</p>
+</li>
+<li><p><strong>未使用的依赖项：</strong> 使用 <code>-u</code> 选项，可以找出程序依赖的库中哪些没有被程序使用。</p>
+</li>
+<li><p><strong>详细信息和版本号：</strong> 使用 <code>-v</code> 选项，可以获取更详细的信息，包括库的版本号和调试信息，有助于排查问题。</p>
+</li>
+<li><p><strong>重定位信息：</strong> 使用 <code>-d</code> 和 <code>-r</code> 选项，可以查看关于数据和函数的重定位信息，对于调试和分析程序行为很有帮助。</p>
+</li>
+<li><p><strong>不解析符号链接：</strong> 使用 <code>-s</code> 选项，可以显示链接库的真实路径，而不是解析符号链接。</p>
+</li>
+<li><p><strong>输出写入文件：</strong> 使用 <code>-f</code> 选项，可以将 <code>ldd</code> 命令的输出写入指定的文件，以便后续分析。</p>
+</li>
+</ul>
+<h2 id="linux-ldd命令-常用技巧"><a href="#linux-ldd命令-常用技巧" class="headerlink" title="linux ldd命令 常用技巧"></a>linux ldd命令 常用技巧</h2><p><code>ldd</code> 命令在 Linux 中用于查看可执行文件或共享库的动态链接依赖关系。以下是一些 <code>ldd</code> 命令的常用技巧：</p>
+<ol>
+<li><p><strong>查看可执行文件的动态链接库：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>这会列出可执行文件所依赖的共享库以及它们的路径。</p>
+</li>
+<li><p><strong>只显示缺失的动态链接库：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -u /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-u</code> 选项，可以仅显示未被程序使用的直接依赖项，即缺失的库。</p>
+</li>
+<li><p><strong>显示详细信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -v /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-v</code> 选项，可以显示更详细的信息，包括库的版本号和调试信息。</p>
+</li>
+<li><p><strong>查看共享库的依赖关系：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd /path/to/shared/library.so</span><br></pre></td></tr></table></figure>
+<p><code>ldd</code> 不仅可以用于可执行文件，也可以用于查看共享库的依赖关系。</p>
+</li>
+<li><p><strong>将输出写入文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd /path/to/executable &gt; dependencies.txt</span><br></pre></td></tr></table></figure>
+<p>将 <code>ldd</code> 的输出写入文件，以便后续分析。</p>
+</li>
+<li><p><strong>显示所有符号链接的真实路径：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -s /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-s</code> 选项，可以显示链接库的真实路径，而不是解析符号链接。</p>
+</li>
+<li><p><strong>显示函数的重定位信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -r /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-r</code> 选项，可以显示函数的重定位信息，对于调试和分析程序行为很有帮助。</p>
+</li>
+<li><p><strong>显示数据的重定位信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd -d /path/to/executable</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-d</code> 选项，可以显示数据的重定位信息。</p>
+</li>
+<li><p><strong>递归查看所有依赖项：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /path/to/executable -<span class="built_in">exec</span> ldd &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>find</code> 命令和 <code>-exec</code> 选项，递归查看所有依赖项。</p>
+</li>
+</ol>
+<p>这些技巧能够帮助你更深入地了解程序的依赖关系，有助于调试和解决运行时的问题。</p>
+<h2 id="ldd（list-dynamic-dependencies）"><a href="#ldd（list-dynamic-dependencies）" class="headerlink" title="ldd（list dynamic dependencies）"></a>ldd（list dynamic dependencies）</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>ldd命令用于打印程序或者库文件所依赖的共享库列表。</li>
+</ul>
+</li>
+<li><p>语法</p>
+<ul>
+<li><code>ldd [参数] [文件]</code></li>
+</ul>
+</li>
+<li><p>参数</p>
+<ul>
+<li>-v 详细信息模式，打印所有相关信息 </li>
+<li>-u 打印未使用的直接依赖 </li>
+<li>-d 执行重定位和报告任何丢失的对象 </li>
+<li>-r 执行数据对象和函数的重定位，并且报告任何丢失的对象和函数 </li>
+<li>–help 显示帮助信息</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldd /path/to/executable</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注：</p>
+<ul>
+<li>当你在终端中运行 ldd 命令并指定一个可执行文件的路径时，它会列出该可执行文件所依赖的共享库。对于每个共享库，它会显示库的路径和版本号。这些共享库是程序在运行时需要的动态链接库，它们提供了程序所需的函数和符号</li>
+<li>ldd 命令对于诊断程序依赖性问题非常有用。通过查看程序的依赖库列表，你可以确定程序是否缺少某些依赖库或使用了不兼容的库版本</li>
+<li>需要注意的是，ldd 命令只能查看程序或共享库的直接依赖库，无法递归地列出所有依赖关系。如果你需要查看所有依赖库，可以使用工具如 readelf 或 objdump 结合脚本来实现</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_62_unset/" rel="prev" title="linux_2_62_unset">
+      <i class="fa fa-chevron-left"></i> linux_2_62_unset
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_61_watch/" rel="next" title="linux_2_61_watch">
+      linux_2_61_watch <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ldd%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux ldd命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常用选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E8%A7%A3%E9%87%8A%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">示例解释：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-ldd%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux ldd命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ldd%EF%BC%88list-dynamic-dependencies%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">ldd（list dynamic dependencies）</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

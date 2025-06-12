@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介输出文件名和行号 使用宏，例如SPDLOG_INFO  使用宏函数输出的日志也写入到文件 使用函数 spdlog::set_default_logger(); 示例如下123456789101112131415161718192021222324static void InitLogger()&#123;    &#x2F;&#x2F;创建控制台日志记录器    auto console_sink &#x3D; std::">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spdlog">
+<meta property="og:url" content="https://junyiha.github.io/2024/08/27/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-08-27-spdlog/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介输出文件名和行号 使用宏，例如SPDLOG_INFO  使用宏函数输出的日志也写入到文件 使用函数 spdlog::set_default_logger(); 示例如下123456789101112131415161718192021222324static void InitLogger()&#123;    &#x2F;&#x2F;创建控制台日志记录器    auto console_sink &#x3D; std::">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-08-27T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.160Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppLibrary">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/08/27/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-08-27-spdlog/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>spdlog | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/08/27/notebook/C++/C++_04_%E5%B8%B8%E7%94%A8%E5%BA%93/2024-08-27-spdlog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spdlog
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-08-27 09:00:00" itemprop="dateCreated datePublished" datetime="2024-08-27T09:00:00+08:00">2024-08-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h2 id="输出文件名和行号"><a href="#输出文件名和行号" class="headerlink" title="输出文件名和行号"></a>输出文件名和行号</h2><ul>
+<li>使用宏，例如SPDLOG_INFO</li>
+</ul>
+<h2 id="使用宏函数输出的日志也写入到文件"><a href="#使用宏函数输出的日志也写入到文件" class="headerlink" title="使用宏函数输出的日志也写入到文件"></a>使用宏函数输出的日志也写入到文件</h2><ul>
+<li>使用函数 spdlog::set_default_logger();</li>
+<li>示例如下<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">InitLogger</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//创建控制台日志记录器</span></span><br><span class="line">    <span class="keyword">auto</span> console_sink = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::stdout_color_sink_mt&gt;();</span><br><span class="line">    console_sink-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br><span class="line"></span><br><span class="line">    console_sink-&gt;<span class="built_in">set_pattern</span>(<span class="string">&quot;[%Y-%m-%d %H:%M:%S.%e][thread %t][%s:%#][%l]: %v&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件日志记录器: 滚动记录，最大文件5M，文件数量100个</span></span><br><span class="line">    std::string log_path = ROOT_PATH;</span><br><span class="line">    log_path += <span class="string">&quot;logs/rotating.txt&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span> rotating_sink = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(log_path, <span class="number">1048576</span> * <span class="number">5</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//同步记录器，</span></span><br><span class="line">    std::vector&lt;spdlog::sink_ptr&gt; sinks&#123; console_sink, rotating_sink &#125;;</span><br><span class="line">    <span class="keyword">auto</span> logger = std::<span class="built_in">make_shared</span>&lt;spdlog::logger&gt;(<span class="string">&quot;logger&quot;</span>, sinks.<span class="built_in">begin</span>(), sinks.<span class="built_in">end</span>());</span><br><span class="line">    spdlog::<span class="built_in">register_logger</span>(logger); <span class="comment">//注册为全局日志，通过log_write访问;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 宏相关配置</span></span><br><span class="line">    spdlog::<span class="built_in">set_default_logger</span>(logger);</span><br><span class="line">    spdlog::<span class="built_in">set_pattern</span>(<span class="string">&quot;[%Y-%m-%d %H:%M:%S.%e][thread %t][%s:%#][%l]: %v&quot;</span>);</span><br><span class="line">    spdlog::<span class="built_in">set_level</span>(spdlog::level::warn);</span><br><span class="line">    spdlog::<span class="built_in">flush_every</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">3</span>)); <span class="comment">//每3s刷新一次</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><ul>
+<li><p>logger: 日志对象，每个日志内包含一个sink组成的vector，每个sink可以分别设置优先级，logger本身也可设置优先级。</p>
+</li>
+<li><p>sink: 直译是水槽，实际上是引流的对象或者可以认为是输出目标，spdlog库内置了多种不同类型的logger可供选择</p>
+</li>
+<li><p>formatter: 格式化对象，绝大部分情况下spdlog默认的格式就足够用了，但是如果有个性化需求，可以进行自定义格式</p>
+</li>
+<li><p>level: 日志级别，不同的日志库可能会有不同的设置，但是基本情况下都会有debug,info,warn,error等级别划分来处理不同的情况，具体各个级别的情况可以根据自己的实际情况选取</p>
+</li>
+<li><p>逻辑关系</p>
+<ul>
+<li>每个logger包含一个vector,该vector由一个或者多个 std::shared_ptr<sink> 组成，logger的每条日志都会调用sink对象，由sink对象按照formatter的格式输出到指定的地方(有可能是控制台，文件等)</li>
+</ul>
+</li>
+</ul>
+<h2 id="formatter"><a href="#formatter" class="headerlink" title="formatter"></a>formatter</h2><ul>
+<li>formatter也即是格式化对象，用于控制日志的输出格式，spdlog自带了默认的formatter，一般情况下，我们无需任何修改，直接使用即可。需要注意的是，每个sink会有一个formatter</li>
+<li>默认formatter的格式为: [日期时间][logger名][log级别]log内容<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2022-10-13 17:00:55.795] [service] [debug] found env XXXXXXX : true</span><br><span class="line">[2022-10-13 17:00:55.795] [func_config] [debug] kafka_brokers : localhost:9092</span><br><span class="line">[2022-10-13 17:00:55.795] [func_config] [debug] kafka_main_topic : kafka_test</span><br><span class="line">[2022-10-13 17:00:55.795] [func_config] [debug] kafka_partition_value : -1</span><br><span class="line">[2022-10-13 17:00:55.795] [service] [info] initialized</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="sink"><a href="#sink" class="headerlink" title="sink"></a>sink</h2><ul>
+<li><p>每个sink对应着一个输出目标和输出格式，它内部包含一个formatter，输出目标可以是控制台，文件等地方。</p>
+</li>
+<li><p>所有的sink都在命名空间spdlog::sinks下，可以自行探索</p>
+</li>
+<li><p>spdlog中创建控制台sink非常简单，该方式创建的sink会输出到命令行终端，且是彩色的。后缀的 _mt 代表多线程， _st 代表单线程</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> sink1 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::stdout_color_sink_mt&gt;();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>文件sink的类型有很多，这里展示几种经典类型</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> sink1 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::basic_file_sink_mt&gt;(log_file_name);<span class="comment">//最简单的文件sink，只需要指定文件名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink2 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::daily_file_sink_mt&gt;(log_file_name, path, <span class="number">14</span>, <span class="number">22</span>);<span class="comment">//每天的14点22分在path下创建新的文件</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink3 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(log_file_name, <span class="number">1024</span> * <span class="number">1024</span> * <span class="number">10</span>, <span class="number">100</span>, <span class="literal">false</span>);<span class="comment">//轮转文件，一个文件满了会写到下一个文件，第二个参数是单文件大小上限，第三个参数是文件数量最大值</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>其他sink</p>
+<ul>
+<li>ostream_sink</li>
+<li>syslog_sink</li>
+</ul>
+</li>
+<li><p>sink的flush问题</p>
+<ul>
+<li>创建好sink后建议设置flush方式，否则可能无法立刻在文件中看到logger的内容</li>
+<li>以下为两种重要的flush方式设置(直接设置全局)<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">spdlog::<span class="built_in">flush_every</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">1</span>));</span><br><span class="line">spdlog::<span class="built_in">flush_on</span>(spdlog::level::debug);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="logger"><a href="#logger" class="headerlink" title="logger"></a>logger</h2><ul>
+<li><p>日志对象，每个logger内容包含了一个vector用于存放sink，每个sink都是互相独立</p>
+</li>
+<li><p>因此一个日志对象在输出日志时可以同时输出到控制台和文件等位置</p>
+</li>
+<li><p>如果整个项目中只需要一个logger，spdlog提供了最为便捷的logger，注意，该logger在全局公用，输出到控制台，多线程，彩色。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Use the default logger (stdout, multi-threaded, colored)</span></span><br><span class="line">spdlog::<span class="built_in">info</span>(<span class="string">&quot;Hello, &#123;&#125;!&quot;</span>, <span class="string">&quot;World&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建特定的logger</p>
+<ul>
+<li>大部分情况下默认logger是不够用的，因为我们可能需要做不同模块各自的logger，可能需要logger输出到文件进行持久化，所以创建logger是很很重要的一件事。</li>
+</ul>
+</li>
+<li><p>直接创建</p>
+<ul>
+<li>与创建sink类似，我们可以非常便捷的创建logger。</li>
+<li>由于大部分时候一个logger只会有一个sink，所以spdlog提供了创建logger的接口并封装了创建sink的过程<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> console = spdlog::<span class="built_in">stdout_color_mt</span>(<span class="string">&quot;some_unique_name&quot;</span>);<span class="comment">//一个输出到控制台的彩色多线程logger，可以指定名字</span></span><br><span class="line"><span class="keyword">auto</span> file_logger = spdlog::<span class="built_in">rotating_logger_mt</span>(<span class="string">&quot;file_logger&quot;</span>, <span class="string">&quot;logs/mylogfile&quot;</span>, <span class="number">1048576</span> * <span class="number">5</span>, <span class="number">3</span>);<span class="comment">//一个输出到指定文件的轮转文件logger，后面的参数指定了文件的信息</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>组合sinks方式创建</p>
+<ul>
+<li>有时候，单sink的logger不够用，那么可以先创建sink的vector，然后使用sinks_vector创建vector</li>
+<li>以下示例中，首先创建了sink的vector，然后创建了两个sink并放入vector，最后使用该vector创建了logger，其中 set_level 的过程不是必须的， register_logger 一般是必须的，否则只能在创建logger的地方使用该logger<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">std::vector&lt;spdlog::sink_ptr&gt; sinks;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink1 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::stdout_color_sink_mt&gt;();</span><br><span class="line">sink1-&gt;<span class="built_in">set_level</span>(MyLoggers::<span class="built_in">getGlobalLevel</span>());</span><br><span class="line">sinks.<span class="built_in">push_back</span>(sink1);</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> sink2 = std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(log_file_name, <span class="number">1024</span> * <span class="number">1024</span> * <span class="number">10</span>, <span class="number">100</span>, <span class="literal">false</span>);</span><br><span class="line">sink2-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br><span class="line">sinks.<span class="built_in">push_back</span>(sink2);</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> logger = std::<span class="built_in">make_shared</span>&lt;spdlog::logger&gt;(<span class="string">&quot;logger_name&quot;</span>, <span class="built_in">begin</span>(sinks), <span class="built_in">end</span>(sinks));</span><br><span class="line">logger-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br><span class="line">spdlog::<span class="built_in">register_logger</span>(logger);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>logger的注册与获取</p>
+<ul>
+<li>在一个地方创建了logger却智能在该处使用肯定是不好的，所以spdlog提供了全局注册和获取logger，我们只需要在某处先创建logger并注册，那么后面再其他地方使用时直接获取就可以了</li>
+<li>注册: spdlog::register_logger()</li>
+<li>获取: spdlog::get()<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//上面的代码中我们注册了一个logger，名字是logger_name，接下来尝试获取</span></span><br><span class="line"><span class="keyword">auto</span> logger = MyLoggers::<span class="built_in">getLogger</span>(<span class="string">&quot;logger_name&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="logger的使用"><a href="#logger的使用" class="headerlink" title="logger的使用"></a>logger的使用</h2><ul>
+<li><p>logger的默认level是info，如果处于开发换进给或者生产环境，绘制需要debug级别以上，可以设置logger的级别</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger-&gt;<span class="built_in">set_level</span>(spdlog::level::debug);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以设置全局logger级别</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spdlog::<span class="built_in">set_level</span>(spdlog::level::warn);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以设置sink级别的logger</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sink1-&gt;<span class="built_in">set_level</span>(spdlog::level::info);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注意: 一个logger假如有多个sink，那么这些sink分别设置level是可以不同的，但是由于logger本身也有level，所以真正使用时，logger的level如果高于某个sink，会覆盖该sink的level，所以建议此时把logger的level手动设置为debug(默认为info)</p>
+</li>
+</ul>
+<h3 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h3><ul>
+<li><p>使用方法一：</p>
+<ul>
+<li>下载好项目源代码，使用cmake编译，命令:<code>cmake -S . -B build</code>，然后进入build进行make，会获取到一个静态库 <code>libspdlog.a</code></li>
+<li>之后通过包含include下的头文件和链接生成的静态库，使用spdlog</li>
+</ul>
+</li>
+<li><p>使用方法二：</p>
+<ul>
+<li>将头文件和源文件分别添加到相应工程中的头文件和源文件</li>
+<li>然后再CMakeLists.txt中添加头文件目录和源文件目录，并且添加一条命令用来编译指定文件：<code>target_compile_definitions($&#123;PROJECT_NAME&#125; PUBLIC SPDLOG_COMPILED_LIB)</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-2-基本用法"><a href="#1-2-基本用法" class="headerlink" title="1.2 基本用法"></a>1.2 基本用法</h3><ul>
+<li><p>输出日志信息到标准输出</p>
+<ul>
+<li><code>spdlog::info(&quot;This is a log message.&#123;0&#125; &#123;1&#125;&quot;, &quot;hello&quot;, &quot;world&quot;)</code></li>
+<li><code>spdlog::warn(&quot;This is a warn message&quot;);</code></li>
+<li><code>spdlog::debug(&quot;This message should not be displayed&quot;);</code></li>
+<li><code>spdlog::set_level(spdlog::level::trace);  // set specifice logger&#39;s log level</code></li>
+<li><code>spdlog::debug(&quot;This message should be displayed, because the level is setted trace&quot;);</code></li>
+</ul>
+</li>
+<li><p>日志信息输出到文件</p>
+<ul>
+<li>创建基础日志文件：<ul>
+<li><code>#include &quot;spdlog/sinks/basic_file_sink.h&quot;</code></li>
+<li><code>auto my_logger = spdlog::basic_logger_mt(&quot;file_logger&quot;, &quot;logs/basic-log.txt&quot;, true);</code></li>
+<li>创建一个文件为<code>logs/basic-log.txt</code>，并设置输出的消息标识为<code>file_logger</code>的日志文件，通过使用<code>my_logger</code>来操作该日志文件</li>
+</ul>
+</li>
+<li>将日志输出到日志文件中：<ul>
+<li><code>my_logger-&gt;info(&quot;Helo Info&quot;);</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>输出行号：</p>
+<ul>
+<li><code>SPDLOG_DEBUG(&quot;some debug message about program: &#123;&#125;&quot;, &quot;robot&quot;);</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="spdlog-spdlog-get-函数-详解"><a href="#spdlog-spdlog-get-函数-详解" class="headerlink" title="spdlog spdlog::get()函数 详解"></a>spdlog spdlog::get()函数 详解</h2><p><code>spdlog</code> 是一个快速的 C++ 日志库，广泛用于高效日志记录。<code>spdlog::get()</code> 函数用于获取已经创建的日志记录器（logger）的共享指针。如果指定名称的日志记录器不存在，它会返回 <code>nullptr</code>。</p>
+<h3 id="1-函数定义"><a href="#1-函数定义" class="headerlink" title="1. 函数定义"></a>1. 函数定义</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::shared_ptr&lt;spdlog::logger&gt; <span class="title">spdlog::get</span><span class="params">(<span class="type">const</span> std::string &amp;name)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-参数说明"><a href="#2-参数说明" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h3><ul>
+<li><strong>name</strong>: 一个 <code>std::string</code> 类型的参数，表示需要获取的日志记录器的名称。</li>
+</ul>
+<h3 id="3-返回值"><a href="#3-返回值" class="headerlink" title="3. 返回值"></a>3. 返回值</h3><ul>
+<li><strong><code>std::shared_ptr&lt;spdlog::logger&gt;</code></strong>: 返回一个指向指定名称的日志记录器的共享指针。如果指定名称的日志记录器未找到，则返回 <code>nullptr</code>。</li>
+</ul>
+<h3 id="4-使用场景"><a href="#4-使用场景" class="headerlink" title="4. 使用场景"></a>4. 使用场景</h3><p><code>spdlog::get()</code> 通常用于在应用程序的不同模块中共享同一个日志记录器。比如，你在主模块中创建了一个名为 “my_logger” 的日志记录器，之后可以在其他模块中通过 <code>spdlog::get(&quot;my_logger&quot;)</code> 获取同一个记录器，而无需重新创建。</p>
+<h3 id="5-示例代码"><a href="#5-示例代码" class="headerlink" title="5. 示例代码"></a>5. 示例代码</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/spdlog.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/sinks/basic_file_sink.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个名为 &quot;file_logger&quot; 的日志记录器</span></span><br><span class="line">    <span class="keyword">auto</span> logger = spdlog::<span class="built_in">basic_logger_mt</span>(<span class="string">&quot;file_logger&quot;</span>, <span class="string">&quot;logs.txt&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用记录器进行日志记录</span></span><br><span class="line">    logger-&gt;<span class="built_in">info</span>(<span class="string">&quot;This is an info message&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在其他地方获取并使用相同的记录器</span></span><br><span class="line">    <span class="keyword">auto</span> same_logger = spdlog::<span class="built_in">get</span>(<span class="string">&quot;file_logger&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (same_logger) &#123;</span><br><span class="line">        same_logger-&gt;<span class="built_in">warn</span>(<span class="string">&quot;This is a warning message from the same logger&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        spdlog::<span class="built_in">error</span>(<span class="string">&quot;Logger not found&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-注意事项"><a href="#6-注意事项" class="headerlink" title="6. 注意事项"></a>6. 注意事项</h3><ul>
+<li><code>spdlog::get()</code> 只返回已经通过 <code>spdlog::register_logger()</code> 或者 <code>spdlog::basic_logger_mt()</code> 等方法注册过的日志记录器。如果未注册过，返回的会是 <code>nullptr</code>。</li>
+<li><code>spdlog::get()</code> 函数是线程安全的，因此可以在多线程环境中安全使用。</li>
+</ul>
+<p>通过 <code>spdlog::get()</code>，你可以在不同模块中灵活地获取和使用日志记录器，确保日志管理的一致性。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppLibrary/" rel="tag"># CppLibrary</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/08/25/notebook/VSCode/2024-08-25-3_launch%E6%96%87%E4%BB%B6/" rel="prev" title="vscode-launch.json文件">
+      <i class="fa fa-chevron-left"></i> vscode-launch.json文件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/08/28/notebook/CMake/cmake_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-08-28-1_02_MasteringCMake/" rel="next" title="MasteringCMake">
+      MasteringCMake <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E6%96%87%E4%BB%B6%E5%90%8D%E5%92%8C%E8%A1%8C%E5%8F%B7"><span class="nav-number">2.</span> <span class="nav-text">输出文件名和行号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AE%8F%E5%87%BD%E6%95%B0%E8%BE%93%E5%87%BA%E7%9A%84%E6%97%A5%E5%BF%97%E4%B9%9F%E5%86%99%E5%85%A5%E5%88%B0%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">使用宏函数输出的日志也写入到文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">4.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#formatter"><span class="nav-number">5.</span> <span class="nav-text">formatter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sink"><span class="nav-number">6.</span> <span class="nav-text">sink</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logger"><span class="nav-number">7.</span> <span class="nav-text">logger</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logger%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">8.</span> <span class="nav-text">logger的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%A6%82%E8%BF%B0"><span class="nav-number">8.1.</span> <span class="nav-text">1.1 概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">8.2.</span> <span class="nav-text">1.2 基本用法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spdlog-spdlog-get-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">spdlog spdlog::get()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">9.1.</span> <span class="nav-text">1. 函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="nav-number">9.2.</span> <span class="nav-text">2. 参数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">9.3.</span> <span class="nav-text">3. 返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">9.4.</span> <span class="nav-text">4. 使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">9.5.</span> <span class="nav-text">5. 示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">9.6.</span> <span class="nav-text">6. 注意事项</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

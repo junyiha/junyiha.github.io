@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 交叉编译相关笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="交叉编译">
+<meta property="og:url" content="https://junyiha.github.io/2024/06/20/notebook/Compiler/2024-06-20-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 交叉编译相关笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-06-20T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.255Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="cross compiler">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/06/20/notebook/Compiler/2024-06-20-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>交叉编译 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/06/20/notebook/Compiler/2024-06-20-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          交叉编译
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-06-20 09:00:00" itemprop="dateCreated datePublished" datetime="2024-06-20T09:00:00+08:00">2024-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Compiler/" itemprop="url" rel="index"><span itemprop="name">Compiler</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>交叉编译相关笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="交叉编译器-维基百科"><a href="#交叉编译器-维基百科" class="headerlink" title="交叉编译器(维基百科)"></a>交叉编译器(维基百科)</h2><ul>
+<li><p>交叉编译器(Cross compiler)是指一个在某个系统平台下可以产生另一个系统平台的可执行文件的编译器。交叉编译器在目标系统平台(开发出来的应用程序所运行的平台)难以或不容易编译时非常有用</p>
+</li>
+<li><p>交叉编译器的存在对于一个开发主机为多个平台编译代码是非常有必要的。直接在平台上编译有时行不通，例如在一个嵌入式系统的单片机，因为他们没有完整的现代操作系统环境，无法直接编译</p>
+</li>
+<li><p>交叉编译器和源代码至源代码编译器不同，交叉编译器用于二进制代码的跨平台软件开发，而源到源编译器是将某种编程语言的程序源代码作为输入，生成以另一种编程语言构成的等效源代码的编译器，但是两者都是编程工具。</p>
+</li>
+<li><p>交叉编译器的基本用法就是将构建环境和目标环境分开。常常在下面几种情况中使用</p>
+<ul>
+<li>嵌入式电脑</li>
+<li>编译多个目标库</li>
+<li>在服务器上编译</li>
+<li>引导一个新平台(Booststrapping)</li>
+</ul>
+</li>
+<li><p>程序虚拟机(例如JVM)也借鉴了当初开发交叉编译器的理念。它可以用同一份输出在多个目标系统上运行，但是编译后的代码必须运行在虚拟机上。</p>
+</li>
+</ul>
+<h2 id="理解交叉编译-Cross-compile"><a href="#理解交叉编译-Cross-compile" class="headerlink" title="理解交叉编译(Cross compile)"></a>理解交叉编译(Cross compile)</h2><ul>
+<li><p>三个名词： build, host, target</p>
+<ul>
+<li>build: 构建gcc编译器的平台系统环境，编译该软件使用的平台</li>
+<li>host: 是执行gcc编译器的平台系统环境，该软件运行的平台</li>
+<li>target: 是让gcc编译器产生能在什么格式运行的平台的系统环境，该软件处理的目标平台</li>
+</ul>
+</li>
+<li><p>build和host不同是交叉编译器</p>
+</li>
+<li><p>build和target不同是交叉编译链</p>
+</li>
+<li><p>三者都相同则为本地编译</p>
+</li>
+</ul>
+<h2 id="什么是交叉编译"><a href="#什么是交叉编译" class="headerlink" title="什么是交叉编译"></a>什么是交叉编译</h2><ul>
+<li>在解释什么是交叉编译之前，先要明白什么是本地编译</li>
+<li>本地编译可以理解为，在当前编译平台下，编译出来的程序只能放到当前平台下运行。</li>
+<li>交叉编译可以理解为，在当前编译平台下，编译出来的程序能运行在体系结构不同的另一种目标平台上，但是编译平台本身却不能运行该程序</li>
+</ul>
+<h2 id="为什么会有交叉编译"><a href="#为什么会有交叉编译" class="headerlink" title="为什么会有交叉编译"></a>为什么会有交叉编译</h2><ul>
+<li>Speed: 目标平台的运行速度往往比主机慢的多，许多专用的嵌入式硬件被设计为低成本和低功耗，没有太高的性能</li>
+<li>Capability: 整个编译过程是非常消耗资源的，嵌入式系统往往没有足够的内存或磁盘空间</li>
+<li>Availability: 即使目标平台资源很充足，可以本地编译，但是第一个目标平台上运行的本地编译器总需要通过交叉编译获得</li>
+<li>Flexibility: 一个完整的Linux编译环境需要很多支持包，交叉编译使我们不需要花时间将各种支持包移植到目标板上</li>
+</ul>
+<h2 id="为什么交叉编译比较困难"><a href="#为什么交叉编译比较困难" class="headerlink" title="为什么交叉编译比较困难"></a>为什么交叉编译比较困难</h2><ul>
+<li><p>不同的体系架构拥有不同的机器特性</p>
+<ul>
+<li>word size: 是64位还是32位系统</li>
+<li>endianness: 是大端还是小端系统</li>
+<li>alignment: 是否必须按照4字节对齐方式进行访问</li>
+<li>default signedness: 默认数据类型是有符号还是无符号</li>
+<li>nommu: 是否支持MMU</li>
+</ul>
+</li>
+<li><p>交叉编译时的主机环境与目标环境不同</p>
+<ul>
+<li>configuration issues</li>
+<li>HOSTCC vs TARGETCC</li>
+<li>toolchain leaks</li>
+<li>libraries</li>
+<li>testing</li>
+</ul>
+</li>
+</ul>
+<h2 id="什么是交叉编译链"><a href="#什么是交叉编译链" class="headerlink" title="什么是交叉编译链"></a>什么是交叉编译链</h2><ul>
+<li>编译过程是按照不同的子功能，依照先后顺序组成的一个复杂的流程</li>
+<li>编译过程包括了预处理，编译，汇编，链接等功能。既然有不同的子功能，那每个子功能都是一个单独的工具来实现，它们组合在一起形成了一个完整的工具集。</li>
+<li>同时编译过程又是一个有先后顺序的流程，他必然牵涉到工具的使用顺序，每个工具按照先后关系串联在一起，这就形成一个链式结构。</li>
+<li>因此，交叉编译链就是为了编译跨平台体系结构的程序代码而形成的由多个子工具构成的一套完整的工具集。同时，它隐藏了预处理，编译，汇编，链接等细节，当我们指定了源文件时，它会自动按照编译流程调用不同的子工具，自动生成最终的二进制程序映像(.bin)</li>
+<li>注意：<ul>
+<li>严格意义上，交叉编译器，只是指交叉编译的gcc，但是实际上为了方便，我们常说的交叉编译器就是交叉工具链。这两个概念，都是指编译链</li>
+</ul>
+</li>
+</ul>
+<h2 id="交叉编译链的命名规则"><a href="#交叉编译链的命名规则" class="headerlink" title="交叉编译链的命名规则"></a>交叉编译链的命名规则</h2><ul>
+<li><p>我们使用交叉编译链时，常常会看到这样的名字</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arm-none-linux-gnueabi-gcc</span><br><span class="line">arm-cortex_a8-linux-gnueabi-gcc</span><br><span class="line">mips-malta-linux-gnu-gcc</span><br></pre></td></tr></table></figure></li>
+<li><p>其中，对应的前缀为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arm-none-linux-gnueabi-</span><br><span class="line">arm-cortex_a8-linux-gnueabi-</span><br><span class="line">mips-malta-linux-gnu-</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这些交叉编译链的命名规则是通用的，有一定的规则： arch-core-kernel-system</p>
+<ul>
+<li>arch: 用于哪个目标平台</li>
+<li>core: 使用的是哪个CPU Core,例如Cortex A8，但是这一组命名比较灵活，在其他厂家提供的交叉编译链中，有以厂家名称命名的，也有以开发板命名的，或者直接是none或者cross的</li>
+<li>kernel: 所运行的OS，见过的有 Linux, uclinux, bare(无OS)</li>
+<li>system: 交叉编译链所选择的库函数和目标映像的规范，例如gnu, gnueabi等。其中gnu等价于glibc+oabi; gnueabi等价于 glib + eabi</li>
+</ul>
+</li>
+<li><p>注意：这个规则是一个猜测，并没有在哪份官方资料上看到过。而且有些编译链的命名确实没有按照这个规则，也不清楚这是不是历史原因造成的</p>
+</li>
+</ul>
+<h2 id="交叉编译包含的工具"><a href="#交叉编译包含的工具" class="headerlink" title="交叉编译包含的工具"></a>交叉编译包含的工具</h2><ul>
+<li><p>Binutils是GNU工具之一，它包括链接器、汇编器和其他用于目标文件和档案的工具，它是二进制代码的处理维护工具。</p>
+</li>
+<li><p>Binutils工具包含的子程序如下：</p>
+<ul>
+<li>ld GNU连接器the GNU linker.</li>
+<li>as GNU汇编器the GNU assembler.</li>
+<li>addr2line 把地址转换成文件名和所在的行数</li>
+<li>ar A utility for creating, modifying and extracting from archives.</li>
+<li>c++filt Filter to demangle encoded C++ symbols.</li>
+<li>dlltool Creates files for building and using DLLs.</li>
+<li>gold A new, faster, ELF only linker, still in beta test.</li>
+<li>gprof Displays profiling information.</li>
+<li>nlmconv Converts object code into an NLM.</li>
+<li>nm Lists symbols from object files.</li>
+<li>objcopy Copys and translates object files.</li>
+<li>objdump Displays information from object files.</li>
+<li>ranlib Generates an index to the contents of an archive.</li>
+<li>readelf Displays information from any ELF format object file.</li>
+<li>size Lists the section sizes of an object or archive file.</li>
+<li>strings Lists printable strings from files.</li>
+<li>strip Discards symbols</li>
+</ul>
+</li>
+<li><p>GNU编译器套件，支持C, C++, Java, Ada, Fortran, Objective-C等众多语言。</p>
+</li>
+<li><p>Linux上通常使用的C函数库为glibc。glibc是linux系统中最底层的api，几乎其它任何运行库都会依赖于glibc。glibc除了封装linux操作系统所提供的系统服务外，它本身也提供了许多其它一些必要功能服务的实现。</p>
+</li>
+<li><p>因为嵌入式环境的资源及其紧张，所以现在除了glibc外，还有uClibc和eglibc可以选择</p>
+</li>
+<li><p>GDB用于调试程序</p>
+</li>
+</ul>
+<h2 id="如何得到交叉编译链"><a href="#如何得到交叉编译链" class="headerlink" title="如何得到交叉编译链"></a>如何得到交叉编译链</h2><ul>
+<li><p>下载已经做好的交叉编译链</p>
+<ul>
+<li>使用其他人针对某些CPU平台已经编译好的交叉编译链。我们只需要找到合适的，下载下来使用即可。</li>
+<li>常见的交叉编译链下载地址：<ul>
+<li>在 <a target="_blank" rel="noopener" href="http://ftp.arm.linux.org.uk/pub/armlinux/toolchain/">http://ftp.arm.linux.org.uk/pub/armlinux/toolchain/</a> 下载已经编译好的交叉编译链</li>
+<li>在 <a target="_blank" rel="noopener" href="http://www.denx.de/en/Software/WebHome">http://www.denx.de/en/Software/WebHome</a> 下载已经编译好的交叉编译链</li>
+<li>在<a target="_blank" rel="noopener" href="https://launchpad.net/gcc-arm-embedded%E4%B8%8B%E8%BD%BD%E5%B7%B2%E7%BB%8F%E7%BC%96%E8%AF%91%E5%A5%BD%E7%9A%84%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E9%93%BE">https://launchpad.net/gcc-arm-embedded下载已经编译好的交叉编译链</a></li>
+<li>一些制作交叉编译链的工具中，包含了已经制作好的交叉编译链，可以直接拿来使用。如crosstool-NG</li>
+<li>如果购买了某个芯片或开发板，一般厂商会提供对应的整套开发软件，其中就包含了交叉编译链。</li>
+</ul>
+</li>
+<li>厂家提供的工具一般是经过了严格的测试，并打入了一些必要的补丁，所以这种方式往往是最可靠的工具来源。</li>
+</ul>
+</li>
+<li><p>使用工具定制交叉编译链</p>
+<ul>
+<li>使用现存的制作工具，以简化制作交叉编译链这个事情的复杂度。我们只需要了解有哪些工具可以实现，并选个合适的工具，搞懂它的操作步骤即可。<ul>
+<li>crosstool-NG</li>
+<li>Buildroot</li>
+<li>Embedded Linux Development Kit(ELDK)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cross-compiler/" rel="tag"># cross compiler</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/06/19/notebook/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/" rel="prev" title="C++中的NaN 产生原因，特性及处理方法">
+      <i class="fa fa-chevron-left"></i> C++中的NaN 产生原因，特性及处理方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/06/22/notebook/Tools/2024-06-22-cpu_gpu_npu_tpu%E5%8C%BA%E5%88%AB/" rel="next" title="CPU,GPU,NPT,TPU的联系和区别">
+      CPU,GPU,NPT,TPU的联系和区别 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%99%A8-%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91"><span class="nav-number">2.</span> <span class="nav-text">交叉编译器(维基百科)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91-Cross-compile"><span class="nav-number">3.</span> <span class="nav-text">理解交叉编译(Cross compile)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">什么是交叉编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91"><span class="nav-number">5.</span> <span class="nav-text">为什么会有交叉编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E6%AF%94%E8%BE%83%E5%9B%B0%E9%9A%BE"><span class="nav-number">6.</span> <span class="nav-text">为什么交叉编译比较困难</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E9%93%BE"><span class="nav-number">7.</span> <span class="nav-text">什么是交叉编译链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E9%93%BE%E7%9A%84%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99"><span class="nav-number">8.</span> <span class="nav-text">交叉编译链的命名规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%8C%85%E5%90%AB%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="nav-number">9.</span> <span class="nav-text">交叉编译包含的工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%BE%97%E5%88%B0%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E9%93%BE"><span class="nav-number">10.</span> <span class="nav-text">如何得到交叉编译链</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

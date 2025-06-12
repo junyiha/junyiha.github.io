@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 threading模块笔记  python threading 判断多个线程是否完成在 Python 中，可以使用 threading.Thread 的 is_alive() 方法或者 join() 方法来判断线程是否完成。 以下是几种判断多个线程是否完成的方法：  方法 1：使用 join() 等待所有线程完成join() 会阻塞主线程，直到子线程完成。这是最常见的方式。 12345678">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python_3_threading模块">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-05-22-python_3_threading%E6%A8%A1%E5%9D%97/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 threading模块笔记  python threading 判断多个线程是否完成在 Python 中，可以使用 threading.Thread 的 is_alive() 方法或者 join() 方法来判断线程是否完成。 以下是几种判断多个线程是否完成的方法：  方法 1：使用 join() 等待所有线程完成join() 会阻塞主线程，直到子线程完成。这是最常见的方式。 12345678">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.459Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-05-22-python_3_threading%E6%A8%A1%E5%9D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>python_3_threading模块 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-05-22-python_3_threading%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python_3_threading模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>threading模块笔记</li>
+</ul>
+<h2 id="python-threading-判断多个线程是否完成"><a href="#python-threading-判断多个线程是否完成" class="headerlink" title="python threading 判断多个线程是否完成"></a>python threading 判断多个线程是否完成</h2><p>在 Python 中，可以使用 <code>threading.Thread</code> 的 <code>is_alive()</code> 方法或者 <code>join()</code> 方法来判断线程是否完成。</p>
+<p>以下是几种判断多个线程是否完成的方法：</p>
+<hr>
+<h3 id="方法-1：使用-join-等待所有线程完成"><a href="#方法-1：使用-join-等待所有线程完成" class="headerlink" title="方法 1：使用 join() 等待所有线程完成"></a><strong>方法 1：使用 <code>join()</code> 等待所有线程完成</strong></h3><p><code>join()</code> 会阻塞主线程，直到子线程完成。这是最常见的方式。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">worker</span>(<span class="params">name, delay</span>):</span><br><span class="line">    time.sleep(delay)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Thread <span class="subst">&#123;name&#125;</span> finished.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建多个线程</span></span><br><span class="line">threads = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    t = threading.Thread(target=worker, args=(<span class="string">f&quot;Thread-<span class="subst">&#123;i&#125;</span>&quot;</span>, i))</span><br><span class="line">    threads.append(t)</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待所有线程完成</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> threads:</span><br><span class="line">    t.join()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;All threads are complete.&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="方法-2：循环检查-is-alive"><a href="#方法-2：循环检查-is-alive" class="headerlink" title="方法 2：循环检查 is_alive()"></a><strong>方法 2：循环检查 <code>is_alive()</code></strong></h3><p><code>is_alive()</code> 返回线程是否仍在运行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">worker</span>(<span class="params">name, delay</span>):</span><br><span class="line">    time.sleep(delay)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Thread <span class="subst">&#123;name&#125;</span> finished.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建多个线程</span></span><br><span class="line">threads = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    t = threading.Thread(target=worker, args=(<span class="string">f&quot;Thread-<span class="subst">&#123;i&#125;</span>&quot;</span>, i))</span><br><span class="line">    threads.append(t)</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查是否所有线程完成</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">any</span>(t.is_alive() <span class="keyword">for</span> t <span class="keyword">in</span> threads):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Waiting for threads to complete...&quot;</span>)</span><br><span class="line">    time.sleep(<span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;All threads are complete.&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="方法-3：使用-Event-对象通知主线程"><a href="#方法-3：使用-Event-对象通知主线程" class="headerlink" title="方法 3：使用 Event 对象通知主线程"></a><strong>方法 3：使用 <code>Event</code> 对象通知主线程</strong></h3><p>通过线程完成时触发 <code>Event</code>，主线程等待所有事件被设置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">worker</span>(<span class="params">name, delay, event</span>):</span><br><span class="line">    time.sleep(delay)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Thread <span class="subst">&#123;name&#125;</span> finished.&quot;</span>)</span><br><span class="line">    event.<span class="built_in">set</span>()  <span class="comment"># 通知主线程</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建多个线程和事件</span></span><br><span class="line">events = []</span><br><span class="line">threads = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    event = threading.Event()</span><br><span class="line">    events.append(event)</span><br><span class="line">    t = threading.Thread(target=worker, args=(<span class="string">f&quot;Thread-<span class="subst">&#123;i&#125;</span>&quot;</span>, i, event))</span><br><span class="line">    threads.append(t)</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待所有事件完成</span></span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> events:</span><br><span class="line">    event.wait()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;All threads are complete.&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="选择合适的方法"><a href="#选择合适的方法" class="headerlink" title="选择合适的方法"></a><strong>选择合适的方法</strong></h3><ul>
+<li><strong>简单场景</strong>：使用 <code>join()</code> 是最简洁的方式。</li>
+<li><strong>动态监控</strong>：使用 <code>is_alive()</code> 可实现更灵活的监控。</li>
+<li><strong>通知机制</strong>：使用 <code>Event</code> 提供更多控制能力。</li>
+</ul>
+<p>如果你的场景需要特定的解决方案，请详细描述，我可以进一步优化代码！</p>
+<h2 id="python3-threading库-启动线程函数并传递参数"><a href="#python3-threading库-启动线程函数并传递参数" class="headerlink" title="python3 threading库 启动线程函数并传递参数"></a>python3 threading库 启动线程函数并传递参数</h2><p>在 Python 的 <code>threading</code> 模块中，可以通过 <code>Thread</code> 类启动线程，并使用 <code>args</code> 和 <code>kwargs</code> 参数向线程函数传递参数。</p>
+<p>以下是具体方法和示例：</p>
+<h3 id="使用-args-和-kwargs-传递参数"><a href="#使用-args-和-kwargs-传递参数" class="headerlink" title="使用 args 和 kwargs 传递参数"></a>使用 <code>args</code> 和 <code>kwargs</code> 传递参数</h3><ul>
+<li>**<code>args</code>**：用于传递位置参数，以元组形式提供。</li>
+<li>**<code>kwargs</code>**：用于传递关键字参数，以字典形式提供。</li>
+</ul>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义线程函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">worker</span>(<span class="params">name, delay, repeat=<span class="number">5</span></span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(repeat):</span><br><span class="line">        time.sleep(delay)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Thread <span class="subst">&#123;name&#125;</span>: <span class="subst">&#123;i+<span class="number">1</span>&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建线程并传递参数</span></span><br><span class="line">thread1 = threading.Thread(target=worker, args=(<span class="string">&quot;A&quot;</span>, <span class="number">1</span>), kwargs=&#123;<span class="string">&quot;repeat&quot;</span>: <span class="number">3</span>&#125;)</span><br><span class="line">thread2 = threading.Thread(target=worker, args=(<span class="string">&quot;B&quot;</span>, <span class="number">2</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动线程</span></span><br><span class="line">thread1.start()</span><br><span class="line">thread2.start()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待线程完成</span></span><br><span class="line">thread1.join()</span><br><span class="line">thread2.join()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;All threads are complete.&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="输出示例"><a href="#输出示例" class="headerlink" title="输出示例"></a>输出示例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Thread A: 1</span><br><span class="line">Thread B: 1</span><br><span class="line">Thread A: 2</span><br><span class="line">Thread B: 2</span><br><span class="line">Thread A: 3</span><br><span class="line">Thread B: 3</span><br><span class="line">Thread B: 4</span><br><span class="line">Thread B: 5</span><br><span class="line">All threads are complete.</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ol>
+<li><strong><code>args</code> 和 <code>kwargs</code> 必须匹配目标函数的参数要求</strong>。</li>
+<li>使用 <code>join</code> 方法可以让主线程等待子线程执行完成。</li>
+<li>启动线程后，不能再调用 <code>start</code> 方法，否则会抛出 <code>RuntimeError</code>。</li>
+</ol>
+<p>如果还有其他需求，随时告诉我！</p>
+<h2 id="python3-threading-模块-详解"><a href="#python3-threading-模块-详解" class="headerlink" title="python3 threading 模块 详解"></a>python3 threading 模块 详解</h2><p><code>threading</code> 模块是 Python 3 中用于多线程编程的标准库模块，它提供了一种方便的方式来创建和管理线程。多线程允许在同一程序中同时执行多个任务，可以提高程序的并发性和性能。以下是有关 <code>threading</code> 模块的详细解释和示例：</p>
+<p><strong>线程的创建</strong>：</p>
+<ol>
+<li><p><code>threading.Thread</code> 类：<code>Thread</code> 类是创建线程的主要工具。您可以通过创建 <code>Thread</code> 类的实例来定义一个新线程，并将要执行的任务（通常是一个函数）传递给 <code>target</code> 参数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">my_function</span>():</span><br><span class="line">    <span class="comment"># 执行任务的代码</span></span><br><span class="line"></span><br><span class="line">my_thread = threading.Thread(target=my_function)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动线程：使用 <code>start()</code> 方法来启动线程，它将在后台执行线程的任务。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_thread.start()</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>线程的控制</strong>：</p>
+<ol>
+<li><p><code>threading.Thread.is_alive()</code>：检查线程是否处于活动状态（正在运行）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> my_thread.is_alive():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Thread is alive&quot;</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>threading.Thread.join()</code>：等待线程执行完毕。主线程可以使用 <code>join()</code> 方法等待其他线程的完成。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_thread.join()</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>线程同步</strong>：</p>
+<ol>
+<li><p><code>threading.Lock</code> 类：<code>Lock</code> 类用于创建锁，以确保多个线程之间的互斥访问共享资源。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">my_lock = threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">my_thread_function</span>():</span><br><span class="line">    <span class="keyword">with</span> my_lock:</span><br><span class="line">        <span class="comment"># 访问共享资源的代码</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>threading.Event</code> 类：<code>Event</code> 类用于线程之间的事件通知和等待。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">my_event = threading.Event()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">waiting_thread</span>():</span><br><span class="line">    my_event.wait()  <span class="comment"># 等待事件被设置</span></span><br><span class="line">    <span class="comment"># 事件被设置后执行的代码</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">setting_thread</span>():</span><br><span class="line">    <span class="comment"># 执行某些操作</span></span><br><span class="line">    my_event.<span class="built_in">set</span>()  <span class="comment"># 设置事件</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>线程间通信</strong>：</p>
+<ol>
+<li><p>使用队列：<code>queue</code> 模块提供了线程安全的队列（<code>queue.Queue</code>）用于在线程之间安全地传递数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> queue</span><br><span class="line"></span><br><span class="line">my_queue = queue.Queue()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">producer</span>():</span><br><span class="line">    <span class="comment"># 生产数据</span></span><br><span class="line">    my_queue.put(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">consumer</span>():</span><br><span class="line">    <span class="comment"># 消费数据</span></span><br><span class="line">    data = my_queue.get()</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>线程池</strong>：</p>
+<p><code>threading</code> 模块还提供了 <code>ThreadPoolExecutor</code> 类，它允许您管理线程池，以便在应用程序中管理和重复使用线程。这对于需要执行多个任务的情况非常有用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> concurrent.futures</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">my_function</span>():</span><br><span class="line">    <span class="comment"># 执行任务的代码</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> concurrent.futures.ThreadPoolExecutor(max_workers=<span class="number">5</span>) <span class="keyword">as</span> executor:</span><br><span class="line">    future = executor.submit(my_function)</span><br><span class="line">    <span class="comment"># 更多任务提交和管理</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意事项</strong>：</p>
+<ul>
+<li><p>Python 中的全局解释器锁（Global Interpreter Lock，GIL）限制了同一时间只能执行一个线程中的 Python 代码。这意味着多线程在 CPU 密集型任务中可能无法充分利用多核处理器。但对于 I&#x2F;O 密集型任务，多线程通常仍然有用。</p>
+</li>
+<li><p>线程在共享数据时可能会引发竞争条件和死锁等问题，因此在多线程编程中需要小心谨慎，使用适当的同步工具。</p>
+</li>
+</ul>
+<p>总之，<code>threading</code> 模块提供了方便的工具来创建、管理和同步线程，允许您实现并发性和并行性，但需要注意线程安全和共享资源的管理问题。对于更高级的并发任务，您还可以考虑使用 <code>multiprocessing</code> 模块，它允许您创建多个进程以利用多核处理器。</p>
+<h2 id="python3-threading模块-传入一个参数"><a href="#python3-threading模块-传入一个参数" class="headerlink" title="python3 threading模块 传入一个参数"></a>python3 threading模块 传入一个参数</h2><p>如果你想在线程中传递一个参数，可以使用 <code>args</code> 参数来传递一个包含单个元素的元组。以下是一个简单的示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">my_function</span>(<span class="params">arg</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Thread is running with argument:&quot;</span>, arg)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个线程，并传递单个参数</span></span><br><span class="line">my_arg = <span class="string">&quot;Hello&quot;</span></span><br><span class="line">my_thread = threading.Thread(target=my_function, args=(my_arg,))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动线程</span></span><br><span class="line">my_thread.start()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待线程结束</span></span><br><span class="line">my_thread.join()</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>my_function</code> 函数期望接收一个参数，我们将参数放入一个元组 <code>(my_arg,)</code> 中，并将该元组作为 <code>args</code> 参数传递给 <code>Thread</code> 类的构造函数。</p>
+<p>确保参数传递的数据类型和数量与目标函数的定义相匹配。如果有多个参数，仍然需要将它们放入一个元组中，并将该元组作为 <code>args</code> 参数传递。</p>
+<h2 id="python3-threading模块-将线程分离到后台"><a href="#python3-threading模块-将线程分离到后台" class="headerlink" title="python3 threading模块 将线程分离到后台"></a>python3 threading模块 将线程分离到后台</h2><p>在Python中，可以使用 <code>threading.Thread</code> 的 <code>daemon</code> 属性将线程设置为后台线程。将线程设置为后台线程意味着当主线程退出时，后台线程也会被终止，而不管它是否完成。</p>
+<p>以下是一个简单的示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">my_function</span>():</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Thread is running...&quot;</span>)</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个后台线程</span></span><br><span class="line">my_thread = threading.Thread(target=my_function)</span><br><span class="line">my_thread.daemon = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动线程</span></span><br><span class="line">my_thread.start()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 主线程等待一段时间</span></span><br><span class="line">time.sleep(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 主线程退出，后台线程也会被终止</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Main thread exiting.&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>my_function</code> 是一个简单的线程函数，线程会在循环中打印消息并休眠1秒。通过将 <code>my_thread.daemon</code> 设置为 <code>True</code>，我们将线程设置为后台线程。当主线程执行 <code>print(&quot;Main thread exiting.&quot;)</code> 时，主线程会退出，同时后台线程也会被终止。</p>
+<p>请注意，如果你的后台线程执行一些关键任务，可能需要谨慎使用后台线程，因为在主线程退出时，可能导致后台线程无法完成其任务。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-05-22-python_3_subprocess%E6%A8%A1%E5%9D%97/" rel="prev" title="python_3_subprocess模块">
+      <i class="fa fa-chevron-left"></i> python_3_subprocess模块
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-05-22-python_3_scipy%E6%A8%A1%E5%9D%97/" rel="next" title="python_3_scipy模块">
+      python_3_scipy模块 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python-threading-%E5%88%A4%E6%96%AD%E5%A4%9A%E4%B8%AA%E7%BA%BF%E7%A8%8B%E6%98%AF%E5%90%A6%E5%AE%8C%E6%88%90"><span class="nav-number">2.</span> <span class="nav-text">python threading 判断多个线程是否完成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9A%E4%BD%BF%E7%94%A8-join-%E7%AD%89%E5%BE%85%E6%89%80%E6%9C%89%E7%BA%BF%E7%A8%8B%E5%AE%8C%E6%88%90"><span class="nav-number">2.1.</span> <span class="nav-text">方法 1：使用 join() 等待所有线程完成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9A%E5%BE%AA%E7%8E%AF%E6%A3%80%E6%9F%A5-is-alive"><span class="nav-number">2.2.</span> <span class="nav-text">方法 2：循环检查 is_alive()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-3%EF%BC%9A%E4%BD%BF%E7%94%A8-Event-%E5%AF%B9%E8%B1%A1%E9%80%9A%E7%9F%A5%E4%B8%BB%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.3.</span> <span class="nav-text">方法 3：使用 Event 对象通知主线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">2.4.</span> <span class="nav-text">选择合适的方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python3-threading%E5%BA%93-%E5%90%AF%E5%8A%A8%E7%BA%BF%E7%A8%8B%E5%87%BD%E6%95%B0%E5%B9%B6%E4%BC%A0%E9%80%92%E5%8F%82%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">python3 threading库 启动线程函数并传递参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-args-%E5%92%8C-kwargs-%E4%BC%A0%E9%80%92%E5%8F%82%E6%95%B0"><span class="nav-number">3.1.</span> <span class="nav-text">使用 args 和 kwargs 传递参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">3.2.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.3.</span> <span class="nav-text">输出示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">3.4.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python3-threading-%E6%A8%A1%E5%9D%97-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">python3 threading 模块 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python3-threading%E6%A8%A1%E5%9D%97-%E4%BC%A0%E5%85%A5%E4%B8%80%E4%B8%AA%E5%8F%82%E6%95%B0"><span class="nav-number">5.</span> <span class="nav-text">python3 threading模块 传入一个参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python3-threading%E6%A8%A1%E5%9D%97-%E5%B0%86%E7%BA%BF%E7%A8%8B%E5%88%86%E7%A6%BB%E5%88%B0%E5%90%8E%E5%8F%B0"><span class="nav-number">6.</span> <span class="nav-text">python3 threading模块 将线程分离到后台</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

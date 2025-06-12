@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 mongoose工具的计时器相关笔记  struct mg_timer 简介：  计时器结构体。描述一个软件计时器。计时器粒度与主事件循环中的mg_mgr_poll()的超时参数相同   原型： 1234567891011struct mg_timer &#123;  uint64_t period_ms;       &#x2F;&#x2F; Timer period in milliseconds  uin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoose_timer">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_timer/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 mongoose工具的计时器相关笔记  struct mg_timer 简介：  计时器结构体。描述一个软件计时器。计时器粒度与主事件循环中的mg_mgr_poll()的超时参数相同   原型： 1234567891011struct mg_timer &#123;  uint64_t period_ms;       &#x2F;&#x2F; Timer period in milliseconds  uin">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.414Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Mongoose">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_timer/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mongoose_timer | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_timer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mongoose_timer
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>mongoose工具的计时器相关笔记</li>
+</ul>
+<h2 id="struct-mg-timer"><a href="#struct-mg-timer" class="headerlink" title="struct mg_timer"></a>struct mg_timer</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>计时器结构体。描述一个软件计时器。计时器粒度与主事件循环中的<code>mg_mgr_poll()</code>的超时参数相同</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> &#123;</span></span><br><span class="line">  <span class="type">uint64_t</span> period_ms;       <span class="comment">// Timer period in milliseconds</span></span><br><span class="line">  <span class="type">uint64_t</span> expire;          <span class="comment">// Expiration timestamp in milliseconds</span></span><br><span class="line">  <span class="type">unsigned</span> flags;           <span class="comment">// Possible flags values below</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MG_TIMER_ONCE 0     <span class="comment">// Call function once</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MG_TIMER_REPEAT 1   <span class="comment">// Call function periodically</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MG_TIMER_RUN_NOW 2  <span class="comment">// Call immediately when timer is set</span></span></span><br><span class="line">  <span class="type">void</span> (*fn)(<span class="type">void</span> *);       <span class="comment">// Function to call</span></span><br><span class="line">  <span class="type">void</span> *arg;                <span class="comment">// Function argument</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> *<span class="title">next</span>;</span>    <span class="comment">// Linkage</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-timer-add"><a href="#mg-timer-add" class="headerlink" title="mg_timer_add"></a>mg_timer_add</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>设置一个计时器。这是一个高级计时器API，允许将软件计时器添加到活动管理器。</li>
+<li>这个函数使用<code>calloc()</code>一个新的计时器，并将它添加到<code>mgr-&gt;timers</code>列表中。</li>
+<li>当调用<code>mg_mgr_poll()</code>时，所有添加的计时器均进行轮询，并在计时器到期时调用计时器设定的函数</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> mg_timer *<span class="title function_">mg_timer_add</span><span class="params">(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">uint64_t</span> period_ms, <span class="type">unsigned</span> flags, <span class="type">void</span> (*fn)(<span class="type">void</span> *), <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>mgr</code>   –  指向事件管理器的结构体指针</li>
+<li><code>ms</code>    –  一个时间间隔，以毫秒为单位</li>
+<li><code>flags</code> –  计时器标志掩码：<code>MG_TIMER_REPEAT</code>和<code>MG_TIMER_RUN_NOW</code></li>
+<li><code>fn</code>    –  函数调用</li>
+<li><code>fn_data</code>  –  调用的函数参数</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>返回一个指向创建的计时器的指针</li>
+</ul>
+</li>
+<li><p>详解：</p>
+<ul>
+<li>确保计时器的间隔等于或大于<code>mg_mgr_poll()</code>的超时时间</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_fn</span><span class="params">(<span class="type">void</span> *data)</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mg_timer_add(mgr, <span class="number">1000</span>, MG_TIMER_REPEAT, timer_fn, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-timer-init"><a href="#mg-timer-init" class="headerlink" title="mg_timer_init"></a>mg_timer_init</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>设置一个计时器</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_timer_init</span><span class="params">(<span class="keyword">struct</span> mg_timer **head, <span class="keyword">struct</span> mg_timer *t, <span class="type">uint64_t</span> period_ms, <span class="type">unsigned</span> flags, <span class="type">void</span> (*fn)(<span class="type">void</span> *), <span class="type">void</span> *fn_data)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>head</code>    –  指向<code>mg_timer</code>队列头部的指针</li>
+<li><code>t</code>       –  指向一个需要被初始化的<code>mg_timer</code></li>
+<li><code>ms</code>      –  时间间隔，以毫秒为单位</li>
+<li><code>flags</code>   –  计时器标志掩码：<code>MG_TIMER_REPEAT</code>和<code>MG_TIMER_RUN_NOW</code></li>
+<li><code>fn</code>    –  函数调用</li>
+<li><code>fn_data</code>  –  调用的函数参数</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">timer_fn</span><span class="params">(<span class="type">void</span> *data)</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> <span class="title">timer</span>, *<span class="title">head</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">mg_timer_init(&amp;head, &amp;timer, <span class="number">1000</span>, MG_TIMER_REPEAT, timer_fn, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-timer-free"><a href="#mg-timer-free" class="headerlink" title="mg_timer_free"></a>mg_timer_free</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>释放计时器，将其从内部计时器列表中删除。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_timer_free</span><span class="params">(<span class="keyword">struct</span> mg_timer **head, <span class="keyword">struct</span> mg_timer *t)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>head</code>  –  指向<code>mg_timer</code>队列头部的指针</li>
+<li><code>t</code>     –  需要释放的计时器</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mg_timer</span> <span class="title">timer</span>;</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">mg_timer_free(&amp;timer);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-timer-poll"><a href="#mg-timer-poll" class="headerlink" title="mg_timer_poll"></a>mg_timer_poll</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>如果当前的时间戳<code>uptime_ms</code>超过了计时器的到期时间，则计时器遍历列表，并调用它们</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">mg_timer_poll</span><span class="params">(<span class="keyword">struct</span> mg_timer **head, <span class="type">uint64_t</span> uptime_ms)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>head</code>   –  指向<code>mg_timer</code>列表头部的指针</li>
+<li><code>uptime_ms</code>  –  当前时间戳</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mg_timer_poll(mg_millis());</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-millis"><a href="#mg-millis" class="headerlink" title="mg_millis"></a>mg_millis</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>以毫秒为单位返回当前运行时间。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int64_t</span> <span class="title">mg_millis</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>当前时间</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int64_t</span> uptime = <span class="built_in">mg_millis</span>();</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mongoose/" rel="tag"># Mongoose</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_tls/" rel="prev" title="mongoose_tls">
+      <i class="fa fa-chevron-left"></i> mongoose_tls
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_rpc/" rel="next" title="mongoose_rpc">
+      mongoose_rpc <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-timer"><span class="nav-number">2.</span> <span class="nav-text">struct mg_timer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-timer-add"><span class="nav-number">3.</span> <span class="nav-text">mg_timer_add</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-timer-init"><span class="nav-number">4.</span> <span class="nav-text">mg_timer_init</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-timer-free"><span class="nav-number">5.</span> <span class="nav-text">mg_timer_free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-timer-poll"><span class="nav-number">6.</span> <span class="nav-text">mg_timer_poll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-millis"><span class="nav-number">7.</span> <span class="nav-text">mg_millis</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

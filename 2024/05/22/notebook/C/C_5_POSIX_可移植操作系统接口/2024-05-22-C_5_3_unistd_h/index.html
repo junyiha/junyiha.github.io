@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 Linux POSIX &lt;unistd.h&gt;  Linux POSIX &lt;unistd.h&gt; 详解在 POSIX 系统中，&lt;unistd.h&gt; 是一个重要的头文件，提供了许多对系统进行访问的标准符号常量、类型和函数原型。这个头文件对于系统级编程非常重要，它定义了 POSIX 操作系统 API 的许多核心功能。 以下是 &lt;unistd.h&gt; 中常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C_5_3_unistd_h">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_3_unistd_h/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 Linux POSIX &lt;unistd.h&gt;  Linux POSIX &lt;unistd.h&gt; 详解在 POSIX 系统中，&lt;unistd.h&gt; 是一个重要的头文件，提供了许多对系统进行访问的标准符号常量、类型和函数原型。这个头文件对于系统级编程非常重要，它定义了 POSIX 操作系统 API 的许多核心功能。 以下是 &lt;unistd.h&gt; 中常">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.239Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CPOSIX">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_3_unistd_h/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C_5_3_unistd_h | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_3_unistd_h/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C_5_3_unistd_h
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Linux POSIX &lt;unistd.h&gt;</li>
+</ul>
+<h2 id="Linux-POSIX-详解"><a href="#Linux-POSIX-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; 详解"></a>Linux POSIX &lt;unistd.h&gt; 详解</h2><p>在 POSIX 系统中，<code>&lt;unistd.h&gt;</code> 是一个重要的头文件，提供了许多对系统进行访问的标准符号常量、类型和函数原型。这个头文件对于系统级编程非常重要，它定义了 POSIX 操作系统 API 的许多核心功能。</p>
+<p>以下是 <code>&lt;unistd.h&gt;</code> 中常见的一些功能和内容：</p>
+<ol>
+<li><p><strong>符号常量</strong>：</p>
+<ul>
+<li><code>STDIN_FILENO</code>、<code>STDOUT_FILENO</code>、<code>STDERR_FILENO</code>：标准输入、标准输出和标准错误的文件描述符。</li>
+<li><code>F_OK</code>、<code>R_OK</code>、<code>W_OK</code>、<code>X_OK</code>：用于文件访问权限的标志常量。</li>
+<li>其他常量用于系统调用、文件操作等。</li>
+</ul>
+</li>
+<li><p><strong>数据类型</strong>：</p>
+<ul>
+<li><code>ssize_t</code>：用于表示字节大小的有符号整数类型。</li>
+<li><code>off_t</code>：用于表示文件偏移量的类型。</li>
+<li><code>pid_t</code>：用于表示进程 ID 的类型。</li>
+<li>其他与系统相关的类型。</li>
+</ul>
+</li>
+<li><p><strong>函数原型</strong>：</p>
+<ul>
+<li>文件操作：<code>read()</code>、<code>write()</code>、<code>close()</code> 等。</li>
+<li>进程控制：<code>fork()</code>、<code>exec()</code>、<code>wait()</code>、<code>exit()</code> 等。</li>
+<li>文件和目录操作：<code>access()</code>、<code>mkdir()</code>、<code>rmdir()</code>、<code>chdir()</code> 等。</li>
+<li>系统调用和资源管理：<code>sleep()</code>、<code>getpid()</code>、<code>getcwd()</code>、<code>getuid()</code> 等。</li>
+</ul>
+</li>
+</ol>
+<p><code>&lt;unistd.h&gt;</code> 头文件中的函数和符号常量是进行系统级编程的关键工具。这些函数和常量允许程序员对文件、进程、系统调用等进行操作，使得在 POSIX 系统上进行更底层的系统编程变得更加容易和标准化。</p>
+<h2 id="Linux-POSIX-open-详解"><a href="#Linux-POSIX-open-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; open() 详解"></a>Linux POSIX &lt;unistd.h&gt; open() 详解</h2><p>在 POSIX 系统中，<code>open()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于打开或创建文件，并返回一个文件描述符，以便后续对文件进行读写操作。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">open</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>pathname</code>：要打开或创建的文件的路径名。</li>
+<li><code>flags</code>：用于指定打开文件的标志，可以是 <code>O_RDONLY</code>（只读）、<code>O_WRONLY</code>（只写）、<code>O_RDWR</code>（读写）、<code>O_CREAT</code>（若文件不存在则创建）、<code>O_TRUNC</code>（清空文件内容）等标志的组合。</li>
+<li><code>mode</code>：用于指定创建文件时的权限，仅在 <code>O_CREAT</code> 标志被指定时有效，通常以八进制数表示，比如 <code>0644</code>。</li>
+</ul>
+<p>返回值为文件描述符 <code>int</code> 类型，表示打开文件的引用，如果出错则返回 -1。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line"></span><br><span class="line">    fd = open(<span class="string">&quot;file.txt&quot;</span>, O_WRONLY | O_CREAT | O_TRUNC, <span class="number">0644</span>); <span class="comment">// 打开或创建文件</span></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;File opened with file descriptor: %d\n&quot;</span>, fd);</span><br><span class="line"></span><br><span class="line">    close(fd); <span class="comment">// 关闭文件</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>open()</code> 函数打开或创建文件，并获取文件描述符。在这个例子中，<code>file.txt</code> 是要打开或创建的文件名。使用 <code>O_WRONLY</code> 表示只写模式，<code>O_CREAT</code> 表示若文件不存在则创建，<code>O_TRUNC</code> 表示清空文件内容。<code>0644</code> 是文件权限，指定文件所有者有读写权限，其他用户只有读权限。</p>
+<p><code>open()</code> 函数在实际应用中用于打开文件或创建文件，返回文件描述符以便后续对文件进行读写操作。</p>
+<h2 id="Linux-POSIX-read-详解"><a href="#Linux-POSIX-read-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; read() 详解"></a>Linux POSIX &lt;unistd.h&gt; read() 详解</h2><p>在 POSIX 系统中，<code>read()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于从文件描述符中读取数据。该函数通常用于从文件、管道、套接字或其他 I&#x2F;O 对象中读取数据。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">read</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>fd</code>：要读取的文件描述符。</li>
+<li><code>buf</code>：用于存储读取数据的缓冲区。</li>
+<li><code>count</code>：要读取的字节数。</li>
+</ul>
+<p><code>read()</code> 函数的返回值 <code>ssize_t</code> 表示实际读取的字节数，或者在出错时返回负数。返回值为 0 表示已到达文件末尾（对于文件描述符到达末尾或连接被关闭的情况）。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> buffer[<span class="number">1024</span>];</span><br><span class="line">    <span class="type">ssize_t</span> bytes_read;</span><br><span class="line"></span><br><span class="line">    fd = open(<span class="string">&quot;file.txt&quot;</span>, O_RDONLY); <span class="comment">// 打开文件</span></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    bytes_read = read(fd, buffer, <span class="keyword">sizeof</span>(buffer)); <span class="comment">// 从文件中读取数据</span></span><br><span class="line">    <span class="keyword">if</span> (bytes_read == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;read&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Read %zd bytes: %s\n&quot;</span>, bytes_read, buffer);</span><br><span class="line"></span><br><span class="line">    close(fd); <span class="comment">// 关闭文件</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>read()</code> 函数从文件中读取数据。首先，通过 <code>open()</code> 函数打开一个文件，并获取文件描述符。然后，使用 <code>read()</code> 函数从该文件中读取数据，并将读取的内容存储在 <code>buffer</code> 缓冲区中。最后，使用 <code>printf()</code> 函数打印读取的字节数和内容。</p>
+<p><code>read()</code> 函数在实际应用中经常用于从文件或其他 I&#x2F;O 对象中读取数据，并将数据存储到指定的缓冲区中。</p>
+<h2 id="Linux-POSIX-write-详解"><a href="#Linux-POSIX-write-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; write() 详解"></a>Linux POSIX &lt;unistd.h&gt; write() 详解</h2><p>在 POSIX 系统中，<code>write()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于向文件描述符中写入数据。这个函数通常用于将数据写入文件、管道、套接字或其他 I&#x2F;O 对象。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">write</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>fd</code>：要写入的文件描述符。</li>
+<li><code>buf</code>：要写入的数据的缓冲区。</li>
+<li><code>count</code>：要写入的字节数。</li>
+</ul>
+<p><code>write()</code> 函数的返回值 <code>ssize_t</code> 表示实际写入的字节数，或者在出错时返回负数。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> *data = <span class="string">&quot;Hello, this is a test!&quot;</span>;</span><br><span class="line">    <span class="type">ssize_t</span> bytes_written;</span><br><span class="line"></span><br><span class="line">    fd = open(<span class="string">&quot;output.txt&quot;</span>, O_WRONLY | O_CREAT | O_TRUNC, <span class="number">0644</span>); <span class="comment">// 打开或创建文件</span></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    bytes_written = write(fd, data, <span class="built_in">strlen</span>(data)); <span class="comment">// 向文件中写入数据</span></span><br><span class="line">    <span class="keyword">if</span> (bytes_written == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Written %zd bytes to the file.\n&quot;</span>, bytes_written);</span><br><span class="line"></span><br><span class="line">    close(fd); <span class="comment">// 关闭文件</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>write()</code> 函数向文件中写入数据。首先，通过 <code>open()</code> 函数打开一个文件或创建一个新文件，并获取文件描述符。然后，使用 <code>write()</code> 函数将数据写入文件中。在这个例子中，字符串 “Hello, this is a test!” 被写入到文件中。最后，使用 <code>printf()</code> 函数打印写入的字节数。</p>
+<p><code>write()</code> 函数在实际应用中通常用于将数据写入到文件中，执行输入&#x2F;输出操作。</p>
+<h2 id="Linux-POSIX-close-详解"><a href="#Linux-POSIX-close-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; close() 详解"></a>Linux POSIX &lt;unistd.h&gt; close() 详解</h2><p>在 POSIX 系统中，<code>close()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于关闭先前打开的文件描述符，释放文件描述符所占用的资源。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">close</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>fd</code> 是要关闭的文件描述符。</p>
+<p><code>close()</code> 函数的返回值为整型。成功关闭文件描述符时返回 0，失败时返回 -1，并设置全局变量 <code>errno</code> 以指示错误类型。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line"></span><br><span class="line">    fd = open(<span class="string">&quot;file.txt&quot;</span>, O_RDONLY); <span class="comment">// 打开文件</span></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在此对文件进行读取、写入等操作...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (close(fd) == <span class="number">-1</span>) &#123; <span class="comment">// 关闭文件</span></span><br><span class="line">        perror(<span class="string">&quot;close&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>close()</code> 函数用于关闭先前使用 <code>open()</code> 打开的文件描述符 <code>fd</code>。关闭文件描述符后，应用程序不再具有对文件的访问权限。</p>
+<p><code>close()</code> 函数在文件操作中是一个重要的步骤，它负责释放文件描述符所占用的资源，因此在使用完文件后，一般都会使用 <code>close()</code> 来关闭文件描述符，以避免资源泄漏。</p>
+<h2 id="Linux-POSIX-lseek-详解"><a href="#Linux-POSIX-lseek-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; lseek() 详解"></a>Linux POSIX &lt;unistd.h&gt; lseek() 详解</h2><p>在 POSIX 系统中，<code>lseek()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于在文件中移动文件读写指针，以便定位到文件中的特定位置。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">off_t</span> <span class="title function_">lseek</span><span class="params">(<span class="type">int</span> fd, <span class="type">off_t</span> offset, <span class="type">int</span> whence)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>fd</code>：文件描述符，指示要操作的文件。</li>
+<li><code>offset</code>：偏移量，指定相对于 <code>whence</code> 参数的位置进行偏移。</li>
+<li><code>whence</code>：指定偏移量的基准位置，可以是 <code>SEEK_SET</code>（从文件开头开始）、<code>SEEK_CUR</code>（从当前位置开始）、<code>SEEK_END</code>（从文件末尾开始）。</li>
+</ul>
+<p><code>lseek()</code> 函数返回 <code>off_t</code> 类型，表示从文件开头到指定位置的偏移量，或者在出错时返回 <code>-1</code>。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">off_t</span> new_offset;</span><br><span class="line"></span><br><span class="line">    fd = open(<span class="string">&quot;file.txt&quot;</span>, O_RDONLY); <span class="comment">// 打开文件</span></span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移动文件读写指针到文件末尾</span></span><br><span class="line">    new_offset = lseek(fd, <span class="number">0</span>, SEEK_END);</span><br><span class="line">    <span class="keyword">if</span> (new_offset == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;lseek&quot;</span>);</span><br><span class="line">        close(fd);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;File size: %lld bytes\n&quot;</span>, (<span class="type">long</span> <span class="type">long</span>)new_offset);</span><br><span class="line"></span><br><span class="line">    close(fd); <span class="comment">// 关闭文件</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>lseek()</code> 函数被用于将文件读写指针移动到文件末尾。通过将 <code>whence</code> 参数设置为 <code>SEEK_END</code> 并将 <code>offset</code> 设置为 0，<code>lseek()</code> 将读写指针移动到文件末尾，并返回文件大小。然后，使用 <code>printf()</code> 打印文件的大小。</p>
+<p><code>lseek()</code> 函数在文件操作中可以用于定位到文件的特定位置，比如读取文件末尾、从指定位置开始读取等操作。</p>
+<h2 id="Linux-POSIX-fork-详解"><a href="#Linux-POSIX-fork-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; fork() 详解"></a>Linux POSIX &lt;unistd.h&gt; fork() 详解</h2><p>在 POSIX 系统中，<code>fork()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于创建一个新的进程，该进程是调用进程的副本，被称为子进程。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">fork</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>fork()</code> 函数不接收任何参数，返回值是一个 <code>pid_t</code> 类型的值，表示进程 ID。在父进程中，<code>fork()</code> 返回子进程的进程 ID；而在子进程中，<code>fork()</code> 返回 0。如果出现错误，<code>fork()</code> 返回一个负数。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pid_t</span> child_pid;</span><br><span class="line"></span><br><span class="line">    child_pid = fork(); <span class="comment">// 创建子进程</span></span><br><span class="line">    <span class="keyword">if</span> (child_pid == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (child_pid == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 子进程执行的代码</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;This is the child process (PID: %d)\n&quot;</span>, getpid());</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 父进程执行的代码</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;This is the parent process (Child PID: %d, Parent PID: %d)\n&quot;</span>, child_pid, getpid());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>fork()</code> 被调用后会创建一个新的子进程。父进程中的 <code>child_pid</code> 变量存储了子进程的进程 ID。在父进程中，<code>fork()</code> 返回子进程的进程 ID；在子进程中，<code>fork()</code> 返回 0。通过检查返回值，可以区分父进程和子进程。</p>
+<p><code>fork()</code> 在创建子进程时，会复制父进程的内存映像。子进程是父进程的副本，但它有自己独立的内存空间。父子进程会同时执行 <code>fork()</code> 调用之后的代码，但在不同的进程上下文中。这使得通过 <code>fork()</code> 创建新进程成为了一种常见的并行执行代码的方式。</p>
+<h2 id="Linux-POSIX-exec-详解"><a href="#Linux-POSIX-exec-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; exec() 详解"></a>Linux POSIX &lt;unistd.h&gt; exec() 详解</h2><p>在 POSIX 系统中，<code>exec()</code> 函数族包括一组函数，用于在当前进程中执行新的程序，替换当前进程的内存映像为新程序的代码和数据。<code>exec()</code> 函数族包括多个变体，如 <code>execl()</code>, <code>execv()</code>, <code>execle()</code>, <code>execve()</code>, 等等。</p>
+<p>这些函数允许程序动态地在当前进程中加载新的程序，并执行该程序的代码，取代当前进程的内容。</p>
+<p>以下是其中两个常用的函数原型：</p>
+<ol>
+<li><p><strong><code>int execl(const char *path, const char *arg0, ... /* (char *) NULL */ );</code></strong></p>
+<ul>
+<li><code>path</code>：新程序的路径。</li>
+<li><code>arg0</code>：新程序的名称，通常被赋予被执行程序的名称。</li>
+<li><code>...</code>：可变数量的参数，用来传递给新程序的命令行参数，最后一个参数必须是 <code>(char *) NULL</code>。</li>
+</ul>
+</li>
+<li><p><strong><code>int execv(const char *path, char *const argv[]);</code></strong></p>
+<ul>
+<li><code>path</code>：新程序的路径。</li>
+<li><code>argv</code>：一个字符指针数组，用于传递给新程序的命令行参数，以 NULL 结尾。</li>
+</ul>
+</li>
+</ol>
+<p>这些函数的返回值在执行成功时一般不会返回，如果返回，通常表示发生了错误。</p>
+<p>示例用法（<code>execv()</code>）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> *args[] = &#123;<span class="string">&quot;/bin/ls&quot;</span>, <span class="string">&quot;-l&quot;</span>, <span class="literal">NULL</span>&#125;; <span class="comment">// 命令行参数数组</span></span><br><span class="line">    <span class="keyword">if</span> (execv(<span class="string">&quot;/bin/ls&quot;</span>, args) == <span class="number">-1</span>) &#123; <span class="comment">// 执行 ls 命令</span></span><br><span class="line">        perror(<span class="string">&quot;execv&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;This line will not be executed because of execv()\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>execv()</code> 函数用于执行 <code>/bin/ls</code> 命令，传递了命令行参数 <code>-l</code>。如果 <code>execv()</code> 执行成功，则会替换当前进程的内存映像为 <code>ls</code> 命令，并显示相应的输出。如果执行失败，则会输出错误信息。需要注意的是，如果 <code>execv()</code> 函数执行成功，则后续代码不会被执行，因为当前进程的内容已经被新程序替换。</p>
+<h2 id="Linux-POSIX-wait-详解"><a href="#Linux-POSIX-wait-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; wait() 详解"></a>Linux POSIX &lt;unistd.h&gt; wait() 详解</h2><p>在 POSIX 系统中，<code>wait()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于父进程等待子进程的终止。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>status</code> 是一个指向整型的指针，用于存储子进程的退出状态信息。如果不关心子进程的退出状态，可以传入 <code>NULL</code>。</p>
+<p><code>wait()</code> 函数的返回值为子进程的进程 ID，如果出错则返回 -1。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pid_t</span> pid = fork(); <span class="comment">// 创建子进程</span></span><br><span class="line">    <span class="keyword">if</span> (pid == <span class="number">-1</span>) &#123;</span><br><span class="line">        perror(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (pid == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 子进程执行的代码</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Child process with PID: %d\n&quot;</span>, getpid());</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">42</span>); <span class="comment">// 子进程退出，退出状态为 42</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 父进程执行的代码</span></span><br><span class="line">        <span class="type">int</span> status;</span><br><span class="line">        <span class="type">pid_t</span> child_pid = wait(&amp;status); <span class="comment">// 等待子进程退出</span></span><br><span class="line">        <span class="keyword">if</span> (child_pid == <span class="number">-1</span>) &#123;</span><br><span class="line">            perror(<span class="string">&quot;wait&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (WIFEXITED(status)) &#123; <span class="comment">// 检查子进程是否正常终止</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Child process %d exited with status: %d\n&quot;</span>, child_pid, WEXITSTATUS(status));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，父进程使用 <code>fork()</code> 创建了一个子进程。在子进程中，使用 <code>exit(42)</code> 退出，并返回状态码 42。在父进程中，使用 <code>wait()</code> 函数等待子进程退出，并获取子进程的退出状态信息。<code>WIFEXITED(status)</code> 用于检查子进程是否正常终止，<code>WEXITSTATUS(status)</code> 获取子进程的退出状态。</p>
+<p><code>wait()</code> 函数允许父进程等待子进程的终止，以便获取子进程的退出状态。</p>
+<h2 id="Linux-POSIX-exit-详解"><a href="#Linux-POSIX-exit-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; exit() 详解"></a>Linux POSIX &lt;unistd.h&gt; exit() 详解</h2><p>在 POSIX 系统中，<code>exit()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于正常终止当前进程。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">exit</span><span class="params">(<span class="type">int</span> status)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>status</code> 是整数类型，表示进程的退出状态。通常情况下，0 表示正常终止，非零值表示出现了错误。</p>
+<p><code>exit()</code> 函数没有返回值，它会终止当前进程的执行，并将进程的退出状态传递给父进程。进程终止后，操作系统会进行清理工作，包括关闭文件描述符、释放内存等。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Before calling exit()\n&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>); <span class="comment">// 正常终止进程，退出状态为 0</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;This line will not be executed\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，<code>exit()</code> 函数被调用来正常终止进程。在调用 <code>exit()</code> 后的代码将不会被执行，因为进程已经终止。</p>
+<p><code>exit()</code> 函数用于结束当前进程的执行，常见的使用情况包括程序执行成功时返回 0，出现错误时返回非零值，以及在程序中遇到不可恢复的错误时终止程序。</p>
+<h2 id="Linux-POSIX-access-详解"><a href="#Linux-POSIX-access-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; access() 详解"></a>Linux POSIX &lt;unistd.h&gt; access() 详解</h2><p>在 POSIX 系统中，<code>access()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于检查文件的权限。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">access</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>pathname</code> 是要检查权限的文件路径名，<code>mode</code> 是要检查的权限。<code>mode</code> 可以是以下值的按位或组合：</p>
+<ul>
+<li><code>F_OK</code>：用于检查文件是否存在。</li>
+<li><code>R_OK</code>：用于检查文件是否可读。</li>
+<li><code>W_OK</code>：用于检查文件是否可写。</li>
+<li><code>X_OK</code>：用于检查文件是否可执行。</li>
+</ul>
+<p><code>access()</code> 函数返回整型值，表示文件权限检查的结果。如果权限检查成功，返回 0；否则返回 -1，并设置 <code>errno</code> 来指示具体的错误类型。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *filename = <span class="string">&quot;example.txt&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查文件是否存在</span></span><br><span class="line">    <span class="keyword">if</span> (access(filename, F_OK) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s exists\n&quot;</span>, filename);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s does not exist\n&quot;</span>, filename);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查文件是否可读</span></span><br><span class="line">    <span class="keyword">if</span> (access(filename, R_OK) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s is readable\n&quot;</span>, filename);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s is not readable\n&quot;</span>, filename);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查文件是否可写</span></span><br><span class="line">    <span class="keyword">if</span> (access(filename, W_OK) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s is writable\n&quot;</span>, filename);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s is not writable\n&quot;</span>, filename);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查文件是否可执行</span></span><br><span class="line">    <span class="keyword">if</span> (access(filename, X_OK) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s is executable\n&quot;</span>, filename);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s is not executable\n&quot;</span>, filename);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>access()</code> 函数被用于检查文件 <code>example.txt</code> 的存在性、可读性、可写性和可执行性。根据权限检查的结果，打印相应的信息。</p>
+<h2 id="Linux-POSIX-mkir-详解"><a href="#Linux-POSIX-mkir-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; mkir() 详解"></a>Linux POSIX &lt;unistd.h&gt; mkir() 详解</h2><p>在 POSIX 系统中，创建新目录的函数是 <code>mkdir()</code>，而不是 <code>mkir()</code>。</p>
+<p><code>mkdir()</code> 函数用于创建新目录，其原型定义在 <code>&lt;sys/stat.h&gt;</code> 头文件中，而不是 <code>&lt;unistd.h&gt;</code>。它的函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">mkdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>pathname</code> 是新目录的路径名。</li>
+<li><code>mode</code> 是新目录的权限模式，通常以八进制表示，比如 <code>0755</code>。</li>
+</ul>
+<p>函数返回值为整型，如果创建成功返回 0，创建失败返回 -1，并设置相应的错误码，可以通过 <code>errno</code> 查看具体错误信息。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *dirname = <span class="string">&quot;new_directory&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建新目录</span></span><br><span class="line">    <span class="keyword">if</span> (mkdir(dirname, <span class="number">0755</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Directory \&quot;%s\&quot; created successfully.\n&quot;</span>, dirname);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;mkdir&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>mkdir()</code> 函数创建一个名为 <code>new_directory</code> 的新目录，并指定了权限为 <code>0755</code>。如果目录创建成功，则会输出相应的成功信息，否则会输出相应的错误信息。</p>
+<p><code>mkdir()</code> 函数是 POSIX 系统中用于创建目录的常用函数之一。</p>
+<h2 id="Linux-POSIX-rmdir-详解"><a href="#Linux-POSIX-rmdir-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; rmdir() 详解"></a>Linux POSIX &lt;unistd.h&gt; rmdir() 详解</h2><p>在 POSIX 系统中，<code>rmdir()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于删除目录。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">rmdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>pathname</code> 是要删除的目录的路径名。</p>
+<p><code>rmdir()</code> 函数的返回值为整型，如果删除成功返回 0，删除失败返回 -1，并设置相应的错误码，可以通过 <code>errno</code> 查看具体错误信息。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *dirname = <span class="string">&quot;directory_to_delete&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 删除目录</span></span><br><span class="line">    <span class="keyword">if</span> (rmdir(dirname) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Directory \&quot;%s\&quot; deleted successfully.\n&quot;</span>, dirname);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;rmdir&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>rmdir()</code> 函数删除一个名为 <code>directory_to_delete</code> 的目录。如果目录删除成功，则会输出相应的成功信息，否则会输出相应的错误信息。</p>
+<p>需要注意的是，使用 <code>rmdir()</code> 删除目录时，目录必须为空。如果目录中包含文件或其他目录，则无法成功删除目录。因此，在删除目录之前，通常需要确保目录为空。</p>
+<h2 id="Linux-POSIX-chdir-详解"><a href="#Linux-POSIX-chdir-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; chdir() 详解"></a>Linux POSIX &lt;unistd.h&gt; chdir() 详解</h2><p>在 POSIX 系统中，<code>chdir()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于改变当前工作目录。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">chdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>path</code> 是要设置为当前工作目录的路径名。</p>
+<p><code>chdir()</code> 函数的返回值为整型，如果成功改变工作目录则返回 0，失败返回 -1，并设置相应的错误码，可以通过 <code>errno</code> 查看具体错误信息。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *new_directory = <span class="string">&quot;/path/to/new_directory&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 改变当前工作目录</span></span><br><span class="line">    <span class="keyword">if</span> (chdir(new_directory) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Changed current working directory to: %s\n&quot;</span>, new_directory);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;chdir&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>chdir()</code> 函数将当前工作目录更改为 <code>/path/to/new_directory</code>。如果成功更改当前工作目录，则会输出相应的成功信息，否则会输出相应的错误信息。</p>
+<p><code>chdir()</code> 函数在 POSIX 系统中是用来改变当前工作目录的常用函数之一。</p>
+<h2 id="Linux-POSIX-sleep-详解"><a href="#Linux-POSIX-sleep-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; sleep() 详解"></a>Linux POSIX &lt;unistd.h&gt; sleep() 详解</h2><p>在 POSIX 系统中，<code>sleep()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于让当前进程挂起指定的时间。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">sleep</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> seconds)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数 <code>seconds</code> 是要挂起的时间长度，单位为秒。该函数会使当前进程挂起指定的秒数，并且在等待的时间内会让出 CPU，直到指定的时间过去为止。</p>
+<p><code>sleep()</code> 函数的返回值为未休眠完的时间（剩余的时间）。如果休眠时间到期，则返回 0。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Sleeping for 3 seconds...\n&quot;</span>);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> remaining_time = sleep(<span class="number">3</span>); <span class="comment">// 休眠 3 秒</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (remaining_time &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Sleep interrupted, remaining time: %u seconds\n&quot;</span>, remaining_time);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Woke up after 3 seconds\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>sleep(3)</code> 使当前进程挂起 3 秒钟。如果休眠时间到期，则程序会打印”Woke up after 3 seconds”，否则如果在等待期间发生了信号中断或其他情况，则会打印”Sleep interrupted, remaining time: [剩余秒数] seconds”。</p>
+<p><code>sleep()</code> 函数通常用于需要暂停执行一段时间的情况，比如在程序中设置定时任务或者等待某些条件达成的情况下。</p>
+<h2 id="Linux-POSIX-getpid-详解"><a href="#Linux-POSIX-getpid-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; getpid() 详解"></a>Linux POSIX &lt;unistd.h&gt; getpid() 详解</h2><p>在 POSIX 系统中，<code>getpid()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于获取当前进程的进程 ID（PID）。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>getpid()</code> 函数不接受任何参数，直接返回调用进程的进程 ID（PID）。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pid_t</span> process_id = getpid(); <span class="comment">// 获取当前进程的 PID</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Current process ID (PID): %d\n&quot;</span>, process_id);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>getpid()</code> 函数被调用以获取当前进程的 PID，并将其打印输出。通常情况下，每个运行的进程都有一个唯一的 PID，可以用来标识和跟踪进程。</p>
+<h2 id="Linux-POSIX-getcwd-详解"><a href="#Linux-POSIX-getcwd-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; getcwd() 详解"></a>Linux POSIX &lt;unistd.h&gt; getcwd() 详解</h2><p>在 POSIX 系统中，<code>getcwd()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于获取当前工作目录的路径名。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getcwd</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>buf</code> 是一个字符指针，用于存储当前工作目录的路径名。</li>
+<li><code>size</code> 是要存储路径名的缓冲区的大小。</li>
+</ul>
+<p><code>getcwd()</code> 函数的返回值是一个指向当前工作目录路径名的字符串指针，即 <code>buf</code> 参数的值。如果出现错误，则返回 NULL，并设置 <code>errno</code> 来指示具体的错误类型。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> buffer[<span class="number">4096</span>]; <span class="comment">// 缓冲区大小</span></span><br><span class="line">    <span class="type">char</span> *cwd = getcwd(buffer, <span class="keyword">sizeof</span>(buffer)); <span class="comment">// 获取当前工作目录</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cwd != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Current working directory: %s\n&quot;</span>, cwd);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        perror(<span class="string">&quot;getcwd&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>getcwd()</code> 函数被调用以获取当前工作目录的路径名，并将其存储在 <code>buffer</code> 缓冲区中。然后，通过判断返回值是否为 NULL，来输出当前工作目录的路径名。这个函数通常用于获取当前工作目录，以便程序在需要时操作特定的文件或目录。</p>
+<h2 id="Linux-POSIX-getuid-详解"><a href="#Linux-POSIX-getuid-详解" class="headerlink" title="Linux POSIX &lt;unistd.h&gt; getuid() 详解"></a>Linux POSIX &lt;unistd.h&gt; getuid() 详解</h2><p>在 POSIX 系统中，<code>getuid()</code> 是 <code>&lt;unistd.h&gt;</code> 头文件中定义的函数之一，用于获取当前进程的实际用户 ID。</p>
+<p>函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">uid_t</span> <span class="title function_">getuid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>getuid()</code> 函数不接受任何参数，直接返回调用进程的实际用户 ID（UID）。</p>
+<p>示例用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">uid_t</span> user_id = getuid(); <span class="comment">// 获取当前进程的实际用户 ID</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Current user ID: %d\n&quot;</span>, user_id);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>getuid()</code> 函数被调用以获取当前进程的实际用户 ID，并将其打印输出。实际用户 ID 是唯一标识一个用户的整数值，用于在系统中识别和区分不同的用户。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CPOSIX/" rel="tag"># CPOSIX</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_6_errno_h/" rel="prev" title="C_5_6_errno_h">
+      <i class="fa fa-chevron-left"></i> C_5_6_errno_h
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_1_posix_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="C_5_1_posix_理论基础">
+      C_5_1_posix_理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-open-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; open() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-read-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; read() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-write-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; write() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-close-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; close() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-lseek-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; lseek() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-fork-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; fork() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-exec-%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; exec() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-wait-%E8%AF%A6%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; wait() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-exit-%E8%AF%A6%E8%A7%A3"><span class="nav-number">11.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; exit() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-access-%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; access() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-mkir-%E8%AF%A6%E8%A7%A3"><span class="nav-number">13.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; mkir() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-rmdir-%E8%AF%A6%E8%A7%A3"><span class="nav-number">14.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; rmdir() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-chdir-%E8%AF%A6%E8%A7%A3"><span class="nav-number">15.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; chdir() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-sleep-%E8%AF%A6%E8%A7%A3"><span class="nav-number">16.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; sleep() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-getpid-%E8%AF%A6%E8%A7%A3"><span class="nav-number">17.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; getpid() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-getcwd-%E8%AF%A6%E8%A7%A3"><span class="nav-number">18.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; getcwd() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-getuid-%E8%AF%A6%E8%A7%A3"><span class="nav-number">19.</span> <span class="nav-text">Linux POSIX &lt;unistd.h&gt; getuid() 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

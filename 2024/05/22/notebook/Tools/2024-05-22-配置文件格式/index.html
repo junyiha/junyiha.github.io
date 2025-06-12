@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 不管是移动应用，桌面程序还是后台服务，经常需要从配置文件中读取配置信息，进行程序初始化和改变运行时的状态。以什么样的格式来存储配置信息，这是开发人员需要面临的一个文件。 常用的配置文件格式主要用： 键值对 JSON XML YAML TOML    键值对 键值对是一个非常简单易用的配置文件格式。每一个键值对表示一项配置，键值对的分隔符一般使用等号或者冒号。解析时，可以将#号开始的行视为注释">
+<meta property="og:type" content="article">
+<meta property="og:title" content="配置文件格式">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Tools/2024-05-22-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 不管是移动应用，桌面程序还是后台服务，经常需要从配置文件中读取配置信息，进行程序初始化和改变运行时的状态。以什么样的格式来存储配置信息，这是开发人员需要面临的一个文件。 常用的配置文件格式主要用： 键值对 JSON XML YAML TOML    键值对 键值对是一个非常简单易用的配置文件格式。每一个键值对表示一项配置，键值对的分隔符一般使用等号或者冒号。解析时，可以将#号开始的行视为注释">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.557Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Tools">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Tools/2024-05-22-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>配置文件格式 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Tools/2024-05-22-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          配置文件格式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>不管是移动应用，桌面程序还是后台服务，经常需要从配置文件中读取配置信息，进行程序初始化和改变运行时的状态。以什么样的格式来存储配置信息，这是开发人员需要面临的一个文件。</li>
+<li>常用的配置文件格式主要用：<ul>
+<li>键值对</li>
+<li>JSON</li>
+<li>XML</li>
+<li>YAML</li>
+<li>TOML</li>
+</ul>
+</li>
+</ul>
+<h2 id="键值对"><a href="#键值对" class="headerlink" title="键值对"></a>键值对</h2><ul>
+<li>键值对是一个非常简单易用的配置文件格式。每一个键值对表示一项配置，键值对的分隔符一般使用等号或者冒号。解析时，可以将#号开始的行视为注释行，以达到注释的功能</li>
+<li>以键值对为表现形式的配置文件格式常见的用Windows .ini文件和Java中的.properties文件</li>
+<li>例如下面是一个使用键值对表示的后台服务配置。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># This is a comment</span><br><span class="line">name=UserProfileServer</span><br><span class="line">maxconns=1000</span><br><span class="line">queuecap=10000</span><br><span class="line">queuetimeout=300</span><br><span class="line">loglevel=ERROR</span><br><span class="line">logsize=10M</span><br><span class="line">lognum=10</span><br><span class="line">logpath=/usr/local/app/log</span><br></pre></td></tr></table></figure></li>
+<li>在解析上面的配置时，可以按行读取，然后放到 map 中。下面以 Go 为例，完成对上面配置文件的解析。<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span>(</span><br><span class="line">	<span class="string">&quot;bufio&quot;</span></span><br><span class="line"> 	<span class="string">&quot;io&quot;</span></span><br><span class="line"> 	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;errors&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ParseConf</span><span class="params">(confPath <span class="type">string</span>)</span></span> (<span class="keyword">map</span>[<span class="type">string</span>]<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">	<span class="keyword">if</span> confPath == <span class="string">&quot;&quot;</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;param is ill&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	f, err := os.Open(confPath)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">  		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line"> 	&#125;</span><br><span class="line"> 	<span class="keyword">defer</span> f.Close()</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//store config info</span></span><br><span class="line">	m := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="type">string</span>]<span class="type">string</span>)</span><br><span class="line">	</span><br><span class="line">	bfRd := bufio.NewReader(f)</span><br><span class="line">	<span class="comment">//read by line, the line terminator is &#x27;\n&#x27;</span></span><br><span class="line">	<span class="keyword">for</span>&#123;</span><br><span class="line">		line, err := bfRd.ReadString(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">		<span class="keyword">if</span> err == <span class="literal">nil</span> || err == io.EOF&#123;</span><br><span class="line">			<span class="comment">//ignore blank and comment line</span></span><br><span class="line">			<span class="keyword">if</span> strings.TrimSpace(line) != <span class="string">&quot;&quot;</span> &amp;&amp; strings.TrimSpace(line)[<span class="number">0</span>] != <span class="string">&#x27;#&#x27;</span>&#123;</span><br><span class="line">				vKV := strings.Split(line, <span class="string">&quot;=&quot;</span>)</span><br><span class="line">				<span class="keyword">if</span> <span class="built_in">len</span>(vKV) == <span class="number">2</span> &#123;</span><br><span class="line">					m[vKV[<span class="number">0</span>]] = vKV[<span class="number">1</span>]</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> err == io.EOF&#123;</span><br><span class="line">				<span class="keyword">return</span> m, <span class="literal">nil</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> m, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	mConf, _ := ParseConf(<span class="string">&quot;server.kv&quot;</span>)</span><br><span class="line">	fmt.Println(mConf)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>运行结果：<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">map</span>[loglevel:ERROR</span><br><span class="line"> lognum:<span class="number">10</span></span><br><span class="line"> logpath:/usr/local/app/log</span><br><span class="line"> logsize:<span class="number">10</span>M</span><br><span class="line"> maxconns:<span class="number">1000</span></span><br><span class="line"> name:UserProfileServer</span><br><span class="line"> queuecap:<span class="number">10000</span></span><br><span class="line"> queuetimeout:<span class="number">300</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h2><ul>
+<li><p>JSON(JavaScript Object Notion)，是轻量级的文本数据交换格式，独立于语言，具有自我描述性。JSON类似于XML，但是比XML更小，更快，更易解析</p>
+</li>
+<li><p>JSON语法是JavaScript对象表示法语法的子集：</p>
+<ul>
+<li>数据在名称&#x2F;值对中</li>
+<li>数据由逗号分隔</li>
+<li>花括号保存对象</li>
+<li>方括号保存数组</li>
+</ul>
+</li>
+<li><p>名称&#x2F;值包括字段名称(在双引号中)，后面写一个冒号，然后是值</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;firstName&quot;</span><span class="punctuation">:</span> <span class="string">&quot;John&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一个合法的JSON可以是：</p>
+<ul>
+<li>数字(整数或者浮点数)</li>
+<li>字符串(在双引号中)</li>
+<li>布尔(true或者 false)</li>
+<li>数组(在方括号中)</li>
+<li>对象(在花括号中)</li>
+<li>null</li>
+</ul>
+</li>
+<li><p>下面以 JSON 表示一个简单的后台服务配置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;-name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;UserProfileServer&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;maxconns&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1000&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;queuecap&quot;</span><span class="punctuation">:</span> <span class="string">&quot;10000&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;queuetimeout&quot;</span><span class="punctuation">:</span> <span class="string">&quot;300&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;loginfo&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;loglevel&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ERROR&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;logsize&quot;</span><span class="punctuation">:</span> <span class="string">&quot;10M&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;lognum&quot;</span><span class="punctuation">:</span> <span class="string">&quot;10&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;logpath&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/usr/local/app/log&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>其中 -name 表示服务的名称，前面一个横杠表示该值可以转换为 XML 的标签属性。其它的键值对表示服务的各个配置项</p>
+</li>
+</ul>
+<h2 id="XML"><a href="#XML" class="headerlink" title="XML"></a>XML</h2><ul>
+<li><p>XML(Extensible Markup Language)是可扩展标记语言，用来传输和存储数据。因为其允许用户自定义标记名称，具有自我描述性，可灵活地用于存储服务配置信息</p>
+</li>
+<li><p>XML文档结构是一种树结构，它从根部开始，然后扩展到枝叶。XML文档必须有一个唯一的根节点，根节点包含所有其他节点。所有节点均可拥有文本内容和属性(名称&#x2F;值的对)。XML节点也叫做XML元素</p>
+</li>
+</ul>
+<h2 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a>YAML</h2><ul>
+<li><p>YAML(YAML Ain’t a Markup Language)是专门用来写配置文件的语言，简洁强大，相比于JSON和XML，更加便于开发人员读写。</p>
+</li>
+<li><p>YAML配置文件后缀为.yml或者.yaml</p>
+</li>
+<li><p>YAML 的基本语法规则如下：</p>
+<ul>
+<li>数据结构采用键值对的形式 key: value。</li>
+<li>键冒号后面要加空格（一般为 1 个空格）。</li>
+<li>字母大小写敏感。</li>
+<li>使用缩进表示层级关系。</li>
+<li>缩进只允许使用空格，不允许使用 Tab 键。</li>
+<li>缩进空格数可以任意，只要相同层级的元素左侧对齐即可。</li>
+<li>字符串值一般不使用引号，必要时可使用。使用双引号表示字符串时，会转义字符串中的特殊字符（例如\n）。使用单引号时不会转义字符串中的特殊字符。</li>
+<li>数组中的每个元素单独一行，并以 - 开头。或使用方括号，元素用逗号隔开。注意短横杆和逗号后面都要有空格。</li>
+<li>对象中的每个成员单独一行，使用键值对形式。或者使用大括号并用逗号分开。</li>
+<li>文档以三个连字符—表示开始，以三个点号…表示结束，二者都是可选的。</li>
+<li>文档前面可能会有指令，在这种情况下，需要使用—来表示指令的结束。指令是一个%后跟一个标识符和一些形参。</li>
+<li>目前只有两个指令：%YAML指定文档的 YAML 版本，%TAG用于 tag 简写。二者都很少使用。</li>
+<li>#表示注释，从这个字符一直到行尾，都会被解析器忽略。</li>
+</ul>
+</li>
+<li><p>YAML支持的数据结构有三种：</p>
+<ul>
+<li>对象：键值对的集合，又称为映射(mapping)，散列(hashes)，字典(dictionary)</li>
+<li>数组：一组按次序排列的值，又称为序列(sequence)，列表(list)</li>
+<li>标量：单个不可再分的值</li>
+</ul>
+</li>
+<li><p>对象</p>
+<ul>
+<li>对象的一组键值对，使用冒号结构表示<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Steve</span></span><br></pre></td></tr></table></figure></li>
+<li>YAML也允许另一种写法，将所有键值对写成一个行内对象<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">who:</span> &#123;<span class="attr">name:</span> <span class="string">Steve</span>, <span class="attr">age:</span> <span class="number">18</span>&#125;</span><br></pre></td></tr></table></figure></li>
+<li>当然，如果对象元素太多一行放不下，那么可以换行<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">who:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">Steve</span></span><br><span class="line">  <span class="attr">age:</span> <span class="number">18</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>数组</p>
+<ul>
+<li>一组以连字符开头的行，构成一个数组。注意，连字符后需要添加空格<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">animals:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Cat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Dog</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Goldfish</span></span><br></pre></td></tr></table></figure></li>
+<li>连字符前可以没有缩进，也就是说下面的这种写法也是OK的，但是还是建议缩进，因为更加易读<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">animals:</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">Cat</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">Dog</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">Goldfish</span></span><br></pre></td></tr></table></figure></li>
+<li>数组也可以采用行内表示法<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">animal:</span> [<span class="string">Cat</span>, <span class="string">Dog</span>, <span class="string">Goldfish</span>]</span><br></pre></td></tr></table></figure></li>
+<li>如果数组元素是一个数组，则可以在连字符下面再缩进输入一个数组<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">animals:</span></span><br><span class="line">  <span class="bullet">-</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Cat</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Dog</span></span><br><span class="line">  <span class="bullet">-</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Fish</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Goldfish</span></span><br></pre></td></tr></table></figure></li>
+<li>如果是行内表示，则为：<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">animals:</span> [[<span class="string">Cat</span>, <span class="string">Dog</span>], [<span class="string">Fish</span>, <span class="string">Goldfish</span>]]</span><br></pre></td></tr></table></figure></li>
+<li>如果数组元素是一个对象，可以写作：<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">animals:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">species:</span> <span class="string">dog</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">foo</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">species:</span> <span class="string">cat</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">bar</span></span><br><span class="line">  </span><br></pre></td></tr></table></figure></li>
+<li>对应的 JSON 为：<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;animals&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;species&quot;</span><span class="punctuation">:</span> <span class="string">&quot;dog&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;foo&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;species&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cat&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bar&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+<li>对象和数组可以结合使用，形成复合结构。<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">languages:</span></span><br><span class="line"> <span class="bullet">-</span> <span class="string">Ruby</span></span><br><span class="line"> <span class="bullet">-</span> <span class="string">Perl</span></span><br><span class="line"> <span class="bullet">-</span> <span class="string">Python</span> </span><br><span class="line"><span class="attr">websites:</span></span><br><span class="line"> <span class="attr">YAML:</span> <span class="string">yaml.org</span> </span><br><span class="line"> <span class="attr">Ruby:</span> <span class="string">ruby-lang.org</span> </span><br><span class="line"> <span class="attr">Python:</span> <span class="string">python.org</span> </span><br><span class="line"> <span class="attr">Perl:</span> <span class="string">use.perl.org</span> </span><br></pre></td></tr></table></figure></li>
+<li>对应的 JSON 表示如下：<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;languages&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;Ruby&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;Perl&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;Python&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;websites&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;YAML&quot;</span><span class="punctuation">:</span> <span class="string">&quot;yaml.org&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Ruby&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ruby-lang.org&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Python&quot;</span><span class="punctuation">:</span> <span class="string">&quot;python.org&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Perl&quot;</span><span class="punctuation">:</span> <span class="string">&quot;use.perl.org&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>标量是最基本、不可再分的值。有以下 7 种：</p>
+<ul>
+<li>字符串</li>
+<li>布尔值</li>
+<li>整数</li>
+<li>浮点数</li>
+<li>Null</li>
+<li>时间</li>
+<li>日期</li>
+</ul>
+</li>
+<li><p>使用一个例子来快速了解标量的基本使用：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">boolean:</span> </span><br><span class="line">    <span class="bullet">-</span> <span class="literal">TRUE</span>	<span class="comment"># true、True 都可以</span></span><br><span class="line">    <span class="bullet">-</span> <span class="literal">FALSE</span>	<span class="comment"># false、False 都可以</span></span><br><span class="line"><span class="attr">float:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">3.14</span>			<span class="comment"># 数值直接以字面量的形式表示</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">6.8523015e+5</span>	<span class="comment"># 可以使用科学计数法</span></span><br><span class="line"><span class="attr">int:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">123</span>							<span class="comment"># 数值直接以字面量的形式表示</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">0b1010_0111_0100_1010_1110</span>	<span class="comment"># 二进制表示</span></span><br><span class="line"><span class="attr">null:</span></span><br><span class="line">    <span class="attr">nodeName:</span> <span class="string">&#x27;node&#x27;</span></span><br><span class="line">    <span class="attr">parent:</span> <span class="string">~</span>  		 <span class="comment"># 使用~表示 null</span></span><br><span class="line"><span class="attr">string:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hello</span>			 <span class="comment"># 字符串默认不使用引号</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;Hello world&quot;</span>  <span class="comment"># 使用双引号或单引号包裹含有空格或特殊字符（如冒号）的字符串</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">newline</span></span><br><span class="line">      <span class="string">newline1</span>		 <span class="comment"># 字符串可以拆成多行，每一换行符会被转化成一个空格</span></span><br><span class="line"><span class="attr">date:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">2018-02-17</span>     <span class="comment"># 日期必须使用 ISO 8601 格式，即 yyyy-MM-dd</span></span><br><span class="line"><span class="attr">datetime:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="number">2018-02-17T15:02:31+08:00</span>    <span class="comment"># 时间使用 ISO 8601 格式，时间和日期之间使用 T 连接，+08:00 表示时区</span></span><br></pre></td></tr></table></figure></li>
+<li><p>YAML 字符串有三种表示方式：</p>
+<ul>
+<li>无引号</li>
+<li>单引号</li>
+<li>双引号</li>
+</ul>
+</li>
+<li><p>字符串默认不需要引号，但是如果字符串包含空格或特殊字符（如冒号），需要加引号。</p>
+</li>
+<li><p>双引号字符串允许在字符串中使用转义序列来表示特殊字符，例如 \n 表示换行，\t 表示制表符，以及 &quot; 表示双引号。</p>
+</li>
+<li><p>单引号字符串被视为纯粹的字面字符串，不支持转义序列。</p>
+</li>
+<li><p>如果字符串含有单引号，可以使用双引号包裹，反之亦然</p>
+</li>
+<li><p>锚点 &amp; 和别名 *，可以用来完成引用</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">defaults:</span> <span class="meta">&amp;defaults</span></span><br><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span><br><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span><br><span class="line"></span><br><span class="line"><span class="attr">development:</span></span><br><span class="line">  <span class="attr">database:</span> <span class="string">myapp_development</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="meta">*defaults</span></span><br></pre></td></tr></table></figure></li>
+<li><p>等同于下面的配置。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">defaults:</span></span><br><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span><br><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span><br><span class="line"></span><br><span class="line"><span class="attr">development:</span></span><br><span class="line">  <span class="attr">database:</span> <span class="string">myapp_development</span></span><br><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span><br><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span><br></pre></td></tr></table></figure></li>
+<li><p>&amp; 用来建立锚点（defaults），&lt;&lt; 表示合并到当前数据，* 用来引用锚点。</p>
+</li>
+<li><p>如果想引入多行的文本块，可以使用 |，|+，|-，&gt;，&gt;+，&gt;-</p>
+</li>
+<li><p>当内容换行时，保留换行符</p>
+</li>
+<li><p>如果最后一行有多个换行符，只保留一个换行符</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">linefeed1:</span> <span class="string">|</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span><span class="attr">linefeed2:</span> <span class="string">|</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span>  </span><br><span class="line"><span class="attr">linefeed3:</span> <span class="string">|</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">  <span class="string">text</span></span><br></pre></td></tr></table></figure></li>
+<li><p>对应的 JSON 为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;linefeed1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed3&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\n\ntext\n&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当内容换行时，保留换行符。</p>
+</li>
+<li><p>与 | 的区别是，如果最后一行有多个换行符，则保留实际数目。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;linefeed1&quot;:</span> <span class="string">&quot;some\ntext\n&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;linefeed2&quot;:</span> <span class="string">&quot;some\ntext\n\n&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;linefeed3&quot;:</span> <span class="string">&quot;some\n\ntext\n&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当内容换行时，保留换行符，但最后的换行符不保留</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">linefeed1:</span> <span class="string">|-</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span><span class="attr">linefeed2:</span> <span class="string">|-</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span>  </span><br><span class="line"><span class="attr">linefeed3:</span> <span class="string">|-</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">  <span class="string">text</span></span><br></pre></td></tr></table></figure></li>
+<li><p>对应的 JSON 为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;linefeed1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed3&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\n\ntext&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当内容换行时，替换为空格，但保留最后一行的换行符</p>
+</li>
+<li><p>如果最后一行有多个换行符，只保留一个换行符</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">linefeed1:</span> <span class="string">&gt;</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span><span class="attr">linefeed2:</span> <span class="string">&gt;</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span>  </span><br><span class="line"><span class="attr">linefeed3:</span> <span class="string">&gt;</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">  <span class="string">text</span></span><br></pre></td></tr></table></figure></li>
+<li><p>对应的 JSON 为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;linefeed1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some text\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some text\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed3&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext\n&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当内容换行时，替换为空格，但保留最后一行的换行符。</p>
+</li>
+<li><p>与 &gt; 的区别是，如果最后一行有多个换行符，则保留实际数目。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">linefeed1:</span> <span class="string">&gt;+</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span><span class="attr">linefeed2:</span> <span class="string">&gt;+</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span>  </span><br><span class="line"><span class="attr">linefeed3:</span> <span class="string">&gt;+</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">  <span class="string">text</span></span><br></pre></td></tr></table></figure></li>
+<li><p>对应的 JSON 为</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;linefeed1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some text\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some text\n\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed3&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext\n&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><blockquote>
+<p>-（缺省行为）</p>
+</blockquote>
+</li>
+<li><p>当内容换行时，替换为空格，不保留最后一行的换行符。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">linefeed1:</span> <span class="string">&gt;-</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span><span class="attr">linefeed2:</span> <span class="string">&gt;-</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string">  text</span></span><br><span class="line"><span class="string"></span>  </span><br><span class="line"><span class="attr">linefeed3:</span> <span class="string">&gt;-</span></span><br><span class="line"><span class="string">  some</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">  <span class="string">text</span></span><br></pre></td></tr></table></figure></li>
+<li><p>对应的 JSON 为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;linefeed1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some text&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some text&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;linefeed3&quot;</span><span class="punctuation">:</span> <span class="string">&quot;some\ntext&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注意：以上 6 个特殊字符，|- 和 &gt;- 用得最多</p>
+</li>
+<li><p>有时我们需要显示指定某些值的类型，可以使用 !（感叹号）显式指定类型。! 单叹号通常是自定义类型，!! 双叹号是内置类型</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># !!str 指定为字符串</span></span><br><span class="line"><span class="attr">string.value:</span> <span class="type">!!str</span> <span class="string">HelloWorld!</span></span><br><span class="line"><span class="comment"># !!timestamp 指定为日期时间类型</span></span><br><span class="line"><span class="attr">datetime.value:</span> <span class="type">!!timestamp</span> <span class="number">2021-04-13T02:31:00+08:00</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>内置的类型如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">!!int</span><span class="string">：整数类型</span></span><br><span class="line"><span class="type">!!float</span><span class="string">：浮点类型</span></span><br><span class="line"><span class="type">!!bool</span><span class="string">：布尔类型</span></span><br><span class="line"><span class="type">!!str</span><span class="string">：字符串类型</span></span><br><span class="line"><span class="type">!!binary</span><span class="string">：二进制类型</span></span><br><span class="line"><span class="type">!!timestamp</span><span class="string">：日期时间类型</span></span><br><span class="line"><span class="type">!!null</span><span class="string">：空值</span></span><br><span class="line"><span class="type">!!set</span><span class="string">：集合类型</span></span><br><span class="line"><span class="type">!!omap</span><span class="string">，!!pairs：键值列表或对象列表</span></span><br><span class="line"><span class="type">!!seq</span><span class="string">：序列</span></span><br><span class="line"><span class="type">!!map</span><span class="string">：散列表类型</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一个 yaml 文件可以包含多个 yaml 文档，使用三个连字符—分隔</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">a:</span> <span class="number">10</span></span><br><span class="line"><span class="attr">b:</span> </span><br><span class="line">	<span class="bullet">-</span> <span class="number">1</span></span><br><span class="line">	<span class="bullet">-</span> <span class="number">2</span></span><br><span class="line">	<span class="bullet">-</span> <span class="number">3</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">a:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">b:</span> </span><br><span class="line">	<span class="bullet">-</span> <span class="number">4</span></span><br><span class="line">	<span class="bullet">-</span> <span class="number">5</span> </span><br></pre></td></tr></table></figure></li>
+<li><p>这种情况在 K8S 和 SpringBoot 中非常常见。</p>
+</li>
+<li><p>比如 SpringBoot 在一个 application.yml 文件中，通过 — 分隔多个不同配置，根据 spring.profiles.active 的值来决定启用哪个配置。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 公共配置</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">prod</span> <span class="comment">#使用名为 prod 的配置，这里可以切换成 dev。</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">jdbc:mysql://localhost:3306/test_db?serverTimezone=UTC&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</span></span><br><span class="line">    <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># 开发环境配置</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span> <span class="string">dev</span> <span class="comment">#profiles属性代表配置的名称。</span></span><br><span class="line"></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment"># 生产环境配置</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span> <span class="string">prod</span></span><br><span class="line"></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下面以 YAML 表示一个简单的后台服务配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">UserProfileServer</span></span><br><span class="line"><span class="attr">maxconns:</span> <span class="number">1000</span></span><br><span class="line"><span class="attr">queuecap:</span> <span class="number">10000</span></span><br><span class="line"><span class="attr">queuetimeout:</span> <span class="number">300</span></span><br><span class="line"><span class="attr">loginfo:</span></span><br><span class="line">  <span class="attr">loglevel:</span> <span class="string">ERROR</span></span><br><span class="line">  <span class="attr">logsize:</span> <span class="string">10M</span></span><br><span class="line">  <span class="attr">lognum:</span> <span class="number">10</span></span><br><span class="line">  <span class="attr">logpath:</span> <span class="string">/usr/local/app/log</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="TOML"><a href="#TOML" class="headerlink" title="TOML"></a>TOML</h2><ul>
+<li><p>GitHub 联合创始人 Tom Preston-Werner 觉得 YAML 不够简洁优雅，如缩进要严格对齐，因此和其他几位开发者一起捣鼓了一个 TOML（Tom’s Obvious Minimal Language）。TOML 旨在成为一个语义显著且易于阅读的极简配置文件格式，能够无歧义地转化为哈希表，且能够简单地解析成形形色色语言中的数据结构，用于取代 YAML 和 JSON</p>
+</li>
+<li><p>TOML 的基本语法规则如下：</p>
+<ul>
+<li>TOML 是大小写敏感的</li>
+<li>TOML 文件必须是合法的 UTF-8 编码的 Unicode 文档</li>
+<li>空白的意思是 Tab（0x09）或空格（0x20）</li>
+<li>换行的意思是 LF（0x0A）或 CRLF（0x0D0A）</li>
+<li>井号将此行剩下的部分标记为注释</li>
+</ul>
+</li>
+</ul>
+<h2 id="配置文件格式的选择"><a href="#配置文件格式的选择" class="headerlink" title="配置文件格式的选择"></a>配置文件格式的选择</h2><ul>
+<li><p>面对常见配置文件格式，使用时该如何选择呢？这里给几个选择的原则：</p>
+<ul>
+<li>支持嵌套结构。仅仅支持 KV 结构的键值对表达能力有点弱；</li>
+<li>支持注释。不支持注释的 JSON 是给机器读的，不是给人读的；</li>
+<li>支持不同的数据类型，而不仅仅是 string。这一点，键值对和 XML 表现的非常逊色；</li>
+<li>最好支持 include 其他配置文件，方便配置模块化。复杂的配置也是无奈之举，但如果支持 include 语法，可以方便的把配置文件模块化。</li>
+</ul>
+</li>
+<li><p>通过以上几个对配置文件的要求，发现键值对不支持层级关系，JSON 不支持注释，可读性较差，虽然 XML 支持注释和层级结构，且可读性较好，但是因为起始标签一定要有个与之对应的结束标签，文件内容较大，解析时占用较多内存，传输时占用较多带宽。所以这里推荐使用 YAML 和 TOML，很多语言都有其 library 实现，跨语言不成问题</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Tools/" rel="tag"># Tools</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Tools/2024-05-22-%E7%AE%97%E6%B3%95/" rel="prev" title="算法">
+      <i class="fa fa-chevron-left"></i> 算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Tools/2024-05-22-%E5%90%8E%E7%AB%AF%E8%AE%BE%E8%AE%A1/" rel="next" title="后端设计">
+      后端设计 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%AE%E5%80%BC%E5%AF%B9"><span class="nav-number">2.</span> <span class="nav-text">键值对</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON"><span class="nav-number">3.</span> <span class="nav-text">JSON</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML"><span class="nav-number">4.</span> <span class="nav-text">XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YAML"><span class="nav-number">5.</span> <span class="nav-text">YAML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TOML"><span class="nav-number">6.</span> <span class="nav-text">TOML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">7.</span> <span class="nav-text">配置文件格式的选择</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

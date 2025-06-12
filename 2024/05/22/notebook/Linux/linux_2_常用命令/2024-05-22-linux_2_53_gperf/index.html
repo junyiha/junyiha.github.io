@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 gperf命令  linux gperf命令 详解gperf 是一个用于生成完美散列函数（perfect hash function）的工具。完美散列函数是一种能够将一组唯一的关键字映射到不同的索引值，且没有冲突的散列函数。gperf 工具通常用于生成用于关键字查找的高效数据结构，例如用于编译器符号表、关键字识别等。 以下是关于 gperf 命令的一些基本说明： 基本用法：1gperf [o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_53_gperf">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_53_gperf/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 gperf命令  linux gperf命令 详解gperf 是一个用于生成完美散列函数（perfect hash function）的工具。完美散列函数是一种能够将一组唯一的关键字映射到不同的索引值，且没有冲突的散列函数。gperf 工具通常用于生成用于关键字查找的高效数据结构，例如用于编译器符号表、关键字识别等。 以下是关于 gperf 命令的一些基本说明： 基本用法：1gperf [o">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_53_gperf/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_53_gperf | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_53_gperf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_53_gperf
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>gperf命令</li>
+</ul>
+<h2 id="linux-gperf命令-详解"><a href="#linux-gperf命令-详解" class="headerlink" title="linux gperf命令 详解"></a>linux gperf命令 详解</h2><p><code>gperf</code> 是一个用于生成完美散列函数（perfect hash function）的工具。完美散列函数是一种能够将一组唯一的关键字映射到不同的索引值，且没有冲突的散列函数。<code>gperf</code> 工具通常用于生成用于关键字查找的高效数据结构，例如用于编译器符号表、关键字识别等。</p>
+<p>以下是关于 <code>gperf</code> 命令的一些基本说明：</p>
+<h3 id="基本用法："><a href="#基本用法：" class="headerlink" title="基本用法："></a>基本用法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gperf [options] [--] keywords</span><br></pre></td></tr></table></figure>
+
+<h3 id="选项说明："><a href="#选项说明：" class="headerlink" title="选项说明："></a>选项说明：</h3><ul>
+<li><strong>-L, –language&#x3D;C：</strong> 指定生成的代码使用的编程语言，默认是 C 语言。</li>
+<li><strong>-N, –namespace：</strong> 在生成的代码中使用命名空间。</li>
+<li><strong>-K, –key-positions&#x3D;POS1[,POS2,…]：</strong> 指定关键字中用于计算散列的字符位置。</li>
+<li><strong>-t, –tables：</strong> 生成一个表达式计算表（expression calculation table）。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gperf -L C -N my_hash_function -K 1,3,5,7 my_keywords.gperf</span><br></pre></td></tr></table></figure>
+
+<p>这个示例使用 <code>gperf</code> 生成了一个 C 语言的完美散列函数，该函数的命名空间为 <code>my_hash_function</code>，关键字文件是 <code>my_keywords.gperf</code>，并且关键字中的第1、3、5、7个字符用于计算散列。</p>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ol>
+<li><p><strong>关键字文件格式：</strong> 关键字文件通常包含一组唯一的关键字，每个关键字占据一行。</p>
+</li>
+<li><p><strong>完美散列函数：</strong> <code>gperf</code> 生成的完美散列函数在给定的关键字集合上没有冲突，因此对于查找操作非常高效。</p>
+</li>
+<li><p><strong>生成的代码：</strong> <code>gperf</code> 生成的代码包含了一个完美散列函数、散列表和查找函数，可以方便地集成到项目中。</p>
+</li>
+<li><p><strong>调整关键字位置：</strong> 通过使用 <code>-K</code> 选项，可以调整计算散列时使用的关键字的位置，以获得更好的散列效果。</p>
+</li>
+</ol>
+<p>请注意，<code>gperf</code> 不是一个通用的散列函数生成器，它专注于生成用于特定用途的完美散列函数。使用 <code>gperf</code> 需要理解关键字集合的特性，以便生成高效的散列函数。</p>
+<h2 id="linux-gperf命令-常用技巧"><a href="#linux-gperf命令-常用技巧" class="headerlink" title="linux gperf命令 常用技巧"></a>linux gperf命令 常用技巧</h2><p>使用 <code>gperf</code> 命令时，以下是一些常用的技巧和最佳实践：</p>
+<ol>
+<li><p><strong>了解关键字集合：</strong><br>在使用 <code>gperf</code> 之前，要仔细了解关键字集合的特性。关键字集合应该是唯一的，这样生成的完美散列函数才能保证没有冲突。</p>
+</li>
+<li><p><strong>选择关键字位置：</strong><br>使用 <code>-K</code> 选项可以指定关键字中用于计算散列的字符位置。通过试验不同的位置组合，可以找到生成更好散列的方式。</p>
+</li>
+<li><p><strong>生成 C 代码：</strong><br>默认情况下，<code>gperf</code> 生成的是 C 语言的代码。如果项目使用其他编程语言，可以使用 <code>-L</code> 选项指定生成的代码语言。</p>
+</li>
+<li><p><strong>使用命名空间：</strong><br>如果生成的代码将会与其他代码集成，考虑使用 <code>-N</code> 选项指定生成的代码使用命名空间，以避免命名冲突。</p>
+</li>
+<li><p><strong>生成表达式计算表：</strong><br>使用 <code>-t</code> 选项可以生成表达式计算表，这有助于更详细地了解散列函数的计算方式。</p>
+</li>
+<li><p><strong>检查生成的代码：</strong><br>生成的代码包含完美散列函数、散列表和查找函数。在集成到项目中之前，建议检查生成的代码，确保它符合项目的要求。</p>
+</li>
+<li><p><strong>选择关键字文件格式：</strong><br><code>gperf</code> 支持两种关键字文件格式：<code>.gperf</code> 和 <code>.txt</code>。可以根据个人偏好选择一种格式，但要确保文件中的关键字格式正确。</p>
+</li>
+<li><p><strong>调整散列表大小：</strong><br>在某些情况下，可能需要调整散列表的大小以适应特定的需求。可以查看生成的代码中对散列表大小的定义，然后根据实际情况进行调整。</p>
+</li>
+<li><p><strong>测试性能：</strong><br>在集成到项目之前，进行性能测试以确保生成的完美散列函数在实际使用中能够提供高效的查找性能。</p>
+</li>
+<li><p><strong>文档记录：</strong><br>在代码中添加适当的注释，记录生成散列函数的相关信息，以便日后维护和理解代码。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更有效地使用 <code>gperf</code> 命令生成完美散列函数，并集成到项目中以提高关键字查找的效率。</p>
+<h2 id="gperf"><a href="#gperf" class="headerlink" title="gperf"></a>gperf</h2><p><code>gperf</code> 是 GNU Perfect Hash Function Generator 的缩写，它是一个用于生成完美哈希函数的工具。完美哈希函数是一种哈希函数，它可以在常数时间内计算给定输入的哈希值，而不会产生冲突（即，每个输入都会有唯一的哈希值）。</p>
+<p><code>gperf</code> 命令在 Linux 系统中使用，可以从输入文件生成完美哈希函数的 C 代码。下面是 <code>gperf</code> 命令的详解：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gperf [选项] &lt;输入文件&gt; &gt; &lt;输出文件&gt;</span><br></pre></td></tr></table></figure>
+
+<p>主要的选项包括：</p>
+<ul>
+<li><code>-a</code>：生成 ANSI C 代码，默认情况下生成 K&amp;R C 代码。</li>
+<li><code>-C</code>：生成 C++ 代码。</li>
+<li><code>-D</code>：指定宏定义，可以在生成的代码中使用。</li>
+<li><code>-E</code>：指定输入文件的字符编码，默认为 ASCII。</li>
+<li><code>-G</code>：生成全局变量，默认情况下生成静态变量。</li>
+<li><code>-k</code>：指定关键字列表的文件。</li>
+<li><code>-N</code>：指定生成的哈希函数名称，默认为 <code>hash</code>。</li>
+<li><code>-t</code>：指定输出文件的类型，默认为文本文件。</li>
+<li><code>-s</code>：指定哈希表的大小，默认为 16384。</li>
+<li><code>-S</code>：指定哈希函数名称的前缀，默认为空。</li>
+</ul>
+<p>使用 <code>gperf</code> 命令生成完美哈希函数的一般步骤如下：</p>
+<ol>
+<li>准备一个包含关键字的输入文件。</li>
+<li>运行 <code>gperf</code> 命令，指定输入文件和其他选项。</li>
+<li>将生成的 C 代码保存到输出文件中。</li>
+</ol>
+<p>生成的 C 代码包含一个哈希表和一个哈希函数。哈希表是一个数组，每个元素包含一个关键字和对应的值。哈希函数使用输入关键字计算哈希值，并通过查找哈希表来获取对应的值。</p>
+<p>通过使用 <code>gperf</code> 生成的完美哈希函数，可以在很短的时间内进行高效的关键字查找，特别适用于大型关键字集合的情况。</p>
+<p>请注意，这只是对 <code>gperf</code> 命令的简要说明，如果需要更详细的信息，可以查阅相关的文档或使用 <code>man gperf</code> 命令来查看 <code>gperf</code> 命令的手册页。</p>
+<hr>
+<h2 id="gperf-1"><a href="#gperf-1" class="headerlink" title="gperf"></a>gperf</h2><p>以下是一个简单的示例，演示如何在 Linux 上使用 <code>gperf</code> 命令生成完美哈希函数。</p>
+<ol>
+<li><p>创建一个名为 <code>keywords.txt</code> 的文本文件，包含一些关键字，每行一个关键字。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apple</span><br><span class="line">banana</span><br><span class="line">orange</span><br><span class="line">peach</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行以下命令来生成完美哈希函数的 C 代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gperf keywords.txt &gt; hash_table.c</span><br></pre></td></tr></table></figure>
+
+<p>这将生成一个名为 <code>hash_table.c</code> 的输出文件，其中包含生成的完美哈希函数的代码。</p>
+</li>
+<li><p>在你的程序中包含 <code>hash_table.c</code> 文件，并使用生成的完美哈希函数进行关键字查找。</p>
+<p>下面是一个简单的示例程序 <code>main.c</code>，使用生成的完美哈希函数查找关键字：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;hash_table.c&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* keyword = <span class="string">&quot;banana&quot;</span>;</span><br><span class="line">    <span class="type">int</span> value = hash_lookup(keyword, <span class="built_in">strlen</span>(keyword));</span><br><span class="line">    <span class="keyword">if</span> (value != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;关键字 &#x27;%s&#x27; 的值为 %d\n&quot;</span>, keyword, value);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;未找到关键字 &#x27;%s&#x27;\n&quot;</span>, keyword);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在编译时，确保将生成的 <code>hash_table.c</code> 文件一起编译，并链接到你的程序中。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc main.c hash_table.c -o program</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行生成的程序：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./program</span><br></pre></td></tr></table></figure>
+
+<p>输出应为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">关键字 &#x27;banana&#x27; 的值为 1</span><br></pre></td></tr></table></figure>
+
+<p>这表明关键字 “banana” 在哈希表中的值为 1。</p>
+</li>
+</ol>
+<p>这是一个简单的示例，演示了如何在 Linux 上使用 <code>gperf</code> 命令生成完美哈希函数。实际使用中，你可以根据自己的需求和输入数据来调整代码和选项。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_57_init/" rel="prev" title="linux_2_57_init">
+      <i class="fa fa-chevron-left"></i> linux_2_57_init
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_48_ip/" rel="next" title="linux_2_48_ip">
+      linux_2_48_ip <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-gperf%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux gperf命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本用法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E9%A1%B9%E8%AF%B4%E6%98%8E%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">选项说明：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-gperf%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux gperf命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gperf"><span class="nav-number">4.</span> <span class="nav-text">gperf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gperf-1"><span class="nav-number">5.</span> <span class="nav-text">gperf</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 xenomai的相关理论基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xenomai_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Xenomai/2024-05-22-xenomai_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 xenomai的相关理论基础">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.584Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Xenomai">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Xenomai/2024-05-22-xenomai_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>xenomai_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Xenomai/2024-05-22-xenomai_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          xenomai_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Xenomai/" itemprop="url" rel="index"><span itemprop="name">Xenomai</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>xenomai的相关理论基础</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="IGH-详细解释"><a href="#IGH-详细解释" class="headerlink" title="IGH 详细解释"></a>IGH 详细解释</h2><p><strong>IGH（Industrial Ethernet Protocols Group）</strong> 是一个开源项目，旨在为工业自动化和嵌入式系统提供 <strong>工业以太网协议</strong> 的实现。该项目为各种工业协议提供了协议栈和驱动程序，特别是那些在 <strong>工业自动化、实时控制和嵌入式通信</strong> 中使用的以太网协议，如 <strong>EtherCAT</strong>、<strong>PROFINET</strong> 和 <strong>Ethernet&#x2F;IP</strong> 等。</p>
+<p>IGH 主要关注 <strong>实时性、可靠性</strong> 和 <strong>高效的数据交换</strong>，这些是工业自动化系统中对通信协议的基本要求。它与 <strong>Xenomai</strong> 等实时操作系统框架兼容，使得工业设备和控制系统能够在实时操作系统中运行。</p>
+<hr>
+<h2 id="1-IGH-的目标"><a href="#1-IGH-的目标" class="headerlink" title="1. IGH 的目标"></a><strong>1. IGH 的目标</strong></h2><p>IGH 项目的主要目标是为工业自动化提供一种支持的、开源的以太网通信协议栈，特别是在实时性要求高的应用中。其目标包括：</p>
+<ul>
+<li><strong>低延迟和高精度</strong>：工业自动化中的许多应用（如运动控制、数据采集等）需要低延迟和高精度的通信协议，IGH 通过优化协议栈的实现来满足这些需求。</li>
+<li><strong>兼容多种工业协议</strong>：IGH 支持多种工业以太网协议栈的实现，确保可以根据不同的工业需求选择合适的协议。</li>
+<li><strong>开源社区支持</strong>：作为开源项目，IGH 允许社区参与开发，定期更新并支持工业协议的不断发展。</li>
+</ul>
+<hr>
+<h2 id="2-IGH-支持的工业以太网协议"><a href="#2-IGH-支持的工业以太网协议" class="headerlink" title="2. IGH 支持的工业以太网协议"></a><strong>2. IGH 支持的工业以太网协议</strong></h2><p>IGH 提供了多个工业以太网协议的实现，这些协议广泛应用于工业自动化领域，主要包括以下几种：</p>
+<h3 id="a-EtherCAT-Ethernet-for-Control-Automation-Technology"><a href="#a-EtherCAT-Ethernet-for-Control-Automation-Technology" class="headerlink" title="a. EtherCAT (Ethernet for Control Automation Technology)"></a><strong>a. EtherCAT (Ethernet for Control Automation Technology)</strong></h3><ul>
+<li><p><strong>EtherCAT</strong> 是一种高速、实时的工业以太网协议，广泛应用于运动控制和实时数据交换的场景。其主要特点是：</p>
+<ul>
+<li><strong>高速通信</strong>：EtherCAT 通过环形拓扑和数据传输优化技术，能够以极低的延迟传输大量数据。</li>
+<li><strong>低延迟</strong>：它允许设备之间的实时同步，确保各设备的精确协调，特别适用于精密控制系统。</li>
+<li><strong>同步性</strong>：EtherCAT 支持设备之间的精确时间同步，确保工业自动化中多个设备的协调操作。</li>
+</ul>
+<p>在 IGH 中，EtherCAT 协议栈的实现提供了对 EtherCAT 主站和从站设备的支持，使得开发者能够在开源环境中实现实时控制系统。</p>
+</li>
+</ul>
+<h3 id="b-PROFINET-Process-Field-Net"><a href="#b-PROFINET-Process-Field-Net" class="headerlink" title="b. PROFINET (Process Field Net)"></a><strong>b. PROFINET (Process Field Net)</strong></h3><ul>
+<li><p><strong>PROFINET</strong> 是一种基于以太网的工业通信协议，广泛用于工业自动化和过程控制领域。PROFINET 提供了可靠的数据传输，支持实时数据交换，特别适用于高性能的设备之间的通信。</p>
+<ul>
+<li><strong>模块化设计</strong>：PROFINET 通过支持实时性、冗余和通信的高可靠性，满足工业控制系统的需要。</li>
+<li><strong>设备管理</strong>：PROFINET 支持设备的自动发现和配置，方便工业设备的接入和管理。</li>
+</ul>
+<p>IGH 提供了 PROFINET 的协议栈，实现了对 PROFINET 主站和从站的支持，可以在支持 Linux 的环境中快速构建 PROFINET 系统。</p>
+</li>
+</ul>
+<h3 id="c-Ethernet-IP-Ethernet-Industrial-Protocol"><a href="#c-Ethernet-IP-Ethernet-Industrial-Protocol" class="headerlink" title="c. Ethernet&#x2F;IP (Ethernet Industrial Protocol)"></a><strong>c. Ethernet&#x2F;IP (Ethernet Industrial Protocol)</strong></h3><ul>
+<li><p><strong>Ethernet&#x2F;IP</strong> 是由 <strong>ODVA（Open DeviceNet Vendors Association）</strong> 开发的协议，用于工业设备之间的通信，尤其是在制造业中的传感器、执行器和其他设备之间。</p>
+<ul>
+<li><strong>基于 TCP&#x2F;IP</strong>：Ethernet&#x2F;IP 使用标准的 TCP&#x2F;IP 协议堆栈来确保通信的兼容性。</li>
+<li><strong>广泛应用</strong>：在许多工业自动化系统中，Ethernet&#x2F;IP 用于实现设备之间的高速数据交换、控制和监测。</li>
+</ul>
+<p>IGH 提供了对 Ethernet&#x2F;IP 的支持，使得开发者可以在支持 Linux 的嵌入式平台中轻松实现 Ethernet&#x2F;IP 网络的通信。</p>
+</li>
+</ul>
+<hr>
+<h2 id="3-IGH-与-Xenomai-的结合"><a href="#3-IGH-与-Xenomai-的结合" class="headerlink" title="3. IGH 与 Xenomai 的结合"></a><strong>3. IGH 与 Xenomai 的结合</strong></h2><p>IGH 与 <strong>Xenomai</strong> 的结合尤其重要，因为工业以太网协议（如 EtherCAT 和 PROFINET）通常对实时性有极高的要求。Xenomai 提供了低延迟的实时性能，能够确保这些协议在实际应用中以最高精度和效率运行。具体来说，Xenomai 的实时任务调度和高优先级处理确保实时数据能够及时、可靠地交换，而 IGH 提供的协议栈则确保各个工业设备通过以太网协议进行高效通信。</p>
+<ul>
+<li><strong>实时性能</strong>：Xenomai 提供的低延迟和优先级调度可以确保实时工业协议在复杂的系统中正常运行，特别是在需要精确同步和协调的场景中。</li>
+<li><strong>协议栈的实现</strong>：IGH 提供了对工业协议的完整实现，可以与 Xenomai 的实时内核配合使用，处理来自现场设备的实时数据并执行实时控制任务。</li>
+</ul>
+<hr>
+<h2 id="4-IGH-的应用场景"><a href="#4-IGH-的应用场景" class="headerlink" title="4. IGH 的应用场景"></a><strong>4. IGH 的应用场景</strong></h2><p>IGH 的协议栈主要应用于以下领域：</p>
+<h3 id="a-工业自动化"><a href="#a-工业自动化" class="headerlink" title="a. 工业自动化"></a><strong>a. 工业自动化</strong></h3><ul>
+<li>在 <strong>工厂自动化</strong>、<strong>制造业</strong> 和 <strong>生产线控制</strong> 中，IGH 支持的实时以太网协议（如 EtherCAT）可以帮助企业实现设备的高效协作，减少生产过程中的延迟和误差。</li>
+</ul>
+<h3 id="b-机器人控制"><a href="#b-机器人控制" class="headerlink" title="b. 机器人控制"></a><strong>b. 机器人控制</strong></h3><ul>
+<li>在 <strong>机器人系统</strong> 中，精确的实时数据传输和设备之间的同步非常重要。通过使用 IGH 的协议栈，机器人能够与传感器、执行器等设备实时通信，确保精确的控制。</li>
+</ul>
+<h3 id="c-嵌入式控制系统"><a href="#c-嵌入式控制系统" class="headerlink" title="c. 嵌入式控制系统"></a><strong>c. 嵌入式控制系统</strong></h3><ul>
+<li>在需要实时控制的 <strong>嵌入式系统</strong> 中，IGH 提供的工业协议栈支持高速和可靠的数据传输，使得这些嵌入式系统能够高效地处理复杂任务，如数据采集、传感器控制、执行器协调等。</li>
+</ul>
+<h3 id="d-高速数据采集和测量系统"><a href="#d-高速数据采集和测量系统" class="headerlink" title="d. 高速数据采集和测量系统"></a><strong>d. 高速数据采集和测量系统</strong></h3><ul>
+<li>对于需要高速和高精度数据采集的系统，如 <strong>精密测量仪器</strong>、<strong>医疗设备</strong> 等，IGH 支持的实时协议能够确保数据的即时传输，确保系统的精确性。</li>
+</ul>
+<hr>
+<h2 id="5-发展和社区支持"><a href="#5-发展和社区支持" class="headerlink" title="5. 发展和社区支持"></a><strong>5. 发展和社区支持</strong></h2><p>IGH 是一个开源项目，开发者可以自由使用和修改它，并根据需要扩展协议栈。这个项目由全球的开源社区支持，社区成员不断改进和完善协议栈，增加新的功能和特性。</p>
+<ul>
+<li><strong>开源协议栈</strong>：IGH 提供了完全开源的工业以太网协议栈，任何开发者都可以参与其中，对其进行修改和优化。</li>
+<li><strong>跨平台支持</strong>：虽然 IGH 最常用于 Linux 环境，但它也支持多种嵌入式平台，帮助开发者在各种硬件平台上实现实时通信。</li>
+</ul>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p><strong>IGH</strong>（Industrial Ethernet Protocols Group）是一个开源项目，提供了多个工业以太网协议（如 EtherCAT、PROFINET、Ethernet&#x2F;IP）的实现。这些协议广泛应用于工业自动化、嵌入式控制、机器人控制等领域。通过与 <strong>Xenomai</strong> 等实时操作系统的结合，IGH 为实时控制系统提供了高效、低延迟的通信协议，确保工业设备能够高效、可靠地进行实时数据交换。开发者可以使用 IGH 提供的协议栈和驱动程序，在开源环境中实现工业自动化系统，满足对实时性的严格要求。</p>
+<h2 id="xenomai-与-igh的关系"><a href="#xenomai-与-igh的关系" class="headerlink" title="xenomai 与 igh的关系"></a>xenomai 与 igh的关系</h2><p><strong>Xenomai</strong> 和 <strong>IGH（Industrial Ethernet Protocols Group）</strong> 之间的关系主要体现在 <strong>实时工业以太网协议</strong> 的支持上。具体来说，Xenomai 提供了实时性能，而 IGH（一个专注于工业以太网协议实现的开源项目）为 Xenomai 提供了对工业以太网协议的支持，尤其是用于工业自动化和嵌入式控制系统中的实时以太网协议。</p>
+<p>下面详细解释二者的关系和互动：</p>
+<hr>
+<h2 id="1-Xenomai：提供实时性能"><a href="#1-Xenomai：提供实时性能" class="headerlink" title="1. Xenomai：提供实时性能"></a><strong>1. Xenomai：提供实时性能</strong></h2><p>Xenomai 本身是一个实时扩展框架，它通过在 <strong>Linux</strong> 系统上实现双内核架构（Real-Time Kernel 和 Linux Kernel）来提供实时任务调度功能。Xenomai 允许实时任务和普通 Linux 任务并行执行，并且通过优先级调度确保实时任务的及时响应。</p>
+<ul>
+<li><strong>实时性</strong>：Xenomai 的核心是提供低延迟和高优先级的实时性，它主要应用于工业控制、嵌入式系统、机器人控制等对实时性能要求高的场景。</li>
+<li><strong>双内核架构</strong>：Xenomai 使用双内核架构（Xenomai 内核和 Linux 内核）来确保实时任务与非实时任务之间的隔离，并保证实时任务不会受到 Linux 内核的干扰。</li>
+</ul>
+<hr>
+<h2 id="2-IGH：工业以太网协议实现"><a href="#2-IGH：工业以太网协议实现" class="headerlink" title="2. IGH：工业以太网协议实现"></a><strong>2. IGH：工业以太网协议实现</strong></h2><p><strong>IGH</strong>（Industrial Ethernet Protocols Group）是一个开源项目，旨在为工业自动化和控制系统提供工业以太网协议的实现。它包含多个用于实时工业通信的协议栈，如 <strong>EtherCAT</strong>、<strong>PROFINET</strong> 和 <strong>Ethernet&#x2F;IP</strong>。</p>
+<ul>
+<li><strong>EtherCAT</strong>：这是工业自动化领域常用的实时以太网协议，特别适用于高精度同步控制、设备控制、机器控制等。</li>
+<li><strong>PROFINET</strong> 和 <strong>Ethernet&#x2F;IP</strong>：其他常见的工业以太网协议，也在 IGH 中得到了支持。</li>
+</ul>
+<p>IGH 提供了这些协议的 <strong>驱动程序和协议栈</strong>，使得工业设备能够通过实时以太网协议进行高速、低延迟的数据通信。</p>
+<hr>
+<h2 id="3-Xenomai-与-IGH-的关系"><a href="#3-Xenomai-与-IGH-的关系" class="headerlink" title="3. Xenomai 与 IGH 的关系"></a><strong>3. Xenomai 与 IGH 的关系</strong></h2><p>Xenomai 和 IGH 主要在以下几个方面产生交集：</p>
+<h3 id="a-实时性支持"><a href="#a-实时性支持" class="headerlink" title="a. 实时性支持"></a><strong>a. 实时性支持</strong></h3><ul>
+<li><p><strong>Xenomai 的实时性能</strong> 是工业以太网协议（如 EtherCAT、PROFINET）在实时控制系统中能够有效运行的基础。Xenomai 为这些协议提供了低延迟和高优先级调度，确保它们能够在严格的时间约束下工作。</p>
+<p>比如，<strong>EtherCAT</strong> 协议要求高实时性，它依赖于精确的时序和低延迟的数据交换，而这些正是 Xenomai 所擅长的。通过在 Xenomai 下运行，EtherCAT 协议可以充分利用实时内核提供的调度和中断响应功能，从而实现高效的实时控制。</p>
+</li>
+</ul>
+<h3 id="b-工业以太网协议的实现"><a href="#b-工业以太网协议的实现" class="headerlink" title="b. 工业以太网协议的实现"></a><strong>b. 工业以太网协议的实现</strong></h3><ul>
+<li><strong>IGH</strong> 提供了对 <strong>EtherCAT</strong> 和其他工业以太网协议的实现。这些协议是工业自动化中广泛使用的实时通信协议，尤其是在需要高速数据传输和同步控制的场景下。Xenomai 可以通过 <strong>IGH 提供的 EtherCAT 实现</strong> 来与工业设备进行高速、实时的通信。</li>
+</ul>
+<h3 id="c-驱动程序与实时任务结合"><a href="#c-驱动程序与实时任务结合" class="headerlink" title="c. 驱动程序与实时任务结合"></a><strong>c. 驱动程序与实时任务结合</strong></h3><ul>
+<li><p>由于 Xenomai 提供的实时性能，开发者可以在 Xenomai 上编写实时任务并使用 IGH 提供的 <strong>EtherCAT</strong> 驱动程序或其他协议栈来进行工业设备的控制。比如，Xenomai 可以处理实时数据采集、运动控制等任务，而 <strong>EtherCAT</strong> 协议可以通过 IGH 的实现负责设备之间的实时数据通信。</p>
+<p>Xenomai 提供了必要的 <strong>实时任务调度</strong>，而 IGH 提供了 <strong>工业协议栈</strong>，两者结合可以让开发者实现一个高效、低延迟的实时工业控制系统。</p>
+</li>
+</ul>
+<hr>
+<h2 id="4-如何实现-Xenomai-与-IGH-的集成"><a href="#4-如何实现-Xenomai-与-IGH-的集成" class="headerlink" title="4. 如何实现 Xenomai 与 IGH 的集成"></a><strong>4. 如何实现 Xenomai 与 IGH 的集成</strong></h2><p>要将 Xenomai 与 IGH 结合，通常的步骤如下：</p>
+<ol>
+<li><p><strong>安装 Xenomai</strong>：首先需要在 Linux 系统上安装并配置 Xenomai，确保系统能够支持实时任务的调度。</p>
+</li>
+<li><p><strong>安装 IGH 协议栈</strong>：然后，安装 IGH 提供的工业以太网协议栈（如 EtherCAT、PROFINET 等），确保协议栈支持 Xenomai 实时内核的操作。</p>
+</li>
+<li><p><strong>配置实时任务与协议栈</strong>：配置 Xenomai 的实时任务，使得这些任务可以与 IGH 提供的协议栈进行交互。例如，可以通过 Xenomai 来控制机械手臂的运动，同时通过 EtherCAT 协议栈来传输数据。</p>
+</li>
+<li><p><strong>优化性能</strong>：根据具体需求，优化实时任务的调度，确保通信的实时性要求能够满足工业自动化的要求。</p>
+</li>
+</ol>
+<hr>
+<h2 id="5-Xenomai-与-IGH-的优势"><a href="#5-Xenomai-与-IGH-的优势" class="headerlink" title="5. Xenomai 与 IGH 的优势"></a><strong>5. Xenomai 与 IGH 的优势</strong></h2><p>结合 Xenomai 和 IGH，可以为工业应用带来以下优势：</p>
+<ul>
+<li><p><strong>实时性</strong>：Xenomai 提供了 Linux 系统下的实时性能，而 IGH 提供了工业以太网协议的实现。结合两者，可以实现在工业自动化系统中高效的实时控制和数据交换。</p>
+</li>
+<li><p><strong>灵活性与扩展性</strong>：Xenomai 作为 Linux 的实时扩展，能够支持多种实时任务，IGH 提供多种工业协议（如 EtherCAT、PROFINET 等），这使得系统具有很强的灵活性和扩展性，可以根据不同需求选择合适的协议和任务。</p>
+</li>
+<li><p><strong>工业自动化支持</strong>：通过 Xenomai 和 IGH 的结合，开发者可以在实时控制系统中实现对多个工业设备的同步控制，适用于高精度、高速的工业控制应用。</p>
+</li>
+</ul>
+<hr>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h2><p><strong>Xenomai</strong> 提供了低延迟和高优先级调度的实时操作系统功能，而 <strong>IGH（Industrial Ethernet Protocols Group）</strong> 提供了工业以太网协议栈（如 EtherCAT、PROFINET 等），两者结合可以使得 Linux 系统支持实时工业以太网协议的高效实现。通过这两者的集成，开发者可以在 Linux 上实现高效的实时工业自动化系统，满足工业设备的实时通信和控制需求。</p>
+<h2 id="xenomai-实时系统-详细解释"><a href="#xenomai-实时系统-详细解释" class="headerlink" title="xenomai 实时系统 详细解释"></a>xenomai 实时系统 详细解释</h2><p><strong>Xenomai</strong> 是一个基于 <strong>Linux</strong> 的高性能实时操作系统（RTOS）扩展框架，用于实现实时任务调度和响应。Xenomai 的主要目标是提供低延迟、高精度的实时功能，使得 Linux 能够满足工业自动化、嵌入式控制、机器人控制等应用中对时间响应性要求极高的需求。</p>
+<hr>
+<h2 id="1-Xenomai-概述"><a href="#1-Xenomai-概述" class="headerlink" title="1. Xenomai 概述"></a><strong>1. Xenomai 概述</strong></h2><p>Xenomai 是在 Linux 内核上实现的一个实时框架，它通过提供实时的调度和中断响应，来扩展 Linux 的实时能力。Xenomai 使得开发者能够在 Linux 系统中运行 <strong>实时任务</strong>，并且通过分离实时任务与非实时任务，确保系统的响应时间可以保证在一个严格的时间限制内。</p>
+<p>Xenomai 提供了一种通过 “双内核”（<strong>Dual-Kernel</strong>）机制来实现 <strong>实时性</strong> 的方式，其中包括：</p>
+<ul>
+<li><strong>Xenomai 内核</strong>：处理实时任务。</li>
+<li><strong>Linux 内核</strong>：负责运行普通的非实时任务。</li>
+</ul>
+<p>Xenomai 的实时功能是通过内核的扩展以及中断管理来提供的，常用于对实时性要求高的工业和嵌入式控制系统中。</p>
+<hr>
+<h2 id="2-Xenomai-的工作原理"><a href="#2-Xenomai-的工作原理" class="headerlink" title="2. Xenomai 的工作原理"></a><strong>2. Xenomai 的工作原理</strong></h2><p>Xenomai 的核心思想是通过将实时任务和非实时任务分开，并为实时任务提供一个特殊的调度器，这样可以确保实时任务的调度优先级不受系统的其他任务（如 Linux 进程）的影响。</p>
+<h3 id="双内核结构（Dual-Kernel）"><a href="#双内核结构（Dual-Kernel）" class="headerlink" title="双内核结构（Dual-Kernel）"></a><strong>双内核结构（Dual-Kernel）</strong></h3><p>Xenomai 使用 <strong>双内核结构</strong>，即将实时任务调度和普通 Linux 任务调度分离：</p>
+<ul>
+<li><strong>Xenomai 内核</strong>：提供低延迟的实时性，能够直接响应硬件中断，执行实时任务。它通过将实时任务与 Linux 内核分离，确保实时任务可以在实时调度器中高效执行。</li>
+<li><strong>Linux 内核</strong>：运行普通的非实时任务，它控制系统的其他非实时资源。</li>
+</ul>
+<h3 id="Xenomai-与-Linux-的协作"><a href="#Xenomai-与-Linux-的协作" class="headerlink" title="Xenomai 与 Linux 的协作"></a><strong>Xenomai 与 Linux 的协作</strong></h3><ul>
+<li>Xenomai 内核与 Linux 内核并行运行，但是 Xenomai 内核不会干扰 Linux 的调度，只会在需要处理实时任务时介入。  </li>
+<li><strong>中断处理</strong>：Xenomai 提供了比 Linux 更优的中断响应能力，因为它允许实时任务直接访问硬件，而 Linux 需要通过调度器和系统调用进行间接访问。</li>
+</ul>
+<h3 id="实时线程与非实时线程"><a href="#实时线程与非实时线程" class="headerlink" title="实时线程与非实时线程"></a><strong>实时线程与非实时线程</strong></h3><ul>
+<li><strong>实时线程</strong>：由 Xenomai 内核管理，具有较高的优先级，实时调度器确保它们按优先级顺序被执行。</li>
+<li><strong>非实时线程</strong>：由 Linux 内核管理，适用于不要求严格时间响应的任务。Xenomai 会限制这些线程对实时任务的影响。</li>
+</ul>
+<h3 id="硬件访问"><a href="#硬件访问" class="headerlink" title="硬件访问"></a><strong>硬件访问</strong></h3><p>Xenomai 提供了直接的硬件访问能力，实时任务可以绕过 Linux 的调度机制直接访问硬件资源，而 Linux 内核则通常通过中断和系统调用进行硬件访问。</p>
+<hr>
+<h2 id="3-Xenomai-的实时性"><a href="#3-Xenomai-的实时性" class="headerlink" title="3. Xenomai 的实时性"></a><strong>3. Xenomai 的实时性</strong></h2><p>实时系统的主要要求是：</p>
+<ul>
+<li><strong>确定性</strong>：任务的响应时间必须在确定的范围内，不能受其他任务或系统负载的影响。</li>
+<li><strong>低延迟</strong>：实时任务必须快速响应，尽量减少任何延迟。</li>
+<li><strong>高优先级任务的保证</strong>：实时任务应优先于非实时任务执行，并且优先级保证。</li>
+</ul>
+<p>Xenomai 提供的实时能力主要体现在以下几个方面：</p>
+<ul>
+<li><strong>实时调度</strong>：Xenomai 采用基于优先级的调度方式，保证高优先级任务得到优先处理。</li>
+<li><strong>中断处理</strong>：通过 Xenomai 内核直接响应硬件中断，而 Linux 内核通常会有所延迟。</li>
+<li><strong>线程隔离</strong>：Xenomai 提供实时线程和普通线程之间的隔离，确保实时线程不会被系统的其他线程干扰。</li>
+</ul>
+<hr>
+<h2 id="4-Xenomai-与其他实时操作系统的比较"><a href="#4-Xenomai-与其他实时操作系统的比较" class="headerlink" title="4. Xenomai 与其他实时操作系统的比较"></a><strong>4. Xenomai 与其他实时操作系统的比较</strong></h2><p>与其他 <strong>实时操作系统（RTOS）</strong> 相比，Xenomai 具备以下特点：</p>
+<ul>
+<li><strong>基于 Linux</strong>：Xenomai 是在 Linux 操作系统之上实现的，使其能够享受 Linux 的庞大生态系统（如文件系统、网络协议栈、开发工具等）。</li>
+<li><strong>硬件访问</strong>：相比传统的 RTOS，Xenomai 提供了更灵活的硬件访问能力，能够直接响应中断、控制硬件设备等。</li>
+<li><strong>双内核架构</strong>：与一些实时操作系统不同，Xenomai 采用双内核架构，实时任务与非实时任务互不干扰，从而提供了较高的实时性。</li>
+</ul>
+<p>但与 <strong>传统的 RTOS</strong>（如 FreeRTOS、VxWorks）相比，Xenomai 可能面临以下限制：</p>
+<ul>
+<li><strong>系统复杂性</strong>：由于双内核的机制，Xenomai 系统的维护和配置相对复杂。</li>
+<li><strong>资源占用</strong>：Xenomai 需要额外的内核空间和资源来运行实时调度器，这可能对资源有限的嵌入式设备不太适用。</li>
+</ul>
+<hr>
+<h2 id="5-Xenomai-的组件"><a href="#5-Xenomai-的组件" class="headerlink" title="5. Xenomai 的组件"></a><strong>5. Xenomai 的组件</strong></h2><p>Xenomai 由多个组件组成，以确保实时性：</p>
+<ul>
+<li><strong>Xenomai 核心</strong>：提供实时调度、实时任务管理、中断处理等功能。</li>
+<li><strong>Xenomai 驱动</strong>：包括支持硬件设备的驱动（如 GPIO、串口、I2C 等）以及用于高效中断处理的驱动接口。</li>
+<li><strong>皮层（Skin）</strong>：提供与其他编程接口的兼容性，使得应用程序能够与 Xenomai 进行交互。例如，Xenomai 提供了与 <strong>POSIX（Portable Operating System Interface）</strong> 标准兼容的 API，使得 Linux 程序可以无缝迁移到 Xenomai 系统中。</li>
+</ul>
+<hr>
+<h2 id="6-Xenomai-的应用领域"><a href="#6-Xenomai-的应用领域" class="headerlink" title="6. Xenomai 的应用领域"></a><strong>6. Xenomai 的应用领域</strong></h2><p>Xenomai 通常应用于那些对实时性要求较高，但又需要兼容 Linux 丰富功能的场合，常见的应用包括：</p>
+<ul>
+<li><strong>工业自动化</strong>：用于控制生产线上的实时任务，如机器手臂控制、PLC 接口、传感器数据采集等。</li>
+<li><strong>机器人控制</strong>：在机器人系统中，实时性非常关键，Xenomai 可以用于控制机器人的运动学、感知和决策任务。</li>
+<li><strong>嵌入式控制系统</strong>：许多嵌入式系统（如自动驾驶汽车、无人机等）对实时性有严格要求，Xenomai 可以提供精确的控制和数据处理。</li>
+<li><strong>高精度测量系统</strong>：Xenomai 在精确测量和数据采集领域也有应用，提供毫秒级甚至微秒级的响应。</li>
+</ul>
+<hr>
+<h2 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>Xenomai 是在 Linux 系统上提供实时功能的一个强大工具，适用于那些需要高精度、低延迟的应用。通过双内核架构，它能够保证实时任务不受非实时任务的干扰，同时享有 Linux 的丰富生态系统。然而，由于系统的复杂性和资源占用，Xenomai 更适用于较为强大的硬件平台以及需要实时性能的嵌入式系统。</p>
+<h2 id="xenomai是什么-详细解释"><a href="#xenomai是什么-详细解释" class="headerlink" title="xenomai是什么 详细解释"></a>xenomai是什么 详细解释</h2><p>Xenomai 是一个用于 Linux 系统的实时开发框架，旨在为普通的 Linux 操作系统提供硬实时（hard real-time）能力。下面是对 Xenomai 的详细解释：</p>
+<ol>
+<li><p><strong>基本概念</strong>  </p>
+<ul>
+<li><strong>实时性需求</strong>：在一些应用场景中（如工业控制、机器人、航空航天等），任务必须在严格规定的时间内完成。标准 Linux 内核虽然稳定，但其调度机制并不适合处理这种严格的实时需求。  </li>
+<li><strong>Xenomai 的定位</strong>：Xenomai 通过提供一个实时内核（通常称为 co-kernel）与标准 Linux 内核协同工作，来实现实时任务的低延迟和确定性调度。</li>
+</ul>
+</li>
+<li><p><strong>工作原理</strong>  </p>
+<ul>
+<li><strong>双内核架构</strong>：Xenomai 采用“双内核”或“二元内核”架构。在这种架构中，实时任务由 Xenomai 的实时内核调度，而非实时任务则由标准 Linux 内核处理。  </li>
+<li><strong>中断拦截与调度</strong>：利用 I-pipe（Interrupt Pipeline）技术，Xenomai 能够拦截硬件中断，在 Linux 内核处理之前将它们传递给实时内核，从而保证实时任务能够及时响应。  </li>
+<li><strong>任务隔离</strong>：实时任务与普通任务之间的隔离确保了实时任务不会受到 Linux 系统中其他非实时任务的影响，从而降低了延迟和抖动。</li>
+</ul>
+</li>
+<li><p><strong>主要特点</strong>  </p>
+<ul>
+<li><strong>硬实时性能</strong>：确保实时任务在严格的时间限制内得到响应，适用于对延迟要求极高的应用场景。  </li>
+<li><strong>多种 API 支持</strong>：Xenomai 支持 POSIX、VxWorks、pSOS 等多种实时 API，方便现有实时系统的迁移和开发。  </li>
+<li><strong>开源项目</strong>：Xenomai 是一个开源软件，社区活跃，用户可以根据自身需求进行定制和优化。  </li>
+<li><strong>工业应用广泛</strong>：由于其优秀的实时性能，Xenomai 常用于工业自动化、机器人控制、嵌入式系统等领域。</li>
+</ul>
+</li>
+<li><p><strong>应用场景</strong>  </p>
+<ul>
+<li><strong>工业控制系统</strong>：如数控机床、自动化生产线等，要求系统对外界变化迅速响应。  </li>
+<li><strong>机器人控制</strong>：保证机器人在运动控制和传感器数据处理中的及时性。  </li>
+<li><strong>航空航天</strong>：需要处理高精度控制和实时数据处理任务。  </li>
+<li><strong>其他需要实时响应的嵌入式系统</strong>。</li>
+</ul>
+</li>
+</ol>
+<p>总结来说，Xenomai 通过引入一个实时内核并与 Linux 内核协同工作，为 Linux 系统提供了硬实时性能，使得开发者能够在不完全舍弃 Linux 丰富功能和生态的前提下，实现高精度的实时控制应用。</p>
+<h2 id="xenomai-名字含义"><a href="#xenomai-名字含义" class="headerlink" title="xenomai 名字含义"></a>xenomai 名字含义</h2><p>Xenomai 的发音通常为 “zee-no-my”（[ziːnəˈmaɪ]）。在描述 Xenomai 作为实时操作系统时，您可以读作 “zee-no-my real-time operating system”（[ziːnəˈmaɪ riːəl taɪm ˈɒpəreɪtɪŋ ˈsɪstəm]）。这种发音方式可用于明确指代 Xenomai 作为实时操作系统的特定角色和功能。</p>
+<h2 id="xenomai-是什么"><a href="#xenomai-是什么" class="headerlink" title="xenomai 是什么"></a>xenomai 是什么</h2><p>Xenomai 是一个开源的软实时（soft real-time）开发框架，旨在为嵌入式系统提供可预测性和实时性。它结合了实时操作系统（RTOS）和Linux内核的能力，提供了一个实时运行环境，允许开发人员在Linux平台上开发实时应用程序。</p>
+<p>以下是 Xenomai 的一些关键特性和详解：</p>
+<ol>
+<li><p><strong>双核架构</strong>：Xenomai 针对多核处理器设计，提供了双核架构，其中一个核心运行标准的Linux内核（称为主核），另一个核心运行 Xenomai 内核（称为实时核）。这种架构可以保证实时任务的可预测性和可靠性，同时在同一硬件上运行标准的Linux应用程序。</p>
+</li>
+<li><p><strong>Cobalt 内核</strong>：Xenomai 的实时核心称为 Cobalt。Cobalt 内核是一个轻量级内核，主要负责管理实时任务和提供实时服务。它实现了抢占式调度算法，允许开发者在应用程序中定义实时任务，并为这些任务提供硬实时（hard real-time）或软实时（soft real-time）保证。</p>
+</li>
+<li><p><strong>POSIX 接口</strong>：Xenomai 提供了一个与POSIX标准兼容的编程接口，使开发者能够使用熟悉的API（如pthread）来编写实时应用程序。这使得现有的应用程序可以相对容易地移植到 Xenomai 环境中，并且使得开发者能够利用 POSIX 提供的丰富功能和工具。</p>
+</li>
+<li><p><strong>实时调度</strong>：Xenomai 的实时调度器具有高精度的时钟和抢占机制，可以确保实时任务按照指定的优先级和期望的执行时间得到调度。通过优先级调度和抢占，Xenomai 可以提供可预测的实时性能，并防止低优先级任务影响高优先级任务的执行。</p>
+</li>
+<li><p><strong>共享内存</strong>：Xenomai 支持实时任务之间的共享内存通信，使得实时任务可以高效地共享数据。这种通信机制可以在实时应用程序中实现高速数据传输和实时协作。</p>
+</li>
+<li><p><strong>中断处理</strong>：Xenomai 提供了可预测的中断处理机制，允许开发者为实时任务注册中断处理程序。这样，实时任务可以及时响应硬件中断事件，并进行相应的处理。</p>
+</li>
+</ol>
+<p>总之，Xenomai 提供了一个强大的软实时开发框架，使开发者能够在Linux平台上构建可预测性和实时性要求较</p>
+<p>高的应用程序。它的双核架构、Cobalt 内核、POSIX 接口、实时调度、共享内存和中断处理等特性使得 Xenomai 成为嵌入式实时应用开发的有力工具。</p>
+<h2 id="xenomai-3-组成结构"><a href="#xenomai-3-组成结构" class="headerlink" title="xenomai 3 组成结构"></a>xenomai 3 组成结构</h2><ul>
+<li><p><code>xenomai3</code>于2015年正式发布，从<code>xenomai3</code>开始支持两种方式构建<code>linux</code>实时系统，分别是<code>cobalt</code>和<code>mercury</code></p>
+</li>
+<li><p><code>cobalt</code> : </p>
+<ul>
+<li>添加一个实时内核，双核结构。具有实时内核<code>cobalt</code>，实时驱动模型<code>RTDM</code>，实时应用<code>POSIX</code>接口库<code>libcobalt</code>，然后再基于<code>libcobalt</code>实现的其他<code>API skins</code></li>
+</ul>
+</li>
+<li><p><code>mercury</code> ： </p>
+<ul>
+<li>基于直接修改linux内核源代码的<code>PREEMPT RT</code>，应用空间在<code>glibc</code>之上，添加<code>xenomai API</code>库</li>
+</ul>
+</li>
+<li><p><code>mercury</code>只是在<code>glibc</code>上加了一层；而<code>cobalt</code>从底层硬件驱动，内核空间到用户空间，保证了实时任务的实时性</p>
+</li>
+<li><p>在标准linux基础上添加一个实时内核Cobalt，得益于基于<code>ADEOS(Adaptive Domain Environment for Operating System)</code>，使Cobalt在内核空间于linux内核共存，并把标准的Linux内核作为实时内核中的一个idle进程在实时内核上调度</p>
+</li>
+<li><p><code>ADEOS(Adaptive Domain Environment for Operating System)</code>，提供了一个灵活的环境，可以在多个操作系统之间或单个OS的多个实例之间共享硬件资源，从而使多个优先级域可以同时存在于同一硬件上。</p>
+</li>
+<li><p>其核心思想是<code>Domain</code>,也就是范围的意思，linux内核有linux内核的范围，cobalt内核有bobalt内核的范围</p>
+<ul>
+<li>两个内核管理各自范围内的应用，驱动，中断</li>
+<li>两个domain之间有优先级之分，cobalt内核优先级高于linux内核</li>
+<li>I-pipe优先处理高优先级域的中断，来保证高优先级域的实时性</li>
+<li>高优先级域可以通过I-pipe向低优先级域发送各类事件等。</li>
+</ul>
+</li>
+<li><p><strong>在用户空间</strong>，添加针对实时应用优化的库–<code>libcobalt</code>，它提供POSIX接口给应用空间实时任务使用，应用通过<code>libcobalt</code>让实时内核<code>cobalt</code>提供服务</p>
+</li>
+<li><p><strong>驱动方面，</strong><code>xenomai</code>提供实时驱动框架模型<code>RTDM(Real-Time Driver Model)</code>，专门用于<code>Cobalt</code>内核，基于<code>RTDM</code>进行实时设备驱动开发，为实时应用提供实时驱动。RTDM将驱动分为两类：字符设备，协议设备</p>
+</li>
+<li><p><strong>中断方面，</strong><code>I-pipe(interrupt Pipeline)</code>分发Linux和Xenomai之间的中断，并以Domain优先级顺序传递中断。I-pipe传递中断，对于实时内核注册的中断，中断产生后能够直接得到处理，保证实时性。对于linux的中断，先将中断记录在i-log,等实时任务让出CPU后，linux得到运行，该中断才得到处理。</p>
+</li>
+</ul>
+<h2 id="xenomai内核解析之xenomai初探"><a href="#xenomai内核解析之xenomai初探" class="headerlink" title="xenomai内核解析之xenomai初探"></a>xenomai内核解析之xenomai初探</h2><ul>
+<li>参考链接：<ul>
+<li><code>https://www.cnblogs.com/wsg1100/p/12833126.html</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="xenomai3"><a href="#xenomai3" class="headerlink" title="xenomai3"></a>xenomai3</h3><ul>
+<li>xenomai3于2015年正式发布，从xenomai3开始支持两种方式构建linux实时系统，分别是cobalt 和 mercury。<ul>
+<li>cobalt ：添加一个实时内核核，双核结构。具有实时内核cobalt、实时驱动模型RTDM、实时应用POSIX接口库libcobalt，然后再基于libcobalt实现的其他API skins，如Alchemy API、VxWorks® emulator、pSOS® emulator等(具体查看应用编程接口文档<code>https://xenomai.org/documentation/xenomai-3/html/xeno3prm</code>)，即VxWorks、pSOS应用程序可稍微修改源码就可以在xenomai上编译运行。<ul>
+<li>需要说明的是Alchemy API是xenomai除posix外的官方编程接口，提供了更接近于传统RTOS编程方式的编程接口，对于不熟悉linux应用开发的MCU开发人员也能很快上手。在xenomai2上Alchemy API是xenomai的原生编程接口，性能最好，posix API是在Alchemy API上实现的skin。在xenomai3相反，Alchemy API、VxWorks、pSOS均基于posix接口实现，也正因为这样诞生了mercury方式。</li>
+</ul>
+</li>
+<li>mercury ：基于直接修改linux内核源代码的PREEMPT RT，应用空间在glibc之上，添加xenomai API库，如下图所示。可以在不支持cobalt内核时，可使用该方法运行xenomai应用；也就是说你还可以通过mercury方式在PREEMPT RT上编译运行VxWorks、pSOS等接口的应用程序。 当然，也可不需要PREEMPT RT，直接使用linux，只是实时性就……</li>
+</ul>
+</li>
+</ul>
+<h3 id="xenomai各种接口应用编译"><a href="#xenomai各种接口应用编译" class="headerlink" title="xenomai各种接口应用编译"></a>xenomai各种接口应用编译</h3><h4 id="编译参数获取"><a href="#编译参数获取" class="headerlink" title="编译参数获取"></a>编译参数获取</h4><ul>
+<li>xenomai 3组成结构小节说到，xenomai库libcobalt提供了多种编程接口，这些接口编写的实时应用程序如何编译呢？xenomai提供了一个脚本工具<code>xeno-config</code>来生成各个接口的GCC编译链接参数：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">root@cor01:/usr/xenomai/bin# ./xeno-config --help</span><br><span class="line">Usage xeno-config OPTIONS</span><br><span class="line">Options :</span><br><span class="line">        --help</span><br><span class="line">        --v,--verbose</span><br><span class="line">        --version</span><br><span class="line">        --cc</span><br><span class="line">        --ccld</span><br><span class="line">        --arch</span><br><span class="line">        --prefix</span><br><span class="line">        --[skin=]posix|vxworks|psos|alchemy|rtdm|smokey|cobalt</span><br><span class="line">        --auto-init|auto-init-solib|no-auto-init</span><br><span class="line">        --mode-check|no-mode-check</span><br><span class="line">        --cflags</span><br><span class="line">        --ldflags</span><br><span class="line">        --lib*-dir|libdir|user-libdir</span><br><span class="line">        --core</span><br><span class="line">        --info</span><br><span class="line">        --compat</span><br><span class="line">root@cor01:/usr/xenomai/bin# ./xeno-config --v</span><br><span class="line">xeno-config --verbose</span><br><span class="line">        --core=cobalt</span><br><span class="line">        --version=&quot;3.2.1&quot;</span><br><span class="line">        --cc=&quot;gcc&quot;</span><br><span class="line">        --ccld=&quot;/usr/xenomai/bin/wrap-link.sh gcc&quot;</span><br><span class="line">        --arch=&quot;x86&quot;</span><br><span class="line">        --prefix=&quot;/usr/xenomai&quot;</span><br><span class="line">        --library-dir=&quot;/usr/xenomai/lib&quot;</span><br><span class="line">root@cor01:/usr/xenomai/bin# </span><br></pre></td></tr></table></figure></li>
+<li>其中<code>--[skin=]</code>参数指定我们编译的应用程序是什么接口类型，例如编译一个POSIX接口的实时应用，指定接口<code>(skin)--posix</code>，同时使用参数<code>--cflags</code>来获取POSIX接口实时应用的编译参数：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@cor01:/usr/xenomai/bin# ./xeno-config --posix --cflags</span><br><span class="line">-I/usr/xenomai/include/cobalt -I/usr/xenomai/include -D_GNU_SOURCE -D_REENTRANT -fasynchronous-unwind-tables -D__COBALT__ -D__COBALT_WRAP__</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="链接参数获取"><a href="#链接参数获取" class="headerlink" title="链接参数获取"></a>链接参数获取</h4><ul>
+<li>获取链接参数，<code>--ldflags</code> 得到链接参数：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@cor01:/usr/xenomai/bin# ./xeno-config --posix --ldflags</span><br><span class="line">-Wl,--no-as-needed -Wl,@/usr/xenomai/lib/cobalt.wrappers -Wl,@/usr/xenomai/lib/modechk.wrappers  /usr/xenomai/lib/xenomai/bootstrap.o -Wl,--wrap=main -Wl,--dynamic-list=/usr/xenomai/lib/dynlist.ld -L/usr/xenomai/lib -lcobalt -lmodechk -lpthread -lrt  </span><br></pre></td></tr></table></figure></li>
+<li>同样通过指定<code>--[skin=]</code>为vxworks、psos来编译VxWorks、psos实时应用程序到xenomai上运行。</li>
+</ul>
+<h3 id="xenomai-内核系统调用"><a href="#xenomai-内核系统调用" class="headerlink" title="xenomai 内核系统调用"></a>xenomai 内核系统调用</h3><ul>
+<li>参考链接：<ul>
+<li><code>https://www.cnblogs.com/wsg1100/p/13160821.html</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="关于系统调用"><a href="#关于系统调用" class="headerlink" title="关于系统调用"></a>关于系统调用</h4><ul>
+<li><p>解析系统调用是了解内核架构最有力的一把钥匙。</p>
+</li>
+<li><p>在Linux内核基础上加入xenomai实时系统内核后，在内核空间两个内核共存，实时任务需要xenomai内核来完成实时的服务，如果实时任务需要用到linux的服务，还可以调用linux内核的系统调用，你可能会好奇xenomai与linux两个内核共存后系统调用是如何实现的？</p>
+</li>
+<li><p>为什么需要系统调用？现代操作系统中，处理器的运行模式一般分为两个空间：内核空间和用户空间，大部分应用程序运行在用户空间，而操作系统内核和设备驱动程序运行在内核空间，如果应用程序需要访问硬件资源或者需要内核提供服务，该怎么办？</p>
+</li>
+<li><p>为了向用户空间上运行的应用程序提供服务，内核提供了一组接口。透过该接口，应用程序可以访问硬件设备和其他操作系统资源。这组接口在应用程序和内核之间扮演了使者的角色，应用程序发送各种请求，而内核负责满足这些请求，这些接口就是系统调用，它是用户空间和内核空间一个中间层。</p>
+</li>
+<li><p>系统调用层主要作用有三个：</p>
+<ul>
+<li>它为用户空间提供了一种统一的硬件的抽象接口。比如当需要读些文件的时候，应用程序就可以不去管磁盘类型和介质，甚至不用去管文件所在的文件系统到底是哪种类型。</li>
+<li>系统调用保证了系统的稳定和安全。应用程序要访问内核就必须通过系统调用层，内核可以在系统调用层对应用程序的访问权限、用户类型和其他一些规则进行过滤，这避免了应用不正确地访问内核，保证了系统和各个应用程序的安全性。</li>
+<li>可移植性。可以让应用程序在不修改源代码的情况下，在不同的操作系统或拥有不同硬件架构的系统中重新编译运行。</li>
+</ul>
+</li>
+<li><p>回到本文开头的问题，该问题细分为如下两个问题：</p>
+<ul>
+<li>双核共存时，如何区分应用发起的系统调用是xenomai内核调用还是linux内核调用？</li>
+<li>一个xenomai实时任务既可以调用xenomai内核服务，也可以调用linux内核服务，这是如何做到的？</li>
+</ul>
+</li>
+</ul>
+<h4 id="32位Linux系统调用"><a href="#32位Linux系统调用" class="headerlink" title="32位Linux系统调用"></a>32位Linux系统调用</h4><ul>
+<li>linux操作系统的API通常以C标准库的方式提供，比如linux中的libc库。C标准库中提供了POSIX的绝大部分API实现，glibc为了提高应用程序的性能，还对一些系统调用进行了封装。</li>
+<li>此外，由于32位系统系统调用使用软中断<code>int 0x80</code>指令实现，应用程序也可以通过汇编直接进行系统调用。软中断属于异常的一种，通过执行该指令陷入(trap)内核，trap在整理的文档x86 Linux中断系统有说明。内核初始化过程中，通过函数<code>tarp_init()</code>设置IDT（Interrupt Descriptor Table 记录每个中断异常处理程序的地址的一张表），有关<code>int 0x80</code>的IDT表项如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">static const __initconst struct idt_data def_idts[] = &#123;</span><br><span class="line">	......</span><br><span class="line">	SYSG(IA32_SYSCALL_VECTOR,	entry_INT80_32),</span><br><span class="line">	......</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>当产生系统调用时，硬件根据向量号在 IDT 中找到对应的表项，即中断描述符，进行特权级检查，发现 DPL &#x3D; CPL &#x3D; 3 ，允许调用。然后硬件将切换到内核栈 (tss.ss0 : tss.esp0)。接着根据中断描述符的 segment selector 在 GDT &#x2F; LDT 中找到对应的段描述符，从段描述符拿到段的基址，加载到 cs 。将 offset 加载到 eip。最后硬件将 ss &#x2F; sp &#x2F; eflags &#x2F; cs &#x2F; ip &#x2F; error code 依次压到内核栈。于是开始执行entry_INT80_32函数，该函数在entry_32.S定义：</li>
+<li>在内核栈的最高地址端，存放的是结构 pt_regs，首先通过 push 和 SAVE_ALL 将当前用户态的寄存器，保存在栈中 pt_regs 结构里面.保存完毕后，关闭中断，将当前栈指针保存到 eax，即do_int80_syscall_32的参数1。</li>
+<li>调用do_int80_syscall_32&#x3D;&gt;do_syscall_32_irqs_on</li>
+<li>在这里，将系统调用号从pt_reges中eax 里面取出来，然后根据系统调用号，在系统调用表中找到相应的函数进行调用，并将寄存器中保存的参数取出来，作为函数参数。如果仔细比对，就能发现，这些参数所对应的寄存器，和 Linux 的注释是一样的。ia32_sys_call_table系统调用表生成后面解析(此图来源于网络)</li>
+<li>相关内核调用执行完后，一直返回到 do_syscall_32_irqs_on ，如果系统调用有返回值，会被保存到 regs-&gt;ax 中。接着返回 entry_INT80_32 继续执行，最后执行 INTERRUPT_RETURN 。 INTERRUPT_RETURN 在 arch&#x2F;x86&#x2F;include&#x2F;asm&#x2F;irqflags.h 中定义为 iret ，iret 指令将原来用户态保存的现场恢复回来，包含代码段、指令指针寄存器等。这时候用户态进程恢复执行。</li>
+</ul>
+<h4 id="32位实时系统调用"><a href="#32位实时系统调用" class="headerlink" title="32位实时系统调用"></a>32位实时系统调用</h4><ul>
+<li>xenomai+linux双内核架构下，通过I-pipe 拦截系统调用，并将系统调用定向到实现它们的系统。</li>
+</ul>
+<h2 id="xenomai内核解析"><a href="#xenomai内核解析" class="headerlink" title="xenomai内核解析"></a>xenomai内核解析</h2><ul>
+<li>参考链接：<code>https://www.cnblogs.com/wsg1100/p/13836497.html</code></li>
+</ul>
+<h3 id="什么是实时？"><a href="#什么是实时？" class="headerlink" title="什么是实时？"></a>什么是实时？</h3><ul>
+<li>实时系统是必须在设置的截止时间内对环境中的事件做出反应的系统，否则会产生严重的后果。</li>
+</ul>
+<h3 id="实时分类"><a href="#实时分类" class="headerlink" title="实时分类"></a>实时分类</h3><ul>
+<li><p>根据错过截止时间产生的后果，实时任务可以分为三类：</p>
+<ul>
+<li>硬实时(Hard real time system)</li>
+<li>强实时(Firm real time system)</li>
+<li>软实时(Soft real time system)</li>
+</ul>
+</li>
+<li><p>硬实时(Hard real time system)</p>
+<ul>
+<li>如果在截止时间之后产生结果，可能对受控系统造成灾难性后果，则该任务是硬实时任务。</li>
+<li>硬任务的例子可以在安全关键系统中找到，并且通常与传感、驱动和控制活动有关，例如：<ul>
+<li>汽车安全气囊的检测与控制；</li>
+<li>反导弹系统要求硬实时。反导弹系统由一系列硬实时任务组成。反导系统必须首先探测所有来袭导弹，正确定位反导炮，然后在导弹来袭之前将其摧毁。所有这些任务本质上都是硬实时的，如果反导弹系统有任何一个任务失败都将无法成功拦截来袭导弹。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>强实时(Firm real time system)</p>
+<ul>
+<li>如果在截止日期之后产生结果对系统无用，但不会造成任何损害，则该任务是强实时任务。</li>
+<li>在网络应用程序和多媒体系统中找到，在这些系统中，跳过一个数据包或一个视频帧比长时间延迟处理更重要。 因此，它们包括以下内容：<ul>
+<li>视频播放；</li>
+<li>音&#x2F;视频编解码中，没有在设置的码率时序范围内执行完，产生结果都是无用的丢弃即可，继续下一轮读取；</li>
+<li>在线图像处理；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>软实时(Soft real time system)</p>
+<ul>
+<li>如果实时任务在截止日期之后产生结果仍然对系统有用，尽管会导致性能下降，则该任务是软实时任务。</li>
+<li>软任务通常与系统-用户交互有关，有点延迟什么的并不影响，只是体验稍差点。 因此，它们包括：<ul>
+<li>用户界面的命令解释器；</li>
+<li>处理来自键盘的输入数据；</li>
+<li>在屏幕上显示消息；</li>
+<li>网页浏览等；</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="常见的RTOS"><a href="#常见的RTOS" class="headerlink" title="常见的RTOS"></a>常见的RTOS</h3><ul>
+<li>小型实时操作系统 UCOS、FreeRTOS、RT-Thread…</li>
+<li>大型实时操作系统 RT linux、VxWorks、QNX、sylixOS…</li>
+</ul>
+<h3 id="latency-和-jitter"><a href="#latency-和-jitter" class="headerlink" title="latency 和 jitter"></a>latency 和 jitter</h3><ul>
+<li>硬实时系统是必须在设置的截止时间内对环境中的事件做出反应的系统。硬实时操作系统应具备的最重要特性之一是确定性、可预期性。</li>
+<li>操作系统的实时性能通常用<code>latency</code>或<code>jitter</code>来表示:<ul>
+<li>事件预期发生与实际发生的时间之间的时间称为延迟(<code>latency</code>)，</li>
+<li>实际发生的最大时间与最小时间之间的差值称为抖动(<code>Jitter</code>)，两者均可表示实时性。</li>
+</ul>
+</li>
+<li>根据实时性的定义，延迟必须是确定的，不能超过<code>deadline</code>，否则将会产生严重的后果。</li>
+</ul>
+<h3 id="实时性的影响因素"><a href="#实时性的影响因素" class="headerlink" title="实时性的影响因素"></a>实时性的影响因素</h3><ul>
+<li>硬实时操作系统应具备的最重要特性之一是确定性、可预测性，系统应该保证满足所有关键时序约束。</li>
+<li>然而，这取决于一系列因素，这些因素涉及硬件的架构特征、内核中采用的机制和策略，以及用于实现应用程序的编程语言、软件设计等。</li>
+<li>根据实时性定义，计算机系统中所有导致程序执行时间不确定的因素，都是实时性影响因素。</li>
+</ul>
+<h4 id="硬件-–-CPU架构"><a href="#硬件-–-CPU架构" class="headerlink" title="硬件 – CPU架构"></a>硬件 – CPU架构</h4><ul>
+<li>硬件方面，第一个影响调度可预测性的是处理器本身。</li>
+<li>处理器的内部特性是不确定性的第一个原因，例如指令预取、流水线操作、分支预测、高速缓存存储器和直接存储器访问（DMA）机制。</li>
+<li>这些特性虽然改善了处理器的平均性能，但它们引入了非确定性因素，这些因素阻止了对最坏情况执行时间WCET（Worst-caseExecutionTime）的精确估计。</li>
+<li>高端CPU，如I5、I7实时性不一定有低端的赛扬、atom系列的好，芯片的设计本身定位就是高吞吐量而不是实时性，实时性与吞吐量不可兼得。</li>
+</ul>
+<h4 id="硬件-–-Cache"><a href="#硬件-–-Cache" class="headerlink" title="硬件 – Cache"></a>硬件 – Cache</h4><ul>
+<li><p>CPU 里的 L1 Cache 或者 L2 Cache，访问延时是内存的 1&#x2F;15 乃至 1&#x2F;100，想要追求极限性能，需要尽可能地多从 CPU Cache 里面拿数据，减少cache miss，上面的分配CPU专门对实时任务服务就是对非共享的L1 、L2 Cache的充分优化。</p>
+</li>
+<li><p>对于L3 Cache，多个cpu核与GPU共享，无法避免非实时任务及GUI争抢L3 Cache对实时任务的影响。</p>
+</li>
+<li><p>为此intel 推出了资源调配技术(Intel RDT)，提供了两种能力：监控和分配。</p>
+</li>
+<li><p>Intel RDT提供了一系列分配(资源控制)能力，包括缓存分配技术(Cache Allocation Technology, CAT)，代码和数据优先级(Code and Data Prioritization, CDP) 以及 内存带宽分配(Memory Bandwidth Allocation, MBA)。</p>
+</li>
+<li><p>该技术旨在通过一系列的CPU指令从而允许用户直接对每个CPU核心（附加了HT技术后为每个逻辑核心）的L2缓存、L3缓存（LLC–Last Level Cache ）以及内存带宽进行监控和分配。</p>
+</li>
+<li><p>RDT一开始是为解决云计算的问题，在云计算领域虚拟化环境中，宿主机的资源（包括CPU cache和内存带宽）都是共享的。这带来一个问题就是：如果有一个过度消耗cache的应用耗尽了L3缓存或者大量的内存带宽，将无法保障其他虚拟机应用的性能。这种问题称为 noisy neighbor。</p>
+</li>
+<li><p>同样对于我们的实时系统也是类似：由于L3 Cache多核共享，如果有一个过度消耗cache的非实时应用耗尽了L3缓存或者大量的内存带宽，将无法保障xenomai实时应用的性能。</p>
+</li>
+<li><p>以往虚拟化环境中解决方法是通过控制虚拟机逻辑资源(cgroup)但是调整粒度太粗，并且无法控制处理器缓存这样敏感而且稀缺的资源。为此Intel推出了RDT技术。在Intel中文网站的 通过英特尔® 资源调配技术优化资源利用视频形象介绍了RDT的作用。</p>
+</li>
+<li><p>Intel的Fenghua Yu在Linux Foundation上的演讲 Resource Allocation in Intel® Resource Director Technology 可以帮助我们快速了解这项技术。</p>
+</li>
+<li><p>总的来说，RDT让我们实现了控制处理器缓存这样敏感而且稀缺的资源，对我们对实时性能提升有很大帮助(不仅限于xenomai，RTAI、PREEMPT-RT均适用)。</p>
+</li>
+<li><p>CAT（缓存分配技术，Cache Alocation Technology），对最后一级缓存（L3 Cache）实现分区，用户可以通过限制每个核心能够向其中分配缓存行的LLC数量，将LLC的部分分配给特定核心，使用该技术可以提升实时任务Cahe命中率，减少MSI延迟和抖动，进而提升实时性能。（不是所有intel处理器具有该功能，一开始只有服务器CPU提供该支持,据笔者了解，6代以后的CPU基本支持CAT。关于CAT 见github)，对于大多数Linux发行版，可直接安装使用该工具，具体的cache分配策略可根据后面的资源隔离情况进行。</p>
+<ul>
+<li><code>sudo apt-get install intel-cmt-cat</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="硬件-–-TLB"><a href="#硬件-–-TLB" class="headerlink" title="硬件 – TLB"></a>硬件 – TLB</h4><ul>
+<li>与cache性质一致。</li>
+</ul>
+<h4 id="硬件-–-分支预测"><a href="#硬件-–-分支预测" class="headerlink" title="硬件 – 分支预测"></a>硬件 – 分支预测</h4><ul>
+<li>现代 CPU 的流水线级数非常长，一般都在10级以上，指令分支判断错误（Branch Mispredict）的时间代价昂贵。如果判断预测正确，可能只需要一个时钟周期；如果判断错误，就还是需要10-20 左右个时钟周期来重新提取指令。</li>
+<li>现代 CPU 的分支预测正确率已经可以在一般情况下维持在 95% 以上，所以当分支存在可预测的规律的时候，还是以性能测试的结果为最终的优化依据。</li>
+</ul>
+<h4 id="硬件-–-Hyper-Threading"><a href="#硬件-–-Hyper-Threading" class="headerlink" title="硬件 – Hyper-Threading"></a>硬件 – Hyper-Threading</h4><ul>
+<li>人们对CPU的性能的追求是无止境的，在CPU性能不断优化提高过程中，对于单一流水线，最佳情况下，IPC 也只能到 1。无论做了哪些流水线层面的优化，即使做到了指令执行层面的乱序执行，CPU 仍然只能在一个时钟周期里面取一条指令。</li>
+<li>为使IPC&gt;1，诞生了多发射（Mulitple Issue）和超标量（Superscalar）技术，伴随的是每个CPU流水线上各种运算单元的增加。但是当处理器在运行一个线程，执行指令代码时，一方面很多时候处理器并不会使用到全部的计算能力，另一方面由于CPU在代码层面运行前后依赖关系的指令，会遇到各种冒险问题，这样CPU部分计算能力就会处于空闲状态。</li>
+<li>为了进一步“压榨”处理器，那就找没有依赖关系的指令来运行好，即另一个程序:<ul>
+<li>一个核可以分成几个逻辑核，来执行多个控制流程，这样可以进一步提高并行程度，这一技术就叫超线程，又称同时多线程（Simultaneous Multi-Threading，简称 SMT）。</li>
+</ul>
+</li>
+<li>由于超线程技术通过双份的 PC 寄存器、指令寄存器、条件码寄存器，在逻辑层面伪装为2个CPU，但指令译码器和ALU是公用的，这就造成实时任务运行时在CPU执行层面的不确定性，造成非实时线程与实时线程在同一物理核上对CPU执行单元的竞争，影响实时任务实时性。</li>
+</ul>
+<h4 id="硬件-–-Multi-Core"><a href="#硬件-–-Multi-Core" class="headerlink" title="硬件 – Multi-Core"></a>硬件 – Multi-Core</h4><ul>
+<li>接收 IRQ 的 CPU 可能不是响应者休眠的 CPU，在这种情况下，前者必须向后者发送重新调度请求，以便它恢复响应者。这通常是通过处理器间中断完成的，也就是IPI，IPI的发送和处理进一步增加了延迟。</li>
+<li>此外，多核LLC共享，NUMA架构远端内存访问等，均会导致访问延迟不确定。</li>
+</ul>
+<h4 id="硬件-–-DMA"><a href="#硬件-–-DMA" class="headerlink" title="硬件 – DMA"></a>硬件 – DMA</h4><ul>
+<li>DMA突发传输不确定占用总线带宽，影响程序执行；</li>
+<li>总线动态调频省电等</li>
+</ul>
+<h4 id="硬件-–-其他"><a href="#硬件-–-其他" class="headerlink" title="硬件 – 其他"></a>硬件 – 其他</h4><ul>
+<li>其他影响因素有内存、散热。</li>
+<li>提升内存频率可降低内存访问延时；使用双通道内存，这两个内存CPU可分别寻址、读取数据，从而使内存的带宽增加一倍，数据存取速度也相应增加一倍（理论上），内存访问延时得到缩短，进而提升系统的实时性能；</li>
+<li>处理器散热设计不好，温度过高时会引发CPU降频保护，系统运行频率降低影响实时性，热设计应确保在高工作量时的温度不会引发降频。</li>
+<li>对于X86 CPU，双通道内存性能是单通道内存的2. 5倍以上；正确的热设计可使实时性提升1.4倍以上。</li>
+</ul>
+<h4 id="BISO-（X86平台）"><a href="#BISO-（X86平台）" class="headerlink" title="BISO （X86平台）"></a>BISO （X86平台）</h4><ul>
+<li>BISO需要针对实时系统进行配置。优化的BIOS设置与使用默认BISO设置的实时性能差距高达9倍。</li>
+</ul>
+<h4 id="软件"><a href="#软件" class="headerlink" title="软件"></a>软件</h4><ul>
+<li>操作系统：调度算法，同步机制，信号量类型，内存管理策略，通信语义和中断处理，是否使用mmu等，OS的类型与定位已经决定了一些影响因素与实时之间的取舍。</li>
+<li>资源的分配隔离：分配CPU专门对实时任务服务、将多余中断隔离到非实时任务CPU上，分配CPU专门对实时任务服务可使L1 、L2 Cache只为实时任务服务。</li>
+<li>动态库运行时延迟绑定。</li>
+<li>内存分配算法时间不确定性。</li>
+<li>实时任务的设计，良好的软件设计能更好的发挥实时性能。</li>
+<li>其他，虚拟化、GUI等 。</li>
+</ul>
+<h4 id="GPU"><a href="#GPU" class="headerlink" title="GPU"></a>GPU</h4><ul>
+<li>硬件上GPU与CPU共享L3 Cache ，因此GUI会影响实时任务的实时性。intel建议根据GUI任务的工作负载来固定GPU的运行频率，且频率尽可能低。减小GPU对实时任务实时性的影响。</li>
+</ul>
+<h3 id="优化措施"><a href="#优化措施" class="headerlink" title="优化措施"></a>优化措施</h3><ul>
+<li><p>原则：降低不确定性，提高可预期性，在此基础上，再提高速度，降低延时。</p>
+</li>
+<li><p>硬件：</p>
+<ul>
+<li>除处理器外，内存方面，使用双通道内存，尽可能高的内存频率。</li>
+<li>散热当面，针对处理器工作负载设计良好的散热结构, 否则芯片保护会强制降频，频率调整CPU会停顿几十上百us。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h4><ul>
+<li>xenomai基于linux，xenomai作为一个小的实时核与linux共存，xenomai并未提供完整的硬件管理机制，许多硬件配置是linux 驱动掌管的，必须让linux配置好，给xenomai提供一个好的硬件环境，让xenomai充分发挥其RTOS的优势，</li>
+<li>主要宗旨：尽可能的不让linux非实时部分影响xenomai，无论是软件还是硬件。</li>
+</ul>
+<h4 id="Linux-–-Kernel-CMDLINE"><a href="#Linux-–-Kernel-CMDLINE" class="headerlink" title="Linux – Kernel CMDLINE"></a>Linux – Kernel CMDLINE</h4><ul>
+<li>cpu隔离</li>
+<li>多核情况下，设置内核参数<code>isolcpus=[cpu列表]</code>,将列表中的CPU从linux内核SMP平衡和调度算法中剔除，将剔除的CPU用于RT应用。如4核CPU平台将第3、4核隔离来做RT应用。</li>
+<li>CPU编号从”0”开始，列表的表示方法有三种：<ul>
+<li><code>numA,numB,...,numN</code></li>
+<li><code>numA-numN</code></li>
+<li><code>numA,...,numM-numN</code></li>
+</ul>
+</li>
+<li>例如：<ul>
+<li>isolcpus&#x3D;0,3,4-7表示隔离CPU0、3、4、5、6、7.</li>
+<li><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3&quot;</code></li>
+</ul>
+</li>
+<li>以上只是linux不会调度普通任务到CPU2和3上运行,这是基础，此时还需要设置xenomai方面的CPU隔离，<ul>
+<li>方法一，任务通过函数pthread_attr_setaffinity_np()设置xenomai任务只在CPU3和4上调度，隔离后的CPU的L1、L2缓存命中率相应的也会得到提高。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cpu_set_t cpus;</span><br><span class="line">CPU_ZERO(&amp;cpus);</span><br><span class="line">CPU_SET(2, &amp;cpus);//将线程限制在指定的cpu2上运行</span><br><span class="line">CPU_SET(3, &amp;cpus);//将线程限制在指定的cpu3上运行</span><br><span class="line">ret = pthread_attr_setaffinity_np(&amp;tattr, sizeof(cpus), &amp;cpus);</span><br></pre></td></tr></table></figure></li>
+<li>方法二，向xenomai设置内核参数supported_cpus,指定xenomai支持的CPU，xenomai任务会自动放到cpu2、cpu3上运行，注意对于xenomai3.2以上版本，supported_cpus必须包含CPU0，否则xenomai内核无法启动！！。<ul>
+<li>xenomai 内核参数supported_cpus与linux不同，supported_cpus是一个16进制数，每bit置位表示支持该CPU，要支持CPU2、CPU3，需要置置位bit2、bit3，即supported_cpus&#x3D;0x0c(00001100b）。</li>
+<li><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3 xenomai.supported_cpus=0x0C&quot;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>注：linux内核参数isolcpus&#x3D;CPU编号列表是基础，否则若不隔离linux任务，后面的xenomai设置将没任何意义。</li>
+</ul>
+<h4 id="Linux-–-Full-Dynamic-Tick"><a href="#Linux-–-Full-Dynamic-Tick" class="headerlink" title="Linux – Full Dynamic Tick"></a>Linux – Full Dynamic Tick</h4><ul>
+<li><p>将CPU2、CPU3作为xenomai使用后，由于xenomai调度是完全基于优先级的调度器，并且我们已将linux任务从这两个cpu上剔除，CPU上Tick也就没啥用了，避免多余的Tick中断影响实时任务的运行，需要将这两个cpu配置为Full Dynamic Tick模式，即关闭tick。通过添加linux内核参数<code>nohz_full=[cpu列表]</code>配置。</p>
+</li>
+<li><p><code>nohz_full=[cpu列表]</code>在使用<code>CONFIG_NO_HZ_FULL = y</code>构建的内核中才生效。</p>
+</li>
+<li><p>为什么是linux内核参数呢？</p>
+<ul>
+<li>双核下时间子系统中分析过，每个CPU的时钟工作方式是linux初始化并配置工作模式的，xenomai最后只是接管而已，所以这里是通过linux内核参数配置。</li>
+</ul>
+</li>
+<li><p>注意：boot CPU(通常是0号CPU)会无条件的从列表中剔除。这是一个坑~</p>
+</li>
+</ul>
+<h4 id="Linux-–-Offload-RCU-callback"><a href="#Linux-–-Offload-RCU-callback" class="headerlink" title="Linux – Offload RCU callback"></a>Linux – Offload RCU callback</h4><ul>
+<li>从引导选择的CPU上卸载RCU回调处理,使用内核线程 <code>“rcuox / N”</code> 代替，通过linux内核参数<code>rcu_nocbs=[cpu列表]</code>指定的CPU列表设置。这对于HPC和实时工作负载很有用，这样可以减少卸载RCU的CPU上操作系统抖动。</li>
+<li><code>&quot;rcuox / N&quot;</code>,N表示CPU编号，</li>
+<li><code>‘x’：&#39;b&#39;</code>是RCU-bh的b,’p’是RCU-preempt，‘s’是RCU-sched。</li>
+<li><code>rcu_nocbs=[cpu列表]</code>在使用<code>CONFIG_RCU_NOCB_CPU=y</code>构建的内核中才生效。除此之外需要设置RCU内核线程rcuc&#x2F;n和rcub&#x2F;n线程的SCHED_FIFO优先级值RCU_KTHREAD_PRIO，RCU_KTHREAD_PRIO设置为高于最低优先级线程的优先级，也就是说至少要使该优先级低于xenomai实时应用的优先级，避免xenomai实时应用迁移到linux后，由于优先级低于RCU_KTHREAD的优先级而实时性受到影响，</li>
+</ul>
+<h4 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h4><ul>
+<li><p>xenomai用户态实时应用运行时，中断优先级最高，CPU必须响应中断，虽然有ipipe会简单将非实时设备中断挂起，但是频繁的非实时设备中断产生可能引入无限延迟，也会影响实时任务的运行。</p>
+</li>
+<li><p>因此多，核情况下，通过内核参数<code>irqaffinity==[cpu列表]</code>，设置linux设备中断的亲和性，设置后，默认由这些cpu核来处理中断。避免了非实时linux中断影响cpu2、cpu3上的实时应用，将linux中断指定到cpu0、cpu1处理，添加参数：</p>
+<ul>
+<li><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3 xenomai.supported_cpus=0x0c nohz_full=2,3 rcu_nocbs=2,3 irqaffinity=0,1&quot;</code></li>
+</ul>
+</li>
+<li><p>以上只是设置linux中断的affinity，只能确保运行实时任务的CPU2、cpu3不会收到linux非实时设备的中断请求，保证实时性。</p>
+</li>
+<li><p>要指定cpu来处理xenomai实时设备中断，需要在实时驱动代码中通过函数xnintr_affinity()设置,绑定实时驱动中断由CPU2、CPU3处理代码如下。</p>
+</li>
+<li><p>虽然ipipe会保证xenomai 实时中断在任何CPU都会优先处理，在实时设备中断比较少的场合，我觉得把linux中断与实时中断分开比较好；如果实时设备中断数量较多，如果隔离就会造成实时中断间相互影响中断处理的实时性，这时候不指定实时中断处理CPU比较好。</p>
+</li>
+<li><p>编写xenomai实时设备驱动程序时，中断处理程序需要尽可能的短。</p>
+</li>
+<li><p>linux irqbalance 用于优化中断分配，它会自动收集系统数据以分析使用模式，并依据系统负载状况将工作状态置于 Performance mode 或 Power-save mode。简单来说irqbalance 会将硬件中断分配到各个CPU核心上处理。</p>
+<ul>
+<li>处于 Performance mode 时，irqbalance 会将中断尽可能均匀地分发给各个 CPU core，以充分利用 CPU 多核，提升性能。</li>
+<li>处于 Power-save mode 时，irqbalance 会将中断集中分配给第一个 CPU，以保证其它空闲 CPU 的睡眠时间，降低能耗。</li>
+</ul>
+</li>
+<li><p>禁用irqbanlance，避免不相干中断发生在RT任务核。发行版不同，配置方式不同，以Ubuntu为例，停止&#x2F;关闭开机启动如下。</p>
+<ul>
+<li><code>systemctl stop irqbalance.service</code></li>
+<li><code>systemctl disable irqbalance.service</code></li>
+</ul>
+</li>
+<li><p>必要的话直接卸载irqbalance。</p>
+<ul>
+<li><code>apt-get remove irqbalance</code></li>
+</ul>
+</li>
+<li><p>x86平台还可添加参数acpi_irq_nobalance禁用ACPI irqbalance.</p>
+<ul>
+<li><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3 xenomai.supported_cpus=0x0c nohz_full=2,3 rcu_nocbs=2,3 irqaffinity=0,1 acpi_irq_nobalance noirqbalance&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="intel-核显配置-x86"><a href="#intel-核显配置-x86" class="headerlink" title="intel 核显配置[x86]"></a>intel 核显配置<code>[x86]</code></h4><ul>
+<li>主要针对intel CPU的核显，配置intel核显驱动模块i915，内核参数如下。<ul>
+<li><code>GRUB_CMDLINE_LINUX=&quot;i915.enable_rc6=0 i915.enable_dc=0 i915.disable_power_well=0  i915.enable_execlists=0 i915.powersave=0&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="nmi-watchdog-x86"><a href="#nmi-watchdog-x86" class="headerlink" title="nmi_watchdog [x86]"></a>nmi_watchdog <code>[x86]</code></h4><ul>
+<li>NMI watchdog是Linux的开发者为了debugging而添加的特性，但也能用来检测和恢复Linux kernel hang，现代多核x86体系都能支持NMI watchdog。</li>
+<li>NMI（Non Maskable Interrupt）即不可屏蔽中断，之所以要使用NMI，是因为NMI watchdog的监视目标是整个内核，而内核可能发生在关中断同时陷入死循环的错误，此时只有NMI能拯救它。</li>
+<li>Linux中有两种NMI watchdog，分别是I&#x2F;O APIC watchdog（nmi_watchdog&#x3D;1）和Local APIC watchdog（nmi_watchdog&#x3D;2）。它们的触发机制不同，但触发NMI之后的操作是几乎一样的。一旦开启了I&#x2F;O APIC watchdog（nmi_watchdog&#x3D;1），那么每个CPU对应的Local APIC的LINT0线都关联到NMI，这样每个CPU将周期性地接到NMI，接到中断的CPU立即处理NMI，用来悄悄监视系统的运行。如果系统正常，它啥事都不做，仅仅是更改 一些时间计数；如果系统不正常（默认5秒没有任何普通外部中断），那它就闲不住了，会立马跳出来，且中止之前程序的运行。该出手时就出手。</li>
+<li>避免周期中断的NMI watchdog影响xenomai实时性需要关闭NMI watchdog，传递内核参数nmi_watchdog&#x3D;0.<ul>
+<li><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3 xenomai.supported_cpus=0x0c nohz_full=2,3 rcu_nocbs=2,3 irqaffinity=0,1 acpi_irq_nobalance noirqbalance i915.enable_rc6=0 i915.enable_dc=0 i915.disable_power_well=0  i915.enable_execlists=0 i915.powersave=0 nmi_watchdog=0&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="nosoftlockup"><a href="#nosoftlockup" class="headerlink" title="nosoftlockup"></a>nosoftlockup</h4><ul>
+<li>linux内核参数，禁用 soft-lockup检测器。<ul>
+<li><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3 xenomai.supported_cpus=0x0c nohz_full=2,3 rcu_nocbs=2,3 irqaffinity=0,1 acpi_irq_nobalance noirqbalance i915.enable_rc6=0 i915.enable_dc=0 i915.disable_power_well=0  i915.enable_execlists=0 i915.powersave=0 nmi_watchdog=0 nosoftlockup&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="CPU特性-x86"><a href="#CPU特性-x86" class="headerlink" title="CPU特性[x86]"></a>CPU特性<code>[x86]</code></h4><ul>
+<li><p>intel处理器相关内核参数：</p>
+<ul>
+<li>nosmap</li>
+<li>nohalt。告诉内核在空闲时,不要使用省电功能PAL_HALT_LIGHT。 这增加了功耗。但它减少了中断唤醒延迟，这可以提高某些环境下的性能，例如联网服务器或实时系统。</li>
+<li>mce&#x3D;ignore_ce,忽略machine checkerrors (MCE).</li>
+<li>idle&#x3D;poll,不要使用HLT在空闲循环中进行节电，而是轮询以重新安排事件。 这将使CPU消耗更多的功率，但对于在多处理器基准测试中获得稍微更好的性能可能很有用。 它还使使用性能计数器的某些性能分析更加准确。</li>
+<li>clocksource&#x3D;tsc tsc&#x3D;reliable,指定tsc作为系统clocksource.</li>
+<li>intel_idle.max_cstate&#x3D;0 禁用intel_idle并回退到acpi_idle.</li>
+<li>processor.max_cstate&#x3D;0 intel.max_cstate&#x3D;0 processor_idle.max_cstate&#x3D;0 限制睡眠状态c-state。</li>
+</ul>
+</li>
+<li><p><code>GRUB_CMDLINE_LINUX=&quot;isolcpus=2,3 xenomai.supported_cpus=0x0c nohz_full=2,3 rcu_nocbs=2,3 irqaffinity=0,1 acpi_irq_nobalance noirqbalance i915.enable_rc6=0 i915.enable_dc=0 i915.disable_power_well=0  i915.enable_execlists=0  nmi_watchdog=0 nosoftlockup processor.max_cstate=0 intel.max_cstate=0 processor_idle.max_cstate=0     intel_idle.max_cstate=0 clocksource=tsc tsc=reliable nmi_watchdog=0 nosoftlockup intel_pstate=disable idle=poll nohalt nosmap  mce=ignore_ce&quot;</code></p>
+</li>
+</ul>
+<h4 id="内核构建配置"><a href="#内核构建配置" class="headerlink" title="内核构建配置"></a>内核构建配置</h4><ul>
+<li>系统构建时，除以上提到的配置外（CONFIG_NO_HZ_FULL &#x3D; y、CONFIG_RCU_NOCB_CPU&#x3D;y、RCU_KTHREAD_PRIO&#x3D;0），其他实时性相关配置如下：<ul>
+<li><code>CONFIG_MIGRATION=n、CONFIG_MCORE2=y[x86]、CONFIG_PREEMPT=y、ACPI_PROCESSOR =n[x86]、CONFIG_CPU_FREQ =n、CONFIG_CPU_IDLE =n；</code></li>
+</ul>
+</li>
+<li>经过以上配置后可以使用latency测试，观察配置前后的变化。</li>
+<li>关于latency，需要注意的是，测试timer-IRQ的latency时，即用latency -t2命令来测试时，xenomai默认使用cpu0的timer，上面提到boot CPU(通常是0号CPU)会无条件的从<code>nohz_full=[cpu列表]</code>列表中剔除，所以latency -t2测试时你会发现没什么变化，还可能会变差了(最坏情况差不多一致，平均值变大了)，另外我们将linux中断affinity全都设置为CPU0处理，这些中断或多或少也会影响timer-IRQ的latency。</li>
+</ul>
+<h4 id="软件方面"><a href="#软件方面" class="headerlink" title="软件方面"></a>软件方面</h4><ul>
+<li>使用静态编译语言</li>
+<li>编写高性能的代码</li>
+<li>尽量让分支有规律性，使用likely()&#x2F;unlikely()或编写无分支代码</li>
+<li>利用cache局部性原理，防止伪共享</li>
+<li>合理分配任务优先级</li>
+<li>尽量使用静态库</li>
+<li>避免实时任务中进行动态内存分配</li>
+<li>驱动程序中断处理尽可能短等等</li>
+</ul>
+<h3 id="嵌入式实时linux概述"><a href="#嵌入式实时linux概述" class="headerlink" title="嵌入式实时linux概述"></a>嵌入式实时linux概述</h3><ul>
+<li><p>Linux系统作为一个GPOS（通用操作系统）发展至今已经非常成熟可靠了，并且由于遵循GPL协议，开放所有系统源代码，非常易于裁剪。更重要的是，与其他开源的GPOS或RTOS相比，Linux系统支持多种处理器、开发板，提供多种软件开发工具，同时Linux系统对网络和图形界面的支持非常出色。显然，选择Linux操作系统在产品的开发周期和成本控制方面都有巨大优势。</p>
+</li>
+<li><p>虽然Linux系统功能强大、实用性强、易于软件的二次开发，并且提供编程人员熟悉的标准API。但是由于Linux系统一开始就被设计成GPOS（通用操作系统），它的目的是构建一个完整、稳定的开源操作系统，尽量缩短系统的平均响应时间，提高吞吐量，注重操作系统的整体功能需求，达到更好地平均性能。所以标准Linux并不提供硬实时性。</p>
+</li>
+<li><p>为解决linux不具有硬实时的问题，诞生了几种基于Linux的硬实时解决方案，分为两类：</p>
+<ul>
+<li>1)<strong>直接修改Linux内核源代码</strong>。对Linux内核代码进行细微修改并不对内核作大规模的变动，在遵循GPL协议的情况下，直接修改内核源代码将Linux改造成一个完全可抢占的实时系统。其缺点是：通过修改Linux内核，难以保证实时进程的执行不会遭到非实时进程所进行的不可预测活动的干扰。该方法的代表是RT-patch(Real Preemption Patch)。</li>
+<li>2)<strong>双内核法</strong>。添加一个实时内核，在内核空间与linux内核并存，把标准的Linux内核作为一个普通进程在实时内核上调度。其优点是可以做到硬实时，并且能很方便地实现一种新的调度策略。常用的双内核法有RT-Linux、RTAI(Real-Time Application Interface)和 Xenomai，</li>
+</ul>
+</li>
+<li><p>双核法具有较好的实时性。RT-Linux最早出现，开创了双核法的先河，是双核法的代表。基于一种成为实时硬件抽象的层技术RTHAL(Real Time Hardware Abstraction Layer)，且为该技术申请了专利，后RT-Linux被WindRiver 收购并商业化，WindRiver于2011年8月彻底停止对其更新和维护,现在 RT-linux 已经不再更新。</p>
+</li>
+<li><p>xenomai和RTAL同样借鉴RT-Linux，Xenomai项目始于2001年8月，Philippe Gerum是Adeos和Xenomai项目的创始人和维护者。2003年它和RTAI项目合并推出了RTAI&#x2F;fusion。RTAI&#x2F;fusion是Linux平台上的具有工业生产级别的实时自由软件开发平台，它基于Xenomai的抽象实时操作系统内核。2005年的时候RTAI&#x2F;fusion项目又从RTAI中独立出来作为Xenomai项目。</p>
+</li>
+<li><p>虽然xenomai和RTAL这两个项目基于同一本质的实时硬件抽象层技术ADEOS（Adoptive Domain Environment for Operating System），但是实际上他们有很多不同之处。这些不同之处主要是由他们不同的目标和各自不同的实现方式造成的。</p>
+<ul>
+<li>RTAI项目致力于技术上可行的最低延迟；</li>
+<li>Xenomai除此之外还很看重扩展性，可移植性以及可维护性。Xenoami项目不仅提供双核还对PREEMPT RT实时抢占补丁提供支持，这又是与RTAI项目的一个显著的不同。</li>
+<li>另外RT-Linux只允许以内核模块的形式提供实时应用；xenomai 更注重用户空间应用的实时性。</li>
+</ul>
+</li>
+<li><p>综上，从实时性、硬件支持、社区活跃度、API和商业版权等方面综合考虑，xenomai无疑是Linux实时操作系统最好的选择。</p>
+</li>
+</ul>
+<h3 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h3><ul>
+<li>参考连接：<code>https://www.cnblogs.com/wsg1100/p/12864199.html</code></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Xenomai/" rel="tag"># Xenomai</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Windows/2024-05-22-windows_03_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="prev" title="windows_03_常用技巧">
+      <i class="fa fa-chevron-left"></i> windows_03_常用技巧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Windows/2024-05-22-windows_02_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="next" title="windows_02_常用命令">
+      windows_02_常用命令 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IGH-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">IGH 详细解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-IGH-%E7%9A%84%E7%9B%AE%E6%A0%87"><span class="nav-number">3.</span> <span class="nav-text">1. IGH 的目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-IGH-%E6%94%AF%E6%8C%81%E7%9A%84%E5%B7%A5%E4%B8%9A%E4%BB%A5%E5%A4%AA%E7%BD%91%E5%8D%8F%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">2. IGH 支持的工业以太网协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#a-EtherCAT-Ethernet-for-Control-Automation-Technology"><span class="nav-number">4.1.</span> <span class="nav-text">a. EtherCAT (Ethernet for Control Automation Technology)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b-PROFINET-Process-Field-Net"><span class="nav-number">4.2.</span> <span class="nav-text">b. PROFINET (Process Field Net)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-Ethernet-IP-Ethernet-Industrial-Protocol"><span class="nav-number">4.3.</span> <span class="nav-text">c. Ethernet&#x2F;IP (Ethernet Industrial Protocol)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-IGH-%E4%B8%8E-Xenomai-%E7%9A%84%E7%BB%93%E5%90%88"><span class="nav-number">5.</span> <span class="nav-text">3. IGH 与 Xenomai 的结合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-IGH-%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">6.</span> <span class="nav-text">4. IGH 的应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#a-%E5%B7%A5%E4%B8%9A%E8%87%AA%E5%8A%A8%E5%8C%96"><span class="nav-number">6.1.</span> <span class="nav-text">a. 工业自动化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b-%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%8E%A7%E5%88%B6"><span class="nav-number">6.2.</span> <span class="nav-text">b. 机器人控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-%E5%B5%8C%E5%85%A5%E5%BC%8F%E6%8E%A7%E5%88%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">6.3.</span> <span class="nav-text">c. 嵌入式控制系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#d-%E9%AB%98%E9%80%9F%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E5%92%8C%E6%B5%8B%E9%87%8F%E7%B3%BB%E7%BB%9F"><span class="nav-number">6.4.</span> <span class="nav-text">d. 高速数据采集和测量系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%8F%91%E5%B1%95%E5%92%8C%E7%A4%BE%E5%8C%BA%E6%94%AF%E6%8C%81"><span class="nav-number">7.</span> <span class="nav-text">5. 发展和社区支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai-%E4%B8%8E-igh%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">9.</span> <span class="nav-text">xenomai 与 igh的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Xenomai%EF%BC%9A%E6%8F%90%E4%BE%9B%E5%AE%9E%E6%97%B6%E6%80%A7%E8%83%BD"><span class="nav-number">10.</span> <span class="nav-text">1. Xenomai：提供实时性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-IGH%EF%BC%9A%E5%B7%A5%E4%B8%9A%E4%BB%A5%E5%A4%AA%E7%BD%91%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0"><span class="nav-number">11.</span> <span class="nav-text">2. IGH：工业以太网协议实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Xenomai-%E4%B8%8E-IGH-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">12.</span> <span class="nav-text">3. Xenomai 与 IGH 的关系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#a-%E5%AE%9E%E6%97%B6%E6%80%A7%E6%94%AF%E6%8C%81"><span class="nav-number">12.1.</span> <span class="nav-text">a. 实时性支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b-%E5%B7%A5%E4%B8%9A%E4%BB%A5%E5%A4%AA%E7%BD%91%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">12.2.</span> <span class="nav-text">b. 工业以太网协议的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E4%B8%8E%E5%AE%9E%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%BB%93%E5%90%88"><span class="nav-number">12.3.</span> <span class="nav-text">c. 驱动程序与实时任务结合</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-Xenomai-%E4%B8%8E-IGH-%E7%9A%84%E9%9B%86%E6%88%90"><span class="nav-number">13.</span> <span class="nav-text">4. 如何实现 Xenomai 与 IGH 的集成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Xenomai-%E4%B8%8E-IGH-%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">14.</span> <span class="nav-text">5. Xenomai 与 IGH 的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">15.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai-%E5%AE%9E%E6%97%B6%E7%B3%BB%E7%BB%9F-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">16.</span> <span class="nav-text">xenomai 实时系统 详细解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Xenomai-%E6%A6%82%E8%BF%B0"><span class="nav-number">17.</span> <span class="nav-text">1. Xenomai 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Xenomai-%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">18.</span> <span class="nav-text">2. Xenomai 的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E5%86%85%E6%A0%B8%E7%BB%93%E6%9E%84%EF%BC%88Dual-Kernel%EF%BC%89"><span class="nav-number">18.1.</span> <span class="nav-text">双内核结构（Dual-Kernel）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Xenomai-%E4%B8%8E-Linux-%E7%9A%84%E5%8D%8F%E4%BD%9C"><span class="nav-number">18.2.</span> <span class="nav-text">Xenomai 与 Linux 的协作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E6%97%B6%E7%BA%BF%E7%A8%8B%E4%B8%8E%E9%9D%9E%E5%AE%9E%E6%97%B6%E7%BA%BF%E7%A8%8B"><span class="nav-number">18.3.</span> <span class="nav-text">实时线程与非实时线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E8%AE%BF%E9%97%AE"><span class="nav-number">18.4.</span> <span class="nav-text">硬件访问</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Xenomai-%E7%9A%84%E5%AE%9E%E6%97%B6%E6%80%A7"><span class="nav-number">19.</span> <span class="nav-text">3. Xenomai 的实时性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Xenomai-%E4%B8%8E%E5%85%B6%E4%BB%96%E5%AE%9E%E6%97%B6%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">20.</span> <span class="nav-text">4. Xenomai 与其他实时操作系统的比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Xenomai-%E7%9A%84%E7%BB%84%E4%BB%B6"><span class="nav-number">21.</span> <span class="nav-text">5. Xenomai 的组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Xenomai-%E7%9A%84%E5%BA%94%E7%94%A8%E9%A2%86%E5%9F%9F"><span class="nav-number">22.</span> <span class="nav-text">6. Xenomai 的应用领域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-2"><span class="nav-number">23.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">24.</span> <span class="nav-text">xenomai是什么 详细解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai-%E5%90%8D%E5%AD%97%E5%90%AB%E4%B9%89"><span class="nav-number">25.</span> <span class="nav-text">xenomai 名字含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">26.</span> <span class="nav-text">xenomai 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai-3-%E7%BB%84%E6%88%90%E7%BB%93%E6%9E%84"><span class="nav-number">27.</span> <span class="nav-text">xenomai 3 组成结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai%E5%86%85%E6%A0%B8%E8%A7%A3%E6%9E%90%E4%B9%8Bxenomai%E5%88%9D%E6%8E%A2"><span class="nav-number">28.</span> <span class="nav-text">xenomai内核解析之xenomai初探</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xenomai3"><span class="nav-number">28.1.</span> <span class="nav-text">xenomai3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xenomai%E5%90%84%E7%A7%8D%E6%8E%A5%E5%8F%A3%E5%BA%94%E7%94%A8%E7%BC%96%E8%AF%91"><span class="nav-number">28.2.</span> <span class="nav-text">xenomai各种接口应用编译</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E5%8F%82%E6%95%B0%E8%8E%B7%E5%8F%96"><span class="nav-number">28.2.1.</span> <span class="nav-text">编译参数获取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5%E5%8F%82%E6%95%B0%E8%8E%B7%E5%8F%96"><span class="nav-number">28.2.2.</span> <span class="nav-text">链接参数获取</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xenomai-%E5%86%85%E6%A0%B8%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">28.3.</span> <span class="nav-text">xenomai 内核系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">28.3.1.</span> <span class="nav-text">关于系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#32%E4%BD%8DLinux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">28.3.2.</span> <span class="nav-text">32位Linux系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#32%E4%BD%8D%E5%AE%9E%E6%97%B6%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">28.3.3.</span> <span class="nav-text">32位实时系统调用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xenomai%E5%86%85%E6%A0%B8%E8%A7%A3%E6%9E%90"><span class="nav-number">29.</span> <span class="nav-text">xenomai内核解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AE%9E%E6%97%B6%EF%BC%9F"><span class="nav-number">29.1.</span> <span class="nav-text">什么是实时？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E6%97%B6%E5%88%86%E7%B1%BB"><span class="nav-number">29.2.</span> <span class="nav-text">实时分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84RTOS"><span class="nav-number">29.3.</span> <span class="nav-text">常见的RTOS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#latency-%E5%92%8C-jitter"><span class="nav-number">29.4.</span> <span class="nav-text">latency 和 jitter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E6%97%B6%E6%80%A7%E7%9A%84%E5%BD%B1%E5%93%8D%E5%9B%A0%E7%B4%A0"><span class="nav-number">29.5.</span> <span class="nav-text">实时性的影响因素</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-CPU%E6%9E%B6%E6%9E%84"><span class="nav-number">29.5.1.</span> <span class="nav-text">硬件 – CPU架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-Cache"><span class="nav-number">29.5.2.</span> <span class="nav-text">硬件 – Cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-TLB"><span class="nav-number">29.5.3.</span> <span class="nav-text">硬件 – TLB</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="nav-number">29.5.4.</span> <span class="nav-text">硬件 – 分支预测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-Hyper-Threading"><span class="nav-number">29.5.5.</span> <span class="nav-text">硬件 – Hyper-Threading</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-Multi-Core"><span class="nav-number">29.5.6.</span> <span class="nav-text">硬件 – Multi-Core</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-DMA"><span class="nav-number">29.5.7.</span> <span class="nav-text">硬件 – DMA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6-%E2%80%93-%E5%85%B6%E4%BB%96"><span class="nav-number">29.5.8.</span> <span class="nav-text">硬件 – 其他</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BISO-%EF%BC%88X86%E5%B9%B3%E5%8F%B0%EF%BC%89"><span class="nav-number">29.5.9.</span> <span class="nav-text">BISO （X86平台）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6"><span class="nav-number">29.5.10.</span> <span class="nav-text">软件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GPU"><span class="nav-number">29.5.11.</span> <span class="nav-text">GPU</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E6%8E%AA%E6%96%BD"><span class="nav-number">29.6.</span> <span class="nav-text">优化措施</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux"><span class="nav-number">29.6.1.</span> <span class="nav-text">Linux</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux-%E2%80%93-Kernel-CMDLINE"><span class="nav-number">29.6.2.</span> <span class="nav-text">Linux – Kernel CMDLINE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux-%E2%80%93-Full-Dynamic-Tick"><span class="nav-number">29.6.3.</span> <span class="nav-text">Linux – Full Dynamic Tick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux-%E2%80%93-Offload-RCU-callback"><span class="nav-number">29.6.4.</span> <span class="nav-text">Linux – Offload RCU callback</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD"><span class="nav-number">29.6.5.</span> <span class="nav-text">中断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#intel-%E6%A0%B8%E6%98%BE%E9%85%8D%E7%BD%AE-x86"><span class="nav-number">29.6.6.</span> <span class="nav-text">intel 核显配置[x86]</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nmi-watchdog-x86"><span class="nav-number">29.6.7.</span> <span class="nav-text">nmi_watchdog [x86]</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nosoftlockup"><span class="nav-number">29.6.8.</span> <span class="nav-text">nosoftlockup</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CPU%E7%89%B9%E6%80%A7-x86"><span class="nav-number">29.6.9.</span> <span class="nav-text">CPU特性[x86]</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E6%9E%84%E5%BB%BA%E9%85%8D%E7%BD%AE"><span class="nav-number">29.6.10.</span> <span class="nav-text">内核构建配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E6%96%B9%E9%9D%A2"><span class="nav-number">29.6.11.</span> <span class="nav-text">软件方面</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%AE%9E%E6%97%B6linux%E6%A6%82%E8%BF%B0"><span class="nav-number">29.7.</span> <span class="nav-text">嵌入式实时linux概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85"><span class="nav-number">29.8.</span> <span class="nav-text">编译安装</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

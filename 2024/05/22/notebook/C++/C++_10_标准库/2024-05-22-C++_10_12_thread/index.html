@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 C++ 标准库  C++ 标准库&lt;thread&gt; 是 C++ 标准库中提供的头文件，用于支持多线程编程。它包含了许多与线程相关的类、函数和工具，使得开发者能够创建、管理和控制线程。 以下是 &lt;thread&gt; 标准库中常用的一些类和函数： 类： std::thread：表示一个线程对象。通过实例化 std::thread 类，可以创建一个新的线程来执行指定的函数或可调用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_10_12_thread">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_12_thread/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 C++ 标准库  C++ 标准库&lt;thread&gt; 是 C++ 标准库中提供的头文件，用于支持多线程编程。它包含了许多与线程相关的类、函数和工具，使得开发者能够创建、管理和控制线程。 以下是 &lt;thread&gt; 标准库中常用的一些类和函数： 类： std::thread：表示一个线程对象。通过实例化 std::thread 类，可以创建一个新的线程来执行指定的函数或可调用">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.182Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppSTL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_12_thread/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_10_12_thread | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_12_thread/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_10_12_thread
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>C++ <thread>标准库</li>
+</ul>
+<h2 id="C-标准库"><a href="#C-标准库" class="headerlink" title="C++ 标准库"></a>C++ <thread>标准库</h2><p><code>&lt;thread&gt;</code> 是 C++ 标准库中提供的头文件，用于支持多线程编程。它包含了许多与线程相关的类、函数和工具，使得开发者能够创建、管理和控制线程。</p>
+<p>以下是 <code>&lt;thread&gt;</code> 标准库中常用的一些类和函数：</p>
+<h3 id="类："><a href="#类：" class="headerlink" title="类："></a>类：</h3><ol>
+<li><p><strong>std::thread</strong>：表示一个线程对象。通过实例化 <code>std::thread</code> 类，可以创建一个新的线程来执行指定的函数或可调用对象。</p>
+</li>
+<li><p><strong>std::mutex</strong>：互斥量类，用于在多线程环境中保护共享资源，防止多个线程同时访问。</p>
+</li>
+<li><p><strong>std::condition_variable</strong>：条件变量类，用于在多线程间进行通信和同步，允许线程等待特定的条件。</p>
+</li>
+<li><p><strong>std::atomic</strong>：提供了原子操作，用于在多线程环境下执行原子操作，避免竞态条件。</p>
+</li>
+</ol>
+<h3 id="函数："><a href="#函数：" class="headerlink" title="函数："></a>函数：</h3><ol>
+<li><p>**std::this_thread::sleep_for()**：让当前线程休眠指定的时间段。</p>
+</li>
+<li><p>**std::this_thread::get_id()**：获取当前线程的唯一标识符。</p>
+</li>
+<li><p>**std::thread::join()**：等待线程结束，阻塞当前线程直到该线程完成执行。</p>
+</li>
+<li><p>**std::thread::detach()**：分离线程，允许线程在后台运行，不需要等待其完成。</p>
+</li>
+<li><p><strong>std::mutex::lock()</strong> 和 **std::mutex::unlock()**：分别用于互斥量的锁定和解锁。</p>
+</li>
+</ol>
+<h3 id="示例用法："><a href="#示例用法：" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Hello from thread!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    myThread.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Main thread&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例展示了如何使用 <code>&lt;thread&gt;</code> 标准库创建新的线程，并在主线程中等待新线程的执行结束。<code>std::thread</code> 类被用来创建一个执行 <code>threadFunction</code> 函数的新线程。然后，<code>join()</code> 函数被用来等待新线程执行完成，使得主线程可以在新线程执行完成后继续执行。</p>
+<h2 id="C-标准库-常用的类和函数"><a href="#C-标准库-常用的类和函数" class="headerlink" title="C++ 标准库 常用的类和函数"></a>C++ <thread>标准库 常用的类和函数</h2><p><code>&lt;thread&gt;</code> 标准库提供了许多用于多线程编程的类和函数。以下是其中一些常用的类和函数：</p>
+<h3 id="类：-1"><a href="#类：-1" class="headerlink" title="类："></a>类：</h3><ol>
+<li><p><strong>std::thread</strong>：表示一个线程对象。通过 <code>std::thread</code> 类，可以创建一个新的线程来执行指定的函数或可调用对象。</p>
+</li>
+<li><p><strong>std::mutex</strong>：互斥量类，用于在多线程环境中保护共享资源，防止多个线程同时访问。</p>
+</li>
+<li><p><strong>std::condition_variable</strong>：条件变量类，用于在多线程间进行通信和同步，允许线程等待特定的条件。</p>
+</li>
+<li><p><strong>std::atomic</strong>：提供了原子操作，用于在多线程环境下执行原子操作，避免竞态条件。</p>
+</li>
+<li><p><strong>std::thread::id</strong>：表示线程的唯一标识符。</p>
+</li>
+</ol>
+<h3 id="函数：-1"><a href="#函数：-1" class="headerlink" title="函数："></a>函数：</h3><ol>
+<li><p>**std::thread::join()**：等待线程结束，阻塞当前线程直到该线程完成执行。</p>
+</li>
+<li><p>**std::thread::detach()**：分离线程，允许线程在后台运行，不需要等待其完成。</p>
+</li>
+<li><p>**std::this_thread::sleep_for()**：让当前线程休眠指定的时间段。</p>
+</li>
+<li><p>**std::this_thread::get_id()**：获取当前线程的唯一标识符。</p>
+</li>
+<li><p><strong>std::mutex::lock()</strong> 和 **std::mutex::unlock()**：分别用于互斥量的锁定和解锁。</p>
+</li>
+<li><p><strong>std::condition_variable::wait()</strong> 和 **std::condition_variable::notify_one()**：用于条件变量的等待和唤醒操作。</p>
+</li>
+</ol>
+<h3 id="示例用法：-1"><a href="#示例用法：-1" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;condition_variable&gt;</span></span></span><br><span class="line"></span><br><span class="line">std::mutex mtx;</span><br><span class="line">std::condition_variable cv;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> ready = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">workerThread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">    cv.<span class="built_in">wait</span>(lck, [] &#123; <span class="keyword">return</span> ready; &#125;); <span class="comment">// 等待条件变量为 true</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Worker thread is processing...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// Perform work here</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">worker</span><span class="params">(workerThread)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 做一些其他工作...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待一段时间后，设置条件变量为 true</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">2</span>));</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">        ready = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cv.<span class="built_in">notify_one</span>(); <span class="comment">// 唤醒等待的线程</span></span><br><span class="line"></span><br><span class="line">    worker.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>&lt;thread&gt;</code> 标准库中的类和函数进行线程的创建、同步和通信。主线程设置条件变量为 <code>true</code> 并唤醒等待的工作线程，从而使得工作线程可以执行相应的任务。</p>
+<h2 id="std-thread"><a href="#std-thread" class="headerlink" title="std::thread"></a>std::thread</h2><p><code>std::thread</code> 是 C++ 标准库 <code>&lt;thread&gt;</code> 中定义的类，用于表示一个线程对象。通过 <code>std::thread</code> 类，可以创建新的线程来执行指定的函数或可调用对象。</p>
+<h3 id="构造函数："><a href="#构造函数：" class="headerlink" title="构造函数："></a>构造函数：</h3><p><code>std::thread</code> 对象的构造函数可以接受函数、可调用对象（函数对象、Lambda 表达式等）作为参数，并在新的线程中执行。构造函数的基本形式如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">std::thread <span class="title">myThread</span><span class="params">(myFunction)</span></span>; <span class="comment">// 通过函数创建新线程</span></span><br><span class="line"><span class="function">std::thread <span class="title">myThread2</span><span class="params">([] &#123; <span class="comment">/* Lambda 表达式 */</span> &#125;)</span></span>; <span class="comment">// 通过 Lambda 表达式创建新线程</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="成员函数和操作："><a href="#成员函数和操作：" class="headerlink" title="成员函数和操作："></a>成员函数和操作：</h3><ol>
+<li><p>**join()**：等待线程结束，阻塞当前线程直到该线程完成执行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">myThread.<span class="built_in">join</span>(); <span class="comment">// 等待 myThread 执行完毕</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**detach()**：分离线程，允许线程在后台运行，不需要等待其完成。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">myThread.<span class="built_in">detach</span>(); <span class="comment">// 分离 myThread</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**get_id()**：获取线程的唯一标识符。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::thread::id threadId = myThread.<span class="built_in">get_id</span>(); <span class="comment">// 获取 myThread 的线程标识符</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**joinable()**：检查线程是否可连接，即是否可以调用 <code>join()</code> 或 <code>detach()</code>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (myThread.<span class="built_in">joinable</span>()) &#123;</span><br><span class="line">    <span class="comment">// 可以调用 join() 或 detach()</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="示例用法：-2"><a href="#示例用法：-2" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread function, x = &quot;</span> &lt;&lt; x &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> value = <span class="number">10</span>;</span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction, value)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (myThread.<span class="built_in">joinable</span>()) &#123;</span><br><span class="line">        myThread.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例中，<code>std::thread</code> 类被用来创建一个执行 <code>threadFunction</code> 函数的新线程。主线程使用 <code>join()</code> 函数等待新线程的执行结束。在创建线程时，可以传递函数名或可调用对象，并且可以携带参数供线程函数使用。</p>
+<h2 id="std-thread-join"><a href="#std-thread-join" class="headerlink" title="std::thread::join()"></a>std::thread::join()</h2><p><code>std::thread::join()</code> 是 <code>std::thread</code> 类的成员函数，用于等待线程的结束。调用 <code>join()</code> 函数会使当前线程阻塞，直到对应的 <code>std::thread</code> 对象所代表的线程执行完毕。</p>
+<h3 id="用法示例："><a href="#用法示例：" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread is running...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// 执行一些任务...</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">3</span>)); <span class="comment">// 模拟线程执行耗时操作</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread completed.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (myThread.<span class="built_in">joinable</span>()) &#123;</span><br><span class="line">        myThread.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Main thread: Thread joined.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Main thread: Thread cannot be joined.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::thread::join()</code> 被用来等待 <code>myThread</code> 所代表的线程执行完毕。<code>join()</code> 函数使得主线程进入阻塞状态，直到 <code>myThread</code> 线程执行完毕，然后继续执行主线程的后续代码。</p>
+<h2 id="std-thread-detach"><a href="#std-thread-detach" class="headerlink" title="std::thread::detach()"></a>std::thread::detach()</h2><p><code>std::thread::detach()</code> 是 <code>std::thread</code> 类的成员函数，用于将 <code>std::thread</code> 对象所代表的线程与 <code>std::thread</code> 对象分离。一旦调用了 <code>detach()</code>，<code>std::thread</code> 对象将不再与实际线程相关联，且不再具有对线程的控制能力。</p>
+<h3 id="用法示例：-1"><a href="#用法示例：-1" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread is running...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// 执行一些任务...</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">3</span>)); <span class="comment">// 模拟线程执行耗时操作</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread completed.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (myThread.<span class="built_in">joinable</span>()) &#123;</span><br><span class="line">        myThread.<span class="built_in">detach</span>(); <span class="comment">// 分离线程</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Main thread: Thread detached.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Main thread: Thread cannot be detached.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里主线程不会等待新线程执行完毕，直接退出</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::thread::detach()</code> 被用来分离 <code>myThread</code> 所代表的线程。调用了 <code>detach()</code> 后，<code>myThread</code> 不再与线程相关联，即使 <code>myThread</code> 所代表的线程仍在执行，主线程也不会等待该线程完成。调用 <code>detach()</code> 后，<code>myThread</code> 对象将不再具有对线程的控制能力，也不再需要调用 <code>join()</code>。</p>
+<h2 id="std-thread-get-id"><a href="#std-thread-get-id" class="headerlink" title="std::thread::get_id()"></a>std::thread::get_id()</h2><p><code>std::thread::get_id()</code> 是 <code>std::thread</code> 类的成员函数，用于获取表示特定线程的唯一标识符。</p>
+<h3 id="用法示例：-2"><a href="#用法示例：-2" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取线程的唯一标识符</span></span><br><span class="line">    std::thread::id threadId = std::this_thread::<span class="built_in">get_id</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread ID: &quot;</span> &lt;&lt; threadId &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (myThread.<span class="built_in">joinable</span>()) &#123;</span><br><span class="line">        myThread.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::thread::get_id()</code> 被用来获取表示线程的唯一标识符。<code>std::thread::id</code> 是一个表示线程标识符的类型，可以通过 <code>get_id()</code> 函数获取当前线程的标识符，然后将其打印输出。</p>
+<p>请注意，线程的标识符类型是 <code>std::thread::id</code>，它可以通过 <code>get_id()</code> 函数来获取。这个标识符是在每个线程创建时由操作系统生成的，用于唯一标识一个线程。</p>
+<h2 id="std-thread-joinable"><a href="#std-thread-joinable" class="headerlink" title="std::thread::joinable()"></a>std::thread::joinable()</h2><p><code>std::thread::joinable()</code> 是 <code>std::thread</code> 类的成员函数，用于检查 <code>std::thread</code> 对象是否与实际的线程相关联，即该线程是否可连接（joinable）。</p>
+<h3 id="用法示例：-3"><a href="#用法示例：-3" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread is running...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// 执行一些任务...</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">3</span>)); <span class="comment">// 模拟线程执行耗时操作</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread completed.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (myThread.<span class="built_in">joinable</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Thread is joinable.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        myThread.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Thread is not joinable.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::thread::joinable()</code> 被用来检查 <code>myThread</code> 对象是否与实际线程相关联。如果线程可以连接（即可等待其完成），则调用 <code>join()</code> 函数等待线程执行完毕。否则，输出提示线程不可连接。调用 <code>joinable()</code> 函数可以避免在不可连接的线程上调用 <code>join()</code> 或 <code>detach()</code> 导致的未定义行为。</p>
+<h2 id="std-this-thread"><a href="#std-this-thread" class="headerlink" title="std::this_thread"></a>std::this_thread</h2><p><code>std::this_thread</code> 是 C++ 标准库中 <code>&lt;thread&gt;</code> 头文件中定义的命名空间，提供了一些与当前线程相关的功能和信息。</p>
+<h3 id="主要成员函数："><a href="#主要成员函数：" class="headerlink" title="主要成员函数："></a>主要成员函数：</h3><ol>
+<li><p>**std::this_thread::get_id()**：获取当前线程的唯一标识符，返回类型为 <code>std::thread::id</code>。</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::thread::id threadId = std::this_thread::<span class="built_in">get_id</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**std::this_thread::sleep_for()**：让当前线程休眠指定的时间段。</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">2</span>)); <span class="comment">// 休眠 2 秒</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**std::this_thread::yield()**：提示线程调度器当前线程愿意让出 CPU 时间片给其他线程。</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::this_thread::<span class="built_in">yield</span>(); <span class="comment">// 提示线程调度器让出 CPU 时间片</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="示例用法：-3"><a href="#示例用法：-3" class="headerlink" title="示例用法："></a>示例用法：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::thread::id threadId = std::this_thread::<span class="built_in">get_id</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread ID: &quot;</span> &lt;&lt; threadId &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">2</span>));</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread completed sleep.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Main thread ID: &quot;</span> &lt;&lt; std::this_thread::<span class="built_in">get_id</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::thread <span class="title">myThread</span><span class="params">(threadFunction)</span></span>; <span class="comment">// 创建新线程</span></span><br><span class="line"></span><br><span class="line">    myThread.<span class="built_in">join</span>(); <span class="comment">// 等待线程执行完毕</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::this_thread</code> 被用来获取当前线程的标识符，并在主线程和另一个线程中进行输出。同时，<code>sleep_for()</code> 函数被用来让当前线程休眠一段时间。</p>
+<h2 id="std-this-thread命名空间下常用的类和函数"><a href="#std-this-thread命名空间下常用的类和函数" class="headerlink" title="std::this_thread命名空间下常用的类和函数"></a>std::this_thread命名空间下常用的类和函数</h2><p>在 <code>std::this_thread</code> 命名空间下，主要包含用于管理和操作当前线程的一些常用类和函数。以下是其中一些常用的类和函数：</p>
+<h3 id="类：-2"><a href="#类：-2" class="headerlink" title="类："></a>类：</h3><ol>
+<li><p><strong>std::this_thread::id</strong>：表示线程的唯一标识符类型，用于标识当前线程的标识符。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::thread::id threadId = std::this_thread::<span class="built_in">get_id</span>(); <span class="comment">// 获取当前线程的标识符</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="函数：-2"><a href="#函数：-2" class="headerlink" title="函数："></a>函数：</h3><ol>
+<li><p>**std::this_thread::get_id()**：获取当前线程的唯一标识符。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::thread::id threadId = std::this_thread::<span class="built_in">get_id</span>(); <span class="comment">// 获取当前线程的标识符</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**std::this_thread::sleep_for()**：让当前线程休眠指定的时间段。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">milliseconds</span>(<span class="number">500</span>)); <span class="comment">// 休眠 500 毫秒</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**std::this_thread::sleep_until()**：让当前线程休眠直到指定的时间点。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::chrono::time_point&lt;std::chrono::system_clock&gt; timeout = std::chrono::system_clock::<span class="built_in">now</span>() + std::chrono::<span class="built_in">seconds</span>(<span class="number">5</span>);</span><br><span class="line">std::this_thread::<span class="built_in">sleep_until</span>(timeout); <span class="comment">// 休眠直到 timeout 时间点</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>**std::this_thread::yield()**：提示线程调度器当前线程愿意让出 CPU 时间片给其他线程。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::this_thread::<span class="built_in">yield</span>(); <span class="comment">// 提示线程调度器让出 CPU 时间片</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>这些函数和类型提供了对当前线程的一些基本操作，比如获取线程标识符、线程休眠等，有助于对当前线程进行控制和管理。</p>
+<h2 id="std-this-thread-id"><a href="#std-this-thread-id" class="headerlink" title="std::this_thread::id"></a>std::this_thread::id</h2><p><code>std::this_thread::id</code> 是一个类型，用于表示线程的唯一标识符。这个类型代表了当前线程的标识符，并且可以用于区分不同的线程。</p>
+<h3 id="主要操作："><a href="#主要操作：" class="headerlink" title="主要操作："></a>主要操作：</h3><ol>
+<li><p>**std::this_thread::get_id()**：获取当前线程的唯一标识符。</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::thread::id threadId = std::this_thread::<span class="built_in">get_id</span>(); <span class="comment">// 获取当前线程的标识符</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>比较操作</strong>：<code>std::this_thread::id</code> 类型的对象支持比较操作符，可以用来检查两个线程标识符是否相等。</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">std::thread::id threadId1 = std::this_thread::<span class="built_in">get_id</span>();</span><br><span class="line">std::thread::id threadId2 = std::this_thread::<span class="built_in">get_id</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (threadId1 == threadId2) &#123;</span><br><span class="line">    <span class="comment">// 这两个线程标识符相等</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 这两个线程标识符不相等</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><code>std::this_thread::id</code> 类型的对象被用于表示线程的唯一标识符，可以用来区分不同的线程。通常，它被用于获取当前线程的标识符并进行比较，以便进行线程相关的操作和判断。</p>
+<h2 id="std-this-thread-get-id"><a href="#std-this-thread-get-id" class="headerlink" title="std::this_thread::get_id()"></a>std::this_thread::get_id()</h2><p><code>std::this_thread::get_id()</code> 是 <code>std::this_thread</code> 命名空间中的函数，用于获取当前线程的唯一标识符（ID）。返回值类型是 <code>std::thread::id</code>，这个类型的对象用于唯一标识线程。</p>
+<h3 id="用法示例：-4"><a href="#用法示例：-4" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::thread::id thisThreadId = std::this_thread::<span class="built_in">get_id</span>(); <span class="comment">// 获取当前线程的标识符</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Current thread ID: &quot;</span> &lt;&lt; thisThreadId &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数被用来获取当前线程的标识符，返回的 <code>std::thread::id</code> 对象可以表示当前线程的唯一标识符。通常用于在多线程环境中识别和区分不同的线程。</p>
+<h2 id="std-this-thread-sleep-for"><a href="#std-this-thread-sleep-for" class="headerlink" title="std::this_thread::sleep_for()"></a>std::this_thread::sleep_for()</h2><p><code>std::this_thread::sleep_for()</code> 是 <code>std::this_thread</code> 命名空间中的函数，用于让当前线程休眠一段指定的时间。</p>
+<h3 id="用法示例：-5"><a href="#用法示例：-5" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Start sleeping...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 休眠 2 秒钟</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Wake up after sleeping for 2 seconds.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数被用来让当前线程暂停执行一段时间。在示例中，<code>std::this_thread::sleep_for()</code> 使得程序执行暂停了 2 秒钟，然后继续往下执行。</p>
+<p>该函数的参数是 <code>std::chrono::duration</code> 类型的实例，可接受各种时间单位（如秒、毫秒、微秒等），用于指定线程暂停的时间长度。</p>
+<h2 id="std-this-thread-sleep-until"><a href="#std-this-thread-sleep-until" class="headerlink" title="std::this_thread::sleep_until()"></a>std::this_thread::sleep_until()</h2><p><code>std::this_thread::sleep_until()</code> 是 <code>std::this_thread</code> 命名空间中的函数，用于让当前线程休眠直到指定的时间点。</p>
+<h3 id="用法示例：-6"><a href="#用法示例：-6" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Start sleeping...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置一个时间点为当前时间加上 5 秒钟</span></span><br><span class="line">    std::chrono::time_point&lt;std::chrono::system_clock&gt; wakeupTime = std::chrono::system_clock::<span class="built_in">now</span>() + std::chrono::<span class="built_in">seconds</span>(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 让当前线程休眠直到指定的时间点</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_until</span>(wakeupTime);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Woke up after 5 seconds.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::this_thread::sleep_until()</code> 函数使得当前线程休眠直到指定的时间点。通过 <code>std::chrono::time_point</code> 设置了一个时间点为当前时间加上 5 秒钟，并将其作为参数传递给 <code>sleep_until()</code> 函数，使得线程休眠直到这个时间点。</p>
+<p>这个函数的参数是 <code>std::chrono::time_point</code> 类型的对象，表示线程应该休眠的时间点。</p>
+<h2 id="std-this-thread-yield"><a href="#std-this-thread-yield" class="headerlink" title="std::this_thread::yield()"></a>std::this_thread::yield()</h2><p><code>std::this_thread::yield()</code> 是 <code>std::this_thread</code> 命名空间中的函数，用于提示线程调度器当前线程愿意让出 CPU 时间片，以便给其他线程执行的机会。</p>
+<h3 id="用法示例：-7"><a href="#用法示例：-7" class="headerlink" title="用法示例："></a>用法示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">taskFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Task running...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        std::this_thread::<span class="built_in">yield</span>(); <span class="comment">// 提示线程调度器让出 CPU 时间片</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">task</span><span class="params">(taskFunction)</span></span>; <span class="comment">// 创建新线程执行任务</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 主线程执行</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Main thread running...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        std::this_thread::<span class="built_in">yield</span>(); <span class="comment">// 提示线程调度器让出 CPU 时间片</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    task.<span class="built_in">join</span>(); <span class="comment">// 等待任务线程执行完毕</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>std::this_thread::yield()</code> 被用来提示线程调度器让出 CPU 时间片。主线程和任务线程分别交替执行，每次循环调用 <code>yield()</code> 后，当前线程会主动让出 CPU 时间片，给其他线程执行的机会。注意，<code>yield()</code> 函数只是一个提示，调度器是否立即采纳取决于操作系统的具体实现。</p>
+<h2 id="C-std-thread-hardware-concurrency-函数"><a href="#C-std-thread-hardware-concurrency-函数" class="headerlink" title="C++ std::thread::hardware_concurrency() 函数"></a>C++ std::thread::hardware_concurrency() 函数</h2><p><code>std::thread::hardware_concurrency()</code> 是 C++ 标准库中的一个函数，用于获取当前系统支持的并发线程数量。这个函数返回一个整数，表示当前系统可用的并发线程数量，通常对应于硬件支持的线程数或处理器核心数。</p>
+<p>以下是对 <code>std::thread::hardware_concurrency()</code> 函数的详细解释：</p>
+<ol>
+<li><p><strong>功能</strong>：</p>
+<ul>
+<li>获取当前系统支持的并发线程数量。</li>
+</ul>
+</li>
+<li><p><strong>语法</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> std::thread::<span class="built_in">hardware_concurrency</span>() <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>参数</strong>：</p>
+<ul>
+<li>无参数。</li>
+</ul>
+</li>
+<li><p><strong>返回值</strong>：</p>
+<ul>
+<li>一个 <code>unsigned int</code> 类型的整数，表示当前系统支持的并发线程数量。</li>
+<li>如果无法确定当前系统支持的并发线程数量，或者该信息不可用，则返回值为0。</li>
+</ul>
+</li>
+<li><p><strong>异常</strong>：</p>
+<ul>
+<li>该函数不抛出任何异常。</li>
+</ul>
+</li>
+<li><p><strong>示例</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> cores = std::thread::<span class="built_in">hardware_concurrency</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Number of cores: &quot;</span> &lt;&lt; cores &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>说明</strong>：</p>
+<ul>
+<li>这个函数可以帮助程序员确定在当前系统上进行并行操作时的最佳线程数量。</li>
+<li>返回值为0时，表示无法确定当前系统支持的并发线程数量，程序可能需要使用默认值或者其他启发式方法来确定线程数量。</li>
+<li>返回值并不总是精确的，有时会受到系统配置、资源限制或者其他因素的影响。因此，在实际应用中，可能需要结合其他信息和策略来确定最佳的并发线程数量。</li>
+</ul>
+</li>
+</ol>
+<p>总的来说，<code>std::thread::hardware_concurrency()</code> 函数是一个便捷的工具，可以帮助程序员在编写多线程程序时确定当前系统支持的并发线程数量，从而更好地利用系统资源。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppSTL/" rel="tag"># CppSTL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_13_mutex/" rel="prev" title="C++_10_13_mutex">
+      <i class="fa fa-chevron-left"></i> C++_10_13_mutex
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_11_version/" rel="next" title="C++_10_11_version">
+      C++_10_11_version <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">C++ 标准库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B1%BB%E5%92%8C%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">C++ 标准库 常用的类和函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%EF%BC%9A-1"><span class="nav-number">3.1.</span> <span class="nav-text">类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%EF%BC%9A-1"><span class="nav-number">3.2.</span> <span class="nav-text">函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-1"><span class="nav-number">3.3.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-thread"><span class="nav-number">4.</span> <span class="nav-text">std::thread</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">构造函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E5%92%8C%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">成员函数和操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-2"><span class="nav-number">4.3.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-thread-join"><span class="nav-number">5.</span> <span class="nav-text">std::thread::join()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">5.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-thread-detach"><span class="nav-number">6.</span> <span class="nav-text">std::thread::detach()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">6.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-thread-get-id"><span class="nav-number">7.</span> <span class="nav-text">std::thread::get_id()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">7.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-thread-joinable"><span class="nav-number">8.</span> <span class="nav-text">std::thread::joinable()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-3"><span class="nav-number">8.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread"><span class="nav-number">9.</span> <span class="nav-text">std::this_thread</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">9.1.</span> <span class="nav-text">主要成员函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A-3"><span class="nav-number">9.2.</span> <span class="nav-text">示例用法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E4%B8%8B%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B1%BB%E5%92%8C%E5%87%BD%E6%95%B0"><span class="nav-number">10.</span> <span class="nav-text">std::this_thread命名空间下常用的类和函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%EF%BC%9A-2"><span class="nav-number">10.1.</span> <span class="nav-text">类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%EF%BC%9A-2"><span class="nav-number">10.2.</span> <span class="nav-text">函数：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread-id"><span class="nav-number">11.</span> <span class="nav-text">std::this_thread::id</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">11.1.</span> <span class="nav-text">主要操作：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread-get-id"><span class="nav-number">12.</span> <span class="nav-text">std::this_thread::get_id()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-4"><span class="nav-number">12.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread-sleep-for"><span class="nav-number">13.</span> <span class="nav-text">std::this_thread::sleep_for()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-5"><span class="nav-number">13.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread-sleep-until"><span class="nav-number">14.</span> <span class="nav-text">std::this_thread::sleep_until()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-6"><span class="nav-number">14.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-this-thread-yield"><span class="nav-number">15.</span> <span class="nav-text">std::this_thread::yield()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%B3%95%E7%A4%BA%E4%BE%8B%EF%BC%9A-7"><span class="nav-number">15.1.</span> <span class="nav-text">用法示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-thread-hardware-concurrency-%E5%87%BD%E6%95%B0"><span class="nav-number">16.</span> <span class="nav-text">C++ std::thread::hardware_concurrency() 函数</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

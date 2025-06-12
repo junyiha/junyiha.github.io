@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 ModBus 相关理论知识  Contexts 上下文 资源句柄 使用 modbus_new_rtu 申请，返回一个 modbus_t ，它包含所有必要的数据  modbus 协议 详解Modbus（Modular Communications System）是一种通信协议，用于在不同设备之间进行数据通信和控制。它通常用于工业自动化领域，用于连接和控制各种设备，如传感器、执行器、PLC（可编">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ModBus">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Tools/2024-05-22-ModBus/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 ModBus 相关理论知识  Contexts 上下文 资源句柄 使用 modbus_new_rtu 申请，返回一个 modbus_t ，它包含所有必要的数据  modbus 协议 详解Modbus（Modular Communications System）是一种通信协议，用于在不同设备之间进行数据通信和控制。它通常用于工业自动化领域，用于连接和控制各种设备，如传感器、执行器、PLC（可编">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.537Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Tools">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Tools/2024-05-22-ModBus/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ModBus | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Tools/2024-05-22-ModBus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ModBus
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tools/" itemprop="url" rel="index"><span itemprop="name">Tools</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>ModBus 相关理论知识</li>
+</ul>
+<h2 id="Contexts-上下文-资源句柄"><a href="#Contexts-上下文-资源句柄" class="headerlink" title="Contexts 上下文 资源句柄"></a>Contexts 上下文 资源句柄</h2><ul>
+<li>使用 modbus_new_rtu 申请，返回一个 modbus_t ，它包含所有必要的数据</li>
+</ul>
+<h2 id="modbus-协议-详解"><a href="#modbus-协议-详解" class="headerlink" title="modbus 协议 详解"></a>modbus 协议 详解</h2><p>Modbus（Modular Communications System）是一种通信协议，用于在不同设备之间进行数据通信和控制。它通常用于工业自动化领域，用于连接和控制各种设备，如传感器、执行器、PLC（可编程逻辑控制器）等。Modbus协议的详解包括以下几个方面：</p>
+<ol>
+<li><p><strong>协议类型</strong>：</p>
+<ul>
+<li>Modbus RTU：基于串行通信，以二进制格式传输数据。</li>
+<li>Modbus ASCII：也是基于串行通信，但以ASCII字符形式传输数据。</li>
+<li>Modbus TCP：基于TCP&#x2F;IP网络通信，用于以太网连接。</li>
+</ul>
+</li>
+<li><p><strong>通信方式</strong>：</p>
+<ul>
+<li>Modbus是主从（Master-Slave）协议，其中有一个主设备（主站）可以向多个从设备（从站）发送请求，并接收它们的响应。</li>
+<li>主站发出请求，从站回应请求，并提供所需的数据。</li>
+</ul>
+</li>
+<li><p><strong>数据格式</strong>：</p>
+<ul>
+<li>Modbus通信包括读（读取从站的数据）和写（向从站写入数据）操作。</li>
+<li>请求和响应消息通常包括功能码、数据字段、CRC校验等部分。</li>
+</ul>
+</li>
+<li><p><strong>寄存器</strong>：</p>
+<ul>
+<li>Modbus协议使用寄存器来表示数据，寄存器可以是输入寄存器、保持寄存器、输入状态、线圈状态等不同类型。</li>
+<li>输入寄存器通常用于表示只读数据，如传感器读数。</li>
+<li>保持寄存器通常用于表示读写数据，如控制器的设置参数。</li>
+</ul>
+</li>
+<li><p><strong>功能码</strong>：</p>
+<ul>
+<li>功能码用于指定要执行的操作，如读取输入寄存器、写入保持寄存器等。</li>
+<li>常见的功能码包括读操作（功能码 3 和功能码 4）和写操作（功能码 6 和功能码 16）。</li>
+</ul>
+</li>
+<li><p><strong>异常处理</strong>：</p>
+<ul>
+<li>Modbus协议包括异常码，用于指示错误情况，如无效功能码、寄存器不可用等。</li>
+<li>异常响应通常包含一个特殊的异常功能码，以及一个描述异常的代码。</li>
+</ul>
+</li>
+<li><p><strong>通信速率</strong>：</p>
+<ul>
+<li>Modbus RTU和Modbus ASCII的通信速率通常在9600、19200、38400等不同速率之间选择。</li>
+<li>Modbus TCP通常使用以太网连接，通信速率由以太网规范确定。</li>
+</ul>
+</li>
+<li><p><strong>安全性</strong>：</p>
+<ul>
+<li>Modbus协议在设计上没有内置安全性，因此在需要安全通信的环境中，通常需要使用其他协议或方法来加强安全性。</li>
+</ul>
+</li>
+</ol>
+<p>总的来说，Modbus协议是一种用于在工业自动化环境中进行设备间通信和控制的标准化协议。它有多种变体和实现，可以根据不同的通信需求和硬件来选择合适的协议类型。 Modbus协议的详细规范可以在Modbus.org等资源中找到。如果需要使用Modbus协议，通常需要查看相关设备的文档以了解如何配置和使用它。</p>
+<h2 id="CRC-详解"><a href="#CRC-详解" class="headerlink" title="CRC 详解"></a>CRC 详解</h2><p>CRC (Cyclic Redundancy Check) 是一种错误检测码，用于验证数据的完整性。它是一种快速且广泛应用的校验算法，常用于通信协议、存储设备、网络传输等领域。</p>
+<p>CRC 的基本原理是通过对数据进行多项式计算来生成校验值，这个校验值称为 CRC 值。发送方在传输数据前，会计算数据的 CRC 值，并将该值附加到数据后面一并传输。接收方在接收到数据后，也会计算接收到的数据的 CRC 值，并与接收到的 CRC 值进行比较。如果两个 CRC 值匹配，表示数据没有出现错误；如果 CRC 值不匹配，表示数据可能在传输过程中发生了错误或被篡改。</p>
+<p>CRC 的特点包括：</p>
+<ol>
+<li><p>快速：CRC 是一种非常快速的校验算法，适用于实时数据传输和处理。</p>
+</li>
+<li><p>简单：CRC 的实现相对简单，通常用位操作来处理数据和多项式计算。</p>
+</li>
+<li><p>检测能力：CRC 能够检测不少常见的错误，但并不是绝对可靠，无法检测所有错误。</p>
+</li>
+<li><p>冗余：CRC 增加了一定的冗余数据，用于检测错误。</p>
+</li>
+</ol>
+<p>在使用 CRC 时，需要事先定义一个生成多项式。不同的 CRC 标准使用不同的多项式，常见的标准有 CRC-16、CRC-32 等。选择合适的 CRC 标准取决于具体应用的要求。</p>
+<p>总体而言，CRC 是一种简单、高效且广泛应用的错误检测码。它在数据传输和存储中起着重要的作用，帮助保障数据的完整性和可靠性。</p>
+<h2 id="linux-libmodbus-库-详解"><a href="#linux-libmodbus-库-详解" class="headerlink" title="linux libmodbus 库 详解"></a>linux libmodbus 库 详解</h2><p><code>libmodbus</code> 是一个用于通信协议 Modbus 的开源C库，用于实现 Modbus 协议的通信。Modbus 是一种通信协议，用于连接工业自动化设备，使它们能够在不同设备之间进行数据传输。以下是关于 <code>libmodbus</code> 库的详细信息：</p>
+<p><strong>安装 libmodbus 库</strong>：</p>
+<p>你可以使用你的 Linux 发行版的包管理器来安装 <code>libmodbus</code> 库。例如，如果你使用的是 Ubuntu，可以使用以下命令安装：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install libmodbus-dev</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用 libmodbus 库</strong>：</p>
+<p>以下是一些关于 <code>libmodbus</code> 库的基本使用方法和功能：</p>
+<ol>
+<li><p><strong>创建 modbus 上下文</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">modbus_t</span>* ctx = modbus_new_rtu(<span class="string">&quot;/dev/ttyUSB0&quot;</span>, <span class="number">9600</span>, <span class="string">&#x27;N&#x27;</span>, <span class="number">8</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们创建了一个用于串口通信的 Modbus 上下文。</p>
+</li>
+<li><p><strong>连接到 Modbus 设备</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (modbus_connect(ctx) == <span class="number">-1</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;Connection failed&quot;</span>);</span><br><span class="line">    modbus_free(ctx);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>modbus_connect</code> 函数连接到 Modbus 设备。</p>
+</li>
+<li><p><strong>读取和写入 Modbus 寄存器</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint16_t</span> data[<span class="number">5</span>];</span><br><span class="line"><span class="type">int</span> num = modbus_read_registers(ctx, <span class="number">0</span>, <span class="number">5</span>, data);</span><br><span class="line"></span><br><span class="line"><span class="type">uint16_t</span> value = <span class="number">1234</span>;</span><br><span class="line">modbus_write_register(ctx, <span class="number">10</span>, value);</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>modbus_read_registers</code> 函数读取寄存器数据，使用 <code>modbus_write_register</code> 函数写入寄存器数据。</p>
+</li>
+<li><p><strong>关闭连接并释放资源</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">modbus_close(ctx);</span><br><span class="line">modbus_free(ctx);</span><br></pre></td></tr></table></figure>
+
+<p>在完成通信后，使用 <code>modbus_close</code> 函数关闭连接，并使用 <code>modbus_free</code> 函数释放资源。</p>
+</li>
+<li><p><strong>其他功能</strong>：</p>
+<p><code>libmodbus</code> 还提供了其他一些功能，如 Modbus TCP&#x2F;IP 支持、异常处理、不同寄存器类型的读写等。</p>
+</li>
+</ol>
+<p><code>libmodbus</code> 库使得在 Linux 下实现 Modbus 协议通信变得更加容易。你可以查阅官方文档或在线教程，深入了解 <code>libmodbus</code> 库的更多功能和用法。在编程中，你可以根据需要使用合适的函数来实现 Modbus 通信，并根据通信需求进行相应的设置和处理。</p>
+<h2 id="linux-libmodbus-库-使用-详解-示例"><a href="#linux-libmodbus-库-使用-详解-示例" class="headerlink" title="linux libmodbus 库 使用 详解 示例"></a>linux libmodbus 库 使用 详解 示例</h2><p>下面是一个使用 <code>libmodbus</code> 库进行 Modbus 通信的简单示例。在这个示例中，我们将使用 Modbus RTU 通信协议通过串口与 Modbus 设备通信，并读取一些寄存器的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;modbus.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">modbus_t</span> *ctx;</span><br><span class="line">    <span class="type">uint16_t</span> data[<span class="number">5</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建 Modbus 上下文，串口路径为 &quot;/dev/ttyUSB0&quot;，波特率为 9600</span></span><br><span class="line">    ctx = modbus_new_rtu(<span class="string">&quot;/dev/ttyUSB0&quot;</span>, <span class="number">9600</span>, <span class="string">&#x27;N&#x27;</span>, <span class="number">8</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (ctx == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;Unable to create Modbus context\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接到 Modbus 设备</span></span><br><span class="line">    <span class="keyword">if</span> (modbus_connect(ctx) == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;Connection failed: %s\n&quot;</span>, modbus_strerror(errno));</span><br><span class="line">        modbus_free(ctx);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读取寄存器数据，起始地址为 0，读取 5 个寄存器</span></span><br><span class="line">    <span class="type">int</span> num = modbus_read_registers(ctx, <span class="number">0</span>, <span class="number">5</span>, data);</span><br><span class="line">    <span class="keyword">if</span> (num == <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;Read error: %s\n&quot;</span>, modbus_strerror(errno));</span><br><span class="line">        modbus_close(ctx);</span><br><span class="line">        modbus_free(ctx);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印读取的寄存器值</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; num; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Register %d: %d\n&quot;</span>, i, data[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭连接并释放资源</span></span><br><span class="line">    modbus_close(ctx);</span><br><span class="line">    modbus_free(ctx);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们首先创建了一个 Modbus 上下文 <code>ctx</code>，然后使用 <code>modbus_connect</code> 函数连接到 Modbus 设备。接着，使用 <code>modbus_read_registers</code> 函数读取起始地址为 0 的连续 5 个寄存器的值。最后，我们打印出读取的寄存器值，并在完成通信后关闭连接和释放资源。</p>
+<p>请注意，此示例是一个基本的用法演示。在实际应用中，你可能需要根据 Modbus 设备的配置和通信需求进行适当的设置和处理。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Tools/" rel="tag"># Tools</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Tools/2024-05-22-OpenGL/" rel="prev" title="OpenGL">
+      <i class="fa fa-chevron-left"></i> OpenGL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Tools/2024-05-22-Nginx/" rel="next" title="Nginx">
+      Nginx <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Contexts-%E4%B8%8A%E4%B8%8B%E6%96%87-%E8%B5%84%E6%BA%90%E5%8F%A5%E6%9F%84"><span class="nav-number">2.</span> <span class="nav-text">Contexts 上下文 资源句柄</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#modbus-%E5%8D%8F%E8%AE%AE-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">modbus 协议 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CRC-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">CRC 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-libmodbus-%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">linux libmodbus 库 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-libmodbus-%E5%BA%93-%E4%BD%BF%E7%94%A8-%E8%AF%A6%E8%A7%A3-%E7%A4%BA%E4%BE%8B"><span class="nav-number">6.</span> <span class="nav-text">linux libmodbus 库 使用 详解 示例</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

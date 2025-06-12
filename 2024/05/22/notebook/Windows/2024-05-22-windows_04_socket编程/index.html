@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要本文介绍了在 Windows 系统下进行 socket 编程的基本方法和常用函数，包括 Winsock 的初始化、套接字的创建、绑定、监听、接受连接、数据传输和清理等操作。还提供了一个简单的 TCP 服务器和客户端示例代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windows_04_socket编程">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Windows/2024-05-22-windows_04_socket%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要本文介绍了在 Windows 系统下进行 socket 编程的基本方法和常用函数，包括 Winsock 的初始化、套接字的创建、绑定、监听、接受连接、数据传输和清理等操作。还提供了一个简单的 TCP 服务器和客户端示例代码。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.584Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Windows/2024-05-22-windows_04_socket%E7%BC%96%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>windows_04_socket编程 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Windows/2024-05-22-windows_04_socket%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          windows_04_socket编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows/" itemprop="url" rel="index"><span itemprop="name">Windows</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文介绍了在 Windows 系统下进行 socket 编程的基本方法和常用函数，包括 Winsock 的初始化、套接字的创建、绑定、监听、接受连接、数据传输和清理等操作。还提供了一个简单的 TCP 服务器和客户端示例代码。</p>
+<span id="more"></span>
+
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>windows系统下socket网络编程笔记</li>
+</ul>
+<h2 id="windows系统下socket编程"><a href="#windows系统下socket编程" class="headerlink" title="windows系统下socket编程"></a>windows系统下socket编程</h2><p>在 Windows 系统下进行 Socket 编程，你可以使用 Windows Sockets API（通常称为 Winsock）。Winsock 是用于在 Windows 上进行网络编程的 API，它提供了一套函数和数据结构，允许应用程序通过网络进行通信。</p>
+<p>以下是一个简单的示例，展示了在 Windows 下使用 Winsock API 进行基本的套接字通信：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;winsock2.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> comment(lib, <span class="string">&quot;Ws2_32.lib&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    WSADATA wsaData;</span><br><span class="line">    SOCKET serverSocket, clientSocket;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">serverAddr</span>, <span class="title">clientAddr</span>;</span></span><br><span class="line">    <span class="type">int</span> iResult;</span><br><span class="line">    <span class="type">int</span> clientAddrLen = <span class="keyword">sizeof</span>(clientAddr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize Winsock</span></span><br><span class="line">    iResult = WSAStartup(MAKEWORD(<span class="number">2</span>, <span class="number">2</span>), &amp;wsaData);</span><br><span class="line">    <span class="keyword">if</span> (iResult != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;WSAStartup failed: %d\n&quot;</span>, iResult);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create a TCP socket</span></span><br><span class="line">    serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);</span><br><span class="line">    <span class="keyword">if</span> (serverSocket == INVALID_SOCKET) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error creating socket: %d\n&quot;</span>, WSAGetLastError());</span><br><span class="line">        WSACleanup();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Bind the socket to an address and port</span></span><br><span class="line">    serverAddr.sin_family = AF_INET;</span><br><span class="line">    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); <span class="comment">// Use any available IP address on the machine</span></span><br><span class="line">    serverAddr.sin_port = htons(<span class="number">8080</span>); <span class="comment">// Use port 8080</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bind(serverSocket, (<span class="keyword">struct</span> sockaddr*)&amp;serverAddr, <span class="keyword">sizeof</span>(serverAddr)) == SOCKET_ERROR) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Bind failed: %d\n&quot;</span>, WSAGetLastError());</span><br><span class="line">        closesocket(serverSocket);</span><br><span class="line">        WSACleanup();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Listen for incoming connections</span></span><br><span class="line">    <span class="keyword">if</span> (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Listen failed: %d\n&quot;</span>, WSAGetLastError());</span><br><span class="line">        closesocket(serverSocket);</span><br><span class="line">        WSACleanup();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Server listening on port 8080...\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Accept a client connection</span></span><br><span class="line">    clientSocket = accept(serverSocket, (<span class="keyword">struct</span> sockaddr*)&amp;clientAddr, &amp;clientAddrLen);</span><br><span class="line">    <span class="keyword">if</span> (clientSocket == INVALID_SOCKET) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Accept failed: %d\n&quot;</span>, WSAGetLastError());</span><br><span class="line">        closesocket(serverSocket);</span><br><span class="line">        WSACleanup();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Client connected\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Communication with the client</span></span><br><span class="line">    <span class="comment">// ... (send/receive data)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Cleanup</span></span><br><span class="line">    closesocket(clientSocket);</span><br><span class="line">    closesocket(serverSocket);</span><br><span class="line">    WSACleanup();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例创建了一个简单的 TCP 服务器。它初始化 Winsock，创建一个 TCP 套接字（<code>socket()</code>），绑定到一个地址和端口（<code>bind()</code>），开始监听来自客户端的连接请求（<code>listen()</code>），接受一个客户端连接（<code>accept()</code>），并最终关闭套接字并清理 Winsock 资源。</p>
+<p>请注意，这只是一个基本示例，实际的网络通信可能涉及到更多的错误处理、数据发送和接收等操作。此外，该示例仅支持单个客户端连接，实际应用可能需要支持多客户端并发连接，需要使用多线程或异步编程技术来实现。</p>
+<h2 id="Winsock是什么"><a href="#Winsock是什么" class="headerlink" title="Winsock是什么"></a>Winsock是什么</h2><p>Winsock（Windows Sockets）是用于在 Microsoft Windows 操作系统上进行网络通信的编程接口。它是一组用于网络通信的 API，允许开发人员在 Windows 平台上创建网络应用程序，实现数据的传输、接收和处理。</p>
+<p>Winsock 提供了一种类似于 Berkeley 套接字（BSD Sockets）接口的编程模型，它支持多种网络协议，例如 TCP（传输控制协议）和 UDP（用户数据报协议），允许应用程序通过这些协议进行网络通信。</p>
+<p>使用 Winsock API，开发人员可以执行以下操作：</p>
+<ol>
+<li>创建和管理套接字（socket）：通过 <code>socket()</code> 函数创建套接字并设置其参数。</li>
+<li>绑定套接字到本地地址和端口：使用 <code>bind()</code> 函数将套接字绑定到特定的本地地址和端口。</li>
+<li>监听和接受连接：使用 <code>listen()</code> 函数开始监听传入的连接请求，并通过 <code>accept()</code> 函数接受客户端的连接。</li>
+<li>发送和接收数据：使用 <code>send()</code> 和 <code>recv()</code> 函数发送和接收数据。</li>
+<li>关闭套接字和清理资源：使用 <code>closesocket()</code> 关闭套接字，并在应用程序结束时使用 <code>WSACleanup()</code> 清理 Winsock 资源。</li>
+</ol>
+<p>Winsock 在 Windows 平台上成为了标准的网络编程接口，并且提供了丰富的功能和灵活性，使得开发人员可以编写各种类型的网络应用程序，包括网络服务器、客户端、实时通信应用、网络游戏等。</p>
+<p>需要注意的是，Winsock 并非 Windows 独有的 API，类似的套接字接口也存在于其他操作系统上，例如 BSD 系统（如 Linux 和 macOS）上的 BSD Sockets。然而，Winsock 是专门为 Windows 平台设计和优化的网络编程接口。</p>
+<h2 id="Winsock详解"><a href="#Winsock详解" class="headerlink" title="Winsock详解"></a>Winsock详解</h2><p>Winsock（Windows Sockets）是用于在 Microsoft Windows 操作系统上进行网络通信的编程接口。它提供了一系列函数、数据结构和定义，允许开发人员编写网络应用程序，实现数据的传输、接收和处理。</p>
+<p>以下是 Winsock 的一些重要概念和功能：</p>
+<ol>
+<li><p><strong>套接字（Socket）</strong>：</p>
+<ul>
+<li>在 Winsock 中，套接字是网络通信的基本抽象，用于描述通信的端点。它允许应用程序通过网络进行数据传输。</li>
+<li>使用 <code>socket()</code> 函数创建套接字，并指定协议族（例如 AF_INET 用于 IPv4），类型（例如 SOCK_STREAM 用于流式套接字或 SOCK_DGRAM 用于数据报套接字），以及协议。</li>
+<li>套接字可以是面向连接的（如 TCP）或无连接的（如 UDP）。</li>
+</ul>
+</li>
+<li><p><strong>地址结构（Address Structures）</strong>：</p>
+<ul>
+<li>在网络通信中，地址结构用于表示和存储网络地址信息，例如 IP 地址和端口号。</li>
+<li><code>struct sockaddr</code> 是 Winsock 中通用的地址结构，<code>struct sockaddr_in</code> 用于存储 IPv4 地址信息。</li>
+</ul>
+</li>
+<li><p><strong>地址解析和转换</strong>：</p>
+<ul>
+<li>使用 <code>getaddrinfo()</code> 函数将主机名（例如 <a target="_blank" rel="noopener" href="http://www.example.com)和服务/%E7%AB%AF%E5%8F%A3%E5%90%8D%EF%BC%88%E4%BE%8B%E5%A6%82">www.example.com）和服务/端口名（例如</a> HTTP 或 80）转换为可用于套接字操作的地址信息结构。</li>
+</ul>
+</li>
+<li><p><strong>绑定（Binding）</strong>：</p>
+<ul>
+<li>使用 <code>bind()</code> 函数将套接字绑定到本地的 IP 地址和端口号，以便接受传入的连接或发送数据。</li>
+</ul>
+</li>
+<li><p><strong>监听和接受连接</strong>：</p>
+<ul>
+<li><code>listen()</code> 函数用于开始监听传入的连接请求。</li>
+<li><code>accept()</code> 函数用于接受传入的连接，并创建新的套接字来处理该连接。</li>
+</ul>
+</li>
+<li><p><strong>发送和接收数据</strong>：</p>
+<ul>
+<li>使用 <code>send()</code> 和 <code>recv()</code> 函数发送和接收数据。对于 TCP 套接字，这些函数用于在连接上进行数据传输；对于 UDP 套接字，它们用于发送和接收数据报。</li>
+</ul>
+</li>
+<li><p><strong>关闭套接字和清理资源</strong>：</p>
+<ul>
+<li>使用 <code>closesocket()</code> 函数关闭套接字，并使用 <code>WSACleanup()</code> 函数在应用程序结束时释放 Winsock 资源。</li>
+</ul>
+</li>
+<li><p><strong>异步通信</strong>：</p>
+<ul>
+<li>Winsock 还支持异步操作，允许应用程序同时处理多个套接字的通信，通过使用事件或 I&#x2F;O 完成端口（IOCP）等机制实现异步通信。</li>
+</ul>
+</li>
+<li><p><strong>错误处理和状态查询</strong>：</p>
+<ul>
+<li>使用 <code>WSAGetLastError()</code> 函数获取最近一次发生的套接字相关错误。</li>
+<li><code>WSAStartup()</code> 函数用于初始化 Winsock 库，返回值表示初始化是否成功。</li>
+<li><code>WSAIsBlocking()</code> 函数用于查询套接字是否处于阻塞模式。</li>
+</ul>
+</li>
+</ol>
+<p>总的来说，Winsock 提供了强大且灵活的功能，允许开发人员构建各种网络应用程序，包括客户端和服务器，支持 TCP 和 UDP 等协议，以及实现复杂的网络通信需求。要使用 Winsock 编写网络应用程序，你需要了解套接字的基本概念和相关函数的使用方法，以便正确地建立、管理和处理网络连接。</p>
+<h2 id="WSAPoll-是什么-详细解释"><a href="#WSAPoll-是什么-详细解释" class="headerlink" title="WSAPoll() 是什么 详细解释"></a>WSAPoll() 是什么 详细解释</h2><p><code>WSAPoll()</code> 是 Windows Sockets API （Winsock）中的一个函数，用于在 Windows 平台上进行异步套接字状态检查。它类似于类Unix系统上的<code>poll()</code>函数，在多路复用（Multiplexing）的情况下，用于轮询一组套接字以检查它们的就绪状态，例如是否可以读取、写入或出错等。</p>
+<p>该函数的作用是检查套接字集合中指定套接字的状态，可以同时检查多个套接字。通过<code>WSAPoll()</code>函数，你可以非阻塞地等待多个套接字之一准备就绪，而不需要为每个套接字创建一个单独的线程或使用其他复杂的同步机制。</p>
+<p>以下是 <code>WSAPoll()</code> 函数的基本信息和参数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">WSAPoll</span><span class="params">(</span></span><br><span class="line"><span class="params">  LPWSAPOLLFD fdArray,</span></span><br><span class="line"><span class="params">  ULONG      fds,</span></span><br><span class="line"><span class="params">  INT        timeout</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>fdArray</code>：指向一个 <code>WSAPOLLFD</code> 结构数组的指针，每个结构描述了一个要检查状态的套接字。</li>
+<li><code>fds</code>：<code>fdArray</code> 数组中元素的数量。</li>
+<li><code>timeout</code>：超时时间，以毫秒为单位。如果设置为负数（如 <code>-1</code>），<code>WSAPoll()</code> 将会无限期地等待套接字状态的变化；如果设置为 <code>0</code>，则立即返回，表示对所有套接字的状态进行一次检查；如果设置为正数，则表示等待指定的毫秒数后超时返回。</li>
+</ul>
+<p><code>WSAPOLLFD</code> 结构用于描述一个套接字及其所关注的事件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    SOCKET fd;</span><br><span class="line">    SHORT  events;</span><br><span class="line">    SHORT  revents;</span><br><span class="line">&#125; WSAPOLLFD, *LPWSAPOLLFD;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>fd</code>：套接字描述符。</li>
+<li><code>events</code>：表示应用程序感兴趣的事件，可以是 <code>POLLRDNORM</code>（可读）、<code>POLLWRNORM</code>（可写）等等。</li>
+<li><code>revents</code>：表示实际发生的事件，由函数填充。函数调用后，将设置该字段以指示套接字的状态。</li>
+</ul>
+<p><code>WSAPoll()</code> 函数调用后，会检查指定的套接字集合的状态，并将就绪的套接字标记在相应的 <code>revents</code> 字段中。然后，你可以检查 <code>revents</code> 字段以确定哪些套接字处于就绪状态，以便执行相应的操作。</p>
+<p>需要注意的是，<code>WSAPoll()</code> 函数在 Windows Vista 及更高版本的系统上可用。它可以用于编写高效的异步网络应用程序，允许程序员更有效地管理多个套接字并监视其状态，而无需阻塞线程等待单个套接字的状态变化。</p>
+<h2 id="C-在windows进行socket编程"><a href="#C-在windows进行socket编程" class="headerlink" title="C++在windows进行socket编程"></a>C++在windows进行socket编程</h2><p>在 Windows 上进行 C++ 的 Socket 编程通常使用 Winsock 库。下面是一个简单的示例，展示了如何在 C++ 中使用 Winsock 创建一个简单的 TCP 客户端和服务器。</p>
+<p>请注意，此示例仅展示基本的连接和通信流程，实际的应用程序可能需要更多的错误处理和完善的逻辑来处理数据发送和接收等操作。</p>
+<h3 id="TCP-服务器示例："><a href="#TCP-服务器示例：" class="headerlink" title="TCP 服务器示例："></a>TCP 服务器示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;winsock2.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> comment(lib, <span class="string">&quot;ws2_32.lib&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    WSADATA wsaData;</span><br><span class="line">    SOCKET serverSocket, clientSocket;</span><br><span class="line">    sockaddr_in serverAddr, clientAddr;</span><br><span class="line">    <span class="type">int</span> clientAddrLen = <span class="built_in">sizeof</span>(clientAddr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize Winsock</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">WSAStartup</span>(<span class="built_in">MAKEWORD</span>(<span class="number">2</span>, <span class="number">2</span>), &amp;wsaData) != <span class="number">0</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;WSAStartup failed\n&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create a TCP socket</span></span><br><span class="line">    serverSocket = <span class="built_in">socket</span>(AF_INET, SOCK_STREAM, IPPROTO_TCP);</span><br><span class="line">    <span class="keyword">if</span> (serverSocket == INVALID_SOCKET) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error creating socket: &quot;</span> &lt;&lt; <span class="built_in">WSAGetLastError</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        <span class="built_in">WSACleanup</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Bind the socket to an address and port</span></span><br><span class="line">    serverAddr.sin_family = AF_INET;</span><br><span class="line">    serverAddr.sin_addr.s_addr = <span class="built_in">htonl</span>(INADDR_ANY);</span><br><span class="line">    serverAddr.sin_port = <span class="built_in">htons</span>(<span class="number">8080</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">bind</span>(serverSocket, (sockaddr*)&amp;serverAddr, <span class="built_in">sizeof</span>(serverAddr)) == SOCKET_ERROR) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Bind failed: &quot;</span> &lt;&lt; <span class="built_in">WSAGetLastError</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        <span class="built_in">closesocket</span>(serverSocket);</span><br><span class="line">        <span class="built_in">WSACleanup</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Listen for incoming connections</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">listen</span>(serverSocket, SOMAXCONN) == SOCKET_ERROR) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Listen failed: &quot;</span> &lt;&lt; <span class="built_in">WSAGetLastError</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        <span class="built_in">closesocket</span>(serverSocket);</span><br><span class="line">        <span class="built_in">WSACleanup</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Server listening on port 8080...\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Accept a client connection</span></span><br><span class="line">    clientSocket = <span class="built_in">accept</span>(serverSocket, (sockaddr*)&amp;clientAddr, &amp;clientAddrLen);</span><br><span class="line">    <span class="keyword">if</span> (clientSocket == INVALID_SOCKET) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Accept failed: &quot;</span> &lt;&lt; <span class="built_in">WSAGetLastError</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        <span class="built_in">closesocket</span>(serverSocket);</span><br><span class="line">        <span class="built_in">WSACleanup</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Client connected\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Communication with the client</span></span><br><span class="line">    <span class="comment">// ... (send/receive data)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Cleanup</span></span><br><span class="line">    <span class="built_in">closesocket</span>(clientSocket);</span><br><span class="line">    <span class="built_in">closesocket</span>(serverSocket);</span><br><span class="line">    <span class="built_in">WSACleanup</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="TCP-客户端示例："><a href="#TCP-客户端示例：" class="headerlink" title="TCP 客户端示例："></a>TCP 客户端示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;winsock2.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> comment(lib, <span class="string">&quot;ws2_32.lib&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    WSADATA wsaData;</span><br><span class="line">    SOCKET clientSocket;</span><br><span class="line">    sockaddr_in serverAddr;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize Winsock</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">WSAStartup</span>(<span class="built_in">MAKEWORD</span>(<span class="number">2</span>, <span class="number">2</span>), &amp;wsaData) != <span class="number">0</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;WSAStartup failed\n&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create a TCP socket</span></span><br><span class="line">    clientSocket = <span class="built_in">socket</span>(AF_INET, SOCK_STREAM, IPPROTO_TCP);</span><br><span class="line">    <span class="keyword">if</span> (clientSocket == INVALID_SOCKET) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error creating socket: &quot;</span> &lt;&lt; <span class="built_in">WSAGetLastError</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        <span class="built_in">WSACleanup</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Connect to the server</span></span><br><span class="line">    serverAddr.sin_family = AF_INET;</span><br><span class="line">    serverAddr.sin_addr.s_addr = <span class="built_in">inet_addr</span>(<span class="string">&quot;127.0.0.1&quot;</span>); <span class="comment">// Server IP address</span></span><br><span class="line">    serverAddr.sin_port = <span class="built_in">htons</span>(<span class="number">8080</span>); <span class="comment">// Server port</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">connect</span>(clientSocket, (sockaddr*)&amp;serverAddr, <span class="built_in">sizeof</span>(serverAddr)) == SOCKET_ERROR) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Connection failed: &quot;</span> &lt;&lt; <span class="built_in">WSAGetLastError</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        <span class="built_in">closesocket</span>(clientSocket);</span><br><span class="line">        <span class="built_in">WSACleanup</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Connected to server\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Communication with the server</span></span><br><span class="line">    <span class="comment">// ... (send/receive data)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Cleanup</span></span><br><span class="line">    <span class="built_in">closesocket</span>(clientSocket);</span><br><span class="line">    <span class="built_in">WSACleanup</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个示例展示了一个简单的 TCP 客户端和服务器。你可以在其中的通信部分添加发送和接收数据的代码，以完成更复杂的通信逻辑。需要注意的是，在实际应用中，需要充分处理错误和异常情况，并且实现完整的数据收发机制。</p>
+<h2 id="VSCode在windows下链接win32库"><a href="#VSCode在windows下链接win32库" class="headerlink" title="VSCode在windows下链接win32库"></a>VSCode在windows下链接win32库</h2><p>在 Visual Studio Code 中连接（link）Win32 库，你需要进行以下步骤：</p>
+<h3 id="1-创建-C-C-项目或文件"><a href="#1-创建-C-C-项目或文件" class="headerlink" title="1. 创建 C&#x2F;C++ 项目或文件"></a>1. 创建 C&#x2F;C++ 项目或文件</h3><ul>
+<li>在 Visual Studio Code 中创建或打开一个 C&#x2F;C++ 项目或文件夹。</li>
+</ul>
+<h3 id="2-设置编译器和构建系统"><a href="#2-设置编译器和构建系统" class="headerlink" title="2. 设置编译器和构建系统"></a>2. 设置编译器和构建系统</h3><ul>
+<li>确保你的开发环境已配置好 C&#x2F;C++ 的编译器和构建系统，比如 MinGW、MSVC 或者其他兼容的编译器。你需要安装相应的工具链和构建工具。</li>
+</ul>
+<h3 id="3-编写代码并包含-Win32-头文件"><a href="#3-编写代码并包含-Win32-头文件" class="headerlink" title="3. 编写代码并包含 Win32 头文件"></a>3. 编写代码并包含 Win32 头文件</h3><ul>
+<li>在你的 C&#x2F;C++ 代码中，引入你需要的 Win32 头文件。例如，如果你想使用 Windows 套接字 API，可以包含以下头文件：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;winsock2.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ws2tcpip.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-链接-Win32-库"><a href="#4-链接-Win32-库" class="headerlink" title="4. 链接 Win32 库"></a>4. 链接 Win32 库</h3><ul>
+<li>打开项目的构建设置或者配置文件（例如 CMakeLists.txt 或 tasks.json）。</li>
+<li>确保在构建配置中指定需要链接的 Win32 库文件。对于 Windows 套接字 API（例如 <code>Ws2_32.lib</code>），你需要在配置文件中指定链接的库文件。</li>
+</ul>
+<p>如果你使用 CMake 来构建项目，可以在 CMakeLists.txt 文件中使用 <code>target_link_libraries</code> 来链接库文件。比如：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_link_libraries</span>(your_project_name Ws2_32.lib)</span><br></pre></td></tr></table></figure>
+
+<p>如果你使用 Visual Studio Code 的 tasks.json 来构建项目，可以使用相应的编译命令并在其中指定需要链接的库文件。</p>
+<h3 id="5-编译和构建项目"><a href="#5-编译和构建项目" class="headerlink" title="5. 编译和构建项目"></a>5. 编译和构建项目</h3><ul>
+<li>在 Visual Studio Code 中使用你所选定的构建系统来编译和构建项目。可以通过终端或者使用内置的构建工具来完成。</li>
+</ul>
+<h3 id="6-运行项目"><a href="#6-运行项目" class="headerlink" title="6. 运行项目"></a>6. 运行项目</h3><ul>
+<li>编译成功后，运行你的项目以验证 Win32 库是否正确链接，并且项目能够按预期运行。</li>
+</ul>
+<p>这些步骤适用于在 Visual Studio Code 中连接 Win32 库。确保你的代码中包含正确的头文件，并且在项目的构建设置中指定了需要链接的库文件，这样才能成功链接并使用 Win32 API。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"># Windows</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_6_network_%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF/2024-05-22-C_6_1_HTTP%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="prev" title="C_6_1_HTTP服务器">
+      <i class="fa fa-chevron-left"></i> C_6_1_HTTP服务器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Windows/2024-09-09-windows_05_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="next" title="Windows下C++编程常用函数">
+      Windows下C++编程常用函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows%E7%B3%BB%E7%BB%9F%E4%B8%8Bsocket%E7%BC%96%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">windows系统下socket编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Winsock%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">4.</span> <span class="nav-text">Winsock是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Winsock%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">Winsock详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WSAPoll-%E6%98%AF%E4%BB%80%E4%B9%88-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">6.</span> <span class="nav-text">WSAPoll() 是什么 详细解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E5%9C%A8windows%E8%BF%9B%E8%A1%8Csocket%E7%BC%96%E7%A8%8B"><span class="nav-number">7.</span> <span class="nav-text">C++在windows进行socket编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">7.1.</span> <span class="nav-text">TCP 服务器示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">TCP 客户端示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VSCode%E5%9C%A8windows%E4%B8%8B%E9%93%BE%E6%8E%A5win32%E5%BA%93"><span class="nav-number">8.</span> <span class="nav-text">VSCode在windows下链接win32库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA-C-C-%E9%A1%B9%E7%9B%AE%E6%88%96%E6%96%87%E4%BB%B6"><span class="nav-number">8.1.</span> <span class="nav-text">1. 创建 C&#x2F;C++ 项目或文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%AE%BE%E7%BD%AE%E7%BC%96%E8%AF%91%E5%99%A8%E5%92%8C%E6%9E%84%E5%BB%BA%E7%B3%BB%E7%BB%9F"><span class="nav-number">8.2.</span> <span class="nav-text">2. 设置编译器和构建系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%BC%96%E5%86%99%E4%BB%A3%E7%A0%81%E5%B9%B6%E5%8C%85%E5%90%AB-Win32-%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">8.3.</span> <span class="nav-text">3. 编写代码并包含 Win32 头文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E9%93%BE%E6%8E%A5-Win32-%E5%BA%93"><span class="nav-number">8.4.</span> <span class="nav-text">4. 链接 Win32 库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BC%96%E8%AF%91%E5%92%8C%E6%9E%84%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="nav-number">8.5.</span> <span class="nav-text">5. 编译和构建项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E8%BF%90%E8%A1%8C%E9%A1%B9%E7%9B%AE"><span class="nav-number">8.6.</span> <span class="nav-text">6. 运行项目</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 strace命令相关笔记  linux strace命令是什么strace 是 Linux 下的一个用于诊断和调试程序的命令，它可以跟踪系统调用和接收的信号。strace 工具允许你查看一个进程执行期间所有的系统调用和它们的返回值，这对理解程序的行为和调试问题非常有帮助。 以下是 strace 的一些常见用法：  跟踪一个程序的系统调用： 1strace -o output.txt prog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_96_strace">
+<meta property="og:url" content="https://junyiha.github.io/2024/07/17/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-07-17-linux_2_97_strace/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 strace命令相关笔记  linux strace命令是什么strace 是 Linux 下的一个用于诊断和调试程序的命令，它可以跟踪系统调用和接收的信号。strace 工具允许你查看一个进程执行期间所有的系统调用和它们的返回值，这对理解程序的行为和调试问题非常有帮助。 以下是 strace 的一些常见用法：  跟踪一个程序的系统调用： 1strace -o output.txt prog">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-07-17T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.381Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/07/17/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-07-17-linux_2_97_strace/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_96_strace | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/07/17/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-07-17-linux_2_97_strace/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_96_strace
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-07-17 09:00:00" itemprop="dateCreated datePublished" datetime="2024-07-17T09:00:00+08:00">2024-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>strace命令相关笔记</li>
+</ul>
+<h2 id="linux-strace命令是什么"><a href="#linux-strace命令是什么" class="headerlink" title="linux strace命令是什么"></a>linux strace命令是什么</h2><p><code>strace</code> 是 Linux 下的一个用于诊断和调试程序的命令，它可以跟踪系统调用和接收的信号。<code>strace</code> 工具允许你查看一个进程执行期间所有的系统调用和它们的返回值，这对理解程序的行为和调试问题非常有帮助。</p>
+<p>以下是 <code>strace</code> 的一些常见用法：</p>
+<ol>
+<li><p><strong>跟踪一个程序的系统调用</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o output.txt program_name</span><br></pre></td></tr></table></figure>
+<p>这会启动 <code>program_name</code> 并将所有的系统调用记录到 <code>output.txt</code> 文件中。</p>
+</li>
+<li><p><strong>跟踪一个已经在运行的进程</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -p pid</span><br></pre></td></tr></table></figure>
+<p>其中 <code>pid</code> 是进程的 ID。这会附加到已经运行的进程并开始跟踪它的系统调用。</p>
+</li>
+<li><p><strong>只跟踪特定类型的系统调用</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=open,<span class="built_in">read</span>,write program_name</span><br></pre></td></tr></table></figure>
+<p>这将只跟踪 <code>open</code>、<code>read</code> 和 <code>write</code> 系统调用。</p>
+</li>
+<li><p><strong>打印每个系统调用所花费的时间</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -T program_name</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>跟踪系统调用和信号</strong>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -c program_name</span><br></pre></td></tr></table></figure>
+<p>这会总结系统调用的次数、出错次数和执行时间。</p>
+</li>
+</ol>
+<p>示例：使用 <code>strace</code> 跟踪 <code>ls</code> 命令的系统调用：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<p>这个命令会在终端中打印出 <code>ls</code> 命令执行期间所有的系统调用和它们的返回值。</p>
+<p><code>strace</code> 是一个非常强大的工具，特别是在调试程序、分析系统性能和排查系统问题时非常有用。</p>
+<h2 id="linux-strace命令-详解"><a href="#linux-strace命令-详解" class="headerlink" title="linux strace命令 详解"></a>linux strace命令 详解</h2><p><code>strace</code> 是一个强大的 Linux 工具，用于诊断和调试程序。它能够跟踪系统调用（syscalls）和信号（signals），从而帮助用户了解程序的行为、查找问题根源、调试错误等。以下是 <code>strace</code> 的详细使用说明和示例。</p>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><h4 id="跟踪一个程序的系统调用"><a href="#跟踪一个程序的系统调用" class="headerlink" title="跟踪一个程序的系统调用"></a>跟踪一个程序的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace program_name</span><br></pre></td></tr></table></figure>
+
+<p>这会启动 <code>program_name</code> 并在终端上显示其所有系统调用。</p>
+<h4 id="将输出重定向到文件"><a href="#将输出重定向到文件" class="headerlink" title="将输出重定向到文件"></a>将输出重定向到文件</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -o output.txt program_name</span><br></pre></td></tr></table></figure>
+
+<p>将系统调用输出记录到 <code>output.txt</code> 文件中。</p>
+<h4 id="跟踪已经运行的进程"><a href="#跟踪已经运行的进程" class="headerlink" title="跟踪已经运行的进程"></a>跟踪已经运行的进程</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -p pid</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>pid</code> 是进程的 ID。这会附加到已经运行的进程并开始跟踪它的系统调用。</p>
+<h3 id="过滤系统调用"><a href="#过滤系统调用" class="headerlink" title="过滤系统调用"></a>过滤系统调用</h3><h4 id="只跟踪特定类型的系统调用"><a href="#只跟踪特定类型的系统调用" class="headerlink" title="只跟踪特定类型的系统调用"></a>只跟踪特定类型的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=open,<span class="built_in">read</span>,write program_name</span><br></pre></td></tr></table></figure>
+
+<p>这将只跟踪 <code>open</code>、<code>read</code> 和 <code>write</code> 系统调用。</p>
+<h4 id="跟踪所有文件相关的系统调用"><a href="#跟踪所有文件相关的系统调用" class="headerlink" title="跟踪所有文件相关的系统调用"></a>跟踪所有文件相关的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=file program_name</span><br></pre></td></tr></table></figure>
+
+<p>这会跟踪所有与文件操作相关的系统调用，例如 <code>open</code>、<code>read</code>、<code>write</code> 等。</p>
+<h4 id="跟踪所有网络相关的系统调用"><a href="#跟踪所有网络相关的系统调用" class="headerlink" title="跟踪所有网络相关的系统调用"></a>跟踪所有网络相关的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=network program_name</span><br></pre></td></tr></table></figure>
+
+<p>这会跟踪所有与网络操作相关的系统调用，例如 <code>socket</code>、<code>connect</code>、<code>send</code>、<code>recv</code> 等。</p>
+<h3 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h3><h4 id="打印每个系统调用所花费的时间"><a href="#打印每个系统调用所花费的时间" class="headerlink" title="打印每个系统调用所花费的时间"></a>打印每个系统调用所花费的时间</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -T program_name</span><br></pre></td></tr></table></figure>
+
+<p>在输出中包含每个系统调用所花费的时间。</p>
+<h4 id="打印时间戳"><a href="#打印时间戳" class="headerlink" title="打印时间戳"></a>打印时间戳</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -t program_name</span><br></pre></td></tr></table></figure>
+
+<p>在每个系统调用前面加上时间戳。</p>
+<h4 id="显示相对时间戳"><a href="#显示相对时间戳" class="headerlink" title="显示相对时间戳"></a>显示相对时间戳</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -r program_name</span><br></pre></td></tr></table></figure>
+
+<p>在每个系统调用前面显示相对于前一个系统调用的时间间隔。</p>
+<h3 id="统计信息"><a href="#统计信息" class="headerlink" title="统计信息"></a>统计信息</h3><h4 id="汇总系统调用的次数、出错次数和执行时间"><a href="#汇总系统调用的次数、出错次数和执行时间" class="headerlink" title="汇总系统调用的次数、出错次数和执行时间"></a>汇总系统调用的次数、出错次数和执行时间</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -c program_name</span><br></pre></td></tr></table></figure>
+
+<p>程序执行完毕后，输出汇总统计信息。</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><h4 id="跟踪-ls-命令的系统调用"><a href="#跟踪-ls-命令的系统调用" class="headerlink" title="跟踪 ls 命令的系统调用"></a>跟踪 <code>ls</code> 命令的系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">execve(&quot;/bin/ls&quot;, [&quot;ls&quot;], 0x7ffccf5a8c38 /* 20 vars */) = 0</span><br><span class="line">brk(NULL)                               = 0x56325f1ff000</span><br><span class="line">access(&quot;/etc/ld.so.nohwcap&quot;, F_OK)      = -1 ENOENT (No such file or directory)</span><br><span class="line">mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fbb6141f000</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h4 id="跟踪一个已经运行的进程"><a href="#跟踪一个已经运行的进程" class="headerlink" title="跟踪一个已经运行的进程"></a>跟踪一个已经运行的进程</h4><p>假设进程 ID 为 1234：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -p 1234</span><br></pre></td></tr></table></figure>
+
+<h4 id="只跟踪-open-和-read-系统调用"><a href="#只跟踪-open-和-read-系统调用" class="headerlink" title="只跟踪 open 和 read 系统调用"></a>只跟踪 <code>open</code> 和 <code>read</code> 系统调用</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace -e trace=open,<span class="built_in">read</span> <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="常见系统调用解释"><a href="#常见系统调用解释" class="headerlink" title="常见系统调用解释"></a>常见系统调用解释</h3><ul>
+<li><code>execve</code>: 执行程序。</li>
+<li><code>open</code>: 打开文件。</li>
+<li><code>read</code>: 读取文件。</li>
+<li><code>write</code>: 写入文件。</li>
+<li><code>close</code>: 关闭文件描述符。</li>
+<li><code>brk</code>: 调整数据段末尾位置，用于内存分配。</li>
+<li><code>mmap</code>: 内存映射，用于文件或设备的内存访问。</li>
+</ul>
+<p><code>strace</code> 是一个非常强大的工具，特别是在调试程序、分析系统性能和排查系统问题时非常有用。它的输出可以帮助开发者理解程序的行为，找出问题的根源并进行优化。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/07/16/notebook/Tools/2024-07-16-Zabbix/" rel="prev" title="Zabbix">
+      <i class="fa fa-chevron-left"></i> Zabbix
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/07/18/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2024-07-18_VideoWriter/" rel="next" title="VideoWrite">
+      VideoWrite <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-strace%E5%91%BD%E4%BB%A4%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">linux strace命令是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-strace%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">linux strace命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">3.1.</span> <span class="nav-text">基本用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.1.1.</span> <span class="nav-text">跟踪一个程序的系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86%E8%BE%93%E5%87%BA%E9%87%8D%E5%AE%9A%E5%90%91%E5%88%B0%E6%96%87%E4%BB%B6"><span class="nav-number">3.1.2.</span> <span class="nav-text">将输出重定向到文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="nav-number">3.1.3.</span> <span class="nav-text">跟踪已经运行的进程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.2.</span> <span class="nav-text">过滤系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AA%E8%B7%9F%E8%B8%AA%E7%89%B9%E5%AE%9A%E7%B1%BB%E5%9E%8B%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.2.1.</span> <span class="nav-text">只跟踪特定类型的系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E6%89%80%E6%9C%89%E6%96%87%E4%BB%B6%E7%9B%B8%E5%85%B3%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.2.2.</span> <span class="nav-text">跟踪所有文件相关的系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E6%89%80%E6%9C%89%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.2.3.</span> <span class="nav-text">跟踪所有网络相关的系统调用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.3.</span> <span class="nav-text">输出格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E6%AF%8F%E4%B8%AA%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%89%80%E8%8A%B1%E8%B4%B9%E7%9A%84%E6%97%B6%E9%97%B4"><span class="nav-number">3.3.1.</span> <span class="nav-text">打印每个系统调用所花费的时间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E6%97%B6%E9%97%B4%E6%88%B3"><span class="nav-number">3.3.2.</span> <span class="nav-text">打印时间戳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%98%BE%E7%A4%BA%E7%9B%B8%E5%AF%B9%E6%97%B6%E9%97%B4%E6%88%B3"><span class="nav-number">3.3.3.</span> <span class="nav-text">显示相对时间戳</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF"><span class="nav-number">3.4.</span> <span class="nav-text">统计信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B1%87%E6%80%BB%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E6%AC%A1%E6%95%B0%E3%80%81%E5%87%BA%E9%94%99%E6%AC%A1%E6%95%B0%E5%92%8C%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4"><span class="nav-number">3.4.1.</span> <span class="nav-text">汇总系统调用的次数、出错次数和执行时间</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.5.</span> <span class="nav-text">示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA-ls-%E5%91%BD%E4%BB%A4%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.5.1.</span> <span class="nav-text">跟踪 ls 命令的系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E4%B8%80%E4%B8%AA%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="nav-number">3.5.2.</span> <span class="nav-text">跟踪一个已经运行的进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AA%E8%B7%9F%E8%B8%AA-open-%E5%92%8C-read-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.5.3.</span> <span class="nav-text">只跟踪 open 和 read 系统调用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E8%A7%A3%E9%87%8A"><span class="nav-number">3.6.</span> <span class="nav-text">常见系统调用解释</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

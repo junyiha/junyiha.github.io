@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 windows环境下C++编程遇到的函数  windows C++ WSAStartup()函数 详解WSAStartup() 是 Windows Sockets API（也称为 Winsock）中用于初始化 Windows Sockets 库的函数。该函数在使用任何其他 Windows Sockets 函数之前必须调用，用于设置程序对网络通信的支持。 函数原型1234int WSAStar">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_03_3_windows下常见函数">
+<meta property="og:url" content="https://junyiha.github.io/2024/09/04/notebook/C++/C++_03_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-09-04-C++_03_3_windows%E4%B8%8B%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 windows环境下C++编程遇到的函数  windows C++ WSAStartup()函数 详解WSAStartup() 是 Windows Sockets API（也称为 Winsock）中用于初始化 Windows Sockets 库的函数。该函数在使用任何其他 Windows Sockets 函数之前必须调用，用于设置程序对网络通信的支持。 函数原型1234int WSAStar">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-04T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.160Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppFunction">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/09/04/notebook/C++/C++_03_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-09-04-C++_03_3_windows%E4%B8%8B%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_03_3_windows下常见函数 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/09/04/notebook/C++/C++_03_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-09-04-C++_03_3_windows%E4%B8%8B%E5%B8%B8%E8%A7%81%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_03_3_windows下常见函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-09-04 09:00:00" itemprop="dateCreated datePublished" datetime="2024-09-04T09:00:00+08:00">2024-09-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>windows环境下C++编程遇到的函数</li>
+</ul>
+<h2 id="windows-C-WSAStartup-函数-详解"><a href="#windows-C-WSAStartup-函数-详解" class="headerlink" title="windows C++ WSAStartup()函数 详解"></a>windows C++ WSAStartup()函数 详解</h2><p><code>WSAStartup()</code> 是 Windows Sockets API（也称为 Winsock）中用于初始化 Windows Sockets 库的函数。该函数在使用任何其他 Windows Sockets 函数之前必须调用，用于设置程序对网络通信的支持。</p>
+<h2 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">WSAStartup</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    WORD wVersionRequested,  <span class="comment">// 请求的 Winsock 版本</span></span></span></span><br><span class="line"><span class="params"><span class="function">    LPWSADATA lpWSAData      <span class="comment">// 指向 WSADATA 结构的指针，用于接收系统信息</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>参数</strong>：</p>
+<ul>
+<li><code>wVersionRequested</code>：指定应用程序请求的 Winsock 版本。该参数由高字节和低字节组成，例如，<code>MAKEWORD(2, 2)</code> 表示请求 Winsock 2.2 版本。</li>
+<li><code>lpWSAData</code>：指向一个 <code>WSADATA</code> 结构的指针，用于接收有关 Windows Sockets 实现的详细信息。</li>
+</ul>
+</li>
+<li><p><strong>返回值</strong>：</p>
+<ul>
+<li>如果函数调用成功，返回值为零 (<code>0</code>)。</li>
+<li>如果函数调用失败，返回一个非零的错误代码。常见的错误代码包括 <code>WSASYSNOTREADY</code>（底层网络子系统不可用）和 <code>WSAVERNOTSUPPORTED</code>（请求的 Winsock 版本不受支持）。</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><ol>
+<li><p><strong>版本管理</strong>：</p>
+<ul>
+<li>在调用 <code>WSAStartup()</code> 时，必须指定应用程序希望使用的 Winsock 版本。最常用的是 <code>2.2</code> 版本 (<code>MAKEWORD(2, 2)</code>)，因为它支持大多数现代网络应用程序的需求。</li>
+<li>如果系统支持请求的版本，<code>WSAStartup()</code> 会返回该版本的详细信息。如果系统不支持请求的版本，则返回较低的版本信息，或者函数调用失败。</li>
+</ul>
+</li>
+<li><p><strong>WSADATA 结构</strong>：</p>
+<ul>
+<li><code>lpWSAData</code> 参数指向的 <code>WSADATA</code> 结构用于接收 Winsock 的相关信息。该结构包含了 Winsock 版本、最大套接字数等重要信息。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">WSAData</span> &#123;</span><br><span class="line">    WORD           wVersion;       <span class="comment">// Winsock 版本</span></span><br><span class="line">    WORD           wHighVersion;   <span class="comment">// 最高支持的 Winsock 版本</span></span><br><span class="line">    <span class="type">char</span>           szDescription[WSADESCRIPTION_LEN + <span class="number">1</span>];  <span class="comment">// 实现描述</span></span><br><span class="line">    <span class="type">char</span>           szSystemStatus[WSASYSSTATUS_LEN + <span class="number">1</span>];   <span class="comment">// 系统状态</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> iMaxSockets;    <span class="comment">// 支持的最大套接字数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> iMaxUdpDg;      <span class="comment">// 最大 UDP 数据报长度</span></span><br><span class="line">    <span class="type">char</span> FAR*      lpVendorInfo;   <span class="comment">// 供应商特定信息</span></span><br><span class="line">&#125; WSADATA, *LPWSADATA;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>清理</strong>：</p>
+<ul>
+<li>当应用程序不再需要使用 Windows Sockets API 时，应该调用 <code>WSACleanup()</code> 函数来卸载 Winsock 库并释放相关资源。</li>
+</ul>
+</li>
+<li><p><strong>错误处理</strong>：</p>
+<ul>
+<li>如果 <code>WSAStartup()</code> 返回非零值，表明初始化失败，应用程序应检查返回值并通过 <code>WSAGetLastError()</code> 函数获取详细的错误信息。</li>
+</ul>
+</li>
+</ol>
+<h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><p>以下是一个简单的示例，展示如何正确使用 <code>WSAStartup()</code> 函数来初始化 Winsock 库：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;winsock2.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    WSADATA wsaData;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化 Winsock 2.2 版本</span></span><br><span class="line">    <span class="type">int</span> result = <span class="built_in">WSAStartup</span>(<span class="built_in">MAKEWORD</span>(<span class="number">2</span>, <span class="number">2</span>), &amp;wsaData);</span><br><span class="line">    <span class="keyword">if</span> (result != <span class="number">0</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;WSAStartup failed with error: &quot;</span> &lt;&lt; result &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Winsock initialized successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Winsock version: &quot;</span> &lt;&lt; <span class="built_in">LOBYTE</span>(wsaData.wVersion) &lt;&lt; <span class="string">&quot;.&quot;</span> &lt;&lt; <span class="built_in">HIBYTE</span>(wsaData.wVersion) &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Description: &quot;</span> &lt;&lt; wsaData.szDescription &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在此处可以编写网络通信相关代码...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清理 Winsock</span></span><br><span class="line">    <span class="built_in">WSACleanup</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li><code>WSAStartup()</code> 函数用于初始化 Winsock 库，请求使用 Winsock 2.2 版本。</li>
+<li>如果初始化成功，程序会输出 Winsock 的版本信息和描述。</li>
+<li>当程序不再需要使用网络功能时，调用 <code>WSACleanup()</code> 函数来清理 Winsock 资源。</li>
+</ul>
+<p><code>WSAStartup()</code> 是任何使用 Windows Sockets API 进行网络编程的应用程序中的必备步骤。初始化成功后，您就可以使用其他 Winsock 函数来执行各种网络操作，例如创建套接字、连接到服务器、发送和接收数据等。</p>
+<h2 id="windows-C-GetCurrentThreadId-函数-详解"><a href="#windows-C-GetCurrentThreadId-函数-详解" class="headerlink" title="windows C++ GetCurrentThreadId()函数 详解"></a>windows C++ GetCurrentThreadId()函数 详解</h2><p><code>GetCurrentThreadId()</code> 是 Windows API 中的一个函数，用于获取当前线程的唯一标识符（线程 ID）。在多线程编程中，每个线程都有一个唯一的 ID，可以通过该函数获取，便于在线程间进行标识和管理。</p>
+<h2 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型"></a>函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DWORD <span class="title">GetCurrentThreadId</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>参数</strong>：</p>
+<ul>
+<li><code>void</code>：该函数不接受任何参数。</li>
+</ul>
+</li>
+<li><p><strong>返回值</strong>：</p>
+<ul>
+<li>返回当前调用线程的 <code>DWORD</code> 类型的线程 ID。线程 ID 是一个系统分配的数字，用于唯一标识当前线程。</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用说明-1"><a href="#使用说明-1" class="headerlink" title="使用说明"></a>使用说明</h2><ol>
+<li><p><strong>线程 ID 的唯一性</strong>：</p>
+<ul>
+<li>每个线程在其生命周期内都有一个唯一的线程 ID。当线程终止时，该 ID 可能会被系统回收并分配给新的线程。</li>
+</ul>
+</li>
+<li><p><strong>典型用法</strong>：</p>
+<ul>
+<li><code>GetCurrentThreadId()</code> 常用于调试、日志记录、线程间通信或同步等场景中。例如，可以使用线程 ID 来标记日志消息，便于区分不同线程的输出。</li>
+<li>线程 ID 也可以用于将线程与某些特定的资源（如窗口、数据结构）关联起来。</li>
+</ul>
+</li>
+<li><p><strong>与其他 API 的关系</strong>：</p>
+<ul>
+<li>线程 ID 与线程句柄不同，线程句柄通过 <code>CreateThread</code> 或 <code>OpenThread</code> 等函数获取，而线程 ID 则是一个直接标识线程的数字。</li>
+<li>通过 <code>OpenThread()</code> 函数可以将线程 ID 转换为线程句柄，便于进行更复杂的线程操作。</li>
+</ul>
+</li>
+<li><p><strong>注意事项</strong>：</p>
+<ul>
+<li>线程 ID 是系统分配的，不应直接作为关键数据或资源的唯一标识，因为它们在特定条件下可能被重复使用。</li>
+</ul>
+</li>
+</ol>
+<h2 id="使用示例-1"><a href="#使用示例-1" class="headerlink" title="使用示例"></a>使用示例</h2><p>以下是一个简单的示例，演示如何使用 <code>GetCurrentThreadId()</code> 获取并打印当前线程的 ID。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程函数</span></span><br><span class="line"><span class="function">DWORD WINAPI <span class="title">ThreadProc</span><span class="params">(LPVOID lpParam)</span> </span>&#123;</span><br><span class="line">    DWORD threadId = <span class="built_in">GetCurrentThreadId</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread ID: &quot;</span> &lt;&lt; threadId &lt;&lt; <span class="string">&quot; is running.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="built_in">Sleep</span>(<span class="number">2000</span>); <span class="comment">// 模拟工作</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread ID: &quot;</span> &lt;&lt; threadId &lt;&lt; <span class="string">&quot; is exiting.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建两个线程</span></span><br><span class="line">    HANDLE hThread1 = <span class="built_in">CreateThread</span>(<span class="literal">NULL</span>, <span class="number">0</span>, ThreadProc, <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    HANDLE hThread2 = <span class="built_in">CreateThread</span>(<span class="literal">NULL</span>, <span class="number">0</span>, ThreadProc, <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待线程完成</span></span><br><span class="line">    <span class="built_in">WaitForSingleObject</span>(hThread1, INFINITE);</span><br><span class="line">    <span class="built_in">WaitForSingleObject</span>(hThread2, INFINITE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭线程句柄</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hThread1);</span><br><span class="line">    <span class="built_in">CloseHandle</span>(hThread2);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li><code>ThreadProc</code> 是线程的执行函数，每个线程在启动后都会执行该函数。</li>
+<li>每个线程都会调用 <code>GetCurrentThreadId()</code> 来获取并打印其自身的线程 ID。</li>
+<li>主线程创建了两个子线程，并等待它们完成执行。</li>
+<li>通过线程 ID，您可以在日志或调试信息中区分不同线程的行为。</li>
+</ul>
+<p><code>GetCurrentThreadId()</code> 是多线程编程中的一个基本工具，能够帮助开发者识别和管理不同的线程。</p>
+<h2 id="windows-C-WaitForSingleObject-函数-详解"><a href="#windows-C-WaitForSingleObject-函数-详解" class="headerlink" title="windows C++ WaitForSingleObject()函数 详解"></a>windows C++ WaitForSingleObject()函数 详解</h2><p><code>WaitForSingleObject()</code> 是 Windows API 中用于同步操作的函数。它用于使调用线程等待一个内核对象（如线程、进程、信号量、事件等）变为有信号状态，或者等待超时。该函数经常用于多线程编程中，确保线程之间的协调与同步。</p>
+<h2 id="函数原型-2"><a href="#函数原型-2" class="headerlink" title="函数原型"></a>函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DWORD <span class="title">WaitForSingleObject</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    HANDLE hHandle,   <span class="comment">// 内核对象的句柄</span></span></span></span><br><span class="line"><span class="params"><span class="function">    DWORD  dwMilliseconds <span class="comment">// 等待的时间（毫秒）</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>参数</strong>：</p>
+<ul>
+<li><code>hHandle</code>：要等待的内核对象的句柄。这个句柄可以是由 <code>CreateEvent</code>、<code>CreateMutex</code>、<code>CreateSemaphore</code>、<code>CreateThread</code> 等函数返回的句柄。</li>
+<li><code>dwMilliseconds</code>：指定等待的时间，单位为毫秒。可以是以下值之一：<ul>
+<li><code>INFINITE</code>：表示无限等待，直到对象变为有信号状态。</li>
+<li>非零值：指定最大等待时间（毫秒）。如果在指定时间内对象没有变为有信号状态，函数会返回 <code>WAIT_TIMEOUT</code>。</li>
+<li><code>0</code>：表示立即返回，不等待。如果对象已经是有信号状态，函数立即返回；否则，函数立即返回 <code>WAIT_TIMEOUT</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>返回值</strong>：</p>
+<ul>
+<li><code>WAIT_OBJECT_0</code> (0x00000000L)：指定的对象变为有信号状态。</li>
+<li><code>WAIT_TIMEOUT</code> (0x00000102L)：等待超时，指定的对象未变为有信号状态。</li>
+<li><code>WAIT_ABANDONED</code> (0x00000080L)：等待的对象是一个互斥体对象，且上一个拥有该互斥体的线程在没有释放互斥体的情况下终止。表示互斥体已被“放弃”。</li>
+<li><code>WAIT_FAILED</code>：函数调用失败。可以通过 <code>GetLastError()</code> 获取错误代码。</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用说明-2"><a href="#使用说明-2" class="headerlink" title="使用说明"></a>使用说明</h2><ol>
+<li><p><strong>同步操作</strong>：</p>
+<ul>
+<li><code>WaitForSingleObject()</code> 主要用于线程同步，确保某个线程在执行某些操作之前等待另一个线程或进程完成其工作。</li>
+</ul>
+</li>
+<li><p><strong>常见应用场景</strong>：</p>
+<ul>
+<li>等待线程或进程终止：通过等待线程或进程的句柄，确保主线程在子线程或子进程完成后再继续执行。</li>
+<li>事件同步：通过等待事件对象，控制多个线程的执行顺序。</li>
+<li>互斥体和信号量：通过等待这些对象，控制对共享资源的访问。</li>
+</ul>
+</li>
+<li><p><strong>注意事项</strong>：</p>
+<ul>
+<li>如果使用 <code>INFINITE</code> 作为等待时间，线程将无限期地等待，直到对象变为有信号状态，这可能导致线程挂起，无法继续执行。</li>
+<li>对于互斥体，使用 <code>WAIT_ABANDONED</code> 返回值表示该互斥体对象被上一个线程错误地放弃，此时程序应小心处理共享资源的状态。</li>
+</ul>
+</li>
+</ol>
+<h2 id="使用示例-2"><a href="#使用示例-2" class="headerlink" title="使用示例"></a>使用示例</h2><p>下面是一个使用 <code>WaitForSingleObject()</code> 的简单示例，演示如何等待一个线程完成执行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程函数</span></span><br><span class="line"><span class="function">DWORD WINAPI <span class="title">ThreadProc</span><span class="params">(LPVOID lpParam)</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread is running...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="built_in">Sleep</span>(<span class="number">3000</span>); <span class="comment">// 模拟线程工作 3 秒钟</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Thread is exiting...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建线程</span></span><br><span class="line">    HANDLE hThread = <span class="built_in">CreateThread</span>(</span><br><span class="line">        <span class="literal">NULL</span>,        <span class="comment">// 默认安全属性</span></span><br><span class="line">        <span class="number">0</span>,           <span class="comment">// 默认堆栈大小</span></span><br><span class="line">        ThreadProc,  <span class="comment">// 线程函数</span></span><br><span class="line">        <span class="literal">NULL</span>,        <span class="comment">// 线程函数的参数</span></span><br><span class="line">        <span class="number">0</span>,           <span class="comment">// 默认创建标志</span></span><br><span class="line">        <span class="literal">NULL</span>         <span class="comment">// 不接收线程 ID</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hThread == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to create thread. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待线程完成</span></span><br><span class="line">    DWORD dwResult = <span class="built_in">WaitForSingleObject</span>(hThread, INFINITE);</span><br><span class="line">    <span class="keyword">switch</span> (dwResult) &#123;</span><br><span class="line">        <span class="keyword">case</span> WAIT_OBJECT_0:</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;Thread has terminated.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> WAIT_TIMEOUT:</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">&quot;Wait timed out.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> WAIT_FAILED:</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">&quot;Wait failed. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭线程句柄</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hThread);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li><code>CreateThread()</code> 函数创建了一个新线程，执行 <code>ThreadProc</code> 函数。</li>
+<li>主线程使用 <code>WaitForSingleObject()</code> 来等待子线程完成执行。因为等待时间设置为 <code>INFINITE</code>，主线程会一直等待，直到子线程终止。</li>
+<li>通过 <code>dwResult</code> 检查 <code>WaitForSingleObject()</code> 的返回值，决定接下来的操作。</li>
+</ul>
+<p><code>WaitForSingleObject()</code> 是多线程编程中非常重要的一个工具，能有效管理线程间的执行顺序和资源访问控制。</p>
+<h2 id="windows-C-GetLastError-函数-详解"><a href="#windows-C-GetLastError-函数-详解" class="headerlink" title="windows C++ GetLastError()函数 详解"></a>windows C++ GetLastError()函数 详解</h2><p><code>GetLastError()</code> 是 Windows API 中用于获取调用失败的函数返回的错误代码的函数。许多 Windows API 函数在执行失败时，不会直接返回错误信息，而是通过设置一个内部的线程局部变量来记录错误代码。调用 <code>GetLastError()</code> 函数可以检索到这个错误代码，用于诊断和处理错误情况。</p>
+<h2 id="函数原型-3"><a href="#函数原型-3" class="headerlink" title="函数原型"></a>函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DWORD <span class="title">GetLastError</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：<ul>
+<li>返回一个 <code>DWORD</code> 类型的错误代码。这个错误代码是一个整数值，对应特定的错误类型。</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用说明-3"><a href="#使用说明-3" class="headerlink" title="使用说明"></a>使用说明</h2><ol>
+<li><p><strong>线程局部存储</strong>：</p>
+<ul>
+<li><code>GetLastError()</code> 返回的错误代码与调用线程是关联的，即每个线程都有自己的错误代码存储区。因此，如果多线程程序中某个线程调用 <code>GetLastError()</code>，它获取到的错误代码仅适用于该线程的上下文。</li>
+</ul>
+</li>
+<li><p><strong>使用场景</strong>：</p>
+<ul>
+<li>当调用 Windows API 函数时，如果函数返回了一个失败的状态（例如返回 <code>NULL</code> 或 <code>INVALID_HANDLE_VALUE</code>），通常应该紧接着调用 <code>GetLastError()</code> 来获取具体的错误代码。这有助于诊断失败的原因并采取相应措施。</li>
+</ul>
+</li>
+<li><p><strong>与 <code>FormatMessage()</code> 配合使用</strong>：</p>
+<ul>
+<li>错误代码本身是一个数字，通常难以直接理解。可以使用 <code>FormatMessage()</code> 函数将错误代码转换为可读的错误消息字符串。</li>
+</ul>
+</li>
+<li><p><strong>清除错误代码</strong>：</p>
+<ul>
+<li><code>GetLastError()</code> 只会返回最近一次失败的函数调用的错误代码。对于成功的函数调用，错误代码不会被清除。因此，在进行新的操作之前，如果想确保没有残留的错误代码，可以先调用 <code>SetLastError(0)</code> 清除错误状态。</li>
+</ul>
+</li>
+</ol>
+<h2 id="常见错误代码"><a href="#常见错误代码" class="headerlink" title="常见错误代码"></a>常见错误代码</h2><p>以下是一些常见的错误代码及其含义：</p>
+<ul>
+<li><code>ERROR_SUCCESS</code> (0)：操作成功。</li>
+<li><code>ERROR_FILE_NOT_FOUND</code> (2)：系统找不到指定的文件。</li>
+<li><code>ERROR_ACCESS_DENIED</code> (5)：拒绝访问。</li>
+<li><code>ERROR_INVALID_HANDLE</code> (6)：句柄无效。</li>
+<li><code>ERROR_NOT_ENOUGH_MEMORY</code> (8)：内存不足，无法完成此操作。</li>
+<li><code>ERROR_INVALID_PARAMETER</code> (87)：参数错误。</li>
+<li><code>ERROR_INSUFFICIENT_BUFFER</code> (122)：缓冲区大小不足。</li>
+</ul>
+<p>完整的错误代码列表可以在微软文档中找到。</p>
+<h2 id="使用示例-3"><a href="#使用示例-3" class="headerlink" title="使用示例"></a>使用示例</h2><p>以下是一个简单的示例，演示如何使用 <code>GetLastError()</code> 获取错误代码并显示相应的错误消息：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 尝试打开一个不存在的文件</span></span><br><span class="line">    HANDLE hFile = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">L&quot;nonexistent_file.txt&quot;</span>, <span class="comment">// 文件名</span></span><br><span class="line">        GENERIC_READ,            <span class="comment">// 访问模式</span></span><br><span class="line">        <span class="number">0</span>,                       <span class="comment">// 共享模式</span></span><br><span class="line">        <span class="literal">NULL</span>,                    <span class="comment">// 安全属性</span></span><br><span class="line">        OPEN_EXISTING,           <span class="comment">// 如何创建</span></span><br><span class="line">        FILE_ATTRIBUTE_NORMAL,   <span class="comment">// 文件属性</span></span><br><span class="line">        <span class="literal">NULL</span>                     <span class="comment">// 模板文件句柄</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        DWORD dwError = <span class="built_in">GetLastError</span>();  <span class="comment">// 获取错误代码</span></span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open file. Error code: &quot;</span> &lt;&lt; dwError &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用 FormatMessage 获取错误信息</span></span><br><span class="line">        LPVOID lpMsgBuf;</span><br><span class="line">        <span class="built_in">FormatMessage</span>(</span><br><span class="line">            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,</span><br><span class="line">            <span class="literal">NULL</span>,</span><br><span class="line">            dwError,</span><br><span class="line">            <span class="built_in">MAKELANGID</span>(LANG_NEUTRAL, SUBLANG_DEFAULT),</span><br><span class="line">            (LPWSTR)&amp;lpMsgBuf,</span><br><span class="line">            <span class="number">0</span>,</span><br><span class="line">            <span class="literal">NULL</span></span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        std::wcerr &lt;&lt; <span class="string">&quot;Error message: &quot;</span> &lt;&lt; (LPWSTR)lpMsgBuf &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 释放 FormatMessage 分配的缓冲区</span></span><br><span class="line">        <span class="built_in">LocalFree</span>(lpMsgBuf);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;File opened successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hFile);  <span class="comment">// 关闭文件句柄</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li>尝试打开一个不存在的文件 <code>nonexistent_file.txt</code>。</li>
+<li><code>CreateFile()</code> 调用失败并返回 <code>INVALID_HANDLE_VALUE</code>，表示操作失败。</li>
+<li>使用 <code>GetLastError()</code> 获取具体的错误代码，并使用 <code>FormatMessage()</code> 将错误代码转换为可读的错误消息。</li>
+</ul>
+<p>这个函数对于调试和错误处理非常重要，可以帮助开发者准确定位问题所在。</p>
+<h2 id="windows-C-ClearCommError-函数-详解"><a href="#windows-C-ClearCommError-函数-详解" class="headerlink" title="windows C++ ClearCommError()函数 详解"></a>windows C++ ClearCommError()函数 详解</h2><p><code>ClearCommError()</code> 是 Windows API 中用于处理通信端口（如串口）错误的函数。它用于获取通信设备的错误信息，并可以清除通信设备的错误状态。这个函数通常用于串口通信程序中，用来检查和处理通信异常情况。</p>
+<h2 id="函数原型-4"><a href="#函数原型-4" class="headerlink" title="函数原型"></a>函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">ClearCommError</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    HANDLE hFile,           <span class="comment">// 通信设备句柄</span></span></span></span><br><span class="line"><span class="params"><span class="function">    LPDWORD lpErrors,       <span class="comment">// 指向一个变量，该变量接收设备错误信息</span></span></span></span><br><span class="line"><span class="params"><span class="function">    LPCOMSTAT lpStat        <span class="comment">// 指向 COMSTAT 结构，该结构接收通信状态信息</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>参数</strong>：</p>
+<ul>
+<li><code>hFile</code>：通信设备的句柄。通常通过 <code>CreateFile()</code> 函数获取，用于表示串口设备（如 <code>COM1</code>, <code>COM2</code>）。</li>
+<li><code>lpErrors</code>：指向一个 <code>DWORD</code> 变量的指针，用于接收通信设备的错误状态信息。这个参数可以为 <code>NULL</code>，如果不需要获取错误信息。</li>
+<li><code>lpStat</code>：指向一个 <code>COMSTAT</code> 结构的指针，该结构接收设备的通信状态信息。这个参数可以为 <code>NULL</code>，如果不需要获取通信状态信息。</li>
+</ul>
+</li>
+<li><p><strong>返回值</strong>：</p>
+<ul>
+<li>如果函数调用成功，返回值为非零值 (<code>TRUE</code>)。</li>
+<li>如果函数调用失败，返回值为零 (<code>FALSE</code>)。可以通过调用 <code>GetLastError()</code> 函数获取详细的错误信息。</li>
+</ul>
+</li>
+</ul>
+<h2 id="错误状态"><a href="#错误状态" class="headerlink" title="错误状态"></a>错误状态</h2><p><code>lpErrors</code> 参数接收的错误状态是一个或多个以下值的组合：</p>
+<ul>
+<li><code>CE_BREAK</code>：接收到中断信号。</li>
+<li><code>CE_FRAME</code>：硬件检测到帧错误。</li>
+<li><code>CE_OVERRUN</code>：输入缓冲区溢出。数据丢失。</li>
+<li><code>CE_RXOVER</code>：输入缓冲区溢出，字符被丢弃。</li>
+<li><code>CE_RXPARITY</code>：接收到的字符有奇偶校验错误。</li>
+<li><code>CE_TXFULL</code>：应用程序试图传输字符时，输出缓冲区已满。</li>
+</ul>
+<h2 id="COMSTAT-结构"><a href="#COMSTAT-结构" class="headerlink" title="COMSTAT 结构"></a>COMSTAT 结构</h2><p><code>lpStat</code> 参数指向的 <code>COMSTAT</code> 结构，用于获取通信设备的状态信息。该结构包括如下成员：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_COMSTAT</span> &#123;</span><br><span class="line">  DWORD fCtsHold : <span class="number">1</span>;      <span class="comment">// CTS (Clear To Send) 信号被保持</span></span><br><span class="line">  DWORD fDsrHold : <span class="number">1</span>;      <span class="comment">// DSR (Data Set Ready) 信号被保持</span></span><br><span class="line">  DWORD fRlsdHold : <span class="number">1</span>;     <span class="comment">// RLSD (Receive Line Signal Detect) 信号被保持</span></span><br><span class="line">  DWORD fXoffHold : <span class="number">1</span>;     <span class="comment">// XOFF 被保持</span></span><br><span class="line">  DWORD fXoffSent : <span class="number">1</span>;     <span class="comment">// 已发送 XOFF</span></span><br><span class="line">  DWORD fEof : <span class="number">1</span>;          <span class="comment">// 已接收到 EOF</span></span><br><span class="line">  DWORD fTxim : <span class="number">1</span>;         <span class="comment">// 传输缓冲区被空中断</span></span><br><span class="line">  DWORD fReserved : <span class="number">25</span>;    <span class="comment">// 保留</span></span><br><span class="line">  DWORD cbInQue;           <span class="comment">// 输入缓冲区中的字节数</span></span><br><span class="line">  DWORD cbOutQue;          <span class="comment">// 输出缓冲区中的字节数</span></span><br><span class="line">&#125; COMSTAT, *LPCOMSTAT;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用示例-4"><a href="#使用示例-4" class="headerlink" title="使用示例"></a>使用示例</h2><p>下面是一个使用 <code>ClearCommError()</code> 函数的简单示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开串口 (COM1)</span></span><br><span class="line">    HANDLE hComm = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">L&quot;COM1&quot;</span>,                     <span class="comment">// 设备名</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE, <span class="comment">// 访问模式</span></span><br><span class="line">        <span class="number">0</span>,                            <span class="comment">// 共享模式</span></span><br><span class="line">        <span class="literal">NULL</span>,                         <span class="comment">// 安全属性</span></span><br><span class="line">        OPEN_EXISTING,                <span class="comment">// 打开已存在的设备</span></span><br><span class="line">        <span class="number">0</span>,                            <span class="comment">// 文件属性</span></span><br><span class="line">        <span class="literal">NULL</span>                          <span class="comment">// 模板文件句柄</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hComm == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open COM1. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查并清除错误</span></span><br><span class="line">    DWORD dwErrors;</span><br><span class="line">    COMSTAT comStat;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">ClearCommError</span>(hComm, &amp;dwErrors, &amp;comStat)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (dwErrors != <span class="number">0</span>) &#123;</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">&quot;Communication error occurred: &quot;</span> &lt;&lt; dwErrors &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;No errors. Bytes in queue: &quot;</span> &lt;&lt; comStat.cbInQue &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to clear communication error. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭串口</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hComm);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中：</p>
+<ul>
+<li><code>CreateFile()</code> 用于打开串口设备 <code>COM1</code>。</li>
+<li><code>ClearCommError()</code> 用于检查通信错误，并获取当前通信状态。</li>
+<li>如果有错误发生，<code>dwErrors</code> 变量将包含具体的错误代码。</li>
+<li><code>comStat</code> 结构提供有关输入和输出缓冲区状态的信息。</li>
+</ul>
+<p>这个函数在串口通信程序中非常有用，可以帮助开发者处理通信中的异常情况，如数据丢失、缓冲区溢出等问题。</p>
+<h2 id="windows-C-CloseHandle-函数-详解"><a href="#windows-C-CloseHandle-函数-详解" class="headerlink" title="windows C++ CloseHandle()函数 详解"></a>windows C++ CloseHandle()函数 详解</h2><p><code>CloseHandle()</code> 是 Windows API 中用于关闭内核对象句柄的函数。它是 Windows 操作系统中资源管理的一部分，用于释放进程中占用的系统资源。</p>
+<h2 id="函数原型-5"><a href="#函数原型-5" class="headerlink" title="函数原型"></a>函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">CloseHandle</span><span class="params">(HANDLE hObject)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>参数</strong>：</p>
+<ul>
+<li><code>hObject</code>：需要关闭的句柄。这个句柄可以是打开的文件、线程、进程、信号量、文件映射对象、互斥体等内核对象。</li>
+</ul>
+</li>
+<li><p><strong>返回值</strong>：</p>
+<ul>
+<li>如果函数调用成功，返回值为非零值 (<code>TRUE</code>)。</li>
+<li>如果函数调用失败，返回值为零 (<code>FALSE</code>)。可以通过调用 <code>GetLastError()</code> 函数获取详细的错误信息。</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用说明-4"><a href="#使用说明-4" class="headerlink" title="使用说明"></a>使用说明</h2><ol>
+<li><p><strong>资源管理</strong>：</p>
+<ul>
+<li>在 Windows 操作系统中，许多资源（如文件、进程、线程等）都是通过句柄来管理的。每当你创建或打开这些资源时，系统都会分配一个句柄。当不再需要这些资源时，必须调用 <code>CloseHandle()</code> 来释放句柄，否则会导致资源泄漏。</li>
+</ul>
+</li>
+<li><p><strong>句柄类型</strong>：</p>
+<ul>
+<li><code>CloseHandle()</code> 可以用于关闭多种类型的句柄，例如文件句柄、线程句柄、进程句柄、互斥体句柄、事件对象句柄等。需要确保关闭正确的句柄类型，以避免程序异常。</li>
+</ul>
+</li>
+<li><p><strong>多次调用</strong>：</p>
+<ul>
+<li>对同一个句柄多次调用 <code>CloseHandle()</code> 是错误的行为。这将导致未定义的行为，可能会引发程序崩溃或其他严重的错误。因此，调用 <code>CloseHandle()</code> 后，不应再使用这个句柄。</li>
+</ul>
+</li>
+<li><p><strong>系统资源的自动释放</strong>：</p>
+<ul>
+<li>当进程终止时，系统会自动关闭该进程中所有打开的句柄。但依赖于系统自动关闭句柄通常不是一个好的实践，程序应该显式地调用 <code>CloseHandle()</code> 来关闭不再需要的句柄。</li>
+</ul>
+</li>
+</ol>
+<h2 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开一个文件</span></span><br><span class="line">    HANDLE hFile = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">L&quot;example.txt&quot;</span>,            <span class="comment">// 文件名</span></span><br><span class="line">        GENERIC_READ,              <span class="comment">// 访问模式</span></span><br><span class="line">        <span class="number">0</span>,                         <span class="comment">// 共享模式</span></span><br><span class="line">        <span class="literal">NULL</span>,                      <span class="comment">// 安全属性</span></span><br><span class="line">        OPEN_EXISTING,             <span class="comment">// 如何创建</span></span><br><span class="line">        FILE_ATTRIBUTE_NORMAL,     <span class="comment">// 文件属性</span></span><br><span class="line">        <span class="literal">NULL</span>);                     <span class="comment">// 模板文件句柄</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open file. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行文件操作...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭文件句柄</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">CloseHandle</span>(hFile)) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;File handle closed successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to close file handle. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>CreateFile()</code> 函数用于打开一个文件，并返回一个文件句柄。然后，使用 <code>CloseHandle()</code> 函数关闭这个文件句柄，释放相关资源。</p>
+<h2 id="windows-C-PurgeComm-函数-详解"><a href="#windows-C-PurgeComm-函数-详解" class="headerlink" title="windows C++ PurgeComm()函数 详解"></a>windows C++ PurgeComm()函数 详解</h2><p><code>PurgeComm</code> 函数是 Windows API 中用于清除串口通信设备的输入或输出缓冲区的函数。它可以有效地清除缓冲区中的数据以及挂起的输入或输出请求，确保串口通信处于已知状态。这在处理通信错误或重置串口设备时非常有用。</p>
+<h3 id="函数原型-6"><a href="#函数原型-6" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">PurgeComm</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  HANDLE hFile,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD  dwFlags</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数详解"><a href="#参数详解" class="headerlink" title="参数详解"></a>参数详解</h3><ol>
+<li><p><strong><code>hFile</code></strong></p>
+<ul>
+<li>类型：<code>HANDLE</code></li>
+<li>描述：这是一个串口设备的句柄，通常由 <code>CreateFile</code> 函数获得，代表一个打开的串口通信端口（如 <code>&quot;COM1&quot;</code>）。</li>
+</ul>
+</li>
+<li><p><strong><code>dwFlags</code></strong></p>
+<ul>
+<li><p>类型：<code>DWORD</code></p>
+</li>
+<li><p>描述：指定要清除的缓冲区或挂起的操作的标志。可以是以下值的组合：</p>
+</li>
+<li><p><strong><code>PURGE_RXABORT</code> (0x0002)</strong>: 终止所有挂起的读取操作。未完成的读取操作将失败。</p>
+</li>
+<li><p><strong><code>PURGE_RXCLEAR</code> (0x0008)</strong>: 清除接收缓冲区中的数据。</p>
+</li>
+<li><p><strong><code>PURGE_TXABORT</code> (0x0001)</strong>: 终止所有挂起的写入操作。未完成的写入操作将失败。</p>
+</li>
+<li><p><strong><code>PURGE_TXCLEAR</code> (0x0004)</strong>: 清除发送缓冲区中的数据。</p>
+</li>
+</ul>
+<p>这些标志可以通过按位或 (<code>|</code>) 组合使用，例如 <code>PURGE_RXABORT | PURGE_TXCLEAR</code>。</p>
+</li>
+</ol>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li><strong>成功</strong>：如果函数执行成功，返回 <code>TRUE</code>，表示缓冲区已被成功清除。</li>
+<li><strong>失败</strong>：如果函数执行失败，返回 <code>FALSE</code>，可以通过调用 <code>GetLastError()</code> 来获取更多错误信息。</li>
+</ul>
+<h3 id="使用示例-5"><a href="#使用示例-5" class="headerlink" title="使用示例"></a>使用示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开串口</span></span><br><span class="line">    HANDLE hSerial = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">&quot;COM1&quot;</span>,                        <span class="comment">// 串口名称</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE,  <span class="comment">// 读写权限</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 独占访问</span></span><br><span class="line">        <span class="literal">NULL</span>,                          <span class="comment">// 默认安全属性</span></span><br><span class="line">        OPEN_EXISTING,                 <span class="comment">// 打开现有串口</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 属性标志</span></span><br><span class="line">        <span class="literal">NULL</span>                           <span class="comment">// 不使用模板文件</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hSerial == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open COM port. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清除接收缓冲区和终止所有挂起的读取操作</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">PurgeComm</span>(hSerial, PURGE_RXCLEAR | PURGE_RXABORT)) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to purge COM port. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;COM port purged successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行其他串口通信操作...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关闭串口</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例中-PurgeComm-的使用"><a href="#解释示例中-PurgeComm-的使用" class="headerlink" title="解释示例中 PurgeComm 的使用"></a>解释示例中 <code>PurgeComm</code> 的使用</h3><p>在上面的例子中，我们首先打开了 <code>COM1</code> 串口。接着，我们使用 <code>PurgeComm</code> 函数清除了接收缓冲区 (<code>PURGE_RXCLEAR</code>) 并终止了所有挂起的读取操作 (<code>PURGE_RXABORT</code>)。这有助于在进行进一步的串口操作之前，确保没有未处理的旧数据或挂起的操作。</p>
+<h3 id="典型用法场景"><a href="#典型用法场景" class="headerlink" title="典型用法场景"></a>典型用法场景</h3><ul>
+<li><strong>处理通信错误</strong>：在检测到通信错误后，可以使用 <code>PurgeComm</code> 清除串口缓冲区，以便重新开始通信。</li>
+<li><strong>重置串口状态</strong>：当需要重置串口状态时，可以清除所有挂起的操作和缓冲区内容，确保通信的稳定性。</li>
+<li><strong>同步操作</strong>：当程序需要与设备重新同步时，可以通过清除接收缓冲区来忽略不完整或意外的输入。</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>挂起操作的影响</strong>：使用 <code>PURGE_RXABORT</code> 和 <code>PURGE_TXABORT</code> 标志会导致挂起的读取或写入操作失败，并返回错误。使用这些标志时需要确保程序能够正确处理这些失败的操作。</li>
+<li><strong>数据丢失</strong>：清除缓冲区（使用 <code>PURGE_RXCLEAR</code> 或 <code>PURGE_TXCLEAR</code>）会导致缓冲区中的数据丢失。因此，调用 <code>PurgeComm</code> 函数之前应确保缓冲区中的数据已被处理或不再需要。</li>
+</ul>
+<h3 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li>**<code>ERROR_INVALID_HANDLE</code>**：无效的句柄，可能是因为串口未成功打开或句柄已关闭。</li>
+<li>**<code>ERROR_IO_PENDING</code>**：有未完成的 I&#x2F;O 操作。这通常表示在尝试清除缓冲区时，有未处理完的操作。</li>
+</ul>
+<p><code>PurgeComm</code> 是串口通信中一个重要的维护工具，特别是在需要处理错误、重置通信状态或确保系统处于已知状态时。通过正确使用该函数，可以提高串口通信的稳定性和可靠性。</p>
+<h2 id="windows-C-SetCommTimeouts-函数-详解"><a href="#windows-C-SetCommTimeouts-函数-详解" class="headerlink" title="windows C++ SetCommTimeouts()函数 详解"></a>windows C++ SetCommTimeouts()函数 详解</h2><p><code>SetCommTimeouts</code> 函数是 Windows API 中用于设置串口通信设备的超时时间的函数。它允许你定义串口设备在读取和写入操作时的超时行为，这是确保串口通信可靠性的重要一步。</p>
+<h3 id="函数原型-7"><a href="#函数原型-7" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">SetCommTimeouts</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  HANDLE hFile,</span></span></span><br><span class="line"><span class="params"><span class="function">  LPCOMMTIMEOUTS lpCommTimeouts</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数详解-1"><a href="#参数详解-1" class="headerlink" title="参数详解"></a>参数详解</h3><ol>
+<li><p><strong><code>hFile</code></strong></p>
+<ul>
+<li>类型：<code>HANDLE</code></li>
+<li>描述：这是一个串口设备的句柄，通常由 <code>CreateFile</code> 函数获得，代表一个打开的串口通信端口（如 <code>&quot;COM1&quot;</code>）。</li>
+</ul>
+</li>
+<li><p><strong><code>lpCommTimeouts</code></strong></p>
+<ul>
+<li>类型：<code>LPCOMMTIMEOUTS</code></li>
+<li>描述：指向 <code>COMMTIMEOUTS</code> 结构的指针，该结构包含了设备输入输出操作的超时设置。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li><strong>成功</strong>：如果函数执行成功，返回 <code>TRUE</code>，表示串口设备的超时设置已被成功应用。</li>
+<li><strong>失败</strong>：如果函数执行失败，返回 <code>FALSE</code>，可以通过调用 <code>GetLastError()</code> 来获取更多错误信息。</li>
+</ul>
+<h3 id="COMMTIMEOUTS-结构体"><a href="#COMMTIMEOUTS-结构体" class="headerlink" title="COMMTIMEOUTS 结构体"></a><code>COMMTIMEOUTS</code> 结构体</h3><p><code>COMMTIMEOUTS</code> 结构体定义了串口设备读写操作的超时设置。结构体定义如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_COMMTIMEOUTS</span> &#123;</span><br><span class="line">  DWORD ReadIntervalTimeout;         <span class="comment">// 读取字符间隔超时（毫秒）</span></span><br><span class="line">  DWORD ReadTotalTimeoutMultiplier;  <span class="comment">// 总读取超时乘子</span></span><br><span class="line">  DWORD ReadTotalTimeoutConstant;    <span class="comment">// 总读取超时常量（毫秒）</span></span><br><span class="line">  DWORD WriteTotalTimeoutMultiplier; <span class="comment">// 总写入超时乘子</span></span><br><span class="line">  DWORD WriteTotalTimeoutConstant;   <span class="comment">// 总写入超时常量（毫秒）</span></span><br><span class="line">&#125; COMMTIMEOUTS, *LPCOMMTIMEOUTS;</span><br></pre></td></tr></table></figure>
+
+<h3 id="结构体字段详解"><a href="#结构体字段详解" class="headerlink" title="结构体字段详解"></a>结构体字段详解</h3><ol>
+<li><p><strong><code>ReadIntervalTimeout</code></strong></p>
+<ul>
+<li>描述：指定两次字符读取之间的最大间隔时间。如果超出此时间，读取操作将完成。以毫秒为单位。</li>
+<li>特殊值：<ul>
+<li><code>MAXDWORD</code>：表示非零值的超时时间无效，系统返回立即可用的数据，而不等待进一步的数据输入。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code>ReadTotalTimeoutMultiplier</code></strong></p>
+<ul>
+<li>描述：指定读取操作的超时乘子。实际的超时为乘子乘以读取的字符数。</li>
+</ul>
+</li>
+<li><p><strong><code>ReadTotalTimeoutConstant</code></strong></p>
+<ul>
+<li>描述：指定读取操作的总超时常量。该值加上 <code>ReadTotalTimeoutMultiplier</code> 的结果为总读取超时时间。</li>
+</ul>
+</li>
+<li><p><strong><code>WriteTotalTimeoutMultiplier</code></strong></p>
+<ul>
+<li>描述：指定写入操作的超时乘子。实际的超时为乘子乘以写入的字符数。</li>
+</ul>
+</li>
+<li><p><strong><code>WriteTotalTimeoutConstant</code></strong></p>
+<ul>
+<li>描述：指定写入操作的总超时常量。该值加上 <code>WriteTotalTimeoutMultiplier</code> 的结果为总写入超时时间。</li>
+</ul>
+</li>
+</ol>
+<h3 id="使用示例-6"><a href="#使用示例-6" class="headerlink" title="使用示例"></a>使用示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开串口</span></span><br><span class="line">    HANDLE hSerial = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">&quot;COM1&quot;</span>,                        <span class="comment">// 串口名称</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE,  <span class="comment">// 读写权限</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 独占访问</span></span><br><span class="line">        <span class="literal">NULL</span>,                          <span class="comment">// 默认安全属性</span></span><br><span class="line">        OPEN_EXISTING,                 <span class="comment">// 打开现有串口</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 属性标志</span></span><br><span class="line">        <span class="literal">NULL</span>                           <span class="comment">// 不使用模板文件</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hSerial == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open COM port. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置串口超时参数</span></span><br><span class="line">    COMMTIMEOUTS timeouts = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">    timeouts.ReadIntervalTimeout = <span class="number">50</span>;          <span class="comment">// 50ms 的字符间隔超时</span></span><br><span class="line">    timeouts.ReadTotalTimeoutMultiplier = <span class="number">10</span>;   <span class="comment">// 每个字符的读取时间为 10ms</span></span><br><span class="line">    timeouts.ReadTotalTimeoutConstant = <span class="number">100</span>;    <span class="comment">// 总读取操作的附加时间为 100ms</span></span><br><span class="line">    timeouts.WriteTotalTimeoutMultiplier = <span class="number">10</span>;  <span class="comment">// 每个字符的写入时间为 10ms</span></span><br><span class="line">    timeouts.WriteTotalTimeoutConstant = <span class="number">100</span>;   <span class="comment">// 总写入操作的附加时间为 100ms</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">SetCommTimeouts</span>(hSerial, &amp;timeouts)) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to set COM port timeouts. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;COM port timeouts configured successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行其他串口通信操作...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关闭串口</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例中超时设置的逻辑"><a href="#解释示例中超时设置的逻辑" class="headerlink" title="解释示例中超时设置的逻辑"></a>解释示例中超时设置的逻辑</h3><ul>
+<li><p><strong>读取超时</strong>：</p>
+<ul>
+<li><code>ReadIntervalTimeout = 50</code>：如果两次字符读取之间的间隔超过 50 毫秒，读取操作将结束。</li>
+<li><code>ReadTotalTimeoutMultiplier = 10</code>：对于每个要读取的字符，设置 10 毫秒的超时。</li>
+<li><code>ReadTotalTimeoutConstant = 100</code>：总读取超时常量为 100 毫秒。</li>
+</ul>
+<p>例如，如果要读取 5 个字符，总读取超时时间为：<code>(5 * 10) + 100 = 150</code> 毫秒。</p>
+</li>
+<li><p><strong>写入超时</strong>：</p>
+<ul>
+<li><code>WriteTotalTimeoutMultiplier = 10</code>：对于每个要写入的字符，设置 10 毫秒的超时。</li>
+<li><code>WriteTotalTimeoutConstant = 100</code>：总写入超时常量为 100 毫秒。</li>
+</ul>
+<p>例如，如果要写入 5 个字符，总写入超时时间为：<code>(5 * 10) + 100 = 150</code> 毫秒。</p>
+</li>
+</ul>
+<h3 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>超时的适应性</strong>：设置的超时应根据实际应用的需要进行调整。如果超时设置得过短，可能会导致读取或写入操作过早地结束；而如果超时设置得过长，则可能会导致应用程序响应迟缓。</li>
+<li><strong>特殊情况</strong>：如果串口通信中需要实时处理（如工业控制），则超时设置要特别小心，确保在通信故障时系统能够快速响应。</li>
+</ul>
+<h3 id="常见错误-1"><a href="#常见错误-1" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li>**<code>ERROR_INVALID_HANDLE</code>**：无效的句柄，可能是因为串口未成功打开或句柄已关闭。</li>
+<li>**<code>ERROR_INVALID_PARAMETER</code>**：传递给 <code>SetCommTimeouts</code> 的参数无效，可能是 <code>COMMTIMEOUTS</code> 结构体中的字段值不合理。</li>
+</ul>
+<p><code>SetCommTimeouts</code> 函数是配置串口通信设备超时的关键函数，通过合理设置，可以确保串口通信的有效性和可靠性，避免因超时问题导致的通信失败。</p>
+<h2 id="windows-C-SetCommState-函数-详解"><a href="#windows-C-SetCommState-函数-详解" class="headerlink" title="windows C++ SetCommState()函数 详解"></a>windows C++ SetCommState()函数 详解</h2><p><code>SetCommState</code> 函数是 Windows API 中用于设置串口设备通信参数的一个函数。它可以修改串口设备的配置，如波特率、数据位、停止位和奇偶校验等。这对于串口通信非常重要，因为需要确保串口设备的设置与通信双方的要求一致。</p>
+<h3 id="函数原型-8"><a href="#函数原型-8" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">SetCommState</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  HANDLE hFile,</span></span></span><br><span class="line"><span class="params"><span class="function">  LPDCB  lpDCB</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数详解-2"><a href="#参数详解-2" class="headerlink" title="参数详解"></a>参数详解</h3><ol>
+<li><p><strong><code>hFile</code></strong></p>
+<ul>
+<li>类型：<code>HANDLE</code></li>
+<li>描述：这是一个串口设备的句柄，通常由 <code>CreateFile</code> 函数获得，代表一个打开的串口通信端口（如 <code>&quot;COM1&quot;</code>）。</li>
+</ul>
+</li>
+<li><p><strong><code>lpDCB</code></strong></p>
+<ul>
+<li>类型：<code>LPDCB</code></li>
+<li>描述：指向 <code>DCB</code>（Device Control Block）结构的指针，该结构包含了串口设备的通信设置。通过 <code>SetCommState</code> 函数，你可以将这些设置应用到串口设备上。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li><strong>成功</strong>：如果函数执行成功，返回 <code>TRUE</code>，表示串口设备的配置已被成功修改。</li>
+<li><strong>失败</strong>：如果函数执行失败，返回 <code>FALSE</code>，可以通过调用 <code>GetLastError()</code> 来获取更多错误信息。</li>
+</ul>
+<h3 id="DCB-结构体"><a href="#DCB-结构体" class="headerlink" title="DCB 结构体"></a><code>DCB</code> 结构体</h3><p><code>DCB</code> 结构体保存了串口设备的详细设置，如波特率、数据位、停止位、奇偶校验等。该结构体的定义如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_DCB</span> &#123;</span><br><span class="line">  DWORD DCBlength;       <span class="comment">// DCB结构体大小</span></span><br><span class="line">  DWORD BaudRate;        <span class="comment">// 波特率</span></span><br><span class="line">  DWORD fBinary : <span class="number">1</span>;     <span class="comment">// 二进制模式，必须为 TRUE</span></span><br><span class="line">  DWORD fParity : <span class="number">1</span>;     <span class="comment">// 启用奇偶校验</span></span><br><span class="line">  DWORD fOutxCtsFlow : <span class="number">1</span>;<span class="comment">// CTS（清除发送）流控制</span></span><br><span class="line">  DWORD fOutxDsrFlow : <span class="number">1</span>;<span class="comment">// DSR（数据设置就绪）流控制</span></span><br><span class="line">  DWORD fDtrControl : <span class="number">2</span>; <span class="comment">// DTR（数据终端就绪）流控制</span></span><br><span class="line">  DWORD fDsrSensitivity : <span class="number">1</span>; <span class="comment">// DSR敏感性</span></span><br><span class="line">  DWORD fTXContinueOnXoff : <span class="number">1</span>; <span class="comment">// 在接收到XOFF时继续发送</span></span><br><span class="line">  DWORD fOutX : <span class="number">1</span>;       <span class="comment">// 启用XON/XOFF发送控制</span></span><br><span class="line">  DWORD fInX : <span class="number">1</span>;        <span class="comment">// 启用XON/XOFF接收控制</span></span><br><span class="line">  DWORD fErrorChar : <span class="number">1</span>;  <span class="comment">// 启用错误字符替换</span></span><br><span class="line">  DWORD fNull : <span class="number">1</span>;       <span class="comment">// 启用空字节丢弃</span></span><br><span class="line">  DWORD fRtsControl : <span class="number">2</span>; <span class="comment">// RTS（请求发送）流控制</span></span><br><span class="line">  DWORD fAbortOnError : <span class="number">1</span>; <span class="comment">// 发生错误时中止所有读写操作</span></span><br><span class="line">  DWORD fDummy2 : <span class="number">17</span>;    <span class="comment">// 保留</span></span><br><span class="line">  WORD  wReserved;       <span class="comment">// 保留</span></span><br><span class="line">  WORD  XonLim;          <span class="comment">// 传输XON字符之前输入缓冲区中最少的字节数</span></span><br><span class="line">  WORD  XoffLim;         <span class="comment">// 传输XOFF字符之前输入缓冲区中最多的字节数</span></span><br><span class="line">  BYTE  ByteSize;        <span class="comment">// 数据位数（4-8）</span></span><br><span class="line">  BYTE  Parity;          <span class="comment">// 奇偶校验设置（0-4 = 无，奇，偶，标记，空格）</span></span><br><span class="line">  BYTE  StopBits;        <span class="comment">// 停止位数（0,1,2 = 1位，1.5位，2位）</span></span><br><span class="line">  <span class="type">char</span>  XonChar;         <span class="comment">// XON字符</span></span><br><span class="line">  <span class="type">char</span>  XoffChar;        <span class="comment">// XOFF字符</span></span><br><span class="line">  <span class="type">char</span>  ErrorChar;       <span class="comment">// 错误字符（如果fErrorChar为TRUE）</span></span><br><span class="line">  <span class="type">char</span>  EofChar;         <span class="comment">// 文件结束字符</span></span><br><span class="line">  <span class="type">char</span>  EvtChar;         <span class="comment">// 事件字符</span></span><br><span class="line">  WORD  wReserved1;      <span class="comment">// 保留</span></span><br><span class="line">&#125; DCB, *LPDCB;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用示例-7"><a href="#使用示例-7" class="headerlink" title="使用示例"></a>使用示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开串口</span></span><br><span class="line">    HANDLE hSerial = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">&quot;COM1&quot;</span>,                        <span class="comment">// 串口名称</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE,  <span class="comment">// 读写权限</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 独占访问</span></span><br><span class="line">        <span class="literal">NULL</span>,                          <span class="comment">// 默认安全属性</span></span><br><span class="line">        OPEN_EXISTING,                 <span class="comment">// 打开现有串口</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 属性标志</span></span><br><span class="line">        <span class="literal">NULL</span>                           <span class="comment">// 不使用模板文件</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hSerial == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open COM port. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前串口状态</span></span><br><span class="line">    DCB dcbSerialParams = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">    dcbSerialParams.DCBlength = <span class="built_in">sizeof</span>(dcbSerialParams);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">GetCommState</span>(hSerial, &amp;dcbSerialParams)) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to get COM port state. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 配置串口参数</span></span><br><span class="line">    dcbSerialParams.BaudRate = CBR_9600;   <span class="comment">// 设置波特率为9600</span></span><br><span class="line">    dcbSerialParams.ByteSize = <span class="number">8</span>;          <span class="comment">// 设置数据位为8</span></span><br><span class="line">    dcbSerialParams.StopBits = ONESTOPBIT; <span class="comment">// 设置停止位为1</span></span><br><span class="line">    dcbSerialParams.Parity   = NOPARITY;   <span class="comment">// 设置无奇偶校验</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置串口状态</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">SetCommState</span>(hSerial, &amp;dcbSerialParams)) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to set COM port state. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;COM port configured successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行其他串口通信操作...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关闭串口</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主要字段详解"><a href="#主要字段详解" class="headerlink" title="主要字段详解"></a>主要字段详解</h3><ul>
+<li>**<code>BaudRate</code>**：设置串口的波特率（例如 <code>CBR_9600</code> 表示 9600 bps）。</li>
+<li>**<code>ByteSize</code>**：设置每个数据包的数据位数，可以是 4 到 8 位。</li>
+<li>**<code>Parity</code>**：设置奇偶校验位，常用值包括 <code>NOPARITY</code> (0)，<code>ODDPARITY</code> (1)，<code>EVENPARITY</code> (2)。</li>
+<li>**<code>StopBits</code>**：设置停止位数，常用值为 <code>ONESTOPBIT</code> (0)，<code>ONE5STOPBITS</code> (1)，<code>TWOSTOPBITS</code> (2)。</li>
+<li>**<code>fBinary</code>**：必须设置为 <code>TRUE</code>，表示串口以二进制模式工作。</li>
+<li>**<code>fParity</code>**：是否启用奇偶校验。</li>
+</ul>
+<h3 id="注意事项-2"><a href="#注意事项-2" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>结构体初始化</strong>：在调用 <code>SetCommState</code> 之前，确保 <code>DCB</code> 结构体的所有字段都已正确设置，特别是 <code>DCBlength</code> 字段应被设置为 <code>sizeof(DCB)</code>。</li>
+<li><strong>获取和设置状态</strong>：通常在调用 <code>SetCommState</code> 之前，先使用 <code>GetCommState</code> 获取当前串口配置，然后对 <code>DCB</code> 结构体进行修改，并再调用 <code>SetCommState</code> 进行设置。</li>
+<li><strong>波特率一致性</strong>：确保通信双方使用相同的波特率和其他通信参数，否则会导致通信失败或数据错误。</li>
+</ul>
+<h3 id="常见错误-2"><a href="#常见错误-2" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li>**<code>ERROR_INVALID_HANDLE</code>**：无效的句柄，可能是因为串口未成功打开或句柄已关闭。</li>
+<li>**<code>ERROR_BAD_COMMAND</code>**：请求的操作不能被串口设备执行，可能是由于串口不支持特定的配置。</li>
+<li>**<code>ERROR_INVALID_PARAMETER</code>**：传递给 <code>SetCommState</code> 的参数无效，可能是 <code>DCB</code> 结构体中的字段值不合理。</li>
+</ul>
+<p><code>SetCommState</code> 是配置串口通信的核心函数，它允许你设置各种串口通信参数，以确保串口设备按照期望的方式工作。</p>
+<h2 id="windows-C-GetCommState-函数-详解"><a href="#windows-C-GetCommState-函数-详解" class="headerlink" title="windows C++ GetCommState()函数 详解"></a>windows C++ GetCommState()函数 详解</h2><p><code>GetCommState</code> 函数是 Windows API 中用于获取串口通信设备当前配置的一个函数。它可以获取串口设备的通信参数，包括波特率、数据位、停止位和奇偶校验设置等。</p>
+<h3 id="函数原型-9"><a href="#函数原型-9" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">GetCommState</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  HANDLE hFile,</span></span></span><br><span class="line"><span class="params"><span class="function">  LPDCB  lpDCB</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数详解-3"><a href="#参数详解-3" class="headerlink" title="参数详解"></a>参数详解</h3><ol>
+<li><p><strong><code>hFile</code></strong></p>
+<ul>
+<li>类型：<code>HANDLE</code></li>
+<li>描述：这是一个串口设备的句柄，通常由 <code>CreateFile</code> 函数获得，代表一个打开的串口通信端口（如 <code>&quot;COM1&quot;</code>）。</li>
+</ul>
+</li>
+<li><p><strong><code>lpDCB</code></strong></p>
+<ul>
+<li>类型：<code>LPDCB</code></li>
+<li>描述：指向 <code>DCB</code> 结构的指针，该结构用于存储串口设备的当前配置。<code>DCB</code> 结构保存了串口的详细设置，包括波特率、数据位、停止位、奇偶校验等。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值-3"><a href="#返回值-3" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li><strong>成功</strong>：如果函数执行成功，返回 <code>TRUE</code>，并且 <code>lpDCB</code> 指向的结构体被填充为当前的串口配置。</li>
+<li><strong>失败</strong>：如果函数执行失败，返回 <code>FALSE</code>，可以通过调用 <code>GetLastError()</code> 来获取更多错误信息。</li>
+</ul>
+<h3 id="DCB-结构体-1"><a href="#DCB-结构体-1" class="headerlink" title="DCB 结构体"></a><code>DCB</code> 结构体</h3><p><code>DCB</code>（Device Control Block）结构体包含了串口设备的配置信息。结构体定义如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_DCB</span> &#123;</span><br><span class="line">  DWORD DCBlength;       <span class="comment">// DCB结构体大小</span></span><br><span class="line">  DWORD BaudRate;        <span class="comment">// 波特率</span></span><br><span class="line">  DWORD fBinary : <span class="number">1</span>;     <span class="comment">// 二进制模式，必须为 TRUE</span></span><br><span class="line">  DWORD fParity : <span class="number">1</span>;     <span class="comment">// 启用奇偶校验</span></span><br><span class="line">  DWORD fOutxCtsFlow : <span class="number">1</span>;<span class="comment">// CTS（清除发送）流控制</span></span><br><span class="line">  DWORD fOutxDsrFlow : <span class="number">1</span>;<span class="comment">// DSR（数据设置就绪）流控制</span></span><br><span class="line">  DWORD fDtrControl : <span class="number">2</span>; <span class="comment">// DTR（数据终端就绪）流控制</span></span><br><span class="line">  DWORD fDsrSensitivity : <span class="number">1</span>; <span class="comment">// DSR敏感性</span></span><br><span class="line">  DWORD fTXContinueOnXoff : <span class="number">1</span>; <span class="comment">// 在接收到XOFF时继续发送</span></span><br><span class="line">  DWORD fOutX : <span class="number">1</span>;       <span class="comment">// 启用XON/XOFF发送控制</span></span><br><span class="line">  DWORD fInX : <span class="number">1</span>;        <span class="comment">// 启用XON/XOFF接收控制</span></span><br><span class="line">  DWORD fErrorChar : <span class="number">1</span>;  <span class="comment">// 启用错误字符替换</span></span><br><span class="line">  DWORD fNull : <span class="number">1</span>;       <span class="comment">// 启用空字节丢弃</span></span><br><span class="line">  DWORD fRtsControl : <span class="number">2</span>; <span class="comment">// RTS（请求发送）流控制</span></span><br><span class="line">  DWORD fAbortOnError : <span class="number">1</span>; <span class="comment">// 发生错误时中止所有读写操作</span></span><br><span class="line">  DWORD fDummy2 : <span class="number">17</span>;    <span class="comment">// 保留</span></span><br><span class="line">  WORD  wReserved;       <span class="comment">// 保留</span></span><br><span class="line">  WORD  XonLim;          <span class="comment">// 传输XON字符之前输入缓冲区中最少的字节数</span></span><br><span class="line">  WORD  XoffLim;         <span class="comment">// 传输XOFF字符之前输入缓冲区中最多的字节数</span></span><br><span class="line">  BYTE  ByteSize;        <span class="comment">// 数据位数（4-8）</span></span><br><span class="line">  BYTE  Parity;          <span class="comment">// 奇偶校验设置（0-4 = 无，奇，偶，标记，空格）</span></span><br><span class="line">  BYTE  StopBits;        <span class="comment">// 停止位数（0,1,2 = 1位，1.5位，2位）</span></span><br><span class="line">  <span class="type">char</span>  XonChar;         <span class="comment">// XON字符</span></span><br><span class="line">  <span class="type">char</span>  XoffChar;        <span class="comment">// XOFF字符</span></span><br><span class="line">  <span class="type">char</span>  ErrorChar;       <span class="comment">// 错误字符（如果fErrorChar为TRUE）</span></span><br><span class="line">  <span class="type">char</span>  EofChar;         <span class="comment">// 文件结束字符</span></span><br><span class="line">  <span class="type">char</span>  EvtChar;         <span class="comment">// 事件字符</span></span><br><span class="line">  WORD  wReserved1;      <span class="comment">// 保留</span></span><br><span class="line">&#125; DCB, *LPDCB;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用示例-8"><a href="#使用示例-8" class="headerlink" title="使用示例"></a>使用示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开串口</span></span><br><span class="line">    HANDLE hSerial = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">&quot;COM1&quot;</span>,                        <span class="comment">// 串口名称</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE,  <span class="comment">// 读写权限</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 独占访问</span></span><br><span class="line">        <span class="literal">NULL</span>,                          <span class="comment">// 默认安全属性</span></span><br><span class="line">        OPEN_EXISTING,                 <span class="comment">// 打开现有串口</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 属性标志</span></span><br><span class="line">        <span class="literal">NULL</span>                           <span class="comment">// 不使用模板文件</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hSerial == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open COM port. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取串口状态</span></span><br><span class="line">    DCB dcbSerialParams = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">    dcbSerialParams.DCBlength = <span class="built_in">sizeof</span>(dcbSerialParams);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">GetCommState</span>(hSerial, &amp;dcbSerialParams)) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to get COM port state. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出当前串口配置</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Baud Rate: &quot;</span> &lt;&lt; dcbSerialParams.BaudRate &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Byte Size: &quot;</span> &lt;&lt; <span class="built_in">static_cast</span>&lt;<span class="type">int</span>&gt;(dcbSerialParams.ByteSize) &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Parity: &quot;</span> &lt;&lt; <span class="built_in">static_cast</span>&lt;<span class="type">int</span>&gt;(dcbSerialParams.Parity) &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Stop Bits: &quot;</span> &lt;&lt; <span class="built_in">static_cast</span>&lt;<span class="type">int</span>&gt;(dcbSerialParams.StopBits) &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关闭串口</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主要字段详解-1"><a href="#主要字段详解-1" class="headerlink" title="主要字段详解"></a>主要字段详解</h3><ul>
+<li>**<code>BaudRate</code>**：波特率，例如 9600、19200 等。</li>
+<li>**<code>ByteSize</code>**：每个字节的数据位数，可以是 4 到 8。</li>
+<li>**<code>Parity</code>**：奇偶校验位设置，常用值包括 <code>NOPARITY</code> (0)，<code>ODDPARITY</code> (1)，<code>EVENPARITY</code> (2)。</li>
+<li>**<code>StopBits</code>**：停止位数，常用值为 <code>ONESTOPBIT</code> (0)，<code>ONE5STOPBITS</code> (1)，<code>TWOSTOPBITS</code> (2)。</li>
+</ul>
+<h3 id="注意事项-3"><a href="#注意事项-3" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>结构体初始化</strong>：在调用 <code>GetCommState</code> 之前，确保 <code>DCB</code> 结构体的 <code>DCBlength</code> 字段已被正确设置为 <code>sizeof(DCB)</code>。</li>
+<li><strong>获取和设置状态</strong>：通常在调用 <code>GetCommState</code> 获取当前配置后，可以使用 <code>SetCommState</code> 修改配置并应用到串口设备上。</li>
+<li><strong>设备句柄</strong>：确保传递给 <code>GetCommState</code> 的句柄是有效的，通常是通过 <code>CreateFile</code> 成功打开串口设备获得的句柄。</li>
+</ul>
+<h3 id="常见错误-3"><a href="#常见错误-3" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li>**<code>ERROR_INVALID_HANDLE</code>**：无效的句柄，可能是因为串口未成功打开或句柄已关闭。</li>
+<li>**<code>ERROR_BAD_COMMAND</code>**：请求的操作不能被串口设备执行，可能是由于串口不支持特定的配置。</li>
+</ul>
+<p><code>GetCommState</code> 函数在串口通信中非常重要，它让你能够读取和理解当前的串口配置，从而确保通信的正确性和稳定性。</p>
+<h2 id="windows-C-SetupComm-函数-详解"><a href="#windows-C-SetupComm-函数-详解" class="headerlink" title="windows C++ SetupComm()函数 详解"></a>windows C++ SetupComm()函数 详解</h2><p><code>SetupComm</code> 函数是 Windows API 中用于配置串口设备缓冲区大小的一个函数。它主要用于设置串口通信时的输入和输出缓冲区的大小。这在处理串口通信时非常重要，因为适当配置的缓冲区可以避免数据丢失或溢出。</p>
+<h3 id="函数原型-10"><a href="#函数原型-10" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">SetupComm</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  HANDLE hFile,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD  dwInQueue,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD  dwOutQueue</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数详解-4"><a href="#参数详解-4" class="headerlink" title="参数详解"></a>参数详解</h3><ol>
+<li><p><strong><code>hFile</code></strong></p>
+<ul>
+<li>类型：<code>HANDLE</code></li>
+<li>描述：这是一个串口设备的句柄。通常，该句柄由 <code>CreateFile</code> 函数获得，代表一个打开的串口通信端口（如 <code>&quot;COM1&quot;</code>）。</li>
+</ul>
+</li>
+<li><p><strong><code>dwInQueue</code></strong></p>
+<ul>
+<li>类型：<code>DWORD</code></li>
+<li>描述：指定输入缓冲区的大小（以字节为单位）。这个缓冲区用于存储从串口接收到的数据。</li>
+</ul>
+</li>
+<li><p><strong><code>dwOutQueue</code></strong></p>
+<ul>
+<li>类型：<code>DWORD</code></li>
+<li>描述：指定输出缓冲区的大小（以字节为单位）。这个缓冲区用于存储将要通过串口发送的数据。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值-4"><a href="#返回值-4" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li><strong>成功</strong>：如果函数执行成功，返回 <code>TRUE</code>。</li>
+<li><strong>失败</strong>：如果函数执行失败，返回 <code>FALSE</code>，可以通过调用 <code>GetLastError()</code> 来获取更多错误信息。</li>
+</ul>
+<h3 id="使用示例-9"><a href="#使用示例-9" class="headerlink" title="使用示例"></a>使用示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 打开串口</span></span><br><span class="line">    HANDLE hSerial = <span class="built_in">CreateFile</span>(</span><br><span class="line">        <span class="string">&quot;COM1&quot;</span>,                        <span class="comment">// 串口名称</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE,  <span class="comment">// 读写权限</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 独占访问</span></span><br><span class="line">        <span class="literal">NULL</span>,                          <span class="comment">// 默认安全属性</span></span><br><span class="line">        OPEN_EXISTING,                 <span class="comment">// 打开现有串口</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 属性标志</span></span><br><span class="line">        <span class="literal">NULL</span>                           <span class="comment">// 不使用模板文件</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hSerial == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to open COM port. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置输入缓冲区为 1024 字节，输出缓冲区为 1024 字节</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">SetupComm</span>(hSerial, <span class="number">1024</span>, <span class="number">1024</span>)) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Failed to setup COM port buffers. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;COM port buffers setup successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 进行其他串口通信操作...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关闭串口</span></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSerial);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项-4"><a href="#注意事项-4" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>缓冲区大小的设置</strong>：通常，输入和输出缓冲区的大小应根据应用程序的需求进行设置。较大的缓冲区可以容纳更多的数据，减少数据丢失的可能性，但也会占用更多的内存。</li>
+<li><strong>句柄有效性</strong>：确保在调用 <code>SetupComm</code> 前，串口设备句柄是有效的。这意味着 <code>CreateFile</code> 成功打开了一个串口设备。</li>
+<li><strong>缓冲区重设</strong>：如果需要更改缓冲区的大小，可以在打开串口设备后立即调用 <code>SetupComm</code>，以确保在任何数据传输之前正确配置缓冲区。</li>
+</ul>
+<h3 id="常见错误-4"><a href="#常见错误-4" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li><strong><code>ERROR_INVALID_HANDLE</code></strong>: 提供的句柄无效，可能是因为串口未成功打开。</li>
+<li><strong><code>ERROR_IO_PENDING</code></strong>: 该错误通常与重叠 I&#x2F;O 操作有关，但在使用 <code>SetupComm</code> 时并不常见。</li>
+</ul>
+<p><code>SetupComm</code> 是串口通信设置中的一个基础函数，正确配置它可以确保串口数据通信的稳定性和效率。</p>
+<h2 id="windows-C-CreateFileA-函数-详解"><a href="#windows-C-CreateFileA-函数-详解" class="headerlink" title="windows C++ CreateFileA()函数 详解"></a>windows C++ CreateFileA()函数 详解</h2><p><code>CreateFileA</code> 函数是 Windows API 中用于打开或创建文件、文件夹、符号链接、命名管道、通信设备等的一种函数。<code>CreateFileA</code> 是其 ANSI 版本，对应的 Unicode 版本为 <code>CreateFileW</code>。以下是 <code>CreateFileA</code> 函数的详解。</p>
+<h3 id="函数原型-11"><a href="#函数原型-11" class="headerlink" title="函数原型"></a>函数原型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HANDLE <span class="title">CreateFileA</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  LPCSTR               lpFileName,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD                dwDesiredAccess,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD                dwShareMode,</span></span></span><br><span class="line"><span class="params"><span class="function">  LPSECURITY_ATTRIBUTES lpSecurityAttributes,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD                dwCreationDisposition,</span></span></span><br><span class="line"><span class="params"><span class="function">  DWORD                dwFlagsAndAttributes,</span></span></span><br><span class="line"><span class="params"><span class="function">  HANDLE               hTemplateFile</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数详解-5"><a href="#参数详解-5" class="headerlink" title="参数详解"></a>参数详解</h3><ol>
+<li><p><strong><code>lpFileName</code></strong></p>
+<ul>
+<li>类型：<code>LPCSTR</code></li>
+<li>描述：指向要打开或创建的对象的名称的指针。对于文件，这通常是文件的路径。如果是设备文件，则使用设备名称（例如 <code>&quot;\\\\.\\COM1&quot;</code>）。</li>
+</ul>
+</li>
+<li><p><strong><code>dwDesiredAccess</code></strong></p>
+<ul>
+<li>类型：<code>DWORD</code></li>
+<li>描述：指定所需的访问权限。可以是以下常量的组合：<ul>
+<li><code>GENERIC_READ</code>：读取访问。</li>
+<li><code>GENERIC_WRITE</code>：写入访问。</li>
+<li><code>GENERIC_EXECUTE</code>：执行访问。</li>
+<li><code>GENERIC_ALL</code>：所有访问权限。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code>dwShareMode</code></strong></p>
+<ul>
+<li>类型：<code>DWORD</code></li>
+<li>描述：指定文件的共享模式，决定其他进程如何访问该文件。可以是以下常量的组合：<ul>
+<li><code>FILE_SHARE_READ</code>：允许其他进程读取文件。</li>
+<li><code>FILE_SHARE_WRITE</code>：允许其他进程写入文件。</li>
+<li><code>FILE_SHARE_DELETE</code>：允许其他进程删除文件。</li>
+</ul>
+</li>
+<li>如果此参数为 0，文件将被独占使用。</li>
+</ul>
+</li>
+<li><p><strong><code>lpSecurityAttributes</code></strong></p>
+<ul>
+<li>类型：<code>LPSECURITY_ATTRIBUTES</code></li>
+<li>描述：指向 <code>SECURITY_ATTRIBUTES</code> 结构的指针，该结构指定返回的句柄是否可被子进程继承以及文件或对象的安全描述符。如果为 NULL，句柄不可继承，且对象没有指定的安全描述符。</li>
+</ul>
+</li>
+<li><p><strong><code>dwCreationDisposition</code></strong></p>
+<ul>
+<li>类型：<code>DWORD</code></li>
+<li>描述：指定如何创建或打开文件，以下是常用的选项：<ul>
+<li><code>CREATE_NEW</code>：创建新文件。如果文件已存在，函数将失败。</li>
+<li><code>CREATE_ALWAYS</code>：创建新文件。如果文件已存在，将覆盖该文件。</li>
+<li><code>OPEN_EXISTING</code>：打开现有文件。如果文件不存在，函数将失败。</li>
+<li><code>OPEN_ALWAYS</code>：打开文件，如果文件不存在则创建新文件。</li>
+<li><code>TRUNCATE_EXISTING</code>：打开现有文件并截断（清空）文件内容。该文件必须有写入权限。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code>dwFlagsAndAttributes</code></strong></p>
+<ul>
+<li>类型：<code>DWORD</code></li>
+<li>描述：指定文件或设备的标志和属性。常用的标志包括：<ul>
+<li><code>FILE_ATTRIBUTE_ARCHIVE</code>：文件归档属性。</li>
+<li><code>FILE_ATTRIBUTE_HIDDEN</code>：文件为隐藏文件。</li>
+<li><code>FILE_ATTRIBUTE_NORMAL</code>：无特殊属性集的文件。</li>
+<li><code>FILE_ATTRIBUTE_READONLY</code>：只读文件。</li>
+<li><code>FILE_FLAG_DELETE_ON_CLOSE</code>：文件在关闭时自动删除。</li>
+<li><code>FILE_FLAG_SEQUENTIAL_SCAN</code>：访问模式为顺序扫描。</li>
+<li><code>FILE_FLAG_RANDOM_ACCESS</code>：访问模式为随机访问。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code>hTemplateFile</code></strong></p>
+<ul>
+<li>类型：<code>HANDLE</code></li>
+<li>描述：用于指定一个有效的模板文件句柄，模板文件的属性将复制到新创建的文件中。该参数通常用于创建新文件时设置与模板文件相同的属性。如果不需要模板文件，设置为 <code>NULL</code>。</li>
+</ul>
+</li>
+</ol>
+<h3 id="返回值-5"><a href="#返回值-5" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回一个指向新打开文件、设备、管道等的句柄 (<code>HANDLE</code>)。你可以使用此句柄进行读写操作。</li>
+<li>失败：返回 <code>INVALID_HANDLE_VALUE</code>，可以调用 <code>GetLastError()</code> 获取详细的错误信息。</li>
+</ul>
+<h3 id="使用示例-10"><a href="#使用示例-10" class="headerlink" title="使用示例"></a>使用示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    HANDLE hFile = <span class="built_in">CreateFileA</span>(</span><br><span class="line">        <span class="string">&quot;example.txt&quot;</span>,                 <span class="comment">// 文件名</span></span><br><span class="line">        GENERIC_READ | GENERIC_WRITE,  <span class="comment">// 读写权限</span></span><br><span class="line">        <span class="number">0</span>,                             <span class="comment">// 独占模式，不共享</span></span><br><span class="line">        <span class="literal">NULL</span>,                          <span class="comment">// 默认安全属性</span></span><br><span class="line">        CREATE_ALWAYS,                 <span class="comment">// 总是创建新文件</span></span><br><span class="line">        FILE_ATTRIBUTE_NORMAL,         <span class="comment">// 普通文件</span></span><br><span class="line">        <span class="literal">NULL</span>                           <span class="comment">// 不使用模板文件</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Failed to create or open file. Error: &quot;</span> &lt;&lt; <span class="built_in">GetLastError</span>() &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;File created/opened successfully.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 进行文件操作...</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">CloseHandle</span>(hFile);  <span class="comment">// 关闭文件句柄</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项-5"><a href="#注意事项-5" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>打开现有文件时，确保使用正确的权限设置（<code>dwDesiredAccess</code>），否则可能会导致访问失败。</li>
+<li>如果文件被其他进程占用且未使用共享模式，你可能会遇到无法访问文件的情况。</li>
+<li>在使用 <code>CreateFileA</code> 打开设备（如串口或并口）时，<code>lpFileName</code> 参数需要使用特定的格式（如 <code>&quot;\\\\.\\COM1&quot;</code>）。</li>
+</ul>
+<h3 id="常见错误-5"><a href="#常见错误-5" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li><code>ERROR_FILE_NOT_FOUND</code>: 文件不存在，且未指定创建新文件。</li>
+<li><code>ERROR_ACCESS_DENIED</code>: 权限不足，无法访问文件。</li>
+</ul>
+<p>这个函数的灵活性和多功能性使它在 Windows 编程中非常重要。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppFunction/" rel="tag"># CppFunction</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/09/03/notebook/Books/2024-09-03-Effective_Modern_C++/" rel="prev" title="Effective Modern C++">
+      <i class="fa fa-chevron-left"></i> Effective Modern C++
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/09/05/notebook/Qt/2024-09-05-qt_4_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="next" title="qt_5_常见技巧">
+      qt_5_常见技巧 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-WSAStartup-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">windows C++ WSAStartup()函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">4.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-GetCurrentThreadId-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">windows C++ GetCurrentThreadId()函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-1"><span class="nav-number">7.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E-1"><span class="nav-number">8.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">9.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-WaitForSingleObject-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">10.</span> <span class="nav-text">windows C++ WaitForSingleObject()函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-2"><span class="nav-number">11.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E-2"><span class="nav-number">12.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-2"><span class="nav-number">13.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-GetLastError-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">14.</span> <span class="nav-text">windows C++ GetLastError()函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-3"><span class="nav-number">15.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E-3"><span class="nav-number">16.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF%E4%BB%A3%E7%A0%81"><span class="nav-number">17.</span> <span class="nav-text">常见错误代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-3"><span class="nav-number">18.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-ClearCommError-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">19.</span> <span class="nav-text">windows C++ ClearCommError()函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-4"><span class="nav-number">20.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E7%8A%B6%E6%80%81"><span class="nav-number">21.</span> <span class="nav-text">错误状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#COMSTAT-%E7%BB%93%E6%9E%84"><span class="nav-number">22.</span> <span class="nav-text">COMSTAT 结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-4"><span class="nav-number">23.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-CloseHandle-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">24.</span> <span class="nav-text">windows C++ CloseHandle()函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-5"><span class="nav-number">25.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E-4"><span class="nav-number">26.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">27.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-PurgeComm-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">28.</span> <span class="nav-text">windows C++ PurgeComm()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-6"><span class="nav-number">28.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number">28.2.</span> <span class="nav-text">参数详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">28.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-5"><span class="nav-number">28.4.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%E4%B8%AD-PurgeComm-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">28.5.</span> <span class="nav-text">解释示例中 PurgeComm 的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E7%94%A8%E6%B3%95%E5%9C%BA%E6%99%AF"><span class="nav-number">28.6.</span> <span class="nav-text">典型用法场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">28.7.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF"><span class="nav-number">28.8.</span> <span class="nav-text">常见错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-SetCommTimeouts-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">29.</span> <span class="nav-text">windows C++ SetCommTimeouts()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-7"><span class="nav-number">29.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3-1"><span class="nav-number">29.2.</span> <span class="nav-text">参数详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-1"><span class="nav-number">29.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COMMTIMEOUTS-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">29.4.</span> <span class="nav-text">COMMTIMEOUTS 结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E5%AD%97%E6%AE%B5%E8%AF%A6%E8%A7%A3"><span class="nav-number">29.5.</span> <span class="nav-text">结构体字段详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-6"><span class="nav-number">29.6.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%E4%B8%AD%E8%B6%85%E6%97%B6%E8%AE%BE%E7%BD%AE%E7%9A%84%E9%80%BB%E8%BE%91"><span class="nav-number">29.7.</span> <span class="nav-text">解释示例中超时设置的逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-1"><span class="nav-number">29.8.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF-1"><span class="nav-number">29.9.</span> <span class="nav-text">常见错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-SetCommState-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">30.</span> <span class="nav-text">windows C++ SetCommState()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-8"><span class="nav-number">30.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3-2"><span class="nav-number">30.2.</span> <span class="nav-text">参数详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-2"><span class="nav-number">30.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DCB-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">30.4.</span> <span class="nav-text">DCB 结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-7"><span class="nav-number">30.5.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%AD%97%E6%AE%B5%E8%AF%A6%E8%A7%A3"><span class="nav-number">30.6.</span> <span class="nav-text">主要字段详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-2"><span class="nav-number">30.7.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF-2"><span class="nav-number">30.8.</span> <span class="nav-text">常见错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-GetCommState-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">31.</span> <span class="nav-text">windows C++ GetCommState()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-9"><span class="nav-number">31.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3-3"><span class="nav-number">31.2.</span> <span class="nav-text">参数详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-3"><span class="nav-number">31.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DCB-%E7%BB%93%E6%9E%84%E4%BD%93-1"><span class="nav-number">31.4.</span> <span class="nav-text">DCB 结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-8"><span class="nav-number">31.5.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%AD%97%E6%AE%B5%E8%AF%A6%E8%A7%A3-1"><span class="nav-number">31.6.</span> <span class="nav-text">主要字段详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-3"><span class="nav-number">31.7.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF-3"><span class="nav-number">31.8.</span> <span class="nav-text">常见错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-SetupComm-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">32.</span> <span class="nav-text">windows C++ SetupComm()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-10"><span class="nav-number">32.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3-4"><span class="nav-number">32.2.</span> <span class="nav-text">参数详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-4"><span class="nav-number">32.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-9"><span class="nav-number">32.4.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-4"><span class="nav-number">32.5.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF-4"><span class="nav-number">32.6.</span> <span class="nav-text">常见错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-C-CreateFileA-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">33.</span> <span class="nav-text">windows C++ CreateFileA()函数 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B-11"><span class="nav-number">33.1.</span> <span class="nav-text">函数原型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3-5"><span class="nav-number">33.2.</span> <span class="nav-text">参数详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-5"><span class="nav-number">33.3.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-10"><span class="nav-number">33.4.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-5"><span class="nav-number">33.5.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF-5"><span class="nav-number">33.6.</span> <span class="nav-text">常见错误</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

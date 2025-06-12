@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 asio模块常用的函数  boost::asio::dispatch() 函数 详解boost::asio::dispatch() 函数是 Boost.Asio 库中用于将操作投递到执行器（executor）的函数。执行器是一个抽象概念，代表了异步操作的执行上下文和调度策略。 以下是对 boost::asio::dispatch() 函数的详细说明：  函数签名： 12template &amp;l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1_2_asio_常用函数">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/BOOST/asio/2024-05-22-1_2_asio_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 asio模块常用的函数  boost::asio::dispatch() 函数 详解boost::asio::dispatch() 函数是 Boost.Asio 库中用于将操作投递到执行器（executor）的函数。执行器是一个抽象概念，代表了异步操作的执行上下文和调度策略。 以下是对 boost::asio::dispatch() 函数的详细说明：  函数签名： 12template &amp;l">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.114Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="boost.asio">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/BOOST/asio/2024-05-22-1_2_asio_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>1_2_asio_常用函数 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/BOOST/asio/2024-05-22-1_2_asio_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          1_2_asio_常用函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BOOST/" itemprop="url" rel="index"><span itemprop="name">BOOST</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>asio模块常用的函数</li>
+</ul>
+<h2 id="boost-asio-dispatch-函数-详解"><a href="#boost-asio-dispatch-函数-详解" class="headerlink" title="boost::asio::dispatch() 函数 详解"></a>boost::asio::dispatch() 函数 详解</h2><p><code>boost::asio::dispatch()</code> 函数是 Boost.Asio 库中用于将操作投递到执行器（executor）的函数。执行器是一个抽象概念，代表了异步操作的执行上下文和调度策略。</p>
+<p>以下是对 <code>boost::asio::dispatch()</code> 函数的详细说明：</p>
+<ol>
+<li><p><strong>函数签名：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor, <span class="keyword">typename</span> Function&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">dispatch</span><span class="params">(Executor <span class="type">const</span>&amp; ex, Function&amp;&amp; func)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数接受一个执行器 <code>ex</code> 和一个可调用对象 <code>func</code>，并将 <code>func</code> 投递到 <code>ex</code> 所指定的执行上下文中。</p>
+</li>
+<li><p><strong>参数解释：</strong></p>
+<ul>
+<li><p><code>Executor const&amp; ex</code>：执行器对象，表示异步操作将在其上下文中执行。</p>
+</li>
+<li><p><code>Function&amp;&amp; func</code>：可调用对象，表示要执行的异步操作。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>使用场景：</strong></p>
+<ul>
+<li><p><strong>确保操作在正确的上下文中执行：</strong> <code>dispatch</code> 通常用于确保某个操作在特定的执行上下文中执行。这对于与异步 I&#x2F;O 操作相关的场景非常有用，以确保操作在正确的线程或上下文中执行。</p>
+</li>
+<li><p><strong>避免竞态条件：</strong> 如果在多个执行上下文中可能同时访问某个共享资源，<code>dispatch</code> 可以用于确保某个操作在适当的上下文中执行，从而避免竞态条件。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取默认的系统执行器</span></span><br><span class="line">    <span class="keyword">auto</span> system_executor = boost::asio::<span class="built_in">system_executor</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 dispatch 将操作投递到系统执行器上下文</span></span><br><span class="line">    boost::asio::<span class="built_in">dispatch</span>(system_executor, [&amp;]() &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Async operation in the context of the system executor&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>dispatch</code> 函数用于将一个操作投递到系统执行器的上下文中，以确保操作在系统执行器的执行上下文中执行。</p>
+</li>
+</ol>
+<p>总的来说，<code>boost::asio::dispatch()</code> 是一个用于投递异步操作到指定执行器上下文的工具函数，有助于确保操作在正确的执行上下文中执行。</p>
+<h2 id="boost-asio-ip-tcp-acceptor-async-accept-函数-传递socket参数"><a href="#boost-asio-ip-tcp-acceptor-async-accept-函数-传递socket参数" class="headerlink" title="boost::asio::ip::tcp::acceptor::async_accept() 函数 传递socket参数"></a>boost::asio::ip::tcp::acceptor::async_accept() 函数 传递socket参数</h2><p><code>boost::asio::ip::tcp::acceptor::async_accept()</code> 函数可以通过额外的参数传递一个 socket 对象，以在连接建立后使用。这通常是通过使用带有额外参数的版本的 <code>async_accept</code> 函数来完成的。</p>
+<p>以下是一个简单的示例，演示如何在 <code>async_accept</code> 中传递一个 socket 参数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">handle_accept</span><span class="params">(<span class="type">const</span> boost::system::error_code&amp; error, boost::asio::ip::tcp::socket socket)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!error) &#123;</span><br><span class="line">        <span class="comment">// 处理连接成功的情况，可以使用传递的 socket 对象进行数据传输</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Connection accepted!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 在这里可以使用 socket 对象进行数据传输或其他操作</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 处理连接失败的情况</span></span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error in async_accept: &quot;</span> &lt;&lt; error.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line">    boost::asio::ip::<span class="function">tcp::acceptor <span class="title">acceptor</span><span class="params">(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), <span class="number">12345</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个 socket 对象，用于传递给 async_accept</span></span><br><span class="line">    boost::asio::ip::<span class="function">tcp::socket <span class="title">socket</span><span class="params">(io_context)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步接受连接，一旦有连接建立，调用 handle_accept 函数，并传递 socket 对象</span></span><br><span class="line">    acceptor.<span class="built_in">async_accept</span>(socket, std::<span class="built_in">bind</span>(handle_accept, std::placeholders::_1, std::<span class="built_in">move</span>(socket)));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context 以等待异步操作完成</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>async_accept</code> 函数接受一个额外的参数 <code>socket</code>，并且通过 <code>std::bind</code> 将 <code>handle_accept</code> 函数与这个参数进行绑定。在 <code>handle_accept</code> 中，你可以使用传递的 <code>socket</code> 对象进行数据传输或其他操作。需要注意的是，这里使用了 <code>std::move(socket)</code> 来确保 <code>socket</code> 对象的所有权正确地转移到 <code>handle_accept</code> 函数中。</p>
+<h2 id="boost-asio-ip-tcp-acceptor-async-accept-函数-详解"><a href="#boost-asio-ip-tcp-acceptor-async-accept-函数-详解" class="headerlink" title="boost::asio::ip::tcp::acceptor::async_accept() 函数 详解"></a>boost::asio::ip::tcp::acceptor::async_accept() 函数 详解</h2><p><code>boost::asio::ip::tcp::acceptor::async_accept()</code> 函数是 Boost.Asio 库中用于异步接受传入连接的方法。这个函数是非阻塞的，它会启动一个异步操作来等待传入连接，一旦连接建立，将调用指定的回调函数。</p>
+<p>下面是一个简要的说明和示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">handle_accept</span><span class="params">(<span class="type">const</span> boost::system::error_code&amp; error)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!error) &#123;</span><br><span class="line">        <span class="comment">// 处理连接成功的情况</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Connection accepted!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 处理连接失败的情况</span></span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error in async_accept: &quot;</span> &lt;&lt; error.<span class="built_in">message</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line">    boost::asio::ip::<span class="function">tcp::acceptor <span class="title">acceptor</span><span class="params">(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), <span class="number">12345</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步接受连接，一旦有连接建立，调用 handle_accept 函数</span></span><br><span class="line">    acceptor.<span class="built_in">async_accept</span>(handle_accept);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context 以等待异步操作完成</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>async_accept()</code> 函数用于异步接受连接。一旦连接建立或者出现错误，指定的回调函数 <code>handle_accept</code> 将被调用。</p>
+<p>需要注意的是，<code>io_context.run()</code> 会一直运行，直到所有的异步操作完成。在实际应用中，你可能会有其他的异步操作，而不仅仅是接受连接，所以你可能需要设计一个更复杂的事件循环。</p>
+<p>此外，可以使用带有额外参数的 <code>async_accept</code>，以传递更多的信息给回调函数。例如，可以传递一个 socket 对象，以便在连接建立后能够立即处理数据传输。</p>
+<h2 id="boost-asio-ip-tcp-acceptor-async-accept-函数-详解-1"><a href="#boost-asio-ip-tcp-acceptor-async-accept-函数-详解-1" class="headerlink" title="boost::asio::ip::tcp::acceptor::async_accept() 函数 详解"></a>boost::asio::ip::tcp::acceptor::async_accept() 函数 详解</h2><p><code>boost::asio::ip::tcp::acceptor::async_accept()</code> 函数是 Boost.Asio 库中用于异步接受传入连接的方法。它通常与 <code>boost::asio::ip::tcp::socket</code> 类结合使用，用于在服务端异步接受客户端的连接请求。以下是对 <code>async_accept</code> 函数的详细解释：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;</span><br><span class="line">    <span class="keyword">typename</span> Protocol1,</span><br><span class="line">    <span class="keyword">typename</span> Protocol2,</span><br><span class="line">    <span class="keyword">typename</span> AcceptHandler&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">async_accept</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    basic_socket&lt;Protocol1&gt;&amp; peer,</span></span></span><br><span class="line"><span class="params"><span class="function">    basic_socket_acceptor&lt;Protocol2&gt;&amp; acceptor,</span></span></span><br><span class="line"><span class="params"><span class="function">    AcceptHandler&amp;&amp; handler)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数解释：</p>
+<ul>
+<li><p><code>peer</code>: 表示接受连接后的新连接的 socket 对象，即用于与客户端通信的 socket。</p>
+</li>
+<li><p><code>acceptor</code>: 表示正在监听连接请求的 acceptor 对象。</p>
+</li>
+<li><p><code>handler</code>: 一个回调函数或函数对象，当连接被接受时会被调用。这个回调函数的签名应该为 <code>void handler(const boost::system::error_code&amp; error)</code></p>
+</li>
+</ul>
+<p>使用 <code>async_accept</code> 时，你需要确保在调用这个函数之前，<code>acceptor</code> 已经被打开并处于监听状态。</p>
+<p>以下是一个简单的使用例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">handle_accept</span><span class="params">(<span class="type">const</span> boost::system::error_code&amp; error)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!error) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Connection accepted!\n&quot;</span>;</span><br><span class="line">        <span class="comment">// 在这里可以处理新连接</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error accepting connection: &quot;</span> &lt;&lt; error.<span class="built_in">message</span>() &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line">    boost::asio::ip::<span class="function">tcp::acceptor <span class="title">acceptor</span><span class="params">(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), <span class="number">12345</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个用于接受连接的 socket</span></span><br><span class="line">    boost::asio::ip::<span class="function">tcp::socket <span class="title">socket</span><span class="params">(io_context)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 异步接受连接，并指定回调函数</span></span><br><span class="line">    acceptor.<span class="built_in">async_accept</span>(socket, &amp;handle_accept);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context 事件循环</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>async_accept</code> 被用于异步接受连接。当连接被接受时，<code>handle_accept</code> 回调函数会被调用。你可以在这个回调函数中处理新连接。注意，在真实的应用中，你可能需要使用更复杂的逻辑来处理连接和管理多个连接。</p>
+<h2 id="boost-asio-make-strand"><a href="#boost-asio-make-strand" class="headerlink" title="boost::asio::make_strand()"></a>boost::asio::make_strand()</h2><p>在Boost.Asio库中，<code>boost::asio::make_strand()</code> 函数用于创建一个新的 <code>boost::asio::strand</code> 对象。<code>strand</code> 提供了一种机制，确保与它关联的异步操作在同一时间只能在一个线程中执行，从而避免了竞态条件（race conditions）。</p>
+<p><code>make_strand</code> 的签名如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> boost::asio &#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor&gt;</span><br><span class="line"><span class="function">strand&lt;Executor&gt; <span class="title">make_strand</span><span class="params">(Executor ex)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125; <span class="comment">// namespace boost::asio</span></span><br></pre></td></tr></table></figure>
+
+<p>这个函数接受一个类型为 <code>Executor</code> 的参数，并返回一个 <code>strand&lt;Executor&gt;</code> 对象。<code>Executor</code> 是执行操作的执行上下文（execution context）。可以使用 <code>io_context</code> 对象作为 <code>Executor</code>，也可以使用其他类型的执行上下文。</p>
+<p>以下是一些关键概念：</p>
+<ul>
+<li><p><strong><code>strand</code> 对象：</strong> <code>strand</code> 提供了一种序列化异步操作的机制，确保它们不会同时执行。这在多线程环境中特别有用，可以避免由并发访问共享资源引起的问题。</p>
+</li>
+<li><p><strong><code>Executor</code>：</strong> <code>Executor</code> 是一个概念，表示能够执行操作的对象。例如，<code>io_context</code> 和 <code>strand</code> 都是实现了 <code>Executor</code> 概念的类。</p>
+</li>
+</ul>
+<p>下面是一个简单的示例，演示了如何使用 <code>make_strand</code> 函数创建一个 <code>strand</code> 对象：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个 strand 对象</span></span><br><span class="line">    boost::asio::strand&lt;boost::asio::io_context::executor_type&gt; my_strand = boost::asio::<span class="built_in">make_strand</span>(io_context.<span class="built_in">get_executor</span>());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在 strand 上进行异步操作</span></span><br><span class="line">    my_strand.<span class="built_in">post</span>([]() &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Operation 1\n&quot;</span>;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    my_strand.<span class="built_in">post</span>([]() &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Operation 2\n&quot;</span>;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context 事件循环</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，我们创建了一个 <code>io_context</code> 对象，并使用 <code>make_strand</code> 函数创建了一个 <code>strand</code> 对象。然后，我们通过 <code>strand</code> 的 <code>post</code> 方法将两个异步操作提交给 <code>io_context</code>。由于这两个操作在同一个 <code>strand</code> 上，它们不会同时执行，确保了操作的顺序性。在运行 <code>io_context</code> 的事件循环后，将依次输出 “Operation 1” 和 “Operation 2”。</p>
+<h2 id="boost-asio-post"><a href="#boost-asio-post" class="headerlink" title="boost::asio::post()"></a>boost::asio::post()</h2><p><code>boost::asio::post()</code> 函数是 Boost.Asio 库提供的一个用于将任务投递到 <code>io_context</code> 队列中以异步执行的工具。<code>io_context</code> 是 Boost.Asio 中的核心概念，负责处理异步操作和事件循环。</p>
+<p>以下是对 <code>boost::asio::post()</code> 函数的详解：</p>
+<ol>
+<li><p><strong>函数签名</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> CompletionToken&gt;</span><br><span class="line"><span class="built_in">BOOST_ASIO_INITFN_RESULT_TYPE</span>(CompletionToken, <span class="built_in">void</span>())</span><br><span class="line">boost::asio::<span class="built_in">post</span>(boost::asio::io_context&amp; io_context, CompletionToken&amp;&amp; token);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>io_context</code>：要将任务投递到的 <code>io_context</code> 对象的引用。</li>
+<li><code>CompletionToken</code>：一个通用的模板参数，可以是函数、Lambda 表达式或其他可调用对象。</li>
+</ul>
+</li>
+<li><p><strong>作用</strong>：</p>
+<ul>
+<li>将指定的任务投递到 <code>io_context</code> 的队列中，等待异步执行。</li>
+<li>任务可以是一个函数、Lambda 表达式、函数对象等。</li>
+</ul>
+</li>
+<li><p><strong>使用示例</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;boost/asio.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">myFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Task executed asynchronously.&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    boost::asio::io_context io_context;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 post 将任务添加到 io_context 的队列中</span></span><br><span class="line">    boost::asio::<span class="built_in">post</span>(io_context, &amp;myFunction);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 运行 io_context，等待任务执行完成</span></span><br><span class="line">    io_context.<span class="built_in">run</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的例子中，<code>myFunction</code> 函数被异步地投递到 <code>io_context</code> 中，并通过 <code>io_context.run()</code> 来运行队列中的任务。</p>
+</li>
+<li><p><strong>注意事项</strong>：</p>
+<ul>
+<li><code>post</code> 函数的返回类型是 <code>void</code>，因为它只是将任务投递到队列，而不返回任何结果。</li>
+<li>任务执行的具体时间取决于 <code>io_context</code> 的事件循环，可能在调用 <code>post</code> 后不久就执行，也可能在稍后执行。</li>
+</ul>
+</li>
+<li><p><strong>用途</strong>：</p>
+<ul>
+<li><code>boost::asio::post()</code> 主要用于将任务从一个线程投递到另一个线程，实现异步操作。</li>
+<li>在多线程编程中，避免直接在不同线程中调用 <code>io_context.run()</code>，而使用 <code>post</code> 将任务安全地传递给 <code>io_context</code> 是一种常见的做法。</li>
+</ul>
+</li>
+</ol>
+<p>总的来说，<code>boost::asio::post()</code> 函数是 Boost.Asio 提供的一个有用的工具，用于实现异步任务的投递和执行，使得多线程编程和异步 I&#x2F;O 操作更为灵活和高效。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/boost-asio/" rel="tag"># boost.asio</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/BOOST/asio/2024-05-22-C++%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8Basio%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/" rel="prev" title="C++网络编程asio使用总结">
+      <i class="fa fa-chevron-left"></i> C++网络编程asio使用总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_2_%E9%87%8D%E8%A6%81%E5%87%BD%E6%95%B0/2024-05-22-C_2_%E9%87%8D%E8%A6%81%E5%87%BD%E6%95%B0/" rel="next" title="C_2_重要函数">
+      C_2_重要函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#boost-asio-dispatch-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">boost::asio::dispatch() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#boost-asio-ip-tcp-acceptor-async-accept-%E5%87%BD%E6%95%B0-%E4%BC%A0%E9%80%92socket%E5%8F%82%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">boost::asio::ip::tcp::acceptor::async_accept() 函数 传递socket参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#boost-asio-ip-tcp-acceptor-async-accept-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">boost::asio::ip::tcp::acceptor::async_accept() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#boost-asio-ip-tcp-acceptor-async-accept-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3-1"><span class="nav-number">5.</span> <span class="nav-text">boost::asio::ip::tcp::acceptor::async_accept() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#boost-asio-make-strand"><span class="nav-number">6.</span> <span class="nav-text">boost::asio::make_strand()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#boost-asio-post"><span class="nav-number">7.</span> <span class="nav-text">boost::asio::post()</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

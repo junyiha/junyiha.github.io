@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 C&#x2F;C++ 语言最为人所诟病的特性之一就是存在内存泄露问题，因此后来的大多数语言都提供了内置内存分配与释放功能，有的甚至干脆对语言的使用者屏蔽了内存指针这一概念。这里不置贬褒，手动分配内存与手动释放内存有利也有弊，自动分配内存和自动释放内存亦如此，这是两种不同的设计哲学。有人认为，内存如此重要的东西怎么能放心交给用户去管理呢？而另外一些人则认为，内存如此重要的东西怎么能放心交给系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_智能指针">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 C&#x2F;C++ 语言最为人所诟病的特性之一就是存在内存泄露问题，因此后来的大多数语言都提供了内置内存分配与释放功能，有的甚至干脆对语言的使用者屏蔽了内存指针这一概念。这里不置贬褒，手动分配内存与手动释放内存有利也有弊，自动分配内存和自动释放内存亦如此，这是两种不同的设计哲学。有人认为，内存如此重要的东西怎么能放心交给用户去管理呢？而另外一些人则认为，内存如此重要的东西怎么能放心交给系统">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.214Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppOthers">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_智能指针 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_智能指针
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><p>C&#x2F;C++ 语言最为人所诟病的特性之一就是存在内存泄露问题，因此后来的大多数语言都提供了内置内存分配与释放功能，有的甚至干脆对语言的使用者屏蔽了内存指针这一概念。这里不置贬褒，手动分配内存与手动释放内存有利也有弊，自动分配内存和自动释放内存亦如此，这是两种不同的设计哲学。有人认为，内存如此重要的东西怎么能放心交给用户去管理呢？而另外一些人则认为，内存如此重要的东西怎么能放心交给系统去管理呢？在 C&#x2F;C++ 语言中，内存泄露的问题一直困扰着广大的开发者，因此各类库和工具的一直在努力尝试各种方法去检测和避免内存泄露，如 boost，智能指针技术应运而生。</p>
+</li>
+<li><p>智能指针主要用于管理在堆上分配的内存，它将普通的指针封装为一个栈对象。当栈对象的生存周期结束后，会在析构函数中释放掉申请的内存，从而防止内存泄漏。简要的说，智能指针利用了 C++ 的 RAII 机制，在智能指针对象作用域结束后，会自动做内存释放的相关操作，不需要我们再手动去操作内存。但是智能指针也不只是说的简简单单的自动释放内存这么简单，在使用上有一些坑需要注意，将会在下文中提到</p>
+</li>
+<li><p>C++ 中有四种智能指针：<code>auto_pt、unique_ptr、shared_ptr、weak_ptr</code> 其中后三个是 C++11 支持，第一个已经被 C++11 弃用且被 unique_prt 代替，不推荐使用。下文将对其逐个说明</p>
+</li>
+</ul>
+<hr>
+<h2 id="std-auto-ptr"><a href="#std-auto-ptr" class="headerlink" title="std::auto_ptr"></a>std::auto_ptr</h2><ul>
+<li><p>在这个年代讨论 std::auto_ptr 不免有点让人怀疑是不是有点过时了，确实如此，随着 C++11 标准的出现（最新标准是 C++20），std::auto_ptr 已经被彻底放弃，取而代之是 std::unique_ptr。然而，之所以还向介绍一下 std::auto_ptr 的用法以及它的设计不足之处是想更多了解 C++ 语言中智能指针的发展过程，一项技术如果我们了解它过去的样子和发展的轨迹，我们就能更好地掌握它</p>
+</li>
+<li><p>std::auto_ptr 的基本用法如下代码所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;memory&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    //初始化方式1</span><br><span class="line">    std::auto_ptr&lt;int&gt; ap1(new int(8));</span><br><span class="line">    //初始化方式2</span><br><span class="line">    std::auto_ptr&lt;int&gt; ap2;</span><br><span class="line">    ap2.reset(new int(8));</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>智能指针对象 ap1 和 ap2 均持有一个在堆上分配 int 对象，其值均是 8，这两块堆内存均可以在 ap1 和 ap2 释放时得到释放。这是 std::auto_ptr 的基本用法</p>
+</li>
+</ul>
+<hr>
+<ul>
+<li><p>std::auto_ptr 真正让人容易误用的地方是其不常用的复制语义，即当复制一个 std::auto_ptr 对象时（拷贝复制或 operator&#x3D; 复制），原对象所持有的堆内存对象也会转移给复制出来的对象</p>
+</li>
+<li><p>利用拷贝构造（ap1 &#x3D;&gt; ap2）和 赋值构造（ap3 &#x3D;&gt; ap4）来创建新的 std::auto_ptr 对象，因此 ap1 持有的堆对象被转移给 ap2，ap3 持有的堆对象被转移给 ap4。而 ap1 和 ap2 已经指向 NULL，若现在再对 ap1 和 ap2 进行访问并操作，将会出现内存错误问题</p>
+</li>
+<li><p>由于 std::auto_ptr 这种不常用的复制语义，我们应该避免在 stl 容器中使用 std::auto_ptr，例如我们绝不应该写出如下代码：</p>
+<ul>
+<li><code>std::vector&lt;std::auto_ptr&lt;int&gt;&gt; myvectors;</code></li>
+<li>当用算法对容器操作的时候（如最常见的容器元素遍历），很难避免不对容器中的元素实现赋值传递，这样便会使容器中多个元素被置为空指针，这不是我们想看到的，会造成很多意想不到的错误</li>
+</ul>
+</li>
+<li><p>正因为 std::auto_ptr 的设计存在如此重大缺陷，C++11 标准在充分借鉴和吸收了 boost 库中智能指针的设计思想，引入了三种类型的智能指针，即 std::unique_ptr、std::shared_ptr 和 std::weak_ptr。</p>
+</li>
+<li><p>boost 还有 scoped_ptr，C++11 并没有全部照搬，而是选择了三个最实用的指针类型。在 C++11 中可以通过 std::unique_ptr 达到与 boost::scoped_ptr 一样的效果。</p>
+</li>
+<li><p>所有的智能指针类（包括 std::unique_ptr）均包含于头文件 <code>&lt;memory&gt;</code> 中。</p>
+</li>
+</ul>
+<hr>
+<h2 id="std-unique-ptr"><a href="#std-unique-ptr" class="headerlink" title="std::unique_ptr"></a>std::unique_ptr</h2><ul>
+<li><p>作为对 std::auto_ptr 的改进，std::unique_ptr 对其持有的堆内存具有唯一拥有权，也就是 std::unique_ptr 不可以拷贝或赋值给其他对象，其拥有的堆内存仅自己独占，std::unique_ptr 对象销毁时会释放其持有的堆内存</p>
+</li>
+<li><p>可以使用以下方式初始化一个 std::unique_ptr 对象</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//初始化方式1</span></span><br><span class="line">    <span class="function">std::unique_ptr&lt;<span class="type">int</span>&gt; <span class="title">up1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">123</span>))</span></span>;</span><br><span class="line">    <span class="comment">//初始化方式2</span></span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; up2;</span><br><span class="line">    up<span class="number">2.</span><span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">int</span>(<span class="number">123</span>));</span><br><span class="line">    <span class="comment">//初始化方式3 (-std=c++14)</span></span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; up3 = std::<span class="built_in">make_unique</span>&lt;<span class="type">int</span>&gt;(<span class="number">123</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>应该尽量使用初始化方式 3 的方式去创建一个 std::unique_ptr 而不是方式 1 和 2，因为形式 3 更安全，原因 Scott Meyers 在其《Effective Modern C++》中已经解释过了，有兴趣的可以阅读此书相关章节</p>
+</li>
+<li><p>令很多人对 C++11 规范不满的地方是，C++11 新增了 std::make_shared() 方法创建一个 std::shared_ptr 对象，却没有提供相应的 std::make_unique() 方法创建一个 std::unique_ptr 对象，这个方法直到 C++14 才被添加进来。当然，在 C++11 中你很容易实现出这样一个方法来：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">template &lt;typename T, typename... Ts&gt;</span><br><span class="line">std::unique_ptr&lt;T&gt; make_unique(Ts &amp;&amp;...params)</span><br><span class="line">&#123;</span><br><span class="line">    return std::unique_ptr&lt;T&gt;(new T(std::forward&lt;Ts&gt;(params)...));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>鉴于 std::auto_ptr 的前车之鉴，std::unique_ptr 禁止复制语义，为了达到这个效果，std::unique_ptr 类的拷贝构造函数和赋值运算符（operator &#x3D;）被标记为 delete</p>
+</li>
+</ul>
+<hr>
+<ul>
+<li><p>禁止复制语义也存在特例，即可以通过一个函数返回一个 std::unique_ptr：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">std::unique_ptr&lt;<span class="type">int</span>&gt; <span class="title">func</span><span class="params">(<span class="type">int</span> val)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::unique_ptr&lt;<span class="type">int</span>&gt; <span class="title">up</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(val))</span></span>;</span><br><span class="line">    <span class="keyword">return</span> up;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; up1 = <span class="built_in">func</span>(<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>上述代码从 func 函数中得到一个 std::unique_ptr 对象，然后返回给 up1</p>
+</li>
+<li><p>既然 std::unique_ptr 不能复制，那么如何将一个 std::unique_ptr 对象持有的堆内存转移给另外一个呢？答案是使用移动构造，示例代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::unique_ptr&lt;<span class="type">int</span>&gt; <span class="title">up1</span><span class="params">(std::make_unique&lt;<span class="type">int</span>&gt;(<span class="number">123</span>))</span></span>;</span><br><span class="line">    <span class="function">std::unique_ptr&lt;<span class="type">int</span>&gt; <span class="title">up2</span><span class="params">(std::move(up1))</span></span>;</span><br><span class="line">    std::cout &lt;&lt; ((up<span class="number">1.</span><span class="built_in">get</span>() == <span class="literal">nullptr</span>) ? <span class="string">&quot;up1 is NULL&quot;</span> : <span class="string">&quot;up1 is not NULL&quot;</span>) &lt;&lt; std::endl;</span><br><span class="line">    </span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>&gt; up3;</span><br><span class="line">    up3 = std::<span class="built_in">move</span>(up2);</span><br><span class="line">    std::cout &lt;&lt; ((up<span class="number">2.</span><span class="built_in">get</span>() == <span class="literal">nullptr</span>) ? <span class="string">&quot;up2 is NULL&quot;</span> : <span class="string">&quot;up2 is not NULL&quot;</span>) &lt;&lt; std::endl;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>以上代码利用 std::move 将 up1 持有的堆内存（值为 123）转移给 up2，再把 up2 转移给 up3。最后，up1 和 up2 不再持有堆内存的引用，变成一个空的智能指针对象</p>
+</li>
+<li><p>并不是所有的对象的 std::move 操作都有意义，只有实现了移动构造函数或移动赋值运算符的类才行，而 std::unique_ptr 正好实现了这二者</p>
+</li>
+</ul>
+<hr>
+<ul>
+<li>std::unique_ptr 不仅可以持有一个堆对象，也可以持有一组堆对象，示例如下<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//创建10个int类型的堆对象</span></span><br><span class="line">    <span class="comment">//形式1</span></span><br><span class="line">    <span class="function">std::unique_ptr&lt;<span class="type">int</span>[]&gt; <span class="title">up1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>])</span></span>;</span><br><span class="line">    <span class="comment">//形式2</span></span><br><span class="line">    std::unique_ptr&lt;<span class="type">int</span>[]&gt; up2;</span><br><span class="line">    up<span class="number">2.</span><span class="built_in">reset</span>(<span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>]);</span><br><span class="line">    <span class="comment">//形式3</span></span><br><span class="line">    <span class="function">std::unique_ptr&lt;<span class="type">int</span>[]&gt; <span class="title">up3</span><span class="params">(std::make_unique&lt;<span class="type">int</span>[]&gt;(<span class="number">10</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        up1[i] = i;</span><br><span class="line">        up2[i] = i;</span><br><span class="line">        up3[i] = i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; up1[i] &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; up2[i] &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; up3[i] &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>std::shared_ptr 和 std::weak_ptr 也可以持有一组堆对象，用法与 std::unique_ptr 相同，下文不再赘述</li>
+</ul>
+<hr>
+<ul>
+<li>另外，std::unique_ptr 有几个常用函数如下：<ul>
+<li><code>void reset(pointer p = pointer())</code><ul>
+<li>释放当前由 unique_ptr（如果有）管理的指针并获得参数 p（参数 p 默认为 NULL）的所有权。如果 p 是空指针（例如默认初始化的指针），则 unique_ptr 变为空，调用后不管理任何对象。</li>
+</ul>
+</li>
+<li><code>pointer release()</code><ul>
+<li>返回管理的指针并将其替换为空指针， 释放其管理指针的所有权。这个调用并不会销毁托管对象，但是将 unique_ptr 对象管理的指针解脱出来。如果要强制销毁所指向的对象，请调用 reset 函数或对其执行赋值操作</li>
+</ul>
+</li>
+<li><code>element_type* get()</code><ul>
+<li>返回存储的指针，不会使 unique_ptr 释放指针的所有权。因此，该函数返回的值不能于构造新的托管指针，如果为了获得存储的指针并释放其所有权，请调用 release。</li>
+</ul>
+</li>
+<li><code>void swap (unique_ptr&amp; x)</code><ul>
+<li>将 unique_ptr 对象的内容与对象 x 进行交换，在它们两者之间转移管理指针的所有权而不破坏二者。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li>自定义智能指针对象持有的资源的释放函数<ul>
+<li>默认情况下，智能指针对象在析构时只会释放其持有的堆内存（调用 delete 或者 delete[]），但是假设这块堆内存代表的对象还对应一种需要回收的资源（如操作系统的套接字句柄、文件句柄等），我们可以通过自定义智能指针的资源释放函数。假设现在有一个 Socket 类，对应着操作系统的套接字句柄，在回收时需要关闭该对象，我们可以如下自定义智能指针对象的资源析构函数，这里以 std::unique_ptr 为例：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Socket</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Socket</span>()</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">Socket</span>()</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//关闭资源句柄</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">close</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> deletor = [](Socket *pSocket)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//关闭句柄</span></span><br><span class="line">        pSocket-&gt;<span class="built_in">close</span>();</span><br><span class="line">        <span class="comment">//<span class="doctag">TODO:</span> 你甚至可以在这里打印一行日志...</span></span><br><span class="line">        <span class="keyword">delete</span> pSocket;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::unique_ptr&lt;Socket, <span class="title">void</span> <span class="params">(*)</span><span class="params">(Socket * pSocket)</span>&gt; <span class="title">upSocket</span><span class="params">(<span class="keyword">new</span> Socket(), deletor)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>自定义 std::unique_ptr 的资源释放函数其规则是：<ul>
+<li><code>std::unique_ptr&lt;T, DeletorFuncPtr&gt;</code> </li>
+<li>其中 T 是你要释放的对象类型，DeletorPtr 是一个自定义函数指针。</li>
+<li>上述代码 28 行表示 DeletorPtr 有点复杂（是 C++11 中的 Lambda 函数），我们可以使用 decltype(deletor) 让编译器自己推导 deletor 的类型，因此可以将 28 行代码修改为：<ul>
+<li><code>std::unique_ptr&lt;Socket, decltype(deletor)&gt; upSocket(new Socket(), deletor);</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="std-shared-ptr"><a href="#std-shared-ptr" class="headerlink" title="std::shared_ptr"></a>std::shared_ptr</h2><ul>
+<li>std::unique_ptr 对其持有的资源具有独占性，而 std::shared_ptr 持有的资源可以在多个 std::shared_ptr 之间共享，每多一个 std::shared_ptr 对资源的引用，资源引用计数将增加 1，每一个指向该资源的 std::shared_ptr 对象析构时，资源引用计数减 1，最后一个 std::shared_ptr 对象析构时，发现资源计数为 0，将释放其持有的资源。多个线程之间，递增和减少资源的引用计数是安全的。（注意：这不意味着多个线程同时操作 std::shared_ptr 引用的对象是安全的）。std::shared_ptr 提供了一个 use_count() 方法来获取当前持有资源的引用计数。除了上面描述的，std::shared_ptr 用法和 std::unique_ptr 基本相同</li>
+<li>下面是一个初始化 std::shared_ptr 的示例：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//初始化方式1</span></span><br><span class="line">    <span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">123</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化方式2</span></span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; sp2;</span><br><span class="line">    sp<span class="number">2.</span><span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">int</span>(<span class="number">123</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化方式3</span></span><br><span class="line">    std::shared_ptr&lt;<span class="type">int</span>&gt; sp3;</span><br><span class="line">    sp3 = std::<span class="built_in">make_shared</span>&lt;<span class="type">int</span>&gt;(<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>和 std::unique_ptr 一样，你应该优先使用 std::make_shared 去初始化一个 std::shared_ptr 对象</li>
+</ul>
+<hr>
+<ul>
+<li>std::shared_ptr 有几个常用函数如下：<ul>
+<li><code>void swap (unique_ptr&amp; x)</code><ul>
+<li>将 shared_ptr 对象的内容与对象 x 进行交换，在它们两者之间转移管理指针的所有权而不破坏或改变二者的引用计数</li>
+</ul>
+</li>
+<li><code>void reset()</code></li>
+<li><code>void reset (ponit p)</code><ul>
+<li>没有参数时，先将管理的计数器引用计数减一并将管理的指针和计数器置清零。有参数 p 时，先做面前没有参数的操作，再管理 p 的所有权和设置计数器</li>
+</ul>
+</li>
+<li><code>element_type* get()</code><ul>
+<li>得到其管理的指针。</li>
+</ul>
+</li>
+<li><code>long int use_count()</code><ul>
+<li>返回与当前智能指针对象在同一指针上共享所有权的 shared_ptr 对象的数量，如果这是一个空的 shared_ptr，则该函数返回 0。如果要用来检查 use_count 是否为 1，可以改用成员函数 unique 会更快。</li>
+</ul>
+</li>
+<li><code>bool unique()</code><ul>
+<li>返回当前 shared_ptr 对象是否不和其他智能指针对象共享指针的所有权，如果这是一个空的 shared_ptr，则该函数返回 false</li>
+</ul>
+</li>
+<li><code>element_type&amp; operator\*()</code><ul>
+<li>重载指针的 * 运算符，返回管理的指针指向的地址的引用。</li>
+</ul>
+</li>
+<li><code>element_type* operator-&gt;()</code><ul>
+<li>重载指针的 -&gt; 运算符，返回管理的指针，可以访问其成员</li>
+</ul>
+</li>
+<li><code>explicit operator bool()</code><ul>
+<li>返回存储的指针是否已经是空指针，返回的结果与 get() !&#x3D; 0 相同</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><code>std::enable_shared_from_this</code><ul>
+<li>实际开发中，有时候需要在类中返回包裹当前对象（this）的一个 std::shared_ptr 对象给外部使用，C++ 新标准也为我们考虑到了这一点，有如此需求的类只要继承自 std::enable_shared_from_this 模板对象即可。用法如下<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> : <span class="keyword">public</span> std::enable_shared_from_this&lt;A&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">A</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;A constructor&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">A</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;A destructor&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::shared_ptr&lt;A&gt; <span class="title">getSelf</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">shared_from_this</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::shared_ptr&lt;A&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line"></span><br><span class="line">    std::shared_ptr&lt;A&gt; sp2 = sp1-&gt;<span class="built_in">getSelf</span>();</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;use count: &quot;</span> &lt;&lt; sp<span class="number">1.</span><span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>上述代码中，类 A 的继承 std::enable_shared_from_this 并提供一个 getSelf() 方法返回自身的 std::shared_ptr 对象，在 getSelf() 中调用 shared_from_this() 即可</li>
+</ul>
+</li>
+<li>std::enable_shared_from_this 用起来比较方便，但是也存在很多不易察觉的陷阱<ul>
+<li>陷阱一：不应该共享栈对象的 this 给智能指针对象<ul>
+<li>假设我们将上面代码 main 函数 25 行生成 A 对象的方式改成一个栈变量，即：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//其他相同代码省略...</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    A a;</span><br><span class="line"></span><br><span class="line">    std::shared_ptr&lt;A&gt; sp2 = a.<span class="built_in">getSelf</span>();</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;use count: &quot;</span> &lt;&lt; sp<span class="number">2.</span><span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>运行修改后的代码会发现程序在 std::shared_ptr sp2 &#x3D; a.getSelf() 产生崩溃。这是因为，智能指针管理的是堆对象，栈对象会在函数调用结束后自行销毁，因此不能通过 shared_from_this() 将该对象交由智能指针对象管理。</li>
+<li><strong>切记：</strong> 智能指针最初设计的目的就是为了管理堆对象的（即那些不会自动释放的资源）</li>
+</ul>
+</li>
+<li>陷阱二：避免 std::enable_shared_from_this 的循环引用问题<ul>
+<li>再来看另外一段代码：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> : <span class="keyword">public</span> std::enable_shared_from_this&lt;A&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">A</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        m_i = <span class="number">9</span>;</span><br><span class="line">        <span class="comment">//注意:</span></span><br><span class="line">        <span class="comment">//比较好的做法是在构造函数里面调用shared_from_this()给m_SelfPtr赋值</span></span><br><span class="line">        <span class="comment">//但是很遗憾不能这么做,如果写在构造函数里面程序会直接崩溃</span></span><br><span class="line"></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;A constructor&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">A</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        m_i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;A destructor&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        m_SelfPtr = <span class="built_in">shared_from_this</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span> m_i;</span><br><span class="line">    std::shared_ptr&lt;A&gt; m_SelfPtr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">std::shared_ptr&lt;A&gt; <span class="title">spa</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line">        spa-&gt;<span class="built_in">func</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>乍一看上面的代码好像看不出什么问题，让我们来实际运行一下看看输出结果：<ul>
+<li><code>A constructor</code></li>
+</ul>
+</li>
+<li>我们发现在程序的整个生命周期内，只有 A 类构造函数的调用输出，没有 A 类析构函数的调用输出，这意味着 new 出来的 A 对象产生了内存泄漏！</li>
+<li>我们来分析一下为什么 new 出来的 A 对象得不到释放。当程序执行到 39 行后，spa 出了其作用域准备析构，在析构时其发现仍然有另外的一个 std::shared_ptr 对象即 A::m_SelfPtr 引用了 A，因此 spa 只会将 A 的引用计数递减为 1，然后就销毁自身了。现在留下一个矛盾的处境：必须销毁 A 才能销毁其成员变量 m_SelfPtr，而销毁 m_SelfPtr 必须先销毁 A。这就是所谓的 std::enable_shared_from_this 的循环引用问题。我们在实际开发中应该避免做出这样的逻辑设计，这种情形下即使使用了智能指针也会造成内存泄漏。</li>
+<li>也就是说: <strong>一个资源的生命周期可以交给一个智能指针对象，但是该智能指针的生命周期不可以再交给整个资源来管理</strong>。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="std-weak-ptr"><a href="#std-weak-ptr" class="headerlink" title="std::weak_ptr"></a>std::weak_ptr</h2><ul>
+<li>std::weak_ptr 是一个不控制资源生命周期的智能指针，是对对象的一种弱引用，只是提供了对其管理的资源的一个访问手段，引入它的目的为协助 std::shared_ptr 工作</li>
+<li>std::weak_ptr 可以从一个 std::shared_ptr 或另一个 std::weak_ptr 对象构造，std::shared_ptr 可以直接赋值给 std::weak_ptr ，也可以通过 std::weak_ptr 的 lock() 函数来获得 std::shared_ptr。它的构造和析构不会引起引用计数的增加或减少。std::weak_ptr 可用来解决 std::shared_ptr 相互引用时的死锁问题（即两个std::shared_ptr 相互引用，那么这两个指针的引用计数永远不可能下降为 0， 资源永远不会释放）</li>
+<li>示例代码：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//创建一个std::shared_ptr对象</span></span><br><span class="line">    <span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">123</span>))</span></span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;use count: &quot;</span> &lt;&lt; sp<span class="number">1.</span><span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过构造函数得到一个std::weak_ptr对象</span></span><br><span class="line">    <span class="function">std::weak_ptr&lt;<span class="type">int</span>&gt; <span class="title">sp2</span><span class="params">(sp1)</span></span>;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;use count: &quot;</span> &lt;&lt; sp<span class="number">1.</span><span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过赋值运算符得到一个std::weak_ptr对象</span></span><br><span class="line">    std::weak_ptr&lt;<span class="type">int</span>&gt; sp3 = sp1;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;use count: &quot;</span> &lt;&lt; sp<span class="number">1.</span><span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过一个std::weak_ptr对象得到另外一个std::weak_ptr对象</span></span><br><span class="line">    std::weak_ptr&lt;<span class="type">int</span>&gt; sp4 = sp2;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;use count: &quot;</span> &lt;&lt; sp<span class="number">1.</span><span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>运行结果<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use count: 1</span><br><span class="line">use count: 1</span><br><span class="line">use count: 1</span><br><span class="line">use count: 1</span><br></pre></td></tr></table></figure></li>
+<li>无论通过何种方式创建 std::weak_ptr 都不会增加资源的引用计数，因此每次输出引用计数的值都是 1。</li>
+</ul>
+<hr>
+<ul>
+<li>既然，std::weak_ptr 不管理对象的生命周期，那么其引用的对象可能在某个时刻被销毁了，如何得知呢？std::weak_ptr 提供了一个 expired() 方法来做这一项检测，返回 true，说明其引用的资源已经不存在了；返回 false，说明该资源仍然存在，这个时候可以使用 std::weak_ptr 的 lock() 方法得到一个 std::shared_ptr 对象然后继续操作资源，以下代码演示了该用法：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tmpConn_ 是一个 std::weak_ptr&lt;TcpConnection&gt; 对象</span></span><br><span class="line"><span class="comment">// tmpConn_ 引用的TcpConnection已经销毁，直接返回</span></span><br><span class="line"><span class="keyword">if</span> (tmpConn_.<span class="built_in">expired</span>())</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">std::shared_ptr&lt;TcpConnection&gt; conn = tmpConn_.<span class="built_in">lock</span>();</span><br><span class="line"><span class="keyword">if</span> (conn)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//对conn进行操作，省略...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>有读者可能对上述代码产生疑问，既然使用了 std::weak_ptr 的 expired() 方法判断了对象是否存在，为什么不直接使用 std::weak_ptr 对象对引用资源进行操作呢？实际上这是行不通的，std::weak_ptr 类没有重写 operator-&gt; 和 operator* 方法，因此不能像 std::shared_ptr 或 std::unique_ptr 一样直接操作对象，同时 std::weak_ptr 类也没有重写 operator! 操作，因此也不能通过 std::weak_ptr 对象直接判断其引用的资源是否存在：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">doSomething</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::shared_ptr&lt;A&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::weak_ptr&lt;A&gt; <span class="title">sp2</span><span class="params">(sp1)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//正确代码</span></span><br><span class="line">    <span class="keyword">if</span> (sp1)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//正确代码</span></span><br><span class="line">        sp1-&gt;<span class="built_in">doSomething</span>();</span><br><span class="line">        (*sp1).<span class="built_in">doSomething</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//正确代码</span></span><br><span class="line">    <span class="keyword">if</span> (!sp1)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//错误代码，无法编译通过</span></span><br><span class="line">    <span class="comment">//if (sp2)</span></span><br><span class="line">    <span class="comment">//&#123;</span></span><br><span class="line">    <span class="comment">//    //错误代码，无法编译通过</span></span><br><span class="line">    <span class="comment">//    sp2-&gt;doSomething();</span></span><br><span class="line">    <span class="comment">//    (*sp2).doSomething();</span></span><br><span class="line">    <span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//错误代码，无法编译通过</span></span><br><span class="line">    <span class="comment">//if (!sp2)</span></span><br><span class="line">    <span class="comment">//&#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>之所以 std::weak_ptr 不增加引用资源的引用计数不管理资源的生命周期，是因为，即使它实现了以上说的几个方法，调用它们也是不安全的，因为在调用期间，引用的资源可能恰好被销毁了，这会造成棘手的错误和麻烦</li>
+</ul>
+<hr>
+<ul>
+<li><p>因此，std::weak_ptr 的正确使用场景是那些资源如果可能就使用，如果不可使用则不用的场景，它不参与资源的生命周期管理。例如，网络分层结构中，Session 对象（会话对象）利用 Connection 对象（连接对象）提供的服务工作，但是 Session 对象不管理 Connection 对象的生命周期，Session 管理 Connection 的生命周期是不合理的，因为网络底层出错会导致 Connection 对象被销毁，此时 Session 对象如果强行持有 Connection 对象与事实矛盾</p>
+</li>
+<li><p>std::weak_ptr 的应用场景，经典的例子是订阅者模式或者观察者模式中。这里以订阅者为例来说明，消息发布器只有在某个订阅者存在的情况下才会向其发布消息，而不能管理订阅者的生命周期</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Subscriber</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SubscribeManager</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">publish</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;iter : m_subscribers)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (!iter.<span class="built_in">expired</span>())</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//TODO：给订阅者发送消息</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::vector&lt;std::weak_ptr&lt;Subscriber&gt;&gt; m_subscribers;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<ul>
+<li>另外，std::weak_ptr 有几个常用函数如下<ul>
+<li><code>void swap (weak_ptr&amp; x)</code><ul>
+<li>将当前 weak_ptr 对象的内容与 x 的内容交换</li>
+</ul>
+</li>
+<li><code>void reset()</code><ul>
+<li>将当前 weak_ptr 对象管理的指针和计数器变成空的，就像默认构造的一样。</li>
+</ul>
+</li>
+<li><code>long int use_count()</code><ul>
+<li>返回与当前 weak_ptr 对象在同一指针上共享所有权的 shared_ptr 对象的数量。</li>
+</ul>
+</li>
+<li><code>bool expired()</code><ul>
+<li>检查是否过期，返回 weak_ptr 对象管理的指针为空，或者和他所属共享的没有更多 shared_ptr。lock 函数一般需要先调用 expired 判断，如果已经过期，就不能通过 weak_ptr 恢复拥有的 shared_ptr。此函数应返回与（use_count() &#x3D;&#x3D; 0）相同的值，但是它可能以更有效的方式执行此操作。</li>
+</ul>
+</li>
+<li><code>shared_ptr&lt;element_type&gt; lock()</code><ul>
+<li>如果它没有过期，则返回一个 shared_ptr，其中包含由 weak_ptr 对象保留的信息。如果 weak_ptr 对象已经过期，则该函数返回一个空的 shared_ptr（默认构造一样）。因为返回的 shared_ptr 对象也算作一个所有者，所以这个函数锁定了拥有的指针，防止它被释放（至少在返回的对象没有释放它的情况下）。 此操作以原子方式执行</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="智能指针使用注意事项"><a href="#智能指针使用注意事项" class="headerlink" title="智能指针使用注意事项"></a>智能指针使用注意事项</h2><ul>
+<li>C++ 新标准提倡的理念之一是不应该再手动调用 delete 或者 free 函数去释放内存了，而应该把它们交给新标准提供的各种智能指针对象。C++ 新标准中的各种智能指针是如此的实用与强大，在现代 C++ 项目开发中，我们应该尽量去使用它们。</li>
+<li>智能指针虽然好用，但稍不注意，也可能存在许多难以发现的 bug，这里我根据经验总结了几条</li>
+</ul>
+<hr>
+<ul>
+<li><p>一旦一个对象使用智能指针管理后，就不该再使用原始裸指针去操作</p>
+</li>
+<li><p>一段代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Subscriber</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Subscriber *pSubscriber = <span class="keyword">new</span> <span class="built_in">Subscriber</span>();</span><br><span class="line"></span><br><span class="line">    <span class="function">std::unique_ptr&lt;Subscriber&gt; <span class="title">spSubscriber</span><span class="params">(pSubscriber)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> pSubscriber;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>这段代码利用创建了一个堆对象 Subscriber，然后利用智能指针 spSubscriber 去管理之，可以却私下利用原始指针销毁了该对象，这让智能指针对象 spSubscriber 情何以堪啊？</p>
+</li>
+<li><p>记住，一旦智能指针对象接管了你的资源，所有对资源的操作都应该通过智能指针对象进行，不建议再通过原始指针进行操作了。</p>
+</li>
+<li><p>当然，除了 std::weak_ptr 之外，std::unique_ptr 和 std::shared_ptr 都提供了获取原始指针的方法——get() 函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Subscriber *pSubscriber = <span class="keyword">new</span> <span class="built_in">Subscriber</span>();</span><br><span class="line"></span><br><span class="line">    <span class="function">std::unique_ptr&lt;Subscriber&gt; <span class="title">spSubscriber</span><span class="params">(pSubscriber)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//pTheSameSubscriber和pSubscriber指向同一个对象</span></span><br><span class="line">    Subscriber *pTheSameSubscriber = spSubscriber.<span class="built_in">get</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<ul>
+<li>分清楚场合应该使用哪种类型的智能指针</li>
+<li>通常情况下，如果你的资源不需要在其他地方共享，那么应该优先使用 std::unique_ptr，反之使用 std::shared_ptr，当然这是在该智能指针需要管理资源的生命周期的情况下；如果不需要管理对象的生命周期，请使用 std::weak_ptr</li>
+</ul>
+<hr>
+<ul>
+<li>认真考虑，避免操作某个引用资源已经释放的智能指针</li>
+<li>前面的例子，一定让你觉得非常容易知道一个智能指针的持有的资源是否还有效，但是还是建议在不同场景谨慎一点，有些场景是很容易造成误判。例如下面的代码<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">T</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">doSomething</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;T do something...&quot;</span> &lt;&lt; m_i &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> m_i;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::shared_ptr&lt;T&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> T())</span></span>;</span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> &amp;sp2 = sp1;</span><br><span class="line"></span><br><span class="line">    sp<span class="number">1.</span><span class="built_in">reset</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//由于sp2已经不再持有对象的引用，程序会在这里出现意外的行为</span></span><br><span class="line">    sp2-&gt;<span class="built_in">doSomething</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>上述代码中，sp2 是 sp1 的引用，sp1 被置空后，sp2 也一同为空。这时候调用 sp2-&gt;doSomething()，sp2-&gt;（即 operator-&gt;）在内部会调用 get() 方法获取原始指针对象，这时会得到一个空指针（地址为 0），继续调用 doSomething() 导致程序崩溃</li>
+<li>你一定仍然觉得这个例子也能很明显地看出问题，ok，让我们把这个例子放到实际开发中再来看一下：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//连接断开</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">MonitorServer::OnClose</span><span class="params">(<span class="type">const</span> std::shared_ptr&lt;TcpConnection&gt; &amp;conn)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">guard</span><span class="params">(m_sessionMutex)</span></span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> iter = m_sessions.<span class="built_in">begin</span>(); iter != m_sessions.<span class="built_in">end</span>(); ++iter)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//通过比对connection对象找到对应的session</span></span><br><span class="line">        <span class="keyword">if</span> ((*iter)-&gt;<span class="built_in">GetConnectionPtr</span>() == conn)</span><br><span class="line">        &#123;</span><br><span class="line">            m_sessions.<span class="built_in">erase</span>(iter);</span><br><span class="line">            <span class="comment">//注意这里：程序在此处崩溃</span></span><br><span class="line">            <span class="built_in">LOGI</span>(<span class="string">&quot;monitor client disconnected: %s&quot;</span>, conn-&gt;<span class="built_in">peerAddress</span>().<span class="built_in">toIpPort</span>().<span class="built_in">c_str</span>());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>该段程序会在代码 12 行处崩溃，崩溃原因是调用了 conn-&gt;peerAddress() 方法</li>
+<li>崩溃原因是传入的 conn 对象和上一个例子中的 sp2 一样都是另外一个 std::shared_ptr 的引用，当连接断开时，对应的 TcpConnection 对象可能早已被销毁，而 conn 引用就会变成空指针（严格来说是不再拥有一个 TcpConnection 对象），此时调用 TcpConnection 的 peerAddress() 方法就会产生和上一个示例一样的错误</li>
+</ul>
+<hr>
+<ul>
+<li>作为类成员变量时，应该优先使用前置声明（forward declarations）</li>
+<li>我们知道，为了减小编译依赖加快编译速度和生成二进制文件的大小，C&#x2F;C++ 项目中一般在 *.h 文件对于指针类型尽量使用前置声明，而不是直接包含对应类的头文件</li>
+<li>示例<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Test.h</span></span><br><span class="line"><span class="comment">//在这里使用A的前置声明，而不是直接包含A.h文件</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>();</span><br><span class="line">    ~<span class="built_in">Test</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    A *m_pA;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>同样的道理，在头文件中当使用智能指针对象作为类成员变量时，也应该优先使用前置声明去引用智能指针对象的包裹类，而不是直接包含包含类的头文件<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Test.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//智能指针包裹类A，这里优先使用A的前置声明，而不是直接包含A.h</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>();</span><br><span class="line">    ~<span class="built_in">Test</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::unique_ptr&lt;A&gt; m_spA;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>Modern C&#x2F;C++ 已经变为 C&#x2F;C++ 开发的趋势，希望能善用和熟练这些智能指针对象</li>
+</ul>
+<hr>
+<h2 id="智能指针的简单实现"><a href="#智能指针的简单实现" class="headerlink" title="智能指针的简单实现"></a>智能指针的简单实现</h2><ul>
+<li><p>最后，给出智能指针的简单实现，因为 weak_ptr 作为弱引用指针，其实现依赖于 Counter 计数器类和 shared_ptr 的赋值，所以先进行 Counter 计数器类和 share_ptr 的简单实现</p>
+</li>
+<li><p>Counter的简单实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 计数器</span></span><br><span class="line"><span class="comment"> * Counter对象就是用来申请一块内存存储引用计数</span></span><br><span class="line"><span class="comment"> * m_refCount是SharedPtr的引用计数</span></span><br><span class="line"><span class="comment"> * m_weakCount是WeakPtr的引用计数</span></span><br><span class="line"><span class="comment"> * 当m_weakCount为0时删除Counter对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Counter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">SharedPtr</span>&lt;T&gt;;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">WeakPtr</span>&lt;T&gt;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Counter</span>() : <span class="built_in">m_refCount</span>(<span class="number">0</span>), <span class="built_in">m_weakCount</span>(<span class="number">0</span>) &#123;&#125;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Counter</span>() &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Counter</span>(<span class="type">const</span> Counter &amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Counter &amp;<span class="keyword">operator</span>=(<span class="type">const</span> Counter &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    atomic_uint m_refCount;  <span class="comment">// #shared,原子操作</span></span><br><span class="line">    atomic_uint m_weakCount; <span class="comment">// #weak,原子操作</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>shared_ptr的简单实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * SharedPtr的简单实现</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SharedPtr</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">WeakPtr</span>&lt;T&gt;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 构造函数，用原生指针构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">SharedPtr</span>(T *ptr) : <span class="built_in">m_ptr</span>(ptr), <span class="built_in">m_cnt</span>(<span class="keyword">new</span> Counter&lt;T&gt;)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (ptr)</span><br><span class="line">        &#123;</span><br><span class="line">            m_cnt-&gt;m_refCount = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;Ptr Construct S.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">SharedPtr</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">release</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 拷贝构造函数，用另一个SharedPtr对象构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">SharedPtr</span>(<span class="type">const</span> SharedPtr &amp;s)</span><br><span class="line">    &#123;</span><br><span class="line">        m_ptr = s.m_ptr;</span><br><span class="line">        s.m_cnt-&gt;m_refCount++;</span><br><span class="line">        m_cnt = s.m_cnt;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;S Copy Construct S.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 拷贝构造函数，用另一个WeakPtr对象构造</span></span><br><span class="line"><span class="comment">     * 为了WeakPtr对象调用自己的lock()方法将自己传进来构造一个SharedPtr返回</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">SharedPtr</span>(<span class="type">const</span> WeakPtr&lt;T&gt; &amp;w)</span><br><span class="line">    &#123;</span><br><span class="line">        m_ptr = w.m_ptr;</span><br><span class="line">        w.m_cnt-&gt;m_refCount++;</span><br><span class="line">        m_cnt = w.m_cnt;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;W Copy Construct S.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 赋值构造函数，用另一个SharedPtr对象构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    SharedPtr&lt;T&gt; &amp;<span class="keyword">operator</span>=(<span class="type">const</span> SharedPtr&lt;T&gt; &amp;s)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != s)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;<span class="built_in">release</span>();</span><br><span class="line">            m_ptr = s.m_ptr;</span><br><span class="line">            s.m_cnt-&gt;m_refCount++;</span><br><span class="line">            m_cnt = s.m_cnt;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;S Assign Construct S.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T &amp;<span class="keyword">operator</span>*()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> *m_ptr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T *<span class="keyword">operator</span>-&gt;()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_ptr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">release</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        m_cnt-&gt;m_refCount--;</span><br><span class="line">        <span class="keyword">if</span> (m_cnt-&gt;m_refCount &lt; <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">delete</span> m_ptr;</span><br><span class="line">            m_ptr = <span class="literal">nullptr</span>;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;SharedPtr Delete Ptr.&quot;</span> &lt;&lt; endl;</span><br><span class="line">            <span class="keyword">if</span> (m_cnt-&gt;m_weakCount &lt; <span class="number">1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">delete</span> m_cnt;</span><br><span class="line">                m_cnt = <span class="literal">nullptr</span>;</span><br><span class="line">                cout &lt;&lt; <span class="string">&quot;SharedPtr Delete Cnt.&quot;</span> &lt;&lt; endl;</span><br><span class="line">            &#125;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;SharedPtr Release.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T *m_ptr;</span><br><span class="line">    Counter&lt;T&gt; *m_cnt;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>weak_ptr的简单实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WeakPtr</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 构造函数，用SharedPtr对象构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">WeakPtr</span>(SharedPtr&lt;T&gt; &amp;s) : <span class="built_in">m_ptr</span>(s.m_ptr), <span class="built_in">m_cnt</span>(s.m_cnt)</span><br><span class="line">    &#123;</span><br><span class="line">        m_cnt-&gt;m_weakCount++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;S Construct W.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 构造函数，用WeakPtr对象构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="built_in">WeakPtr</span>(WeakPtr&lt;T&gt; &amp;w) : <span class="built_in">m_ptr</span>(w.m_ptr), <span class="built_in">m_cnt</span>(w.m_cnt)</span><br><span class="line">    &#123;</span><br><span class="line">        m_cnt-&gt;m_weakCount++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;W Construct W.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">WeakPtr</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">release</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 赋值构造函数，用另一个SharedPtr对象构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    WeakPtr&lt;T&gt; &amp;<span class="keyword">operator</span>=(SharedPtr&lt;T&gt; &amp;s)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">release</span>();</span><br><span class="line">        m_cnt = s.m_cnt;</span><br><span class="line">        m_cnt-&gt;m_weakCount++;</span><br><span class="line">        m_ptr = s.m_ptr;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;S Assign Construct W.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 赋值构造函数，用另一个WeakPtr对象构造</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    WeakPtr&lt;T&gt; &amp;<span class="keyword">operator</span>=(WeakPtr&lt;T&gt; &amp;w)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;w)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">release</span>();</span><br><span class="line">            m_cnt = w.m_cnt;</span><br><span class="line">            m_cnt-&gt;m_weakCount++;</span><br><span class="line">            m_ptr = w-&gt;m_ptr;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;W Assign Construct W.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * WeakPtr通过lock函数获得SharedPtr</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">SharedPtr&lt;T&gt; &amp;<span class="title">lock</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">SharedPtr</span>&lt;T&gt;(*<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 检查SharedPtr是否已过期</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">expired</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (m_cnt)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (m_cnt-&gt;m_refCount &gt; <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">WeakPtr</span>() = <span class="keyword">delete</span>;       WeakPtr禁止默认构造，只能从SharedPtr或者WeakPtr构造</span><br><span class="line">    T &amp;<span class="keyword">operator</span>*() = <span class="keyword">delete</span>;  <span class="comment">//WeakPtr禁止*</span></span><br><span class="line">    T *<span class="keyword">operator</span>-&gt;() = <span class="keyword">delete</span>; <span class="comment">//WeakPtr禁止-&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">release</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (m_cnt)</span><br><span class="line">        &#123;</span><br><span class="line">            m_cnt-&gt;m_weakCount--;</span><br><span class="line">            <span class="keyword">if</span> (m_cnt-&gt;m_weakCount &lt; <span class="number">1</span> &amp;&amp; m_cnt-&gt;m_refCount &lt; <span class="number">1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">delete</span> m_cnt;</span><br><span class="line">                m_cnt = <span class="literal">nullptr</span>;</span><br><span class="line">                cout &lt;&lt; <span class="string">&quot;Delete Cnt.&quot;</span> &lt;&lt; endl;</span><br><span class="line">            &#125;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;WeakPtr Release.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T *m_ptr;</span><br><span class="line">    Counter&lt;T&gt; *m_cnt;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><ul>
+<li><code>https://blog.csdn.net/code_peak/article/details/119722167</code></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppOthers/" rel="tag"># CppOthers</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E6%83%AF%E7%94%A8%E5%86%99%E6%B3%95/" rel="prev" title="C++_惯用写法">
+      <i class="fa fa-chevron-left"></i> C++_惯用写法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++_%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80/" rel="next" title="C++_编译基础">
+      C++_编译基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-auto-ptr"><span class="nav-number">2.</span> <span class="nav-text">std::auto_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-unique-ptr"><span class="nav-number">3.</span> <span class="nav-text">std::unique_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-shared-ptr"><span class="nav-number">4.</span> <span class="nav-text">std::shared_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-weak-ptr"><span class="nav-number">5.</span> <span class="nav-text">std::weak_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">6.</span> <span class="nav-text">智能指针使用注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">7.</span> <span class="nav-text">智能指针的简单实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%EF%BC%9A"><span class="nav-number">8.</span> <span class="nav-text">参考：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 grep命令  linux grep命令 详解grep命令是一个在Linux和Unix系统中用于搜索指定文本模式的强大工具。它通过标准输入或文件中的文本进行匹配搜索，并将匹配的行输出到标准输出。以下是grep命令的基本语法和一些常见选项： 基本语法：1grep [选项] 模式 [文件...]  常见选项： 基本搜索： 1grep &quot;pattern&quot; filename 在指">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_31_grep">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_31_grep/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 grep命令  linux grep命令 详解grep命令是一个在Linux和Unix系统中用于搜索指定文本模式的强大工具。它通过标准输入或文件中的文本进行匹配搜索，并将匹配的行输出到标准输出。以下是grep命令的基本语法和一些常见选项： 基本语法：1grep [选项] 模式 [文件...]  常见选项： 基本搜索： 1grep &quot;pattern&quot; filename 在指">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.343Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_31_grep/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_31_grep | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_31_grep/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_31_grep
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>grep命令</li>
+</ul>
+<h2 id="linux-grep命令-详解"><a href="#linux-grep命令-详解" class="headerlink" title="linux grep命令 详解"></a>linux grep命令 详解</h2><p><code>grep</code>命令是一个在Linux和Unix系统中用于搜索指定文本模式的强大工具。它通过标准输入或文件中的文本进行匹配搜索，并将匹配的行输出到标准输出。以下是<code>grep</code>命令的基本语法和一些常见选项：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep [选项] 模式 [文件...]</span><br></pre></td></tr></table></figure>
+
+<h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
+<li><p><strong>基本搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>在指定文件中搜索包含指定模式的行。</p>
+</li>
+<li><p><strong>递归搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -r <span class="string">&quot;pattern&quot;</span> directory</span><br></pre></td></tr></table></figure>
+<p>使用<code>-r</code>选项可以递归搜索指定目录及其子目录中的文件。</p>
+</li>
+<li><p><strong>忽略大小写：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -i <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-i</code>选项可以忽略搜索时的大小写。</p>
+</li>
+<li><p><strong>显示匹配行数：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-n</code>选项可以显示匹配行的行号。</p>
+</li>
+<li><p><strong>显示不匹配的行：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-v</code>选项可以显示不包含指定模式的行。</p>
+</li>
+<li><p><strong>只显示匹配的模式：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -o <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-o</code>选项可以只显示匹配的模式，而不显示整行。</p>
+</li>
+<li><p><strong>显示匹配的行及上下文：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -C 2 <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-C</code>选项可以显示匹配行的上下文（前后2行）。</p>
+</li>
+<li><p><strong>使用正则表达式：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -E <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-E</code>选项可以启用扩展正则表达式。</p>
+</li>
+<li><p><strong>显示匹配的行数：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -c <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-c</code>选项可以显示匹配的行数而不显示匹配的内容。</p>
+</li>
+</ol>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
+<li><p>在文件中搜索指定模式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>递归搜索目录及其子目录中的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -r <span class="string">&quot;pattern&quot;</span> directory</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>忽略大小写搜索：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -i <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示匹配行的行号：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示不匹配的行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>只显示匹配的模式而不显示整行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -o <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示匹配行的上下文：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -C 2 <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用扩展正则表达式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -E <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显示匹配的行数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -c <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><code>grep</code>命令非常灵活，可以通过不同的选项和参数满足各种搜索需求。记得查看<code>man grep</code>以获取更多详细信息。</p>
+<h2 id="linux-grep命令-常用技巧"><a href="#linux-grep命令-常用技巧" class="headerlink" title="linux grep命令 常用技巧"></a>linux grep命令 常用技巧</h2><p>在使用<code>grep</code>命令时，有一些常用的技巧和选项，可以帮助你更有效地进行文本搜索。以下是一些<code>grep</code>命令的常用技巧：</p>
+<ol>
+<li><p><strong>递归搜索目录及其子目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -r <span class="string">&quot;pattern&quot;</span> directory</span><br></pre></td></tr></table></figure>
+<p>使用<code>-r</code>选项可以递归搜索指定目录及其子目录中的文件。</p>
+</li>
+<li><p><strong>忽略大小写进行搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -i <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-i</code>选项可以忽略搜索时的大小写。</p>
+</li>
+<li><p><strong>显示匹配行的行号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-n</code>选项可以显示匹配行的行号。</p>
+</li>
+<li><p><strong>只显示匹配的模式而不显示整行：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -o <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-o</code>选项可以只显示匹配的模式，而不显示整行。</p>
+</li>
+<li><p><strong>显示匹配行的上下文：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -C 2 <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-C</code>选项可以显示匹配行的上下文（前后2行）。</p>
+</li>
+<li><p><strong>使用正则表达式进行搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -E <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-E</code>选项可以启用扩展正则表达式。</p>
+</li>
+<li><p><strong>显示不匹配的行：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-v</code>选项可以显示不包含指定模式的行。</p>
+</li>
+<li><p><strong>只统计匹配的行数而不显示匹配的内容：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -c <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-c</code>选项可以只显示匹配的行数。</p>
+</li>
+<li><p><strong>逆向搜索，显示不匹配的行：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-v</code>选项可以显示不包含指定模式的行，实现逆向搜索。</p>
+</li>
+<li><p><strong>使用多个文件进行搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;pattern&quot;</span> file1 file2</span><br></pre></td></tr></table></figure>
+<p>可以同时在多个文件中搜索指定模式。</p>
+</li>
+<li><p><strong>搜索特定类型的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;pattern&quot;</span> *.txt</span><br></pre></td></tr></table></figure>
+<p>可以使用通配符来搜索特定类型的文件。</p>
+</li>
+<li><p><strong>使用管道和其他命令结合搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> filename | grep <span class="string">&quot;pattern&quot;</span></span><br></pre></td></tr></table></figure>
+<p>可以通过管道将其他命令的输出传递给<code>grep</code>进行搜索。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更灵活地使用<code>grep</code>命令，提高文本搜索的效率。记得查看<code>man grep</code>以获取更多详细信息。</p>
+<h2 id="linux-grep命令-高级技巧"><a href="#linux-grep命令-高级技巧" class="headerlink" title="linux grep命令 高级技巧"></a>linux grep命令 高级技巧</h2><p>除了基本的用法和常用技巧之外，<code>grep</code>命令还有一些高级的用法，可以更灵活、高效地进行文本搜索。以下是一些高级的<code>grep</code>命令技巧：</p>
+<ol>
+<li><p><strong>使用正则表达式进行复杂匹配：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -E <span class="string">&quot;pattern1|pattern2&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-E</code>选项启用扩展正则表达式，可以使用<code>|</code>操作符实现或逻辑，匹配<code>pattern1</code>或<code>pattern2</code>。</p>
+</li>
+<li><p><strong>使用反向引用进行复杂匹配：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -E <span class="string">&quot;(pattern)\1&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用反向引用，<code>\1</code>表示匹配前面括号中的内容，这可以用于查找重复的模式。</p>
+</li>
+<li><p><strong>搜索行首或行尾：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;^pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>^</code>表示匹配行首，<code>pattern$</code>表示匹配行尾。</p>
+</li>
+<li><p><strong>递归搜索并显示匹配的文件名：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -r -l <span class="string">&quot;pattern&quot;</span> directory</span><br></pre></td></tr></table></figure>
+<p>使用<code>-l</code>选项，<code>grep</code>会显示包含匹配模式的文件名，而不是匹配的内容。</p>
+</li>
+<li><p><strong>显示匹配行的上下文，并带颜色：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -C 2 --color <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>--color</code>选项可以为匹配的模式添加颜色显示，同时使用<code>-C</code>选项显示匹配行的上下文。</p>
+</li>
+<li><p><strong>只显示匹配的行号：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n -o -e <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-o</code>选项只显示匹配的模式，再结合<code>-n</code>选项显示匹配行的行号。</p>
+</li>
+<li><p><strong>忽略二进制文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -I <span class="string">&quot;pattern&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用<code>-I</code>选项可以忽略二进制文件，仅搜索文本文件。</p>
+</li>
+<li><p><strong>使用多个模式进行搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -e <span class="string">&quot;pattern1&quot;</span> -e <span class="string">&quot;pattern2&quot;</span> filename</span><br></pre></td></tr></table></figure>
+<p>使用多个<code>-e</code>选项可以同时搜索多个模式。</p>
+</li>
+<li><p><strong>在搜索结果中排除某个模式：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;pattern&quot;</span> filename | grep -v <span class="string">&quot;exclude_pattern&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用管道结合<code>grep -v</code>命令可以排除某个模式。</p>
+</li>
+<li><p><strong>使用<code>--include</code>和<code>--exclude</code>选项进行文件过滤：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -r --include=<span class="string">&quot;*.txt&quot;</span> --exclude=<span class="string">&quot;*.bak&quot;</span> <span class="string">&quot;pattern&quot;</span> directory</span><br></pre></td></tr></table></figure>
+<p>使用<code>--include</code>和<code>--exclude</code>选项可以指定搜索的文件类型，排除不需要搜索的文件。</p>
+</li>
+</ol>
+<p>这些高级用法可以帮助你更灵活地利用<code>grep</code>命令进行文本搜索，满足更复杂的搜索需求。记得查看<code>man grep</code>以获取更多详细信息。</p>
+<h2 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h2><ul>
+<li>grep,命令用于查找文件里符合条件的字符串</li>
+<li>grep指令用于查找内容包含指定的范本样式的文件,如果发现某文件的内容符合所指定的范本样式,预设grep指令会把含有范本样式的那一列显示出来</li>
+<li>若不指定任何文件名称,或是所给予的文件名为 - ,则grep指令会从标准输入设备读取数据.</li>
+<li>示例：<ul>
+<li><code>grep -i -r -w -n cudnn ./*</code> <ul>
+<li><code>-i,--ignore-case</code> : 忽略大小写</li>
+<li><code>-r,--recursive</code> :递归查找每一个文件夹下的文件 </li>
+<li><code>-w,--word-regexp</code> : 仅查找包含全部字符的行</li>
+<li><code>-n,--line-number</code> : 输入每个文件所匹配的字符在的行，以1为基准</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>在Linux中，<code>grep</code>是一个强大的文本搜索工具，用于在文件中查找指定模式的文本行。<code>grep</code>命令通常与其他命令结合使用，以便在大量文本数据中过滤出所需的内容。</p>
+<p>以下是<code>grep</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep [options] pattern [file(s)]</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>pattern</code>是要搜索的模式，<code>file(s)</code>是要搜索的文件列表。</p>
+<p>以下是一些常见的<code>grep</code>命令选项和用法：</p>
+<ol>
+<li><p>在单个文件中搜索模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep pattern file</span><br></pre></td></tr></table></figure>
+
+<p>此命令将在指定的文件中搜索匹配指定模式的文本行，并将其输出到标准输出。</p>
+</li>
+<li><p>在多个文件中搜索模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep pattern file1 file2</span><br></pre></td></tr></table></figure>
+
+<p>此命令将在多个文件中搜索匹配指定模式的文本行，并将其输出到标准输出。</p>
+</li>
+<li><p>递归地搜索目录中的文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -r pattern directory</span><br></pre></td></tr></table></figure>
+
+<p>此命令将递归地搜索指定目录中的所有文件，查找匹配指定模式的文本行。</p>
+</li>
+<li><p>忽略大小写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -i pattern file</span><br></pre></td></tr></table></figure>
+
+<p>此命令将在搜索时忽略模式的大小写。</p>
+</li>
+<li><p>显示匹配行的行号：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n pattern file</span><br></pre></td></tr></table></figure>
+
+<p>此命令将显示匹配行的行号。</p>
+</li>
+<li><p>反向搜索（显示不匹配的行）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -v pattern file</span><br></pre></td></tr></table></figure>
+
+<p>此命令将显示不匹配指定模式的文本行。</p>
+</li>
+</ol>
+<p><code>grep</code>命令还支持其他一些选项和功能，如正则表达式匹配、显示匹配的上下文行、统计匹配的行数等。您可以使用<code>man grep</code>命令查看完整的选项和用法说明。</p>
+<p><code>grep</code>命令是一个非常强大和灵活的文本搜索工具，可用于在文件和目录中快速查找匹配特定模式的内容。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_32_eval/" rel="prev" title="linux_2_32_eval">
+      <i class="fa fa-chevron-left"></i> linux_2_32_eval
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_33_mount/" rel="next" title="linux_2_33_mount">
+      linux_2_33_mount <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-grep%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux grep命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常见选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-grep%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux grep命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-grep%E5%91%BD%E4%BB%A4-%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7"><span class="nav-number">4.</span> <span class="nav-text">linux grep命令 高级技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#grep"><span class="nav-number">5.</span> <span class="nav-text">grep</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

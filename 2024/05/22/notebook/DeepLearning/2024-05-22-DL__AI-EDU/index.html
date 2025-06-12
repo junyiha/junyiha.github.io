@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介摘要 讲解神经网络基本的训练和工作原理 讲解反向传播和梯度下降 梯度下降是神经网络的基本学习方法讲解损失函数  人工智能的定义 第一个层面,人们对人工智能的期待可以分为:  智能地把某件特定的事情做好,在某个领域增强人类的智慧,这种方式又叫做智能增强,例如搜索引擎,智能助手等,帮助人类完成某种特定任务,又称为”弱人工智能”,或者”狭义人工智能”. 像人类一样能认知,思考,判断:模拟人类的智能,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DL__AI-EDU">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/DeepLearning/2024-05-22-DL__AI-EDU/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介摘要 讲解神经网络基本的训练和工作原理 讲解反向传播和梯度下降 梯度下降是神经网络的基本学习方法讲解损失函数  人工智能的定义 第一个层面,人们对人工智能的期待可以分为:  智能地把某件特定的事情做好,在某个领域增强人类的智慧,这种方式又叫做智能增强,例如搜索引擎,智能助手等,帮助人类完成某种特定任务,又称为”弱人工智能”,或者”狭义人工智能”. 像人类一样能认知,思考,判断:模拟人类的智能,">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.282Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="DL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/DeepLearning/2024-05-22-DL__AI-EDU/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>DL__AI-EDU | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/DeepLearning/2024-05-22-DL__AI-EDU/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DL__AI-EDU
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>讲解神经网络基本的训练和工作原理</li>
+<li>讲解反向传播和梯度下降</li>
+<li>梯度下降是神经网络的基本学习方法<br>讲解损失函数</li>
+</ul>
+<h3 id="人工智能的定义"><a href="#人工智能的定义" class="headerlink" title="人工智能的定义"></a>人工智能的定义</h3><ol>
+<li><p>第一个层面,人们对人工智能的期待可以分为:</p>
+<ul>
+<li>智能地把某件特定的事情做好,在某个领域增强人类的智慧,这种方式又叫做<strong>智能增强</strong>,例如搜索引擎,智能助手等,帮助人类完成某种特定任务,又称为”弱人工智能”,或者”狭义人工智能”.</li>
+<li>像人类一样能认知,思考,判断:模拟人类的智能,这样的智能也称为”<strong>通用人工智能</strong>“(Artificial General Intelligence, AGI),或”强人工智能”.</li>
+</ul>
+</li>
+<li><p>第二个层面,从技术的特点来看</p>
+<ul>
+<li><p>机器学习:如果一个程序解决任务(T)的效能(用P表示)随着经验(E)得到了提高,那么这个程序就能从经验(E)中学到了关于任务(T)的知识,并让衡量值(P)得到提高.</p>
+<ol>
+<li>选择一个模型结构(例如逻辑回归,决策树等),这就是上面所说的程序</li>
+<li>用训练数据(输入和输出) 输入模型,这就是上面的经验(E)</li>
+<li>通过不断执行任务(T)并衡量结果(P),让P不断提高,直到达到一个满意的值.</li>
+</ol>
+</li>
+<li><p>机器学习的各种方法是如何从经验中学习?其大致可分为三种类型:</p>
+<ol>
+<li>监督学习(Supervised Learning)  :通过标注的数据来学习</li>
+<li>无监督学习(Unsupervised Learning):通过没有标注的数据来学习,这种算法可以发现数据中自然形成的共同特性(聚类),可以用来发现不同数据之间的联系</li>
+<li>强化学习(Reinforcement Learning):让程序选择和它的环境互动,环境给程序反馈</li>
+</ol>
+</li>
+<li><p><strong>机器学习领域出现了各种模型,其中,神经网络模型是一个重要的方法</strong></p>
+<ul>
+<li>它的原型在1943年就出现了,在生物神经网络中,每个神经元与其他神经元相连,当它兴奋时,就会向相邻的神经元发送化学物质,从而改变这些神经元内的电位;如果某神经元的电位超过了一个阈值,那么它就会被激活(兴奋) ,向其他神经元发送化学物质.</li>
+<li><strong>把许多这样的神经元按照一定的层次结构连接起来,我们就构建了一个神经网络</strong></li>
+<li>随着数据的丰富和机器算力的增强,人们不断增加神经网络的层次数目,相邻层次之间的输入输出由非线性函数来控制,这就产生了DNN(<strong>深度神经网络</strong>).</li>
+<li><strong>随着人们不断的调整网络结构,DNN也演变成许多不同的网络拓扑结构</strong>,例如 CNN(卷积神经网络), RNN(循环神经网络), LSTM(长期短期记忆), GAN(生成对抗网络), Transfer Learning(迁移学习)等,这些模型还在不断演化中</li>
+<li><strong>训练AI模型,需要一系列专门的工具,业界有不少成熟的训练平台</strong>(TensorFlow, PyTorch, MXNet等),这些平台也在不断演化,支持新的模型,提高训练的效率,改进易用性等.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>第三个层面,从应用的角度来看,狭义人工智能在各个领域都取得了很大的成果</p>
+<ul>
+<li>一种是标杆式的任务,例如ImageNet,考察AI模型能否识别图像的类别</li>
+<li>另一种是AI技术和各种其他技术结合,解决政府,企业,个人用户的需求.在政府方面,把所有计算,数据,云端和物联网终端的设备联系起来,搭建一个能支持智能决定的系统,现代社会的城市管理,金融,医疗,物流和交通管理等等都运行在这样的系统上.专家称之为<strong>智能基础建设</strong></li>
+</ul>
+</li>
+</ol>
+<h4 id="模型的生成与应用"><a href="#模型的生成与应用" class="headerlink" title="模型的生成与应用"></a>模型的生成与应用</h4><ul>
+<li>首先要设计一个模型,然后用已标注过的数据来训练这个模型,在训练过程中,<strong>模型的各个参数在多次训练中不断得到调整,最后得到了一个达到要求的模型</strong>.</li>
+<li>这个模型会被用于一个推理模型中,和其他程序模块一起组成一个应用程序或者是服务,能处理新的数据,满足用户的需求.</li>
+</ul>
+<h3 id="范式的演化"><a href="#范式的演化" class="headerlink" title="范式的演化"></a>范式的演化</h3><p>范式演化的四个阶段:</p>
+<ol>
+<li><p>第一阶段:经验</p>
+<ul>
+<li>人类最早的科学研究,主要以记录和描述自然现象为特征,可以称之为”经验归纳”(第一范式)</li>
+</ul>
+</li>
+<li><p>第二阶段:理论</p>
+<ul>
+<li>科学家们开始明确定义,速度是什么,质量是什么等等</li>
+</ul>
+</li>
+<li><p>第三阶段:计算仿真</p>
+<ul>
+<li>从二十世纪中期开始,利用电子计算机对科学实验进行模拟仿真的模式得到迅速普及</li>
+</ul>
+</li>
+<li><p>第四阶段:数据探索</p>
+<ul>
+<li>在这个阶段,科学家收集数据,分析数据,探索新的规律.</li>
+<li>在深度学习的浪潮中出现的许多结果就是基于海量数据学习得来的.有些数据并不是从现实世界中收集而来的,而是由计算机程序自己生成的</li>
+</ul>
+</li>
+</ol>
+<h4 id="数据探索"><a href="#数据探索" class="headerlink" title="数据探索"></a>数据探索</h4><ul>
+<li>当人类探索客观世界的时候,大部分情况下,我们是不了解新环境的运行规则.这个时候,我们可以观察自己的行动和客观世界的反馈,判断得失,再总结出规律.这种学习方法,叫强化学习(Reinforcement Learning),可以使用这种方法来找出适合的策略</li>
+</ul>
+<h3 id="神经网络的基本工作原理简介"><a href="#神经网络的基本工作原理简介" class="headerlink" title="神经网络的基本工作原理简介"></a>神经网络的基本工作原理简介</h3><p>神经元计算模型:</p>
+<ol>
+<li><p>输入 input:</p>
+<ul>
+<li>(x1, x2, x3)是外界输入信号,一般是一个训练数据样本的多个属性. 例如:(x1, x2, x3)分别代表了(红, 绿, 蓝)三种颜色,而此神经元用于识别输入的信号是暖色还是冷色</li>
+</ul>
+</li>
+<li><p>权重 weights:</p>
+<ul>
+<li>(w1, w2, w3)是每个输入信号的权重值,以上面的(x1, x2, x3)的例子来说,x1的权重可能是0.92, x2的权重可能是0.2, x3的权重可能是0.03. <strong>权重值相加之后可以不是1</strong></li>
+</ul>
+</li>
+<li><p>偏移 bias:</p>
+<ul>
+<li>一般的书或者博客上会说:那是因为y &#x3D; w*x + b, b是偏移值,使得直线能够沿Y轴上下移动,这是用结果来解释原因,并非b存在的真实原因</li>
+<li>从生物学上解释,在脑神经细胞中,一定是输入信号的电平&#x2F;电流大于某个<strong>临界值</strong>时,神经元细胞才会处于兴奋状态,这个b实际就是那个临界值. 即当: w1 * x1 + w2 * x2 + w3 * x3 &gt;&#x3D; t时,该神经 细胞才会兴奋</li>
+</ul>
+</li>
+<li><p>激活函数 activation:</p>
+<ul>
+<li>求和之后,神经细胞已经处于兴奋状态了,已经决定要向下一个神经元传递信号了,但是要传递多强烈的信号,要由激活函数来确定.</li>
+<li>如果激活函数是一个阶跃信号的话,会像继电器开合一样咔咔的开启和闭合; 但是在生物体中是不可能有这种装置的,而是一个渐渐变化的过程.所以激活函数都是有一个渐变的过程,也就是是个<strong>曲线</strong></li>
+</ul>
+</li>
+</ol>
+<h4 id="神经网络的主要功能"><a href="#神经网络的主要功能" class="headerlink" title="神经网络的主要功能"></a>神经网络的主要功能</h4><ol>
+<li><p>回归(Regression)或者叫做拟合(Fitting)</p>
+<ul>
+<li>单层的神经网络能够模拟一条二维平面上的直线,从而可以完成线性分割任务</li>
+<li>所谓回归或者拟合,其实就是<strong>给出x值输出y值的过程,并且让y值与样本数据形成的曲线的距离可能的小</strong>,可以理解为是对样本数据的一种骨架式的抽象.</li>
+</ul>
+</li>
+<li><p>分类(Classification)</p>
+<ul>
+<li>使用一个两层的神经网络可以得到一个非常近似的结果,使得分类误差在满意的范围之内.</li>
+<li>分类可以理解为对两类或多类样本数据的边界的抽象</li>
+<li>对于复杂的函数,一个两层的神经网络是如何做到的?其实从输入层到隐藏层的矩阵计算,就是对输入数据进行了空间变换,使其可以被线性可分,然后在输出层画出一个分界线.而训练的过程,就是确定那个空间变换矩阵的过程.<strong>因此,多层神经网络的本质就是对复杂函数的拟合.</strong></li>
+</ul>
+</li>
+</ol>
+<h4 id="激活函数的作用"><a href="#激活函数的作用" class="headerlink" title="激活函数的作用"></a>激活函数的作用</h4><ol>
+<li>激活函数相当于人类的关节</li>
+<li>如果不运用激活函数,输出信号将仅仅是一个简单的线性函数,线性函数是一个一级多项式.线性方程是很容易解决的,但是它们的复杂性有限,并且从数据中学习复杂函数映射的能力更小.<strong>一个没有激活函数的神经网络将只不过是一个线性回归模型罢了,不能解决现实世界中的大多数非线性问题.</strong></li>
+<li>没有激活函数,神经网络将无法学习和模拟其他复杂类型的数据,例如图像,视频,音频,语音等.这就是为什么要使用<strong>人工神经网络技术</strong>,诸如深度学习等来理解一些复杂的事情,一些相互之间具有很多隐藏层的非线性问题</li>
+</ol>
+<h3 id="神经网络中的三个基本概念-反向传播-梯度下降-损失函数"><a href="#神经网络中的三个基本概念-反向传播-梯度下降-损失函数" class="headerlink" title="神经网络中的三个基本概念:反向传播, 梯度下降, 损失函数"></a>神经网络中的三个基本概念:反向传播, 梯度下降, 损失函数</h3><ul>
+<li><p>神经网络训练的最基本的思想就是:先”猜”一个结果,称为预测结果a,看看这个预测结果和事先标记好的训练集中的真是结果y之间的差距,然后调整策略,再试一次,这一次就不是”猜”了,而是有依据地向正确的方向靠近.如此反复多次,一直到预测结果和真实结果之间相差无几,即|a - y| 趋近于 0 ,就结束训练.在神经网络训练中,我们把”猜”叫做初始化,可以随机,也可以根据以前的经验给定初始值</p>
+</li>
+<li><p>简单总结反向传播和梯度下降的基本工作原理:</p>
+<ol>
+<li>初始化;</li>
+<li>正向计算;</li>
+<li>损失函数提供计算损失的方法;</li>
+<li>梯度下降是在损失函数基础上向着损失最小的点靠近而指引了网络权重调整的方向;</li>
+<li>反向传播把损失值反向传给神经网络的每一层,让每一层都根据损失值反向调整权重;</li>
+<li>Go to 2,直到精度足够好</li>
+</ol>
+</li>
+</ul>
+<h3 id="梯度下降"><a href="#梯度下降" class="headerlink" title="梯度下降"></a>梯度下降</h3><ul>
+<li><p>梯度下降三要素:</p>
+<ol>
+<li>当前点;</li>
+<li>方向;</li>
+<li>步长.</li>
+</ol>
+</li>
+<li><p>为什么说是”梯度下降”?</p>
+<ol>
+<li>梯度:函数当前位置的最快上升点</li>
+<li>下降:与导数相反的方向,用数学语言描述就是那个减号; 亦即与上升相反的方向运动,就是下降.</li>
+</ol>
+</li>
+</ul>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><ul>
+<li><p>概念:</p>
+<ul>
+<li>在各种材料中经常看到的中英文词汇有:误差,偏差,Error,Cost,Loss,损失,代价等,意思都差不多</li>
+<li>使用”损失函数”和”Loss Function”这两个词汇,具体的损失函数符号用J来表示,误差值用loss表示</li>
+<li>“损失”就是所有样本的”误差”的总和</li>
+<li>在黑盒子的例子中,如果说”某个样本的损失”是不对的,只能说”某个样本的误差”,因为样本是一个一个计算的.</li>
+<li>如果我们把神经网络的参数调整到完全满足独立样本的输出误差为0,通常会令其它样本的误差变得更大,这样作为误差之和的损失函数值,就会变得更大.所以,<strong>我们通常会根据某个样本的误差调整权重后,计算一下整体样本的损失函数值,来判定网络是不是已经训练到了可接受的状态</strong>.</li>
+</ul>
+</li>
+<li><p>损失函数的作用:</p>
+<ul>
+<li>损失函数的作用,就是计算神经网络每次迭代的前向计算结果与真实值的差距,从而指导下一步的训练正确的方向进行.</li>
+<li>如何使用损失函数?具体步骤:<ol>
+<li>用随机值初始化前向计算公式的参数;</li>
+<li>代入样本,计算输出的预测值;</li>
+<li>用损失函数计算预测值和标签值(真实值)的误差;</li>
+<li>根据损失函数的导数,沿梯度最小方向将误差回传,修正前向计算公式中的各个权重值;</li>
+<li>进入第二步重复,指导损失函数值达到一个满意的值就停止迭代</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>神经网络中常用的损失函数:</p>
+<ul>
+<li>均方差函数,主要用于回归</li>
+<li>交叉熵函数,主要用于分类</li>
+<li>二者都是非负函数,极值在底部,用梯度下降法可以求解.</li>
+</ul>
+</li>
+</ul>
+<h1 id="第二步-线性回归"><a href="#第二步-线性回归" class="headerlink" title="第二步:线性回归"></a>第二步:线性回归</h1><h3 id="神经网络法"><a href="#神经网络法" class="headerlink" title="神经网络法"></a>神经网络法</h3><ul>
+<li><p>定义神经网络结构:</p>
+<ol>
+<li>输入层</li>
+<li>权重w,b</li>
+<li>输出层</li>
+<li>损失函数</li>
+</ol>
+</li>
+<li><p>训练过程:</p>
+<ol>
+<li>读取一个样本数据</li>
+<li>前向计算</li>
+<li>反向传播</li>
+<li>更新梯度</li>
+</ol>
+</li>
+<li><p>推理预测:</p>
+<ul>
+<li>推理过程,实际上就是一个<strong>前向计算过程</strong>,把它单独拿出来,方便对外接口的设计,所以这个方法被设计成了公开的方法</li>
+</ul>
+</li>
+</ul>
+<h3 id="样本特征数据标准化"><a href="#样本特征数据标准化" class="headerlink" title="样本特征数据标准化"></a>样本特征数据标准化</h3><ul>
+<li><p>数据标准化(Normalization),又可以叫做数据归一化</p>
+</li>
+<li><p>为什么要做标准化?</p>
+</li>
+<li><p>理论层面上,神经网络是以样本在事件中的统计分布概率为基础进行训练和预测的,所以它对样本数据的要求比较苛刻</p>
+<ol>
+<li>样本的各个特征的取值要符合概率分布,即[0,1]</li>
+<li>样本的度量单位要相同</li>
+<li>神经网络假设所有的输入输出数据都是标准差为1,均值为0,包括权重值的初始化,激活函数的选择,以及优化算法的设计</li>
+<li>数值问题</li>
+<li>梯度更新,如果输出层的数量级很大,会引起损失函数的数量级很大,这样做反向传播时的梯度也就很大,这时会给梯度的更新带来数值问题</li>
+<li>学习率</li>
+</ol>
+</li>
+<li><p>标准化的常用方法:</p>
+<ul>
+<li>Min-Max标准化(离差标准化),将数据映射到[0,1]区间</li>
+<li>平均值标准化,将数据映射到[-1,1]区间</li>
+<li>对数转换</li>
+<li>反正切转换</li>
+<li>Z-Score法(标准差标准化&#x2F;零均值标准化):把每个特征值中的所有数据,变成平均值为0,标准差为1的数据,最后正态分布</li>
+<li>中心化,平均值为0,无标准差要求</li>
+<li>比例法,要求数据全是正值</li>
+</ul>
+</li>
+</ul>
+<p><strong>总结</strong>:</p>
+<ol>
+<li>标准如果不做标准化,网络发散,训练无法进行;</li>
+<li>训练样本标准化后,网络训练可以得到结果,但是预测结果有问题;</li>
+<li>还原参数值后,预测结果正确,但是此还原方法并不普遍使用;</li>
+<li>标准化测试样本,而不需要还原参数值,可以保证普遍使用;</li>
+<li>标准化标签纸,可以使得网络训练收敛快,但是在预测时需要把结果反标准化,以便得到真实值.</li>
+</ol>
+<h1 id="第三步-线性分类"><a href="#第三步-线性分类" class="headerlink" title="第三步:线性分类"></a>第三步:线性分类</h1><h3 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a>摘要</h3><ul>
+<li>分类问题在很多资料中都称之为逻辑回归, Logistic Regression, 其原因是使用了线性回归中的线性模型,加上一个Logistic二分类函数,共同构造了一个分类器.</li>
+<li>神经网络的一个重要功能就是分类,现实世界中的分类任务复杂多样,但是万变不离其宗,我们都可以用同一种模式的神经网络来处理</li>
+</ul>
+<h3 id="逻辑回归模型"><a href="#逻辑回归模型" class="headerlink" title="逻辑回归模型"></a>逻辑回归模型</h3><ul>
+<li>回归问题可以分为两类:线性回归和逻辑回归<ol>
+<li>逻辑回归(Logistic Regression), 回归给出的结果是事件成功或失败的概率.当因变量的类型属于二值(1&#x2F;0, 真&#x2F;假, 是&#x2F;否)变量时,我们就应该使用逻辑回归</li>
+<li>线性回归使用一条直线拟合样本数据,而逻辑回归的目标是”拟合”0或1两个数值,而不是具体连续数值,所以成为广义线性模型.</li>
+<li>逻辑回归又称Logistic回归分析,常用于数据挖掘,疾病自动诊断,经济预测等领域</li>
+<li>逻辑回归的另外一个名字叫做分类器,分为线性分类器和非线性分类器,然后无论是线性还是非线性分类器,又分为两种:二分类问题和多分类问题.</li>
+</ol>
+</li>
+<li>回归问题-&gt;逻辑回归问题-&gt;线性逻辑回归即分类问题-&gt;线性二分类问题</li>
+</ul>
+<h3 id="二分类函数"><a href="#二分类函数" class="headerlink" title="二分类函数"></a>二分类函数</h3><ul>
+<li>对率函数Logistic Function,即可以作为激活函数使用,又可以作为二分类函数使用.在二分类任务中,叫做Logistic函数;在作为激活函数时,叫做Sigmoid函数</li>
+</ul>
+<h3 id="实现逻辑与或非门"><a href="#实现逻辑与或非门" class="headerlink" title="实现逻辑与或非门"></a>实现逻辑与或非门</h3><ul>
+<li>单层神经网络,又叫做感知机,它可以轻松实现逻辑与,或,非门.由于逻辑与,或门,需要有两个变量输入,而逻辑非门只有一个变量输入.但是它们共同的特点是输入为0或1,可以看做是正负两个类别</li>
+</ul>
+<h1 id="第四步-非线性回归"><a href="#第四步-非线性回归" class="headerlink" title="第四步:非线性回归"></a>第四步:非线性回归</h1><h1 id="第五步-非线性分类"><a href="#第五步-非线性分类" class="headerlink" title="第五步:非线性分类"></a>第五步:非线性分类</h1><h1 id="第六步-模型部署"><a href="#第六步-模型部署" class="headerlink" title="第六步:模型部署"></a>第六步:模型部署</h1><h3 id="摘要-2"><a href="#摘要-2" class="headerlink" title="摘要"></a><strong>摘要</strong></h3><ul>
+<li>如果已经用神经网络训练出来了一套权重矩阵,那么在实际生产环境中如何使用这些权重矩阵?</li>
+<li>如果需要将训练好的网络用到后台服务中:搭建网络-&gt;加载权重矩阵-&gt;调用前向计算</li>
+<li>如果是在桌面端或手机端应用中使用这些权重矩阵,这就是一个跨平台,跨语言的需求.引出了模型文件的概念,后面也直接简称为模型.</li>
+<li>模型文件中不仅包含了所有的权重矩阵,还记录了该神经网络的数据流图.这样不同平台,不同语言都可以根据模型文件里的信息构建网络,加载权重矩阵,执行前向计算.</li>
+</ul>
+<h3 id="模型的推理与部署"><a href="#模型的推理与部署" class="headerlink" title="模型的推理与部署"></a>模型的推理与部署</h3><ul>
+<li>在经过几天或者几个月的训练之后,得到了一系列的能够满足需求的权重矩阵.将输入数据按一定的顺序与权重矩阵进行运算,就可以得到对应的输出,<strong>这个过程就是推理的过程</strong>.</li>
+<li>如果没有保存这些权重矩阵,那么每次使用之前,需要重新训练,这在计算资源有限的情况下是难以接受的.另外一个选择是将训练好的权重矩阵保存下来,需要使用的时候重新加载权重矩阵.</li>
+<li>几乎所有的训练平台都会把<strong>网络结构,权重矩阵等信息</strong>保存在文件中,这就是我们常说的<strong>模型文件</strong>,后面也直接简称为模型.</li>
+<li>模型文件快问快答:<ol>
+<li>为什么需要模型文件?<ul>
+<li>模型,可以想象为一个”黑盒”,输入是需要处理的一张图像,输出是一个它的类别信息或是一些特征,<strong>模型文件也因此保存了能完成这一过程的所有重要信息,并且还能用来再次训练,推理等,方便了模型的传播与发展.</strong></li>
+</ul>
+</li>
+<li>模型文件描述的是什么?<ul>
+<li>首先,目前绝大部分的深度学习框架都将整个AI模型的计算过程抽象成<strong>数据流图(Data Flow Graphs)</strong>,用户写的模型构建代码都由框架组建出一个数据流图(也可以简单理解为神经网络的结构),而当程序开始运行时,框架的执行器会根据调度策略一次执行数据流图,完成整个计算.</li>
+<li>有了上面的背景知识,很容易想到:为了方便地重用AI模型的计算过程,需要将它运行的数据流图,相应的运行参数(Parameters)和训练出来的权重(Weights)保存下来,这就是AI模型文件主要描述的内容.</li>
+</ul>
+</li>
+<li>AI模型的作用是什么?<ul>
+<li>以视觉处理为例,人通过眼睛捕获光线,传递给大脑处理,返回图像的一些信息,例如:这是花,那是动物.AI模型的作用就相当于大脑的处理,能根据输入的数据给予一定的判断.</li>
+<li>使用封装好的AI模型,那么设计者只需要考虑把输入的数据处理成合适的格式(类似于感光细胞的作用),然后传递给AI模型(大脑),之后就可以得到一个想要的数据.</li>
+</ul>
+</li>
+<li>模型文件有哪些类型?TensorFlow和其他框架有什么区别?<ul>
+<li>由于每个深度学习框架都有自己的设计理念和工具链,对数据流图的定义和粒度都不一样,所以每家的AI模型文件都有些区别,几乎不能通用.</li>
+<li>TensorFlow在设计之处,就考虑了从训练,预测,部署等复杂的需求,所以它的数据流图几乎涵盖了整个过程可能涉及到的操作,例如:初始化,后向求导以及优化算法,设备部署(Device Placement)和分布式化,量化压缩等,所以只需要通过TensorFlow的模型文件就能获取模型完整的运行逻辑,所以很容易迁移到各种平台使用.</li>
+</ul>
+</li>
+<li>拿到一个模型文件,自己有一些新的数据,就能继续训练AI吗?如果不能,还需要做什么 ?</li>
+</ol>
+<ul>
+<li>训练模型的时候,除了网络架构和权重,还有训练时所使用的各种超参,比如:使用的优化器(Optimizer),批量大小(Batch size),学习率(Learning rate),冲量(Momentum)等,这些都会影响我们再训练的效果,需要格外注意.</li>
+</ul>
+<ol start="6">
+<li>ONNX文件是什么,如果保存为ONNX文件?<ul>
+<li>开放式神经网络交换(Open Neural Network Exchange,简称ONNX),是由微软,FaceBook,亚马逊等多个公司一起推出的,针对机器学习设计的开放式文件格式,可以用来存储训练好的模型.它使得不同的人工智能框架可以采用相同的格式存储模型数据并交互.</li>
+<li>目前很多机器学习框架都支持ONNX格式,如Pytorch,Caffe2,CNTK,ML,NET,MXNet等,它们都有专门的export_to_onnx方法,通过遍历它们原生的数据流图,转换为ONNX标准的数据流图.而对于TensorFlow这样并不原生支持ONNX的框架,通常会使用图匹配(Graph Matching)的方法转化数据流图</li>
+</ul>
+</li>
+<li>转化的来的模型文件有什么信息丢失?<ul>
+<li>由于模型文件仅仅描述了数据流和和权重,并不包含操作符的具体实现,所以不同框架对于”同名”的操作符理解和实现也会有所不同,最终可能得到不完全一致的推理结果</li>
+</ul>
+</li>
+<li>模型文件是如何与应用程序一起工作的?<ul>
+<li>应用程序使用模型文件,本质也是要执行模型文件的数据流图.一般有两种方式实现模型文件和应用程序的协作:<ol>
+<li>如果有可以独立执行模型文件的运行时(Runtime),例如:系统级别的CoreML,WinML和软件级别的Caffe,DarkNet等,我们就可以在程序中动态链接直接使用</li>
+<li>除此之外,也可以将数据流图和执行数据流图的程序(一般称为Op Kernel)编译在一起,从而脱离运行时,由于单一模型涉及到的操作有限,这样可以极大减少框架所占用的资源.</li>
+</ol>
+</li>
+<li>在将模型集成到应用程序中之前,应该先使用模型查看工具(例如Netron等)查看模型的接口,输入输出的格式和对应的范围,然后对程序中传入模型的输入作对应的预处理工作,否则可能无法得到预期的效果.</li>
+</ul>
+</li>
+<li>本地机器有GPU,在运行推理模型的时候,怎么能利用上GPU资源?<ul>
+<li>首先需要安装匹配的显卡驱动,CUDA和GPU版的框架,然后根据框架进行代码调整:</li>
+<li>对于TensorFlow这样能够自动做设备部署(Device Placement)的框架,它会尽量把GPU支持的操作自动分配给GPU计算,不太需要额外的适配;</li>
+<li>对于PyTorch,MXNet这样不具有自动设备部署功能的框架,可能需要进行一个额外的操作将模型,张量(tensor)从CPU部署到GPU上.</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="ONNX模型文件"><a href="#ONNX模型文件" class="headerlink" title="ONNX模型文件"></a>ONNX模型文件</h3><ul>
+<li>ONNX是一个开放式的规范,定义了可扩展的计算图模型,标准数据类型以及内置的运算符.该文件在存储结构上可以理解为是一种层级的结构<ul>
+<li>最顶层结构是模型(Model):模型记录了该模型文件的基本数据,例如:使用的ONNX标准的版本,使用的运算符集版本,制造商的名字和版本等信息.除此以外,模型中记录着最主要的信息是图(Graph)</li>
+<li>图(Graph):可以理解为是计算图的一种描述,是由输入,输出以及节点(Node)组成的,它们之间通过寻找相同的名字实现连接,也就是说,相同名字的变量会被认为是同一个变量,如果一个节点的输出名字和另一个节点的输入名字相同,这两个节点会被认为是连在一起的</li>
+<li>节点(Node):就是要调用的运算符,多个节点(Node)以列表的形式在图(Graph)中存储</li>
+</ul>
+</li>
+</ul>
+<h1 id="第七步-深度神经网络"><a href="#第七步-深度神经网络" class="headerlink" title="第七步:深度神经网络"></a>第七步:深度神经网络</h1><h1 id="第八步-卷及神经网络"><a href="#第八步-卷及神经网络" class="headerlink" title="第八步:卷及神经网络"></a>第八步:卷及神经网络</h1><h2 id="卷积神经网络概述"><a href="#卷积神经网络概述" class="headerlink" title="卷积神经网络概述"></a>卷积神经网络概述</h2><ul>
+<li><p>卷积神经网络（CNN，Convolutional Neural Net)是神经网络的类型之一，在图像识别和分类领域中取得了非常好的效果，比如识别人脸、物体、交通标识等，这就为机器人、自动驾驶等应用提供了坚实的技术基础。</p>
+</li>
+<li><p>一个典型的卷积神经网络中，会至少包含以下几个层：</p>
+<ul>
+<li>卷积层</li>
+<li>激活函数层</li>
+<li>池化层</li>
+<li>全连接分类层</li>
+</ul>
+</li>
+<li><p>卷积核， 就是一个小矩阵， </p>
+</li>
+<li><p>在卷积层中，我们会用输入数据与卷积核相乘，得到输出数据，就类似全连接层中的Weights一样，所以卷积核里的数值，也是通过反向传播的方法学习到的</p>
+</li>
+<li><p>各种卷积核的作用</p>
+<ul>
+<li>锐化(<code>sharpness</code>) ： 如果一个像素点比周围像素点亮，则此算子会令其更亮</li>
+<li>检测竖边(<code>vertical edge</code>) ： 检测出了十字线中的竖线，由于是左侧和右侧分别检查一次，所以得到两条颜色不一样的竖线</li>
+<li>周边(<code>surround</code>)   ：  把周边增强，把同色的区域变弱，形成大色块</li>
+<li>Sobel-Y(<code>sobel y</code>) ：  纵向亮度差分可以检测出横边，与横边检测不同的是，它可以使得两条横线具有相同的颜色，具有分割线的效果</li>
+<li>Identity ： 中心为1四周为0的过滤器，卷积后与原图相同</li>
+<li>横边检测(<code>horizontal edge</code>)  ： 检测出了十字线中的横线，由于是上侧和下侧分别检查一次，所以得到两条颜色不一样的横线</li>
+<li>模糊(<code>blur</code>)  ： 通过把周围的点做平均值计算而“杀富济贫”造成模糊效果</li>
+<li>Sobel-X(<code>sobel x</code>)  ： 横向亮度差分可以检测出竖边，与竖边检测不同的是，它可以使得两条竖线具有相同的颜色，具有分割线的效果</li>
+<li>浮雕(<code>embossing</code>)    ： 形成大理石浮雕般的效果</li>
+</ul>
+</li>
+<li><p>卷积神经网络通过反向传播而令卷积核自我学习，找到分布在图片中的不同的feature，最后形成的卷积核中的数据。</p>
+</li>
+<li><p>但是如果想达到这种效果，只有卷积层的话是不够的，还需要激活函数、池化等操作的配合</p>
+</li>
+<li><p>我们实现的卷积操作不是原始数学含义的卷积，而是工程上的卷积，可以简称为卷积</p>
+</li>
+<li><p>在实现卷积操作时，并不会反转卷积核</p>
+</li>
+<li><p>在传统的图像处理中，卷积操作多用来进行滤波，锐化或者边缘检测啥的。我们可以认为<strong>卷积是利用某些设计好的参数组合（卷积核）去提取图像空域上相邻的信息</strong></p>
+</li>
+<li><p>多入单出的降维卷积</p>
+<ul>
+<li>一张图片，通常是彩色的，具有红绿蓝三个通道。我们可以有两个选择来处理<ul>
+<li>变成灰度的，每个像素只剩下一个值，就可以用二维卷积</li>
+<li>对于三个通道，每个通道都使用一个卷积核，分别处理红绿蓝三种颜色的信息</li>
+</ul>
+</li>
+<li>显然第2种方法可以从图中学习到更多的特征，于是出现了三维卷积，即有三个卷积核分别对应输入的三个通道，三个子核的尺寸是一样的，比如都是2x2，这样的话，这三个卷积核就是一个3x2x2的立体核，称为<strong>过滤器Filter</strong>，所以称为三维卷积</li>
+</ul>
+</li>
+<li><p>每一个卷积核对应着左侧相同颜色的输入通道，三个过滤器的值并不一定相同。对三个通道各自做卷积后，得到右侧的三张特征图，然后再按照原始值不加权地相加在一起，得到最右侧的白色特征图，这张图里面已经把三种颜色的特征混在一起了，所以画成了白色，表示没有颜色特征了</p>
+</li>
+<li><p>虽然输入图片是多个通道的，或者说是三维的，但是在相同数量的过滤器的计算后，相加在一起的结果是一个通道，即2维数据，所以称为<strong>降维</strong>。这当然简化了对多通道数据的计算难度，但同时也会损失多通道数据自带的颜色信息</p>
+</li>
+<li><p>卷积编程模型， 五个概念</p>
+<ul>
+<li>输入    – <code>Input Channel</code></li>
+<li>卷积核组 – <code>WeightsBias</code></li>
+<li>过滤器  – <code>Filter</code></li>
+<li>卷积核  – <code>Kernel</code></li>
+<li>输出    – <code>Feature Map</code></li>
+</ul>
+</li>
+<li><p>输入是三维数据（3x32x32），经过2x3x5x5的卷积后，输出为三维（2x28x28），维数并没有变化，只是每一维内部的尺寸有了变化，一般都是要向更小的尺寸变化，以便于简化计算</p>
+</li>
+<li><p>三维卷积的特点：</p>
+<ul>
+<li>预先定义输出的feature map的数量，而不是根据前向计算自动计算出来</li>
+<li>对于每个输出，都有一个对应的过滤器Filter</li>
+<li>每个Filter内都有一个或多个卷积核Kernal，对应每个输入通道(Input Channel)，</li>
+<li>每个Filter只有一个Bias值，Filter-1对应b1，Filter-2对应b2</li>
+<li>卷积核Kernal的大小一般是奇数如：1x1, 3x3, 5x5, 7x7等</li>
+</ul>
+</li>
+<li><p>步长：</p>
+<ul>
+<li>每次计算后，卷积核会向右或者向下移动一个单元，即步长stride &#x3D; 1</li>
+<li>卷积核每次向右或向下移动两个单元，即stride &#x3D; 2</li>
+</ul>
+</li>
+<li><p>一般情况下，我们用正方形的卷积核，且为奇数</p>
+</li>
+<li><p>如果计算出的输出图片尺寸为小数，则取整，不做四舍五入</p>
+</li>
+</ul>
+<h2 id="卷积神经网络应用"><a href="#卷积神经网络应用" class="headerlink" title="卷积神经网络应用"></a>卷积神经网络应用</h2><ul>
+<li><p>卷积神经网络是现在深度学习领域中最有用的网络类型，尤其在计算机视觉领域更是一枝独秀。卷积神经网络从90年代的LeNet开始，沉寂了10年，也孵化了10年，直到2012年AlexNet开始再次崛起，后续的ZF Net、VGG、GoogLeNet、ResNet、DenseNet，网络越来越深，架构越来越复杂，解决反向传播时梯度消失的方法也越来越巧妙。下面让我们一起学习一下这些经典的网络模型</p>
+</li>
+<li><p>LeNet是卷积神经网络的开创者LeCun在1998年提出，用于解决手写数字识别的视觉任务。自那时起，卷积神经网络的最基本的架构就定下来了：卷积层、池化层、全连接层</p>
+</li>
+<li></li>
+</ul>
+<h1 id="第九步-循环神经网络"><a href="#第九步-循环神经网络" class="headerlink" title="第九步:循环神经网络"></a>第九步:循环神经网络</h1>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DL/" rel="tag"># DL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Debugger/2024-05-22-gdb_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="prev" title="gdb_2_常用技巧">
+      <i class="fa fa-chevron-left"></i> gdb_2_常用技巧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/DeepLearning/2024-05-22-pytorch/" rel="next" title="pytorch">
+      pytorch <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">2.1.</span> <span class="nav-text">人工智能的定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E5%BA%94%E7%94%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">模型的生成与应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8C%83%E5%BC%8F%E7%9A%84%E6%BC%94%E5%8C%96"><span class="nav-number">2.2.</span> <span class="nav-text">范式的演化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%8E%A2%E7%B4%A2"><span class="nav-number">2.2.1.</span> <span class="nav-text">数据探索</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E7%AE%80%E4%BB%8B"><span class="nav-number">2.3.</span> <span class="nav-text">神经网络的基本工作原理简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="nav-number">2.3.1.</span> <span class="nav-text">神经网络的主要功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.3.2.</span> <span class="nav-text">激活函数的作用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E4%B8%89%E4%B8%AA%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5-%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D-%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">2.4.</span> <span class="nav-text">神经网络中的三个基本概念:反向传播, 梯度下降, 损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="nav-number">2.5.</span> <span class="nav-text">梯度下降</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">2.6.</span> <span class="nav-text">损失函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="nav-number"></span> <span class="nav-text">第二步:线性回归</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E6%B3%95"><span class="nav-number">0.1.</span> <span class="nav-text">神经网络法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B7%E6%9C%AC%E7%89%B9%E5%BE%81%E6%95%B0%E6%8D%AE%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">0.2.</span> <span class="nav-text">样本特征数据标准化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5-%E7%BA%BF%E6%80%A7%E5%88%86%E7%B1%BB"><span class="nav-number"></span> <span class="nav-text">第三步:线性分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81-1"><span class="nav-number">0.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E6%A8%A1%E5%9E%8B"><span class="nav-number">0.2.</span> <span class="nav-text">逻辑回归模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E5%88%86%E7%B1%BB%E5%87%BD%E6%95%B0"><span class="nav-number">0.3.</span> <span class="nav-text">二分类函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E9%80%BB%E8%BE%91%E4%B8%8E%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-number">0.4.</span> <span class="nav-text">实现逻辑与或非门</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5-%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="nav-number"></span> <span class="nav-text">第四步:非线性回归</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5-%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%88%86%E7%B1%BB"><span class="nav-number"></span> <span class="nav-text">第五步:非线性分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E6%AD%A5-%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2"><span class="nav-number"></span> <span class="nav-text">第六步:模型部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81-2"><span class="nav-number">0.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86%E4%B8%8E%E9%83%A8%E7%BD%B2"><span class="nav-number">0.2.</span> <span class="nav-text">模型的推理与部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ONNX%E6%A8%A1%E5%9E%8B%E6%96%87%E4%BB%B6"><span class="nav-number">0.3.</span> <span class="nav-text">ONNX模型文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%83%E6%AD%A5-%E6%B7%B1%E5%BA%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number"></span> <span class="nav-text">第七步:深度神经网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E5%85%AB%E6%AD%A5-%E5%8D%B7%E5%8F%8A%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number"></span> <span class="nav-text">第八步:卷及神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">卷积神经网络概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%BA%94%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">卷积神经网络应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B9%9D%E6%AD%A5-%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number"></span> <span class="nav-text">第九步:循环神经网络</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

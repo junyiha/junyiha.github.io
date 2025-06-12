@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 Redis相关笔记  redis是什么Redis是一个开源的内存数据库，它可以用作键值存储、缓存和消息队列。Redis支持各种数据结构，如字符串、哈希、列表、集合、有序集合等，这使得它非常灵活和多用途。它通常被用来加速应用程序的性能，存储会频繁访问的数据，或者作为分布式系统中的数据存储和消息传递中间件。Redis的速度非常快，因为它将数据存储在内存中，并且可以通过持久化机制将数据保存到磁盘上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1_1_基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Redis/1_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/2024-05-22-1_1_%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 Redis相关笔记  redis是什么Redis是一个开源的内存数据库，它可以用作键值存储、缓存和消息队列。Redis支持各种数据结构，如字符串、哈希、列表、集合、有序集合等，这使得它非常灵活和多用途。它通常被用来加速应用程序的性能，存储会频繁访问的数据，或者作为分布式系统中的数据存储和消息传递中间件。Redis的速度非常快，因为它将数据存储在内存中，并且可以通过持久化机制将数据保存到磁盘上">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.501Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Redis/1_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/2024-05-22-1_1_%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>1_1_基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Redis/1_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/2024-05-22-1_1_%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          1_1_基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Redis相关笔记</li>
+</ul>
+<h2 id="redis是什么"><a href="#redis是什么" class="headerlink" title="redis是什么"></a>redis是什么</h2><p>Redis是一个开源的内存数据库，它可以用作键值存储、缓存和消息队列。Redis支持各种数据结构，如字符串、哈希、列表、集合、有序集合等，这使得它非常灵活和多用途。它通常被用来加速应用程序的性能，存储会频繁访问的数据，或者作为分布式系统中的数据存储和消息传递中间件。Redis的速度非常快，因为它将数据存储在内存中，并且可以通过持久化机制将数据保存到磁盘上以进行持久化存储。</p>
+<h2 id="Redis-维基百科"><a href="#Redis-维基百科" class="headerlink" title="Redis(维基百科)"></a>Redis(维基百科)</h2><ul>
+<li><p>Redis(Remote Dictionary Server)是一个使用ANSI C编写的支持网络，基于内存，分布式，可选持久性的键值对存储数据库。</p>
+</li>
+<li><p>数据模型</p>
+<ul>
+<li>Redis的外围由一个键，值映射的字典构成。与其他非关系型数据库主要不同在于： Redis中值的类型不仅限于字符串，还支持如下抽象数据类型<ul>
+<li>字符串列表</li>
+<li>无序不重复的字符串集合</li>
+<li>有序不重复的字符串集合</li>
+<li>键，值都为字符串的哈希表</li>
+</ul>
+</li>
+<li>值的类型决定了值本身支持的操作。Redis支持不同无序，有序的列表，无序，有序的集合间的交集，并集等高级服务器端原子操作</li>
+</ul>
+</li>
+<li><p>持久化</p>
+<ul>
+<li>Redis通常将全部数据存储在内存中</li>
+<li>目前通过两种方式实现持久化<ul>
+<li>使用快照，一种半持久耐用模式。不时的将数据集以异步方式从内存以RDB格式写入硬盘</li>
+<li>1.1版本开始使用更安全的AOF格式替代，一种只能追加的日志类型。将数据集修改操作记录起来。Redis能够在后台对只可追加的记录进行修改，从而避免日志的无限增长。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>同步</p>
+<ul>
+<li>Redis支持主从同步。数据可以从主服务器向任意数量的从服务器上同步，从服务器可以是关联其他从服务器的主服务器。这使得Redis可执行单层树复制。从盘可以有意无意的对数据进行写操作。由于完全实现了发布&#x2F;订阅机制，使得从数据库在任何地方同步树时，可订阅一个频道并接收主服务器完整的消息发布记录。同步对读取操作的可扩展性和数据冗余很有帮助</li>
+</ul>
+</li>
+<li><p>性能</p>
+<ul>
+<li>当数据依赖不再需要，Redis这种基于内存的性质，与在执行一个事务时将每个变化都写入硬盘的数据库系统相比就显得执行效率非常高。[11]写与读操作速度没有明显差别。</li>
+</ul>
+</li>
+</ul>
+<h2 id="数据库-redis-详解"><a href="#数据库-redis-详解" class="headerlink" title="数据库 redis 详解"></a>数据库 redis 详解</h2><p>Redis是一个非常流行的开源内存数据库，它提供了丰富的功能和灵活的用途。下面是对Redis的一些详细解释：</p>
+<ol>
+<li><p><strong>内存数据库</strong>：Redis主要将数据存储在内存中，这使得它能够提供非常快速的读写操作。由于内存的速度远高于磁盘，因此Redis能够在毫秒级别处理大量的读写请求。</p>
+</li>
+<li><p><strong>键值存储</strong>：Redis是一个键值存储系统，其中的每个键都与一个值相关联。这种简单的数据结构使得Redis在处理简单数据模型时非常高效。</p>
+</li>
+<li><p><strong>数据结构支持</strong>：Redis支持多种数据结构，包括字符串、哈希、列表、集合、有序集合等。这些数据结构使得Redis可以应对各种不同的需求，并提供了丰富的数据操作命令。</p>
+</li>
+<li><p><strong>持久化存储</strong>：尽管Redis主要将数据存储在内存中，但它也提供了持久化存储功能，可以将数据定期保存到磁盘上，以防止数据丢失。</p>
+</li>
+<li><p><strong>缓存</strong>：由于其快速的读写速度和灵活的数据结构，Redis经常被用作缓存系统。它可以将经常访问的数据存储在内存中，从而加速应用程序的性能。</p>
+</li>
+<li><p><strong>发布&#x2F;订阅</strong>：Redis支持发布&#x2F;订阅模式，可以用作消息队列系统。发布者可以将消息发布到特定的频道，而订阅者则可以订阅这些频道以接收消息。</p>
+</li>
+<li><p><strong>分布式系统支持</strong>：Redis提供了多种分布式特性，如主从复制、分片等，使得它可以在分布式系统中使用，并提供高可用性和可扩展性。</p>
+</li>
+<li><p><strong>事务支持</strong>：Redis支持事务操作，可以将多个命令打包成一个原子操作，从而保证这些命令要么全部执行成功，要么全部执行失败。</p>
+</li>
+</ol>
+<p>总的来说，Redis是一个功能强大、性能优越的内存数据库，可以应对各种不同的应用场景，从简单的缓存系统到复杂的分布式系统都能够发挥作用。</p>
+<h2 id="linux-redis-C-相关工具库"><a href="#linux-redis-C-相关工具库" class="headerlink" title="linux redis C++相关工具库"></a>linux redis C++相关工具库</h2><p>在Linux环境下，有几个与Redis相关的C++工具库可以用来与Redis进行交互和操作。以下是其中一些：</p>
+<ol>
+<li><p><strong>hiredis</strong>：hiredis是一个轻量级的C库，用于与Redis进行交互。虽然它是用C编写的，但也提供了C++的包装器，可以在C++项目中使用。hiredis提供了简洁的API，使得与Redis进行连接、发送命令和接收响应变得非常方便。</p>
+</li>
+<li><p><strong>cpp_redis</strong>：cpp_redis是一个用C++编写的Redis客户端库，提供了现代C++风格的API和异步支持。它的设计使得在C++应用程序中与Redis进行交互变得更加简单和高效。</p>
+</li>
+<li><p><strong>Redox</strong>：Redox是另一个用C++编写的Redis客户端库，它提供了类似于cpp_redis的现代C++接口，并支持异步操作。Redox的设计目标是提供简单易用的API，同时保持高性能。</p>
+</li>
+</ol>
+<p>这些工具库都可以在Linux环境下使用，并且都支持与Redis进行连接、命令发送、响应接收等操作。选择哪个库取决于你的项目需求和个人偏好，但无论选择哪个，它们都提供了方便、高效的方式来利用Redis的功能。</p>
+<h2 id="linux-redis开发结构是什么样的"><a href="#linux-redis开发结构是什么样的" class="headerlink" title="linux redis开发结构是什么样的"></a>linux redis开发结构是什么样的</h2><p>在Linux环境下进行Redis开发时，通常会采用一种分层结构来组织代码和实现功能。这种结构可以根据项目的规模和复杂度进行调整，但通常包含以下几个层次：</p>
+<ol>
+<li><p><strong>应用层</strong>：应用层是最高级别的层次，它包含与业务逻辑直接相关的代码。在这一层，开发者会编写与具体业务需求相关的功能，如数据处理、业务逻辑实现等。应用层通过调用下一层的接口来与Redis进行交互，发送命令、接收响应，并处理返回的数据。</p>
+</li>
+<li><p><strong>Redis客户端库</strong>：在应用层之下是Redis客户端库，它提供了与Redis服务器进行通信的API和功能。开发者可以使用已有的Redis客户端库，如hiredis、cpp_redis或Redox，也可以根据需要自行开发客户端库。这一层负责建立与Redis服务器的连接，发送命令和接收响应，并提供方便的接口供应用层调用。</p>
+</li>
+<li><p><strong>网络通信层</strong>：在客户端库之下是网络通信层，它负责处理与Redis服务器之间的网络通信。这一层实现了与Redis服务器的连接建立、命令发送、响应接收等功能，通常使用TCP&#x2F;IP协议来进行通信。</p>
+</li>
+<li><p><strong>Redis服务器</strong>：最底层是Redis服务器，它负责存储数据、处理命令、生成响应等功能。Redis服务器通常在Linux环境下运行，可以作为单机或分布式系统来部署和管理。</p>
+</li>
+</ol>
+<p>在这种结构下，应用层通过调用Redis客户端库提供的API与Redis进行交互，而客户端库则通过网络通信层与Redis服务器建立连接，并发送命令和接收响应。这种分层结构使得Redis开发更加模块化和可维护，同时也提供了灵活性和扩展性，能够适应不同规模和复杂度的项目需求。</p>
+<h2 id="redis的用途-详解"><a href="#redis的用途-详解" class="headerlink" title="redis的用途 详解"></a>redis的用途 详解</h2><p>Redis 是一个开源的、基于内存的数据存储系统，它支持多种数据结构（如字符串、哈希表、列表、集合、有序集合等），并提供了丰富的功能和特性。Redis 的用途非常广泛，包括但不限于以下几个方面：</p>
+<h3 id="1-缓存："><a href="#1-缓存：" class="headerlink" title="1. 缓存："></a>1. 缓存：</h3><p>Redis 可以作为高性能的缓存系统，用于存储常用的数据，加速访问速度。由于 Redis 的数据存储在内存中，读写速度非常快，适合存储热点数据和频繁访问的数据。常见的缓存应用包括网页缓存、会话缓存、对象缓存等。</p>
+<h3 id="2-数据库："><a href="#2-数据库：" class="headerlink" title="2. 数据库："></a>2. 数据库：</h3><p>虽然 Redis 是一个键值存储系统，但它的数据结构支持丰富，可以存储复杂的数据类型，并提供了持久化功能，可以将数据持久化到磁盘上。因此，Redis 也可以作为轻量级的数据库使用，适用于一些对数据持久性要求不是很高的场景，如消息队列、计数器、排行榜等。</p>
+<h3 id="3-分布式锁："><a href="#3-分布式锁：" class="headerlink" title="3. 分布式锁："></a>3. 分布式锁：</h3><p>Redis 的原子操作和分布式特性使其成为实现分布式锁的一个理想选择。通过 Redis 的 SETNX（SET if Not eXists）命令可以很方便地实现分布式锁，保证在分布式环境下的数据一致性和并发安全性。</p>
+<h3 id="4-消息队列："><a href="#4-消息队列：" class="headerlink" title="4. 消息队列："></a>4. 消息队列：</h3><p>Redis 的发布订阅功能使其成为一个简单而有效的消息队列系统。生产者可以将消息发布到指定的频道，而订阅者则可以订阅这些频道，并在有消息到达时接收并处理。这种发布-订阅模式非常适用于异步任务处理、消息广播等场景。</p>
+<h3 id="5-实时排行榜和计数器："><a href="#5-实时排行榜和计数器：" class="headerlink" title="5. 实时排行榜和计数器："></a>5. 实时排行榜和计数器：</h3><p>由于 Redis 支持有序集合和原子操作，可以非常方便地实现实时排行榜和计数器功能。通过有序集合存储分数和成员的对应关系，可以实现按分数排序的排行榜，而通过增减操作可以实现实时计数器功能。</p>
+<h3 id="6-地理位置应用："><a href="#6-地理位置应用：" class="headerlink" title="6. 地理位置应用："></a>6. 地理位置应用：</h3><p>Redis 的地理位置数据结构和地理位置计算命令，使其成为实现地理位置应用（如附近的人、地点推荐等）的一个良好选择。通过地理位置数据结构存储经纬度信息，并使用地理位置计算命令进行距离计算和位置查询，可以实现许多有趣的地理位置应用。</p>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>Redis 是一个功能强大、用途广泛的数据存储系统，可以应用于缓存、数据库、分布式锁、消息队列、实时计数器、地理位置应用等众多场景。其快速、高效、稳定的特性使其成为众多互联网应用的首选，是一个非常受欢迎的开源项目。</p>
+<h2 id="redis报文-详解"><a href="#redis报文-详解" class="headerlink" title="redis报文 详解"></a>redis报文 详解</h2><p>在 Redis 中，通信是通过简单的文本协议进行的，称为 Redis 协议（Redis Protocol）。Redis 协议是一种基于文本的、简单易懂的协议，它使用 RESP（REdis Serialization Protocol）格式来进行数据的序列化和反序列化。下面是关于 Redis 协议报文的详细解释：</p>
+<h3 id="1-RESP-格式："><a href="#1-RESP-格式：" class="headerlink" title="1. RESP 格式："></a>1. RESP 格式：</h3><p>RESP 是 Redis 自定义的一种序列化协议，用于在客户端和服务器之间传输数据。RESP 格式有以下几种类型：</p>
+<ul>
+<li><strong>单行字符串（Simple Strings）</strong>：以 “+” 开头，例如：<code>+OK\r\n</code>。</li>
+<li><strong>错误消息（Errors）</strong>：以 “-“ 开头，例如：<code>-Error message\r\n</code>。</li>
+<li><strong>整数值（Integers）</strong>：以 “:” 开头，例如：<code>:1000\r\n</code>。</li>
+<li><strong>批量字符串（Bulk Strings）</strong>：以 “$” 开头，例如：<code>$6\r\nfoobar\r\n</code>。</li>
+<li><strong>数组（Arrays）</strong>：以 “*” 开头，例如：<code>*3\r\n:1\r\n:2\r\n:3\r\n</code>。</li>
+</ul>
+<h3 id="2-Redis-协议报文示例："><a href="#2-Redis-协议报文示例：" class="headerlink" title="2. Redis 协议报文示例："></a>2. Redis 协议报文示例：</h3><p>下面是一个 Redis 协议报文的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">*3\r\n</span><br><span class="line">$3\r\nSET\r\n</span><br><span class="line">$5\r\nmykey\r\n</span><br><span class="line">$7\r\nmyvalue\r\n</span><br></pre></td></tr></table></figure>
+
+<p>这个报文表示一个数组，包含三个元素，分别是一个字符串 SET、一个字符串 mykey 和一个字符串 myvalue。这个报文表示的操作是向 Redis 数据库中设置一个键值对，键为 mykey，值为 myvalue。</p>
+<h3 id="3-报文的解析与处理："><a href="#3-报文的解析与处理：" class="headerlink" title="3. 报文的解析与处理："></a>3. 报文的解析与处理：</h3><p>在 Redis 客户端和服务器之间的通信过程中，客户端会向服务器发送一系列的命令请求报文，服务器接收到请求后进行解析和处理，然后返回相应的响应报文给客户端。客户端收到响应后进行解析并根据需要进行后续的操作。</p>
+<h3 id="4-客户端和服务器之间的通信："><a href="#4-客户端和服务器之间的通信：" class="headerlink" title="4. 客户端和服务器之间的通信："></a>4. 客户端和服务器之间的通信：</h3><p>在实际的使用中，Redis 客户端和服务器之间的通信是通过套接字（Socket）来实现的。客户端通过套接字向服务器发送请求报文，服务器接收到请求后进行处理，并根据请求发送响应报文给客户端。</p>
+<h3 id="5-序列化与反序列化："><a href="#5-序列化与反序列化：" class="headerlink" title="5. 序列化与反序列化："></a>5. 序列化与反序列化：</h3><p>Redis 协议中的报文需要进行序列化和反序列化操作，以便在网络上传输和在客户端&#x2F;服务器中进行处理。客户端和服务器需要实现相应的序列化和反序列化算法来处理 Redis 协议报文。</p>
+<p>总的来说，Redis 协议是一种简单易懂的文本协议，用于客户端和服务器之间的通信。通过使用 RESP 格式的报文，客户端可以向服务器发送命令请求，服务器接收到请求后进行处理，并返回相应的响应给客户端。这种基于文本的通信协议使得 Redis 在网络传输和数据处理方面具有良好的可扩展性和易用性。</p>
+<h2 id="redis有哪些数据结构"><a href="#redis有哪些数据结构" class="headerlink" title="redis有哪些数据结构"></a>redis有哪些数据结构</h2><p>Redis 是一个支持多种数据结构的内存数据库，每种数据结构都有其特定的用途和优势。以下是 Redis 中常见的数据结构：</p>
+<ol>
+<li><p><strong>字符串（String）：</strong></p>
+<ul>
+<li>最基本的数据结构，存储一个键值对，键是字符串，值可以是字符串、整数或浮点数。</li>
+</ul>
+</li>
+<li><p><strong>哈希表（Hash）：</strong></p>
+<ul>
+<li>类似于关联数组，存储字段和与其关联的值的映射关系，用于存储对象。</li>
+</ul>
+</li>
+<li><p><strong>列表（List）：</strong></p>
+<ul>
+<li>双向链表结构，支持插入、删除、查找等操作，可以用作队列、栈等数据结构。</li>
+</ul>
+</li>
+<li><p><strong>集合（Set）：</strong></p>
+<ul>
+<li>无序集合，元素唯一，支持添加、删除、查找等操作，可以用于存储唯一值。</li>
+</ul>
+</li>
+<li><p><strong>有序集合（Sorted Set）：</strong></p>
+<ul>
+<li>类似于集合，每个元素都关联了一个分数（score），元素按照分数从小到大排序，支持添加、删除、查找等操作。</li>
+</ul>
+</li>
+<li><p><strong>位图（Bitmap）：</strong></p>
+<ul>
+<li>由二进制位组成的数据结构，支持位运算操作，可以用于表示用户在线状态、标记用户行为等。</li>
+</ul>
+</li>
+<li><p><strong>HyperLogLog：</strong></p>
+<ul>
+<li>用于基数估计的数据结构，用于估算集合中元素的数量。</li>
+</ul>
+</li>
+<li><p><strong>地理空间索引（GeoSpatial）：</strong></p>
+<ul>
+<li>存储地理位置信息的数据结构，支持添加、删除、查找等操作，可以用于位置信息检索和计算。</li>
+</ul>
+</li>
+</ol>
+<p>这些数据结构使 Redis 能够满足不同场景下的需求，例如缓存、计数器、消息队列、排行榜等。在使用 Redis 时，根据具体需求选择合适的数据结构能够更好地发挥其性能和功能优势。</p>
+<h2 id="连接操作命令"><a href="#连接操作命令" class="headerlink" title="连接操作命令"></a>连接操作命令</h2><ul>
+<li><code>quit</code> : 关闭连接</li>
+<li><code>auth</code> : 简单密码认证</li>
+<li><code>help cmd</code> : 查看cmd帮助，例如：<code>help quit</code></li>
+</ul>
+<h2 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h2><ul>
+<li><code>save</code> : 将数据同步保存到磁盘</li>
+<li><code>bgsave</code> : 将数据异步保存到磁盘</li>
+<li><code>lastsave</code> : 返回上次成功将数据保存到磁盘的Unix时戳</li>
+<li><code>shundown</code> : 将数据同步保存到磁盘，然后关闭服务</li>
+</ul>
+<h2 id="远程服务控制"><a href="#远程服务控制" class="headerlink" title="远程服务控制"></a>远程服务控制</h2><ul>
+<li><code>info</code> : 提供服务器的信息和统计</li>
+<li><code>monitor</code> : 实时转储收到的请求</li>
+<li><code>slaveof</code> : 改变复制策略设置</li>
+<li><code>config</code> : 在运行时配置Redis服务器</li>
+</ul>
+<h2 id="对value操作的命令"><a href="#对value操作的命令" class="headerlink" title="对value操作的命令"></a>对value操作的命令</h2><ul>
+<li><code>exists (key)</code> : 确认一个key是否存在</li>
+<li><code>del (key)</code> : 删除一个key</li>
+<li><code>type (key)</code> : 返回值的类型</li>
+<li><code>keys (pattern)</code> : 返回满足给定pattern的所有key</li>
+<li><code>randomkey</code> : 随即返回key空间的一个</li>
+<li><code>keyrename(oldname, newname)</code> : 重命名key</li>
+<li><code>dbsize</code> : 返回当前数据库中key的数目</li>
+<li><code>expire</code> : 设定一个key的活动时间(s)</li>
+<li><code>ttl</code> : 获得一个key的活动时间</li>
+<li><code>select (index)</code> : 按索引查询</li>
+<li><code>move (key, dbindex)</code> : 移动当前数据库中的key到dbindex数据库</li>
+<li><code>flushdb</code> : 删除当前选择数据库中所有key</li>
+<li><code>flushall</code> : 删除所有数据库中的所有key</li>
+</ul>
+<h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><ul>
+<li><code>rpush(key, value)</code> : 在名称为key的list尾部添加一个值为value的元素</li>
+<li><code>lpush(key, value)</code> : 在名称为key的list头部添加一个值为alue的元素</li>
+<li><code>llen(key)</code> : 返回名称为key的list长度</li>
+<li><code>lrange(key, start, end)</code> : 返回名称为key的list中start至end之间的元素</li>
+<li><code>ltrim(key, start, end)</code> : 截取名称为key的list</li>
+<li><code>lindex(key, index)</code> : 返回名称为key的list中index位置的元素</li>
+<li><code>lset(key, index, value)</code> : 给名称为key的list中index位置的元素赋值</li>
+<li><code>lrem(key, count, value)</code> : 删除count个key的list中值为value的元素</li>
+<li><code>lpop(key)</code> : 返回并删除名称为key的list中的首元素</li>
+<li><code>rpop(key)</code> : 返回并删除名称为key的list中的尾元素</li>
+<li><code>blpop(key1, key2, ... key N, timeout)</code> : lpop命令的block版本</li>
+<li><code>brpop(key1, key2, ... key N, timeout)</code> : rpop的block版本</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Qt/%E5%B8%B8%E8%A7%81%E5%AE%B9%E5%99%A8/2024-12-11-QVector/" rel="prev" title="QVector">
+      <i class="fa fa-chevron-left"></i> QVector
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Redis/1_%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/2024-05-22-1_2_%E8%8F%9C%E9%B8%9F%E6%95%99%E7%A8%8B/" rel="next" title="1_2_菜鸟教程">
+      1_2_菜鸟教程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redis%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">redis是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91"><span class="nav-number">3.</span> <span class="nav-text">Redis(维基百科)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93-redis-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">数据库 redis 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-redis-C-%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7%E5%BA%93"><span class="nav-number">5.</span> <span class="nav-text">linux redis C++相关工具库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-redis%E5%BC%80%E5%8F%91%E7%BB%93%E6%9E%84%E6%98%AF%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84"><span class="nav-number">6.</span> <span class="nav-text">linux redis开发结构是什么样的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redis%E7%9A%84%E7%94%A8%E9%80%94-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">redis的用途 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BC%93%E5%AD%98%EF%BC%9A"><span class="nav-number">7.1.</span> <span class="nav-text">1. 缓存：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">2. 数据库：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%EF%BC%9A"><span class="nav-number">7.3.</span> <span class="nav-text">3. 分布式锁：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%EF%BC%9A"><span class="nav-number">7.4.</span> <span class="nav-text">4. 消息队列：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%AE%9E%E6%97%B6%E6%8E%92%E8%A1%8C%E6%A6%9C%E5%92%8C%E8%AE%A1%E6%95%B0%E5%99%A8%EF%BC%9A"><span class="nav-number">7.5.</span> <span class="nav-text">5. 实时排行榜和计数器：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE%E5%BA%94%E7%94%A8%EF%BC%9A"><span class="nav-number">7.6.</span> <span class="nav-text">6. 地理位置应用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">7.7.</span> <span class="nav-text">总结：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redis%E6%8A%A5%E6%96%87-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">redis报文 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-RESP-%E6%A0%BC%E5%BC%8F%EF%BC%9A"><span class="nav-number">8.1.</span> <span class="nav-text">1. RESP 格式：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Redis-%E5%8D%8F%E8%AE%AE%E6%8A%A5%E6%96%87%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">8.2.</span> <span class="nav-text">2. Redis 协议报文示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%8A%A5%E6%96%87%E7%9A%84%E8%A7%A3%E6%9E%90%E4%B8%8E%E5%A4%84%E7%90%86%EF%BC%9A"><span class="nav-number">8.3.</span> <span class="nav-text">3. 报文的解析与处理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%92%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1%EF%BC%9A"><span class="nav-number">8.4.</span> <span class="nav-text">4. 客户端和服务器之间的通信：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%EF%BC%9A"><span class="nav-number">8.5.</span> <span class="nav-text">5. 序列化与反序列化：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redis%E6%9C%89%E5%93%AA%E4%BA%9B%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">9.</span> <span class="nav-text">redis有哪些数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4"><span class="nav-number">10.</span> <span class="nav-text">连接操作命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">11.</span> <span class="nav-text">持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E6%8E%A7%E5%88%B6"><span class="nav-number">12.</span> <span class="nav-text">远程服务控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9value%E6%93%8D%E4%BD%9C%E7%9A%84%E5%91%BD%E4%BB%A4"><span class="nav-number">13.</span> <span class="nav-text">对value操作的命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#List"><span class="nav-number">14.</span> <span class="nav-text">List</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

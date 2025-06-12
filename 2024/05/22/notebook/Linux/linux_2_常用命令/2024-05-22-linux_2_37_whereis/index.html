@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 whereis命令  linux whereis命令 详解whereis 是 Linux 中的一个用于查找二进制、源代码和帮助文档文件的命令。它提供了一种简便的方式来查找系统中特定文件或程序的位置。以下是whereis命令的详解： 基本语法：1whereis [选项] 文件或程序名  常用选项： -b： 限制搜索二进制文件。 -m： 限制搜索帮助手册文件。 -s： 限制搜索源代码文件。 -u">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_37_whereis">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_37_whereis/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 whereis命令  linux whereis命令 详解whereis 是 Linux 中的一个用于查找二进制、源代码和帮助文档文件的命令。它提供了一种简便的方式来查找系统中特定文件或程序的位置。以下是whereis命令的详解： 基本语法：1whereis [选项] 文件或程序名  常用选项： -b： 限制搜索二进制文件。 -m： 限制搜索帮助手册文件。 -s： 限制搜索源代码文件。 -u">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.347Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_37_whereis/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_37_whereis | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_37_whereis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_37_whereis
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>whereis命令</li>
+</ul>
+<h2 id="linux-whereis命令-详解"><a href="#linux-whereis命令-详解" class="headerlink" title="linux whereis命令 详解"></a>linux whereis命令 详解</h2><p><code>whereis</code> 是 Linux 中的一个用于查找二进制、源代码和帮助文档文件的命令。它提供了一种简便的方式来查找系统中特定文件或程序的位置。以下是<code>whereis</code>命令的详解：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis [选项] 文件或程序名</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用选项："><a href="#常用选项：" class="headerlink" title="常用选项："></a>常用选项：</h3><ul>
+<li><strong>-b：</strong> 限制搜索二进制文件。</li>
+<li><strong>-m：</strong> 限制搜索帮助手册文件。</li>
+<li><strong>-s：</strong> 限制搜索源代码文件。</li>
+<li><strong>-u：</strong> 显示不包括指定文件类型的位置。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ol>
+<li><p><strong>查找二进制文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>这将返回 <code>ls</code> 命令的二进制文件、帮助文件和源代码文件的路径。</p>
+</li>
+<li><p><strong>限制搜索类型：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -b <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>仅显示 <code>ls</code> 命令的二进制文件路径。</p>
+</li>
+<li><p><strong>查找帮助文档：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -m <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>仅显示 <code>ls</code> 命令的帮助文档路径。</p>
+</li>
+<li><p><strong>查找源代码：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -s <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>仅显示 <code>ls</code> 命令的源代码路径。</p>
+</li>
+<li><p><strong>显示多个文件的位置：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis <span class="built_in">ls</span> grep</span><br></pre></td></tr></table></figure>
+<p>查找多个文件或程序的位置。</p>
+</li>
+<li><p><strong>显示不同类型的位置：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -b -m <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>仅显示 <code>ls</code> 命令的二进制文件和帮助文档路径。</p>
+</li>
+<li><p><strong>不同文件类型的路径：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -u <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>显示不包括 <code>ls</code> 命令的源代码文件的路径。</p>
+</li>
+</ol>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>whereis</code> 主要用于查找系统命令或文件，不适用于用户自定义的脚本或其他非系统提供的文件。</li>
+<li><code>whereis</code> 会搜索默认的系统路径，如 <code>/bin</code>、<code>/usr/bin</code> 等，因此，如果某个程序或文件不在这些路径下，<code>whereis</code> 将无法找到它。</li>
+</ul>
+<p>总的来说，<code>whereis</code> 是一个方便的工具，用于快速查找系统中二进制、源代码和帮助文档文件的位置。如果需要查找更广泛范围的文件，或者需要自定义搜索路径，可能需要使用其他工具如 <code>find</code> 或 <code>locate</code>。</p>
+<h2 id="linux-whereis命令-常用技巧"><a href="#linux-whereis命令-常用技巧" class="headerlink" title="linux whereis命令 常用技巧"></a>linux whereis命令 常用技巧</h2><p>虽然 <code>whereis</code> 命令相对简单，但你可以通过一些技巧来更灵活地使用它：</p>
+<ol>
+<li><p><strong>结合通配符进行模糊搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -b -u <span class="string">&quot;*keyword*&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用通配符 <code>*</code> 可以进行模糊搜索，查找包含指定关键字的二进制文件。</p>
+</li>
+<li><p><strong>使用管道和其他命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -b <span class="built_in">command</span> | xargs <span class="built_in">ls</span> -l</span><br></pre></td></tr></table></figure>
+<p>结合 <code>xargs</code> 可以将 <code>whereis</code> 的输出作为参数传递给其他命令，这里是 <code>ls -l</code>。</p>
+</li>
+<li><p><strong>输出详细信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -l <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>-l</code> 选项可以输出详细的信息，包括文件类型和路径。</p>
+</li>
+<li><p><strong>查找共享库文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -M /lib /usr/lib -f libc.so</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-M</code> 选项指定额外的搜索路径，查找共享库文件。</p>
+</li>
+<li><p><strong>在路径中搜索指定文件类型：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -b -B /path/to/search -f filename</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-B</code> 选项指定自定义搜索路径，查找指定文件类型。</p>
+</li>
+<li><p><strong>使用别名简化命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> ws=<span class="string">&#x27;whereis -b -m -s&#x27;</span></span><br><span class="line">ws <span class="built_in">command</span></span><br></pre></td></tr></table></figure>
+<p>创建一个别名（这里是 <code>ws</code>），以简化 <code>whereis</code> 的命令行输入。</p>
+</li>
+<li><p><strong>结合 <code>find</code> 进行更复杂的搜索：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find $(whereis -b <span class="built_in">command</span> | <span class="built_in">cut</span> -d<span class="string">&#x27; &#x27;</span> -f2) -name <span class="string">&quot;*.txt&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>find</code> 命令可以基于 <code>whereis</code> 的结果执行更复杂的搜索操作。</p>
+</li>
+<li><p><strong>将 <code>whereis</code> 结果导入数组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">paths=($(whereis -b <span class="built_in">command</span> | <span class="built_in">cut</span> -d<span class="string">&#x27; &#x27;</span> -f2))</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$&#123;paths[0]&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure>
+<p>将 <code>whereis</code> 的输出导入到 Bash 数组中，以便进一步处理。</p>
+</li>
+<li><p><strong>显示文件权限和所有者：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -l <span class="built_in">ls</span> | xargs <span class="built_in">ls</span> -l</span><br></pre></td></tr></table></figure>
+<p>结合 <code>-l</code> 选项和 <code>xargs</code> 来显示文件的权限和所有者信息。</p>
+</li>
+<li><p><strong>过滤结果：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis -b <span class="built_in">command</span> | grep <span class="string">&quot;/bin/&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用 <code>grep</code> 命令过滤 <code>whereis</code> 的输出，只显示包含 “&#x2F;bin&#x2F;“ 的路径。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更好地利用 <code>whereis</code> 命令，使其更适应你的需求。根据具体情况，你可能会结合其他命令和选项以达到更复杂的搜索和操作。</p>
+<h2 id="whereis"><a href="#whereis" class="headerlink" title="whereis"></a>whereis</h2><ul>
+<li>检查二进制文件和库文件的位置<ul>
+<li><code>whereis systemctl</code></li>
+</ul>
+</li>
+</ul>
+<p>在Linux中，<code>whereis</code>命令用于定位可执行程序、源代码文件和帮助文档的位置。它提供了一个简单的方法来查找特定命令或文件在系统中的位置。</p>
+<p>以下是<code>whereis</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis [options] command</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>command</code>是要查找的命令或文件。</p>
+<p>以下是一些常见的<code>whereis</code>命令选项和用法：</p>
+<ol>
+<li><p>查找可执行程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis ls</span><br></pre></td></tr></table></figure>
+
+<p>此命令将显示<code>ls</code>命令的可执行程序位置。</p>
+</li>
+<li><p>查找源代码文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis grep</span><br></pre></td></tr></table></figure>
+
+<p>此命令将显示<code>grep</code>命令的源代码文件位置。</p>
+</li>
+<li><p>查找帮助文档：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis man</span><br></pre></td></tr></table></figure>
+
+<p>此命令将显示<code>man</code>命令的帮助文档位置。</p>
+</li>
+</ol>
+<p><code>whereis</code>命令会搜索特定文件类型的位置，并显示相关信息，包括可执行程序、源代码和帮助文档的路径。它会搜索系统默认的搜索路径，如<code>/bin</code>、<code>/usr/bin</code>等。</p>
+<p>请注意，<code>whereis</code>命令仅搜索已经建立索引的文件和路径，因此可能无法找到某些文件。另外，它不会搜索用户自定义的路径或目录。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_36_sed/" rel="prev" title="linux_2_36_sed">
+      <i class="fa fa-chevron-left"></i> linux_2_36_sed
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_40_file/" rel="next" title="linux_2_40_file">
+      linux_2_40_file <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-whereis%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux whereis命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常用选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-whereis%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux whereis命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#whereis"><span class="nav-number">4.</span> <span class="nav-text">whereis</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

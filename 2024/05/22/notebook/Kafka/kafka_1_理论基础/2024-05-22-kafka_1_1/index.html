@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 kafka相关的理论基础知识  维基百科 Kafka是什么 Kafka是由Apache软件基金会开发的一个开源流处理平台，由Scala和Java编写。该项目的目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。其持久化层本质上是一个“按照分布式事务日志架构的大规模发布&#x2F;订阅消息队列”，[4]这使它作为企业级基础设施来处理流式数据非常有价值。此外，Kafka可以通过Kafka C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kafka_1_1">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Kafka/kafka_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-kafka_1_1/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 kafka相关的理论基础知识  维基百科 Kafka是什么 Kafka是由Apache软件基金会开发的一个开源流处理平台，由Scala和Java编写。该项目的目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。其持久化层本质上是一个“按照分布式事务日志架构的大规模发布&#x2F;订阅消息队列”，[4]这使它作为企业级基础设施来处理流式数据非常有价值。此外，Kafka可以通过Kafka C">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.317Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Kafka">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Kafka/kafka_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-kafka_1_1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>kafka_1_1 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Kafka/kafka_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-05-22-kafka_1_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          kafka_1_1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kafka/" itemprop="url" rel="index"><span itemprop="name">Kafka</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>kafka相关的理论基础知识</li>
+</ul>
+<h2 id="维基百科-Kafka是什么"><a href="#维基百科-Kafka是什么" class="headerlink" title="维基百科 Kafka是什么"></a>维基百科 Kafka是什么</h2><ul>
+<li><p>Kafka是由Apache软件基金会开发的一个开源流处理平台，由Scala和Java编写。该项目的目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。其持久化层本质上是一个“按照分布式事务日志架构的大规模发布&#x2F;订阅消息队列”，[4]这使它作为企业级基础设施来处理流式数据非常有价值。此外，Kafka可以通过Kafka Connect连接到外部系统（用于数据输入&#x2F;输出），并提供了Kafka Streams——一个Java流式处理库。</p>
+</li>
+<li><p>Kafka的历史</p>
+<ul>
+<li>Kafka最初是由领英开发，并随后于2011年初开源，并于2012年10月23日由Apache Incubator孵化出站。2014年11月，几个曾在领英为Kafka工作的工程师，创建了名为Confluent的新公司，[6]，并着眼于Kafka。根据2014年Quora的帖子，Jay Kreps似乎已经将它以作家弗朗茨·卡夫卡命名。Kreps选择将该系统以一个作家命名是因为，它是“一个用于优化写作的系统”，而且他很喜欢卡夫卡的作品</li>
+</ul>
+</li>
+<li><p>Kafka的架构</p>
+<ul>
+<li>Kafka存储的消息来自任意多被称为“生产者”（Producer）的进程。数据从而可以被分配到不同的“分区”（Partition）、不同的“Topic”下。在一个分区内，这些消息被索引并连同时间戳存储在一起。其它被称为“消费者”（Consumer）的进程可以从分区查询消息。Kafka运行在一个由一台或多台服务器组成的集群上，并且分区可以跨集群结点分布。</li>
+<li>Kafka高效地处理实时流式数据，可以实现与Storm、HBase和Spark的集成。作为聚类部署到多台服务器上，Kafka处理它所有的发布和订阅消息系统使用了四个API，即生产者API、消费者API、Stream API和Connector API。它能够传递大规模流式消息，自带容错功能，已经取代了一些传统消息系统，如JMS、AMQP等。</li>
+<li>Kafka架构的主要术语包括Topic、Record和Broker。Topic由Record组成，Record持有不同的信息，而Broker则负责复制消息。Kafka有四个主要API：<ul>
+<li>生产者API：支持应用程序发布Record流。</li>
+<li>消费者API：支持应用程序订阅Topic和处理Record流</li>
+<li>Stream API：将输入流转换为输出流，并产生结果。</li>
+<li>Connector API：执行可重用的生产者和消费者API，可将Topic链接到现有应用程序。</li>
+</ul>
+</li>
+<li>相关术语<ul>
+<li>Topic 用来对消息进行分类，每个进入到Kafka的信息都会被放到一个Topic下</li>
+<li>Broker 用来实现数据存储的主机服务器</li>
+<li>Partition 每个Topic中的消息会被分为若干个Partition，以提高消息的处理效率</li>
+<li>Producer 消息的生产者</li>
+<li>Consumer 消息的消费者</li>
+<li>Consumer Group 消息的消费群组</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Kafka的性能</p>
+<ul>
+<li>由于其广泛集成到企业级基础设施中，监测Kafka在规模运行中的性能成为一个日益重要的问题。监测端到端性能，要求跟踪所有指标，包括Broker、消费者和生产者。除此之外还要监测ZooKeeper，Kafka用它来协调各个消费者。[8][9]目前有一些监测平台可以追踪Kafka的性能，有开源的，如领英的Burrow；也有付费的，如Datadog。除了这些平台之外，收集Kafka的数据也可以使用工具来进行，这些工具一般需要Java，包括JConsole</li>
+</ul>
+</li>
+</ul>
+<h2 id="C-librdkafka库是什么"><a href="#C-librdkafka库是什么" class="headerlink" title="C++ librdkafka库是什么"></a>C++ librdkafka库是什么</h2><p>C++库librdkafka是一个用于Apache Kafka的客户端库。它提供了与Kafka集群通信的功能，允许你在C++应用程序中生产和消费消息。librdkafka是一个高性能的、轻量级的库，具有很好的可扩展性，因此在许多C++应用程序中被广泛使用。它提供了丰富的特性和配置选项，使得开发者能够灵活地与Kafka进行交互，例如消息的分区、压缩、认证等。</p>
+<h2 id="C-librdkafka库-详解"><a href="#C-librdkafka库-详解" class="headerlink" title="C++ librdkafka库 详解"></a>C++ librdkafka库 详解</h2><p>librdkafka 是一个 C&#x2F;C++ 客户端库，用于与 Apache Kafka 通信。它提供了高性能的生产者和消费者功能，允许你在 C++ 应用程序中轻松地发送和接收消息到 Kafka 集群。</p>
+<p>以下是 librdkafka 的一些关键特性和详解：</p>
+<ol>
+<li><p><strong>高性能</strong>：librdkafka 是一个高性能的库，它通过最大限度地减少与 Kafka 集群的网络通信以及有效地使用系统资源来提高性能。</p>
+</li>
+<li><p><strong>异步和批处理</strong>：librdkafka 支持异步发送和接收消息的方式，它能够批量发送和接收消息，从而提高吞吐量并减少延迟。</p>
+</li>
+<li><p><strong>生产者和消费者</strong>：librdkafka 提供了生产者和消费者的功能，允许你从应用程序中发送消息到 Kafka 主题，并从 Kafka 主题中接收消息。</p>
+</li>
+<li><p><strong>消息分区和复制</strong>：librdkafka 允许你指定消息的分区方式，以及处理消息的复制和故障转移。</p>
+</li>
+<li><p><strong>灵活的配置</strong>：librdkafka 提供了丰富的配置选项，允许你根据应用程序的需要对其行为进行微调，包括消息的序列化和压缩方式、日志记录级别、连接超时等。</p>
+</li>
+<li><p><strong>消息传递语义</strong>：librdkafka 支持不同的消息传递语义，包括最少一次传递、最多一次传递和恰好一次传递，以满足不同应用程序的需求。</p>
+</li>
+<li><p><strong>跨平台支持</strong>：librdkafka 支持多种操作系统，包括 Linux、Windows 和 macOS，以及多种编译器和架构。</p>
+</li>
+</ol>
+<p>总的来说，librdkafka 是一个功能强大、高性能的 C++ 客户端库，为开发者提供了与 Kafka 集群进行可靠通信的工具，使得构建分布式消息系统变得更加容易。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Kafka/" rel="tag"># Kafka</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_2_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/2024-05-22-mongoose_2_1%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="prev" title="mongoose_2_1常用技巧">
+      <i class="fa fa-chevron-left"></i> mongoose_2_1常用技巧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/NVIDIA/TensorRT/2024-05-22-tensorrt_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="tensorrt_1_理论基础">
+      tensorrt_1_理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91-Kafka%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">维基百科 Kafka是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-librdkafka%E5%BA%93%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">3.</span> <span class="nav-text">C++ librdkafka库是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-librdkafka%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">C++ librdkafka库 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

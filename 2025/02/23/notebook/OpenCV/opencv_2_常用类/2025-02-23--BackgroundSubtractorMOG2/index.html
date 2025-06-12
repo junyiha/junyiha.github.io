@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 cv::BackgroundSubtractorMOG2 类相关笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cv::BackgroundSubtractorMOG2">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/23/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-23--BackgroundSubtractorMOG2/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 cv::BackgroundSubtractorMOG2 类相关笔记">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-23T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.427Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/23/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-23--BackgroundSubtractorMOG2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>cv::BackgroundSubtractorMOG2 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/23/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-23--BackgroundSubtractorMOG2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          cv::BackgroundSubtractorMOG2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-23 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-23T09:00:00+08:00">2025-02-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>cv::BackgroundSubtractorMOG2 类相关笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="OpenCV-cv-BackgroundSubtractorMOG2-类-详细解释"><a href="#OpenCV-cv-BackgroundSubtractorMOG2-类-详细解释" class="headerlink" title="OpenCV cv::BackgroundSubtractorMOG2 类 详细解释"></a>OpenCV cv::BackgroundSubtractorMOG2 类 详细解释</h2><p>OpenCV 中的 <code>cv::BackgroundSubtractorMOG2</code> 是一种基于高斯混合模型（Gaussian Mixture Model, GMM）的背景减除算法，专门用于从视频序列中提取运动前景目标（如行人、车辆等）。它是经典 MOG（Mixture of Gaussians）的改进版本，支持自适应建模和阴影检测。以下是详细解释：</p>
+<hr>
+<h3 id="1-核心原理"><a href="#1-核心原理" class="headerlink" title="1. 核心原理"></a><strong>1. 核心原理</strong></h3><ul>
+<li>**高斯混合模型 (GMM)**：<br>对每个像素的颜色值（如 RGB 或灰度）建模为多个高斯分布的混合。动态场景中的像素可能属于背景（稳定的高斯分布）或前景（突变的高斯分布）。</li>
+<li><strong>自适应更新</strong>：<br>根据新帧的数据实时更新高斯分布的参数（均值、方差、权重），适应光照变化或背景运动。</li>
+<li><strong>阴影检测</strong>：<br>通过颜色空间（如 HSV）分析，区分真实前景和阴影区域。</li>
+</ul>
+<hr>
+<h3 id="2-类功能与参数"><a href="#2-类功能与参数" class="headerlink" title="2. 类功能与参数"></a><strong>2. 类功能与参数</strong></h3><h4 id="创建对象"><a href="#创建对象" class="headerlink" title="创建对象"></a><strong>创建对象</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Ptr&lt;cv::BackgroundSubtractorMOG2&gt; bg_subtractor = cv::<span class="built_in">createBackgroundSubtractorMOG2</span>();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>构造函数参数</strong>（可省略，使用默认值）：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">createBackgroundSubtractorMOG2</span>(</span><br><span class="line">    <span class="type">int</span> history = <span class="number">500</span>,        <span class="comment">// 用于建模的帧数（记忆长度）</span></span><br><span class="line">    <span class="type">double</span> varThreshold = <span class="number">16</span>, <span class="comment">// 方差阈值，决定像素是否匹配背景模型</span></span><br><span class="line">    <span class="type">bool</span> detectShadows = <span class="literal">true</span> <span class="comment">// 是否检测阴影</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="关键参数详解"><a href="#关键参数详解" class="headerlink" title="关键参数详解"></a><strong>关键参数详解</strong></h4><table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>history</code></td>
+<td>控制模型更新的速度。值越大，模型对变化的适应越慢，但更稳定。</td>
+</tr>
+<tr>
+<td><code>varThreshold</code></td>
+<td>像素与背景模型的匹配阈值。值越小，对变化越敏感，可能产生更多噪声。</td>
+</tr>
+<tr>
+<td><code>detectShadows</code></td>
+<td>若为 <code>true</code>，阴影会被标记为灰色（通常值为 127），需后续处理过滤。</td>
+</tr>
+<tr>
+<td><code>backgroundRatio</code></td>
+<td>背景模型的高斯分布权重占比阈值（默认 0.9），用于选择保留的分布数量。</td>
+</tr>
+<tr>
+<td><code>nmixtures</code></td>
+<td>每个像素的高斯分布最大数量（默认 5）。动态场景需更多分布。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3-使用步骤"><a href="#3-使用步骤" class="headerlink" title="3. 使用步骤"></a><strong>3. 使用步骤</strong></h3><h4 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a><strong>基本流程</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cv::VideoCapture <span class="title">cap</span><span class="params">(<span class="string">&quot;video.mp4&quot;</span>)</span></span>;</span><br><span class="line">cv::Ptr&lt;cv::BackgroundSubtractorMOG2&gt; bg_sub = cv::<span class="built_in">createBackgroundSubtractorMOG2</span>();</span><br><span class="line">cv::Mat frame, fg_mask;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (cap.<span class="built_in">read</span>(frame)) &#123;</span><br><span class="line">    <span class="comment">// 更新背景模型并获取前景掩码</span></span><br><span class="line">    bg_sub-&gt;<span class="built_in">apply</span>(frame, fg_mask);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 可选：后处理（去噪、形态学操作等）</span></span><br><span class="line">    cv::<span class="built_in">threshold</span>(fg_mask, fg_mask, <span class="number">250</span>, <span class="number">255</span>, cv::THRESH_BINARY);</span><br><span class="line">    cv::<span class="built_in">medianBlur</span>(fg_mask, fg_mask, <span class="number">5</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 显示结果</span></span><br><span class="line">    cv::<span class="built_in">imshow</span>(<span class="string">&quot;Foreground&quot;</span>, fg_mask);</span><br><span class="line">    <span class="keyword">if</span> (cv::<span class="built_in">waitKey</span>(<span class="number">30</span>) == <span class="number">27</span>) <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="获取背景图像"><a href="#获取背景图像" class="headerlink" title="获取背景图像"></a><strong>获取背景图像</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat background;</span><br><span class="line">bg_sub-&gt;<span class="built_in">getBackgroundImage</span>(background); <span class="comment">// 需模型稳定后调用</span></span><br><span class="line">cv::<span class="built_in">imshow</span>(<span class="string">&quot;Background&quot;</span>, background);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-参数调优建议"><a href="#4-参数调优建议" class="headerlink" title="4. 参数调优建议"></a><strong>4. 参数调优建议</strong></h3><h4 id="场景适应性"><a href="#场景适应性" class="headerlink" title="场景适应性"></a><strong>场景适应性</strong></h4><ul>
+<li><strong>静态背景</strong>：<br>减小 <code>history</code>（如 200）以快速适应短暂变化（如飘动的树叶）。  </li>
+<li><strong>动态背景</strong>（如水面波纹）：<br>增加 <code>nmixtures</code>（如 5<del>7）和 <code>varThreshold</code>（如 20</del>30），减少误检。  </li>
+<li><strong>光照突变</strong>：<br>增大 <code>history</code>（如 1000）使模型更新更缓慢，避免将突然光照变化误判为前景。</li>
+</ul>
+<h4 id="阴影处理"><a href="#阴影处理" class="headerlink" title="阴影处理"></a><strong>阴影处理</strong></h4><ul>
+<li>启用 <code>detectShadows</code> 后，通过阈值过滤阴影：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">threshold</span>(fg_mask, fg_mask, <span class="number">200</span>, <span class="number">255</span>, cv::THRESH_BINARY); <span class="comment">// 去除灰色阴影</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a><strong>性能优化</strong></h4><ul>
+<li>对输入帧进行下采样（降低分辨率）可加速处理，但会损失细节。</li>
+<li>使用灰度图像（而非 RGB）减少计算量：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">cvtColor</span>(frame, frame, cv::COLOR_BGR2GRAY);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="5-示例代码（完整流程）"><a href="#5-示例代码（完整流程）" class="headerlink" title="5. 示例代码（完整流程）"></a><strong>5. 示例代码（完整流程）</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">cv::VideoCapture <span class="title">cap</span><span class="params">(<span class="string">&quot;input.mp4&quot;</span>)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!cap.<span class="built_in">isOpened</span>()) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;无法打开视频！&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建 MOG2 背景减除器</span></span><br><span class="line">    <span class="keyword">auto</span> bg_sub = cv::<span class="built_in">createBackgroundSubtractorMOG2</span>(<span class="number">500</span>, <span class="number">16.0</span>, <span class="literal">true</span>);</span><br><span class="line">    cv::Mat frame, fg_mask, bg_image;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (cap.<span class="built_in">read</span>(frame)) &#123;</span><br><span class="line">        <span class="comment">// 更新模型并获取前景掩码</span></span><br><span class="line">        bg_sub-&gt;<span class="built_in">apply</span>(frame, fg_mask);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 去除阴影（灰色区域）</span></span><br><span class="line">        cv::<span class="built_in">threshold</span>(fg_mask, fg_mask, <span class="number">200</span>, <span class="number">255</span>, cv::THRESH_BINARY);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 去噪：中值滤波 + 形态学开运算</span></span><br><span class="line">        cv::<span class="built_in">medianBlur</span>(fg_mask, fg_mask, <span class="number">5</span>);</span><br><span class="line">        cv::<span class="built_in">morphologyEx</span>(fg_mask, fg_mask, cv::MORPH_OPEN, cv::<span class="built_in">getStructuringElement</span>(cv::MORPH_RECT, &#123;<span class="number">3</span>,<span class="number">3</span>&#125;));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 显示结果</span></span><br><span class="line">        cv::<span class="built_in">imshow</span>(<span class="string">&quot;Input&quot;</span>, frame);</span><br><span class="line">        cv::<span class="built_in">imshow</span>(<span class="string">&quot;Foreground Mask&quot;</span>, fg_mask);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 按 &#x27;b&#x27; 键显示背景模型</span></span><br><span class="line">        <span class="keyword">if</span> (cv::<span class="built_in">waitKey</span>(<span class="number">30</span>) == <span class="string">&#x27;b&#x27;</span>) &#123;</span><br><span class="line">            bg_sub-&gt;<span class="built_in">getBackgroundImage</span>(bg_image);</span><br><span class="line">            cv::<span class="built_in">imshow</span>(<span class="string">&quot;Background&quot;</span>, bg_image);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (cv::<span class="built_in">waitKey</span>(<span class="number">30</span>) == <span class="number">27</span>) <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="6-与其他算法的对比"><a href="#6-与其他算法的对比" class="headerlink" title="6. 与其他算法的对比"></a><strong>6. 与其他算法的对比</strong></h3><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MOG2</strong></td>
+<td>自适应高斯分布数量，支持阴影检测，适合动态场景。</td>
+</tr>
+<tr>
+<td><strong>KNN</strong></td>
+<td>基于最近邻的快速背景建模，对光照变化敏感，适合静态背景。</td>
+</tr>
+<tr>
+<td><strong>GMG</strong></td>
+<td>基于统计初始化，适合固定摄像头场景，但需要较长的初始化时间。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="7-常见问题"><a href="#7-常见问题" class="headerlink" title="7. 常见问题"></a><strong>7. 常见问题</strong></h3><h4 id="前景掩码噪声多"><a href="#前景掩码噪声多" class="headerlink" title="前景掩码噪声多"></a><strong>前景掩码噪声多</strong></h4><ul>
+<li><strong>原因</strong>：<code>varThreshold</code> 过小或动态背景干扰。</li>
+<li><strong>解决</strong>：增大 <code>varThreshold</code>，或对输入帧进行高斯模糊预处理：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">GaussianBlur</span>(frame, frame, &#123;<span class="number">5</span>,<span class="number">5</span>&#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="模型更新过慢"><a href="#模型更新过慢" class="headerlink" title="模型更新过慢"></a><strong>模型更新过慢</strong></h4><ul>
+<li><strong>原因</strong>：<code>history</code> 值太大。</li>
+<li><strong>解决</strong>：减小 <code>history</code>，如设置为 100~300。</li>
+</ul>
+<h4 id="阴影误检为前景"><a href="#阴影误检为前景" class="headerlink" title="阴影误检为前景"></a><strong>阴影误检为前景</strong></h4><ul>
+<li><strong>原因</strong>：未启用阴影检测或阈值过滤不当。</li>
+<li><strong>解决</strong>：确保 <code>detectShadows=true</code>，并通过阈值过滤灰色值。</li>
+</ul>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p><code>cv::BackgroundSubtractorMOG2</code> 是 OpenCV 中高效的背景减除工具，适用于监控、交通检测等场景。通过合理调整参数（如 <code>history</code>、<code>varThreshold</code>）和后处理（去噪、形态学操作），可以显著提升前景提取的准确性。对于复杂场景（如动态背景或剧烈光照变化），建议结合其他算法（如光流法）进行优化。</p>
+<h2 id="OpenCV-cv-BackgroundSubtractorMOG2-类-常用函数"><a href="#OpenCV-cv-BackgroundSubtractorMOG2-类-常用函数" class="headerlink" title="OpenCV cv::BackgroundSubtractorMOG2 类 常用函数"></a>OpenCV cv::BackgroundSubtractorMOG2 类 常用函数</h2><p><code>cv::BackgroundSubtractorMOG2</code> 是 OpenCV 提供的背景建模算法之一，使用高斯混合模型（GMM）来进行背景&#x2F;前景分割。它是 <code>cv::BackgroundSubtractor</code> 的一个派生类，适用于运动检测、目标跟踪等任务。</p>
+<h2 id="cv-BackgroundSubtractorMOG2-常用函数"><a href="#cv-BackgroundSubtractorMOG2-常用函数" class="headerlink" title="cv::BackgroundSubtractorMOG2 常用函数"></a><code>cv::BackgroundSubtractorMOG2</code> 常用函数</h2><h3 id="1-构造函数"><a href="#1-构造函数" class="headerlink" title="1. 构造函数"></a>1. <strong>构造函数</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Ptr&lt;cv::BackgroundSubtractorMOG2&gt; bgSubtractor = cv::<span class="built_in">createBackgroundSubtractorMOG2</span>(<span class="type">int</span> history = <span class="number">500</span>, <span class="type">double</span> varThreshold = <span class="number">16</span>, <span class="type">bool</span> detectShadows = <span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+<p><strong>参数说明：</strong></p>
+<ul>
+<li><code>history</code>：用于背景建模的历史帧数（默认 500）。</li>
+<li><code>varThreshold</code>：阈值，用于确定像素是否属于前景（默认 16）。</li>
+<li><code>detectShadows</code>：是否检测阴影（默认 <code>true</code>，会在前景掩码中将阴影区域标记为 127）。</li>
+</ul>
+<hr>
+<h3 id="2-应用背景分割"><a href="#2-应用背景分割" class="headerlink" title="2. 应用背景分割"></a>2. <strong>应用背景分割</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">apply</span><span class="params">(InputArray image, OutputArray fgmask, <span class="type">double</span> learningRate = <span class="number">-1</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>功能</strong>：对输入帧进行背景建模，并输出前景掩码。</p>
+<p><strong>参数说明：</strong></p>
+<ul>
+<li><code>image</code>：输入的单帧图像（<code>cv::Mat</code>）。</li>
+<li><code>fgmask</code>：输出的前景掩码（<code>cv::Mat</code>，二值图像，前景为 255，阴影区域若启用则为 127）。</li>
+<li><code>learningRate</code>：学习率，控制背景更新速度。<code>-1</code> 表示自动计算。</li>
+</ul>
+<p><strong>示例代码：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat frame, fgMask;</span><br><span class="line"><span class="function">cv::VideoCapture <span class="title">cap</span><span class="params">(<span class="number">0</span>)</span></span>;</span><br><span class="line">cv::Ptr&lt;cv::BackgroundSubtractorMOG2&gt; bgSubtractor = cv::<span class="built_in">createBackgroundSubtractorMOG2</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (cap.<span class="built_in">read</span>(frame)) &#123;</span><br><span class="line">    bgSubtractor-&gt;<span class="built_in">apply</span>(frame, fgMask);</span><br><span class="line">    cv::<span class="built_in">imshow</span>(<span class="string">&quot;Foreground Mask&quot;</span>, fgMask);</span><br><span class="line">    <span class="keyword">if</span> (cv::<span class="built_in">waitKey</span>(<span class="number">30</span>) == <span class="number">27</span>) <span class="keyword">break</span>; <span class="comment">// 按 ESC 退出</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-设置-获取参数"><a href="#3-设置-获取参数" class="headerlink" title="3. 设置&#x2F;获取参数"></a>3. <strong>设置&#x2F;获取参数</strong></h3><p><code>cv::BackgroundSubtractorMOG2</code> 提供了一些参数的 <code>set</code> 和 <code>get</code> 方法，用于调整背景建模的行为。</p>
+<h4 id="1-设置-获取历史帧数"><a href="#1-设置-获取历史帧数" class="headerlink" title="(1) 设置&#x2F;获取历史帧数"></a>(1) 设置&#x2F;获取历史帧数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">setHistory</span><span class="params">(<span class="type">int</span> history)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">getHistory</span><span class="params">()</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>setHistory(n)</code>：设置背景建模所需的历史帧数。</li>
+<li><code>getHistory()</code>：获取当前的历史帧数。</li>
+</ul>
+<h4 id="2-设置-获取方差阈值"><a href="#2-设置-获取方差阈值" class="headerlink" title="(2) 设置&#x2F;获取方差阈值"></a>(2) 设置&#x2F;获取方差阈值</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">setVarThreshold</span><span class="params">(<span class="type">double</span> varThreshold)</span></span>;</span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">getVarThreshold</span><span class="params">()</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>setVarThreshold(v)</code>：设置高斯模型的方差阈值，控制像素分类的敏感度。</li>
+<li><code>getVarThreshold()</code>：获取当前的方差阈值。</li>
+</ul>
+<h4 id="3-设置-获取阴影检测"><a href="#3-设置-获取阴影检测" class="headerlink" title="(3) 设置&#x2F;获取阴影检测"></a>(3) 设置&#x2F;获取阴影检测</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">setDetectShadows</span><span class="params">(<span class="type">bool</span> detectShadows)</span></span>;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">getDetectShadows</span><span class="params">()</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>setDetectShadows(true/false)</code>：开启&#x2F;关闭阴影检测。</li>
+<li><code>getDetectShadows()</code>：返回当前阴影检测状态。</li>
+</ul>
+<h4 id="4-设置-获取背景比例"><a href="#4-设置-获取背景比例" class="headerlink" title="(4) 设置&#x2F;获取背景比例"></a>(4) 设置&#x2F;获取背景比例</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">setBackgroundRatio</span><span class="params">(<span class="type">double</span> ratio)</span></span>;</span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">getBackgroundRatio</span><span class="params">()</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>setBackgroundRatio(r)</code>：设置背景像素占据的比例（默认 0.9）。</li>
+<li><code>getBackgroundRatio()</code>：获取背景比例。</li>
+</ul>
+<h4 id="5-设置-获取阴影阈值"><a href="#5-设置-获取阴影阈值" class="headerlink" title="(5) 设置&#x2F;获取阴影阈值"></a>(5) 设置&#x2F;获取阴影阈值</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">setShadowThreshold</span><span class="params">(<span class="type">double</span> threshold)</span></span>;</span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">getShadowThreshold</span><span class="params">()</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>setShadowThreshold(t)</code>：设置阴影检测的阈值（默认 0.5）。</li>
+<li><code>getShadowThreshold()</code>：获取当前的阴影阈值。</li>
+</ul>
+<hr>
+<h3 id="4-获取背景图像"><a href="#4-获取背景图像" class="headerlink" title="4. 获取背景图像"></a>4. <strong>获取背景图像</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">getBackgroundImage</span><span class="params">(OutputArray backgroundImage)</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>功能</strong>：获取当前计算的背景图像。</p>
+<p><strong>示例代码：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat bgImage;</span><br><span class="line">bgSubtractor-&gt;<span class="built_in">getBackgroundImage</span>(bgImage);</span><br><span class="line">cv::<span class="built_in">imshow</span>(<span class="string">&quot;Background Image&quot;</span>, bgImage);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>apply()</code></td>
+<td>计算前景掩码</td>
+</tr>
+<tr>
+<td><code>getBackgroundImage()</code></td>
+<td>获取背景图像</td>
+</tr>
+<tr>
+<td><code>setHistory()</code> &#x2F; <code>getHistory()</code></td>
+<td>设置&#x2F;获取历史帧数</td>
+</tr>
+<tr>
+<td><code>setVarThreshold()</code> &#x2F; <code>getVarThreshold()</code></td>
+<td>设置&#x2F;获取阈值</td>
+</tr>
+<tr>
+<td><code>setDetectShadows()</code> &#x2F; <code>getDetectShadows()</code></td>
+<td>开启&#x2F;关闭阴影检测</td>
+</tr>
+<tr>
+<td><code>setBackgroundRatio()</code> &#x2F; <code>getBackgroundRatio()</code></td>
+<td>设置&#x2F;获取背景比例</td>
+</tr>
+<tr>
+<td><code>setShadowThreshold()</code> &#x2F; <code>getShadowThreshold()</code></td>
+<td>设置&#x2F;获取阴影检测阈值</td>
+</tr>
+</tbody></table>
+<p>这就是 <code>cv::BackgroundSubtractorMOG2</code> 的主要用法，适用于运动目标检测和视频背景建模等任务。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/23/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-23--%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2/" rel="prev" title="OpenCV 前景分割">
+      <i class="fa fa-chevron-left"></i> OpenCV 前景分割
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/23/notebook/OpenCV/opencv_2_%E5%B8%B8%E7%94%A8%E7%B1%BB/2025-02-23--BackgroundSubtractorKNN/" rel="next" title="cv::BackgroundSubtractorKNN">
+      cv::BackgroundSubtractorKNN <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenCV-cv-BackgroundSubtractorMOG2-%E7%B1%BB-%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">OpenCV cv::BackgroundSubtractorMOG2 类 详细解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">1. 核心原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%B1%BB%E5%8A%9F%E8%83%BD%E4%B8%8E%E5%8F%82%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">2. 类功能与参数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.2.1.</span> <span class="nav-text">创建对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.2.2.</span> <span class="nav-text">关键参数详解</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.3.</span> <span class="nav-text">3. 使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">2.3.1.</span> <span class="nav-text">基本流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%83%8C%E6%99%AF%E5%9B%BE%E5%83%8F"><span class="nav-number">2.3.2.</span> <span class="nav-text">获取背景图像</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%8F%82%E6%95%B0%E8%B0%83%E4%BC%98%E5%BB%BA%E8%AE%AE"><span class="nav-number">2.4.</span> <span class="nav-text">4. 参数调优建议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E9%80%82%E5%BA%94%E6%80%A7"><span class="nav-number">2.4.1.</span> <span class="nav-text">场景适应性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%B4%E5%BD%B1%E5%A4%84%E7%90%86"><span class="nav-number">2.4.2.</span> <span class="nav-text">阴影处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">2.4.3.</span> <span class="nav-text">性能优化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%88%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">5. 示例代码（完整流程）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E4%B8%8E%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-number">2.6.</span> <span class="nav-text">6. 与其他算法的对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">2.7.</span> <span class="nav-text">7. 常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E6%99%AF%E6%8E%A9%E7%A0%81%E5%99%AA%E5%A3%B0%E5%A4%9A"><span class="nav-number">2.7.1.</span> <span class="nav-text">前景掩码噪声多</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E6%9B%B4%E6%96%B0%E8%BF%87%E6%85%A2"><span class="nav-number">2.7.2.</span> <span class="nav-text">模型更新过慢</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%B4%E5%BD%B1%E8%AF%AF%E6%A3%80%E4%B8%BA%E5%89%8D%E6%99%AF"><span class="nav-number">2.7.3.</span> <span class="nav-text">阴影误检为前景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.8.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenCV-cv-BackgroundSubtractorMOG2-%E7%B1%BB-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">OpenCV cv::BackgroundSubtractorMOG2 类 常用函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cv-BackgroundSubtractorMOG2-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">cv::BackgroundSubtractorMOG2 常用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">4.1.</span> <span class="nav-text">1. 构造函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%BA%94%E7%94%A8%E8%83%8C%E6%99%AF%E5%88%86%E5%89%B2"><span class="nav-number">4.2.</span> <span class="nav-text">2. 应用背景分割</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%AE%BE%E7%BD%AE-%E8%8E%B7%E5%8F%96%E5%8F%82%E6%95%B0"><span class="nav-number">4.3.</span> <span class="nav-text">3. 设置&#x2F;获取参数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%AE%BE%E7%BD%AE-%E8%8E%B7%E5%8F%96%E5%8E%86%E5%8F%B2%E5%B8%A7%E6%95%B0"><span class="nav-number">4.3.1.</span> <span class="nav-text">(1) 设置&#x2F;获取历史帧数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%AE%BE%E7%BD%AE-%E8%8E%B7%E5%8F%96%E6%96%B9%E5%B7%AE%E9%98%88%E5%80%BC"><span class="nav-number">4.3.2.</span> <span class="nav-text">(2) 设置&#x2F;获取方差阈值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%AE%BE%E7%BD%AE-%E8%8E%B7%E5%8F%96%E9%98%B4%E5%BD%B1%E6%A3%80%E6%B5%8B"><span class="nav-number">4.3.3.</span> <span class="nav-text">(3) 设置&#x2F;获取阴影检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E8%AE%BE%E7%BD%AE-%E8%8E%B7%E5%8F%96%E8%83%8C%E6%99%AF%E6%AF%94%E4%BE%8B"><span class="nav-number">4.3.4.</span> <span class="nav-text">(4) 设置&#x2F;获取背景比例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E8%AE%BE%E7%BD%AE-%E8%8E%B7%E5%8F%96%E9%98%B4%E5%BD%B1%E9%98%88%E5%80%BC"><span class="nav-number">4.3.5.</span> <span class="nav-text">(5) 设置&#x2F;获取阴影阈值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%8E%B7%E5%8F%96%E8%83%8C%E6%99%AF%E5%9B%BE%E5%83%8F"><span class="nav-number">4.4.</span> <span class="nav-text">4. 获取背景图像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

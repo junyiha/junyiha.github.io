@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 理解，学习霍夫圆检测原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="霍夫圆检测原理">
+<meta property="og:url" content="https://junyiha.github.io/2025/05/06/notebook/ComputerVision/2025-05-06--%E9%9C%8D%E5%A4%AB%E5%9C%86%E6%A3%80%E6%B5%8B/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 理解，学习霍夫圆检测原理">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-06T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-07T08:04:35.825Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="ComputerVision">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/05/06/notebook/ComputerVision/2025-05-06--%E9%9C%8D%E5%A4%AB%E5%9C%86%E6%A3%80%E6%B5%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>霍夫圆检测原理 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/05/06/notebook/ComputerVision/2025-05-06--%E9%9C%8D%E5%A4%AB%E5%9C%86%E6%A3%80%E6%B5%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          霍夫圆检测原理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-05-06 09:00:00" itemprop="dateCreated datePublished" datetime="2025-05-06T09:00:00+08:00">2025-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-05-07 16:04:35" itemprop="dateModified" datetime="2025-05-07T16:04:35+08:00">2025-05-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ComputerVision/" itemprop="url" rel="index"><span itemprop="name">ComputerVision</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>理解，学习霍夫圆检测原理</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="霍夫圆检测"><a href="#霍夫圆检测" class="headerlink" title="霍夫圆检测"></a>霍夫圆检测</h2><ul>
+<li>霍夫圆检测能检测出目标图像中存在的圆，但在实际使用中，参数调节存在很大的困难。</li>
+</ul>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><ul>
+<li>霍夫圆检测与霍夫变换密切相关，霍夫变换是基于极坐标系(是由半径与夹角所描述的一种坐标系)与笛卡尔坐标系(普通的平面坐标系)的相互转变而实现的。笛卡尔坐标系上的一个点，变换到极坐标系上就变成了一条线；反之亦然。</li>
+<li>然而，基于霍夫变换的霍夫圆检测方法计算量极大，不适合实际应用。</li>
+<li>在opencv的实现中，是使用霍夫梯度算法进行圆检测</li>
+</ul>
+<h2 id="霍夫梯度法的原理"><a href="#霍夫梯度法的原理" class="headerlink" title="霍夫梯度法的原理"></a>霍夫梯度法的原理</h2><ol>
+<li>把原图做一次Canny边缘检测，得到边缘检测的二值图</li>
+<li>对原始图像执行一次Sobel算子，计算出所有像素的邻域梯度值</li>
+<li>初始化圆心空间N(a, b)，令所有的N(a, b) &#x3D; 0。若要求圆心在图像中，则a，b值的范围分别对应图像的宽高，N(a, b)表示一共有 a * b个。</li>
+<li>遍历Canny边缘二值图中的所有非零像素点，沿着梯度方向(切线的垂直方向，根据Sobel算子计算出的垂直梯度及水平梯度得来)固定搜索半径范围画线，将线段经过的所有累加器中的点(a, b)的N(a, b) +&#x3D; 1</li>
+<li>统计排序N(a, b)，得到可能的圆心。 N(a, b)越大，越有可能是圆心。</li>
+</ol>
+<h2 id="霍夫梯度法缺点"><a href="#霍夫梯度法缺点" class="headerlink" title="霍夫梯度法缺点"></a>霍夫梯度法缺点</h2><ul>
+<li>在霍夫梯度法中，使用Sobel导数来计算局部梯度，那么随之而来的假设是，其可以视作等同于一条基于几个局部点的切线，并且这个不是一个数值稳定的做法。在大多数情况下，这样做会得到正确的结果，但或许会在输出中产生一些噪声</li>
+<li>在边缘图像中的整个非0像素被看作每个中心的候选部分，若没有合理设置梯度方向的搜索半径范围，则会导致计算量巨大</li>
+<li>因为霍夫梯度算法通过圆弧切线的垂直线进行圆心累加检测，当存在同心圆时，会累加到同一个圆心，这导致指挥选择到累加值最大的圆。</li>
+</ul>
+<p>霍夫圆检测是一种基于霍夫变换的图像处理技术，用于检测图像中的圆形。其核心思想是将图像空间中的圆转换为参数空间进行投票，通过累加器确定最可能的圆心和半径。以下是霍夫圆检测的详细步骤及关键要点：</p>
+<h3 id="霍夫圆检测原理"><a href="#霍夫圆检测原理" class="headerlink" title="霍夫圆检测原理"></a><strong>霍夫圆检测原理</strong></h3><ol>
+<li><p><strong>圆的参数表示</strong><br>圆的方程为 ((x-a)^2 + (y-b)^2 &#x3D; r^2)，其中 ((a, b)) 为圆心，(r) 为半径。参数空间为三维（a, b, r），直接遍历计算复杂度高。</p>
+</li>
+<li><p><strong>梯度方向优化</strong><br>使用梯度方向信息简化计算：</p>
+<ul>
+<li>对边缘点进行梯度计算（如Sobel算子），确定边缘的法线方向（指向圆心）。</li>
+<li>沿梯度方向画线，累加可能的圆心 ((a, b))。多个边缘点的梯度线交点即为候选圆心。</li>
+<li>统计候选圆心到边缘点的距离，确定半径 (r)（出现次数最多的距离值）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a><strong>算法步骤</strong></h3><ol>
+<li><p><strong>预处理</strong>  </p>
+<ul>
+<li><strong>高斯滤波</strong>：平滑图像以减少噪声。</li>
+<li><strong>边缘检测</strong>：使用Canny检测器提取边缘点，得到二值边缘图像和梯度方向。</li>
+</ul>
+</li>
+<li><p><strong>圆心检测</strong>  </p>
+<ul>
+<li>对每个边缘点，沿梯度方向在参数空间 ((a, b)) 中累加可能的圆心位置。</li>
+<li>设定阈值（如<code>param2</code>），筛选出高投票数的候选圆心。</li>
+</ul>
+</li>
+<li><p><strong>半径确定</strong>  </p>
+<ul>
+<li>对每个候选圆心，计算所有关联边缘点到圆心的距离。</li>
+<li>构建半径直方图，选择出现次数最多的半径作为最终结果。</li>
+</ul>
+</li>
+<li><p><strong>后处理</strong>  </p>
+<ul>
+<li><strong>非极大值抑制</strong>：合并邻近的相似圆。</li>
+<li>根据参数（如<code>minDist</code>）过滤重叠圆。</li>
+</ul>
+</li>
+</ol>
+<h3 id="关键参数解析（以OpenCV为例）"><a href="#关键参数解析（以OpenCV为例）" class="headerlink" title="关键参数解析（以OpenCV为例）"></a><strong>关键参数解析（以OpenCV为例）</strong></h3><ul>
+<li>**<code>dp</code>**：累加器分辨率与图像分辨率之比。值越大，累加器越小（计算快但精度低）。</li>
+<li>**<code>minDist</code>**：圆之间的最小距离，避免重复检测。</li>
+<li>**<code>param1</code>**：Canny边缘检测的高阈值，低阈值为其一半。</li>
+<li>**<code>param2</code>**：圆心累加器阈值，值越高检测条件越严格。</li>
+<li>**<code>minRadius</code>&#x2F;<code>maxRadius</code>**：限制检测的半径范围，减少计算量。</li>
+</ul>
+<h3 id="优化与注意事项"><a href="#优化与注意事项" class="headerlink" title="优化与注意事项"></a><strong>优化与注意事项</strong></h3><ul>
+<li><strong>梯度方向准确性</strong>：噪声可能导致梯度方向偏差，需通过高斯滤波改善。</li>
+<li><strong>计算效率</strong>：通过限制半径范围和调整<code>dp</code>参数平衡速度与精度。</li>
+<li><strong>参数调优</strong>：需根据具体图像调整阈值和半径范围，避免过拟合或漏检。</li>
+</ul>
+<h3 id="示例代码（OpenCV）"><a href="#示例代码（OpenCV）" class="headerlink" title="示例代码（OpenCV）"></a><strong>示例代码（OpenCV）</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">img = cv2.imread(<span class="string">&#x27;circles.jpg&#x27;</span>, <span class="number">0</span>)</span><br><span class="line">img = cv2.medianBlur(img, <span class="number">5</span>)</span><br><span class="line">cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)</span><br><span class="line"></span><br><span class="line">circles = cv2.HoughCircles(</span><br><span class="line">    image=img,</span><br><span class="line">    method=cv2.HOUGH_GRADIENT,</span><br><span class="line">    dp=<span class="number">1</span>,</span><br><span class="line">    minDist=<span class="number">20</span>,</span><br><span class="line">    param1=<span class="number">50</span>,</span><br><span class="line">    param2=<span class="number">30</span>,</span><br><span class="line">    minRadius=<span class="number">10</span>,</span><br><span class="line">    maxRadius=<span class="number">50</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> circles <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">    circles = np.uint16(np.around(circles))</span><br><span class="line">    <span class="keyword">for</span> (x, y, r) <span class="keyword">in</span> circles[<span class="number">0</span>, :]:</span><br><span class="line">        cv2.circle(cimg, (x, y), r, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">cv2.imshow(<span class="string">&#x27;Detected Circles&#x27;</span>, cimg)</span><br><span class="line">cv2.waitKey(<span class="number">0</span>)</span><br><span class="line">cv2.destroyAllWindows()</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>霍夫圆检测通过梯度方向优化，将三维参数空间分解为二维圆心和一维半径问题，显著提升效率。其性能依赖于梯度准确性、参数调优及预处理步骤，适用于已知半径范围且边缘清晰的圆形检测场景。</p>
+<h2 id="霍夫圆检测调试技巧"><a href="#霍夫圆检测调试技巧" class="headerlink" title="霍夫圆检测调试技巧"></a>霍夫圆检测调试技巧</h2><p>在霍夫圆检测（Hough Circle Detection）的实际应用中，调试参数是确保检测效果的关键。以下是针对霍夫圆检测的调试技巧和常见问题解决方案，结合OpenCV的<code>HoughCircles</code>函数进行说明：</p>
+<hr>
+<h3 id="1-预处理优化"><a href="#1-预处理优化" class="headerlink" title="1. 预处理优化"></a><strong>1. 预处理优化</strong></h3><p>霍夫圆检测对边缘质量和梯度方向非常敏感，预处理直接影响检测效果：</p>
+<ul>
+<li><p><strong>降噪处理</strong>  </p>
+<ul>
+<li><strong>高斯滤波</strong>：通过<code>cv2.GaussianBlur</code>或<code>cv2.medianBlur</code>平滑图像，减少噪声对梯度计算的干扰。  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img = cv2.medianBlur(img, <span class="number">5</span>)  <span class="comment"># 中值滤波对椒盐噪声更有效</span></span><br></pre></td></tr></table></figure></li>
+<li><strong>自适应阈值</strong>：若图像光照不均，使用<code>cv2.adaptiveThreshold</code>代替全局阈值。</li>
+</ul>
+</li>
+<li><p><strong>边缘检测优化</strong>  </p>
+<ul>
+<li><strong>Canny参数调整</strong>：<code>param1</code>参数对应Canny的高阈值（低阈值为其一半）。  <ul>
+<li><strong>边缘断裂</strong>：降低<code>param1</code>以保留更多边缘（但可能引入噪声）。  </li>
+<li><strong>噪声过多</strong>：增大<code>param1</code>或先进行更严格的降噪。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-参数调试策略"><a href="#2-参数调试策略" class="headerlink" title="2. 参数调试策略"></a><strong>2. 参数调试策略</strong></h3><p>OpenCV的<code>HoughCircles</code>主要参数如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">circles = cv2.HoughCircles(</span><br><span class="line">    image, </span><br><span class="line">    method=cv2.HOUGH_GRADIENT, </span><br><span class="line">    dp=<span class="number">1</span>, </span><br><span class="line">    minDist=<span class="number">20</span>, </span><br><span class="line">    param1=<span class="number">50</span>, </span><br><span class="line">    param2=<span class="number">30</span>, </span><br><span class="line">    minRadius=<span class="number">0</span>, </span><br><span class="line">    maxRadius=<span class="number">0</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-dp（累加器分辨率）"><a href="#1-dp（累加器分辨率）" class="headerlink" title="(1) dp（累加器分辨率）"></a><strong>(1) <code>dp</code>（累加器分辨率）</strong></h4><ul>
+<li><strong>作用</strong>：控制累加器分辨率与图像分辨率的比例（<code>dp=1</code>表示与图像相同，<code>dp=2</code>表示缩小一倍）。  </li>
+<li><strong>调试技巧</strong>：  <ul>
+<li><strong>检测不到圆</strong>：降低<code>dp</code>（如<code>dp=0.8</code>），提高累加器分辨率。  </li>
+<li><strong>计算速度慢</strong>：增大<code>dp</code>（如<code>dp=1.5</code>），牺牲精度换取速度。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-minDist（圆间最小距离）"><a href="#2-minDist（圆间最小距离）" class="headerlink" title="(2) minDist（圆间最小距离）"></a><strong>(2) <code>minDist</code>（圆间最小距离）</strong></h4><ul>
+<li><strong>作用</strong>：防止检测到重叠的圆。  </li>
+<li><strong>调试技巧</strong>：  <ul>
+<li><strong>多个圆被合并</strong>：增大<code>minDist</code>（如设置为图像宽度的1&#x2F;10）。  </li>
+<li><strong>漏检邻近圆</strong>：减小<code>minDist</code>，但需结合<code>param2</code>避免误检。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-param1（Canny高阈值）"><a href="#3-param1（Canny高阈值）" class="headerlink" title="(3) param1（Canny高阈值）"></a><strong>(3) <code>param1</code>（Canny高阈值）</strong></h4><ul>
+<li><strong>作用</strong>：控制边缘检测的敏感度。  </li>
+<li><strong>调试技巧</strong>：  <ul>
+<li><strong>边缘缺失</strong>：降低<code>param1</code>（如<code>param1=30</code>）。  </li>
+<li><strong>噪声过多</strong>：增大<code>param1</code>（如<code>param1=100</code>）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-param2（圆心累加器阈值）"><a href="#4-param2（圆心累加器阈值）" class="headerlink" title="(4) param2（圆心累加器阈值）"></a><strong>(4) <code>param2</code>（圆心累加器阈值）</strong></h4><ul>
+<li><strong>作用</strong>：决定被接受为圆的最小投票数（阈值越高，条件越严格）。  </li>
+<li><strong>调试技巧</strong>：  <ul>
+<li><strong>漏检真圆</strong>：降低<code>param2</code>（如<code>param2=20</code>）。  </li>
+<li><strong>误检假圆</strong>：增大<code>param2</code>（如<code>param2=50</code>）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="5-minRadius和maxRadius（半径范围）"><a href="#5-minRadius和maxRadius（半径范围）" class="headerlink" title="(5) minRadius和maxRadius（半径范围）"></a><strong>(5) <code>minRadius</code>和<code>maxRadius</code>（半径范围）</strong></h4><ul>
+<li><strong>作用</strong>：限制检测的半径范围，减少计算量。  </li>
+<li><strong>调试技巧</strong>：  <ul>
+<li><strong>已知半径范围</strong>：直接设置<code>minRadius</code>和<code>maxRadius</code>。  </li>
+<li><strong>未知半径</strong>：设为<code>0</code>，但需增大<code>param2</code>避免噪声干扰。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="3-分步调试技巧"><a href="#3-分步调试技巧" class="headerlink" title="3. 分步调试技巧"></a><strong>3. 分步调试技巧</strong></h3><h4 id="1-可视化边缘检测结果"><a href="#1-可视化边缘检测结果" class="headerlink" title="(1) 可视化边缘检测结果"></a><strong>(1) 可视化边缘检测结果</strong></h4><p>在调用<code>HoughCircles</code>前，先验证Canny边缘检测的结果：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">edges = cv2.Canny(img, param1//<span class="number">2</span>, param1)  <span class="comment"># 低阈值为param1的一半</span></span><br><span class="line">cv2.imshow(<span class="string">&#x27;Edges&#x27;</span>, edges)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>目标</strong>：确保目标圆的边缘连续且噪声较少。</li>
+</ul>
+<h4 id="2-圆心累加器分析"><a href="#2-圆心累加器分析" class="headerlink" title="(2) 圆心累加器分析"></a><strong>(2) 圆心累加器分析</strong></h4><p>若检测不到圆心，可能是梯度方向不准确或<code>param2</code>设置过高：</p>
+<ul>
+<li><strong>梯度方向验证</strong>：通过<code>cv2.Sobel</code>计算梯度方向，观察是否指向圆心。</li>
+<li>**调试<code>param2</code>**：逐步降低<code>param2</code>，观察是否能检测到候选圆心。</li>
+</ul>
+<h4 id="3-半径直方图统计"><a href="#3-半径直方图统计" class="headerlink" title="(3) 半径直方图统计"></a><strong>(3) 半径直方图统计</strong></h4><p>对检测到的候选圆心，绘制半径分布直方图：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">distances = [np.sqrt((x - a)**<span class="number">2</span> + (y - b)**<span class="number">2</span>) <span class="keyword">for</span> (x, y) <span class="keyword">in</span> edge_points]</span><br><span class="line">plt.hist(distances, bins=<span class="number">50</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>目标</strong>：确定半径的集中区域，调整<code>minRadius</code>和<code>maxRadius</code>。</li>
+</ul>
+<hr>
+<h3 id="4-常见问题与解决方案"><a href="#4-常见问题与解决方案" class="headerlink" title="4. 常见问题与解决方案"></a><strong>4. 常见问题与解决方案</strong></h3><table>
+<thead>
+<tr>
+<th><strong>问题现象</strong></th>
+<th><strong>可能原因</strong></th>
+<th><strong>解决方案</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>检测不到圆</td>
+<td>边缘断裂、<code>param2</code>过高</td>
+<td>降低<code>param1</code>和<code>param2</code>，检查预处理</td>
+</tr>
+<tr>
+<td>检测到过多假圆</td>
+<td>噪声干扰、<code>param2</code>过低</td>
+<td>增大<code>param2</code>，加强降噪，限制半径范围</td>
+</tr>
+<tr>
+<td>圆位置偏移</td>
+<td>梯度方向不准确</td>
+<td>优化高斯滤波，验证梯度方向</td>
+</tr>
+<tr>
+<td>邻近圆被合并</td>
+<td><code>minDist</code>设置过大</td>
+<td>减小<code>minDist</code>，增大<code>param2</code></td>
+</tr>
+<tr>
+<td>计算速度过慢</td>
+<td>图像分辨率高、半径范围大</td>
+<td>增大<code>dp</code>，限制半径范围，降低图像分辨率</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="5-动态参数调优（实战技巧）"><a href="#5-动态参数调优（实战技巧）" class="headerlink" title="5. 动态参数调优（实战技巧）"></a><strong>5. 动态参数调优（实战技巧）</strong></h3><p>使用滑动条实时调整参数，快速观察效果（适合复杂场景）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">nothing</span>(<span class="params">x</span>): <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">cv2.namedWindow(<span class="string">&#x27;Hough Circles&#x27;</span>)</span><br><span class="line">cv2.createTrackbar(<span class="string">&#x27;param2&#x27;</span>, <span class="string">&#x27;Hough Circles&#x27;</span>, <span class="number">30</span>, <span class="number">100</span>, nothing)</span><br><span class="line">cv2.createTrackbar(<span class="string">&#x27;minDist&#x27;</span>, <span class="string">&#x27;Hough Circles&#x27;</span>, <span class="number">20</span>, <span class="number">100</span>, nothing)</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    param2 = cv2.getTrackbarPos(<span class="string">&#x27;param2&#x27;</span>, <span class="string">&#x27;Hough Circles&#x27;</span>)</span><br><span class="line">    minDist = cv2.getTrackbarPos(<span class="string">&#x27;minDist&#x27;</span>, <span class="string">&#x27;Hough Circles&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, dp=<span class="number">1</span>, minDist=minDist,</span><br><span class="line">                              param1=<span class="number">50</span>, param2=param2, minRadius=<span class="number">10</span>, maxRadius=<span class="number">50</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 绘制圆并显示</span></span><br><span class="line">    <span class="keyword">if</span> circles <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)</span><br><span class="line">        <span class="keyword">for</span> (x, y, r) <span class="keyword">in</span> circles[<span class="number">0</span>, :]:</span><br><span class="line">            cv2.circle(cimg, (x, y), r, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">        cv2.imshow(<span class="string">&#x27;Hough Circles&#x27;</span>, cimg)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> cv2.waitKey(<span class="number">10</span>) &amp; <span class="number">0xFF</span> == <span class="number">27</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="6-高级优化思路"><a href="#6-高级优化思路" class="headerlink" title="6. 高级优化思路"></a><strong>6. 高级优化思路</strong></h3><ul>
+<li><strong>多尺度检测</strong>：对同一图像使用不同<code>dp</code>值检测不同大小的圆。</li>
+<li><strong>颜色空间过滤</strong>：在检测后，根据圆的颜色进一步筛选（例如只保留红色圆）。</li>
+<li><strong>形态学操作</strong>：对边缘图像进行闭运算（<code>cv2.morphologyEx</code>）连接断裂边缘。</li>
+</ul>
+<hr>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>霍夫圆检测的调试核心是<strong>平衡敏感度与特异性</strong>：  </p>
+<ul>
+<li><strong>敏感度</strong>（检测到真圆）：由<code>param1</code>（边缘）、<code>param2</code>（圆心投票）、<code>minRadius</code>控制。  </li>
+<li><strong>特异性</strong>（排除假圆）：由<code>minDist</code>、<code>maxRadius</code>、降噪和<code>param2</code>控制。</li>
+</ul>
+<p>通过分步验证边缘质量、圆心候选和半径分布，结合动态参数调整，可高效解决大多数检测问题。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/448935812">https://zhuanlan.zhihu.com/p/448935812</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_74259636/article/details/132655935">https://blog.csdn.net/m0_74259636/article/details/132655935</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ComputerVision/" rel="tag"># ComputerVision</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/06/notebook/ComputerVision/2025-05-06--%E9%87%8D%E6%8A%95%E5%BD%B1%E8%AF%AF%E5%B7%AE/" rel="prev" title="重投影误差">
+      <i class="fa fa-chevron-left"></i> 重投影误差
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/05/06/notebook/ComputerVision/2025-05-06--%E6%9B%9D%E5%85%89%E6%97%B6%E9%97%B4%E5%92%8C%E5%A2%9E%E7%9B%8A/" rel="next" title="曝光时间和增益">
+      曝光时间和增益 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E5%9C%86%E6%A3%80%E6%B5%8B"><span class="nav-number">2.</span> <span class="nav-text">霍夫圆检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">基本原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E6%A2%AF%E5%BA%A6%E6%B3%95%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">霍夫梯度法的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E6%A2%AF%E5%BA%A6%E6%B3%95%E7%BC%BA%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text">霍夫梯度法缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E5%9C%86%E6%A3%80%E6%B5%8B%E5%8E%9F%E7%90%86"><span class="nav-number">5.1.</span> <span class="nav-text">霍夫圆检测原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="nav-number">5.2.</span> <span class="nav-text">算法步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%EF%BC%88%E4%BB%A5OpenCV%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">关键参数解析（以OpenCV为例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">5.4.</span> <span class="nav-text">优化与注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%88OpenCV%EF%BC%89"><span class="nav-number">5.5.</span> <span class="nav-text">示例代码（OpenCV）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.6.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E5%9C%86%E6%A3%80%E6%B5%8B%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7"><span class="nav-number">6.</span> <span class="nav-text">霍夫圆检测调试技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E9%A2%84%E5%A4%84%E7%90%86%E4%BC%98%E5%8C%96"><span class="nav-number">6.1.</span> <span class="nav-text">1. 预处理优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8F%82%E6%95%B0%E8%B0%83%E8%AF%95%E7%AD%96%E7%95%A5"><span class="nav-number">6.2.</span> <span class="nav-text">2. 参数调试策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-dp%EF%BC%88%E7%B4%AF%E5%8A%A0%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%EF%BC%89"><span class="nav-number">6.2.1.</span> <span class="nav-text">(1) dp（累加器分辨率）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-minDist%EF%BC%88%E5%9C%86%E9%97%B4%E6%9C%80%E5%B0%8F%E8%B7%9D%E7%A6%BB%EF%BC%89"><span class="nav-number">6.2.2.</span> <span class="nav-text">(2) minDist（圆间最小距离）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-param1%EF%BC%88Canny%E9%AB%98%E9%98%88%E5%80%BC%EF%BC%89"><span class="nav-number">6.2.3.</span> <span class="nav-text">(3) param1（Canny高阈值）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-param2%EF%BC%88%E5%9C%86%E5%BF%83%E7%B4%AF%E5%8A%A0%E5%99%A8%E9%98%88%E5%80%BC%EF%BC%89"><span class="nav-number">6.2.4.</span> <span class="nav-text">(4) param2（圆心累加器阈值）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-minRadius%E5%92%8CmaxRadius%EF%BC%88%E5%8D%8A%E5%BE%84%E8%8C%83%E5%9B%B4%EF%BC%89"><span class="nav-number">6.2.5.</span> <span class="nav-text">(5) minRadius和maxRadius（半径范围）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%88%86%E6%AD%A5%E8%B0%83%E8%AF%95%E6%8A%80%E5%B7%A7"><span class="nav-number">6.3.</span> <span class="nav-text">3. 分步调试技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%8F%AF%E8%A7%86%E5%8C%96%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%E7%BB%93%E6%9E%9C"><span class="nav-number">6.3.1.</span> <span class="nav-text">(1) 可视化边缘检测结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%9C%86%E5%BF%83%E7%B4%AF%E5%8A%A0%E5%99%A8%E5%88%86%E6%9E%90"><span class="nav-number">6.3.2.</span> <span class="nav-text">(2) 圆心累加器分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%8D%8A%E5%BE%84%E7%9B%B4%E6%96%B9%E5%9B%BE%E7%BB%9F%E8%AE%A1"><span class="nav-number">6.3.3.</span> <span class="nav-text">(3) 半径直方图统计</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">6.4.</span> <span class="nav-text">4. 常见问题与解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%8A%A8%E6%80%81%E5%8F%82%E6%95%B0%E8%B0%83%E4%BC%98%EF%BC%88%E5%AE%9E%E6%88%98%E6%8A%80%E5%B7%A7%EF%BC%89"><span class="nav-number">6.5.</span> <span class="nav-text">5. 动态参数调优（实战技巧）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E9%AB%98%E7%BA%A7%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF"><span class="nav-number">6.6.</span> <span class="nav-text">6. 高级优化思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">6.7.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">引用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

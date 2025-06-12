@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 在C++编程中， NaN(Not a number)是浮点数类型(例如float, double, long double)中的一种特殊值，用于表示无法定义的数值或者操作结果。NaN在数值计算和科学计算中十分常见，正确理解和处理NaN对于编写健壮和可靠的代码至关重要。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中的NaN 产生原因，特性及处理方法">
+<meta property="og:url" content="https://junyiha.github.io/2024/06/19/notebook/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 在C++编程中， NaN(Not a number)是浮点数类型(例如float, double, long double)中的一种特殊值，用于表示无法定义的数值或者操作结果。NaN在数值计算和科学计算中十分常见，正确理解和处理NaN对于编写健壮和可靠的代码至关重要。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-06-19T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.160Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppBasic">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/06/19/notebook/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++中的NaN 产生原因，特性及处理方法 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/06/19/notebook/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++中的NaN 产生原因，特性及处理方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-06-19 09:00:00" itemprop="dateCreated datePublished" datetime="2024-06-19T09:00:00+08:00">2024-06-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>在C++编程中， NaN(Not a number)是浮点数类型(例如float, double, long double)中的一种特殊值，用于表示无法定义的数值或者操作结果。NaN在数值计算和科学计算中十分常见，正确理解和处理NaN对于编写健壮和可靠的代码至关重要。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="NaN的产生原因"><a href="#NaN的产生原因" class="headerlink" title="NaN的产生原因"></a>NaN的产生原因</h2><ul>
+<li><p>零为被除数</p>
+<ul>
+<li>当我们尝试除以零时，会产生NaN。特别是在浮点运算中，零除零是一种未定义的操作。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> result = <span class="number">0.0</span> / <span class="number">0.0</span>;  <span class="comment">// 结果是NaN</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>负数开平方</p>
+<ul>
+<li>对于实数域来说，负数的平方根是未定义的（因为平方根只在非负数域内有意义）。尝试计算负数的平方根会导致NaN<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> result = <span class="built_in">sqrt</span>(<span class="number">-1.0</span>);  <span class="comment">// 结果是NaN</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>未定义的数学运算</p>
+<ul>
+<li>许多数学函数在特定输入下会返回NaN。例如，对负数取对数<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> result = <span class="built_in">log</span>(<span class="number">-1.0</span>);  <span class="comment">// 结果是NaN</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>未初始化的浮点数</p>
+<ul>
+<li>如果一个浮点数变量未被初始化，它的值可能会被解释为NaN<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> result;</span><br><span class="line"><span class="comment">// result可能是NaN</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="NaN的特性"><a href="#NaN的特性" class="headerlink" title="NaN的特性"></a>NaN的特性</h2><ul>
+<li><p>NaN具有一些独特的特性，使其在程序运行时容易检测和处理</p>
+</li>
+<li><p>NaN不等于任何数，包括它自己。</p>
+<ul>
+<li>这是NaN最重要的特性。任何NaN值都不等于包括它自己在内的任何数。这一特性使得检测NaN变得相对简单。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> nanValue = std::<span class="built_in">nan</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (nanValue != nanValue) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;nanValue is NaN&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>NaN与任何数进行运算结果仍然是NaN</p>
+<ul>
+<li>如果一个运算的任何一个操作数是NaN，那么运算结果也将是NaN。这是因为NaN表示一个未定义或无法表示的值，因此任何涉及NaN的运算结果也是未定义的。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> nanValue = std::<span class="built_in">nan</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line"><span class="type">double</span> result = nanValue + <span class="number">5.0</span>;  <span class="comment">// 结果是NaN</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>NaN存在多种表示形式</p>
+<ul>
+<li>尽管所有NaN在数值上都是“未定义”的，但它们在内部表示上可能不同。C++标准库提供了创建带有不同标识符的NaN的功能。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> nan1 = std::<span class="built_in">nan</span>(<span class="string">&quot;1&quot;</span>);</span><br><span class="line"><span class="type">double</span> nan2 = std::<span class="built_in">nan</span>(<span class="string">&quot;2&quot;</span>);</span><br><span class="line"><span class="comment">// 虽然都是NaN，但内部表示可能不同</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="NaN的处理方法"><a href="#NaN的处理方法" class="headerlink" title="NaN的处理方法"></a>NaN的处理方法</h2><ul>
+<li><p>检测NaN使用标准库函数 std::isnan 可以检测一个值是否是NaN。这个函数在头文件中定义，返回一个布尔值，指示其参数是否为NaN</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cmath&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">double</span> value = std::<span class="built_in">nan</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (std::<span class="built_in">isnan</span>(value)) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;value is NaN&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>避免产生NaN在可能产生NaN的操作之前进行检查和处理是防止NaN产生的有效方法。例如，在进行除法操作前检查分母是否为零，在进行平方根计算前检查操作数是否为非负数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">double</span> a = <span class="number">0.0</span>, b = <span class="number">0.0</span>;</span><br><span class="line"><span class="keyword">if</span> (b != <span class="number">0.0</span>) &#123;</span><br><span class="line">    <span class="type">double</span> result = a / b;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Division by zero error&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>类似地，在进行平方根计算时，可以添加前置检查</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> x = <span class="number">-1.0</span>;</span><br><span class="line"><span class="keyword">if</span> (x &gt;= <span class="number">0.0</span>) &#123;</span><br><span class="line">    <span class="type">double</span> result = <span class="built_in">sqrt</span>(x);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Cannot compute the square root of a negative number&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>处理NaN值。当检测到NaN时，可以采取相应的补救措施，如使用默认值或者触发错误处理机制。通过这种方式，可以确保程序的稳定性和正确性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> value = std::<span class="built_in">nan</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (std::<span class="built_in">isnan</span>(value)) &#123;</span><br><span class="line">    value = <span class="number">0.0</span>;  <span class="comment">// 使用默认值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppBasic/" rel="tag"># CppBasic</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/06/19/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-06-19-linux_2_96_rsync/" rel="prev" title="linux_2_96_rsync">
+      <i class="fa fa-chevron-left"></i> linux_2_96_rsync
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/06/20/notebook/Compiler/2024-06-20-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/" rel="next" title="交叉编译">
+      交叉编译 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NaN%E7%9A%84%E4%BA%A7%E7%94%9F%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.</span> <span class="nav-text">NaN的产生原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NaN%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text">NaN的特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NaN%E7%9A%84%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">NaN的处理方法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

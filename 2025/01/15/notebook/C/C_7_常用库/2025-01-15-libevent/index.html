@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 libevent 库 相关学习笔记 libevent是一个异步事件处理软件函数库，是一个提供异步事件通知的软件库。它提供了一组应用程序编程接口(API)，libevent API提供的机制允许开发者为事件注册回调函数，例如文件描述符上的发生了特定事件或等待事件超时，接收到信号的事件，常规的定时器超时事件。当事件发生时，libevent实例会执行回调函数。 libevent在设计上是用来替代很">
+<meta property="og:type" content="article">
+<meta property="og:title" content="libevent库">
+<meta property="og:url" content="https://junyiha.github.io/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libevent/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 libevent 库 相关学习笔记 libevent是一个异步事件处理软件函数库，是一个提供异步事件通知的软件库。它提供了一组应用程序编程接口(API)，libevent API提供的机制允许开发者为事件注册回调函数，例如文件描述符上的发生了特定事件或等待事件超时，接收到信号的事件，常规的定时器超时事件。当事件发生时，libevent实例会执行回调函数。 libevent在设计上是用来替代很">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-01-15T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.255Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="C_libevent">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libevent/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>libevent库 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libevent/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          libevent库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-01-15 09:00:00" itemprop="dateCreated datePublished" datetime="2025-01-15T09:00:00+08:00">2025-01-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>libevent 库 相关学习笔记</li>
+<li>libevent是一个异步事件处理软件函数库，是一个提供异步事件通知的软件库。它提供了一组应用程序编程接口(API)，libevent API提供的机制允许开发者为事件注册回调函数，例如文件描述符上的发生了特定事件或等待事件超时，接收到信号的事件，常规的定时器超时事件。当事件发生时，libevent实例会执行回调函数。</li>
+<li>libevent在设计上是用来替代很多事件驱动网络服务器自行实现的事件循环框架的。也就是说，libevent可以用来取代网络服务器所使用的事件循环检查框架。</li>
+<li>libevent现在支持 &#x2F;dev&#x2F;poll, kqueue, POSIX select, Windows IOCP, poll, epoll, Solaris端口。libevent对实时信号有实验性支持。libevent暴露出的API在全平台都是一致的，因此libevent支持可移值的应用程序开发，并提供操作系统上可扩展的事件通知机制。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="libevent-详解"><a href="#libevent-详解" class="headerlink" title="libevent 详解"></a>libevent 详解</h2><p><code>libevent</code> 是一个开源的事件通知库，它提供了一个高效、跨平台的 API 来处理异步 I&#x2F;O 操作、定时器事件和信号处理。<code>libevent</code> 的核心功能是支持多种 I&#x2F;O 模型，允许开发者使用事件驱动的方式来开发高效、并发的网络服务应用程序。</p>
+<p><code>libevent</code> 设计的目标是简化异步编程，特别是在高并发应用中，它通过事件循环（event loop）来调度事件并通知相应的回调函数。它被广泛用于一些高性能的服务器中，尤其是那些需要高效网络通信、文件操作或信号处理的场景。</p>
+<h3 id="1-核心概念"><a href="#1-核心概念" class="headerlink" title="1. 核心概念"></a>1. <strong>核心概念</strong></h3><h4 id="1-1-事件循环（Event-Loop）"><a href="#1-1-事件循环（Event-Loop）" class="headerlink" title="1.1 事件循环（Event Loop）"></a>1.1 事件循环（Event Loop）</h4><p><code>libevent</code> 的核心是事件循环，类似于 <code>libuv</code> 或 <code>Node.js</code>。事件循环不断地检测事件（如 I&#x2F;O 操作完成、定时器到期等），并在事件发生时调用相应的回调函数。</p>
+<p>事件循环的执行是非阻塞的，事件循环会持续运行，直到所有注册的事件都被处理完成。</p>
+<h4 id="1-2-事件驱动模型（Event-Driven-Model）"><a href="#1-2-事件驱动模型（Event-Driven-Model）" class="headerlink" title="1.2 事件驱动模型（Event-Driven Model）"></a>1.2 事件驱动模型（Event-Driven Model）</h4><p><code>libevent</code> 使用事件驱动的模型来管理不同类型的事件，包括：</p>
+<ul>
+<li>网络 I&#x2F;O 事件（例如读取或写入文件或套接字）</li>
+<li>定时器事件（例如定时任务或超时）</li>
+<li>信号事件（例如接收系统信号，如 SIGINT）</li>
+<li>文件系统事件（例如文件描述符的变化）</li>
+</ul>
+<p>开发者将这些事件与对应的回调函数关联起来，一旦事件发生，<code>libevent</code> 就会调用回调函数处理事件。</p>
+<h4 id="1-3-事件源（Event-Sources）"><a href="#1-3-事件源（Event-Sources）" class="headerlink" title="1.3 事件源（Event Sources）"></a>1.3 事件源（Event Sources）</h4><p><code>libevent</code> 支持多种事件源，主要包括：</p>
+<ul>
+<li><strong>I&#x2F;O 事件</strong>：用于非阻塞的 I&#x2F;O 操作，如网络通信、文件操作。</li>
+<li><strong>定时器事件</strong>：在指定时间后执行回调函数。</li>
+<li><strong>信号事件</strong>：处理操作系统发送的信号。</li>
+<li><strong>文件描述符事件</strong>：监控文件描述符的状态变化（例如，网络连接可读可写）。</li>
+</ul>
+<h3 id="2-libevent-的基本结构和-API"><a href="#2-libevent-的基本结构和-API" class="headerlink" title="2. libevent 的基本结构和 API"></a>2. <strong><code>libevent</code> 的基本结构和 API</strong></h3><h4 id="2-1-创建事件基础"><a href="#2-1-创建事件基础" class="headerlink" title="2.1 创建事件基础"></a>2.1 创建事件基础</h4><p>在使用 <code>libevent</code> 时，首先需要创建一个事件基础（<code>event_base</code>），它是事件循环的核心对象，管理着所有的事件和调度。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;event.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event_base</span> *<span class="title">base</span>;</span></span><br><span class="line">    base = event_base_new();  <span class="comment">// 创建事件基础</span></span><br><span class="line">    <span class="keyword">if</span> (!base) &#123;</span><br><span class="line">        perror(<span class="string">&quot;Failed to create event base&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在此处设置事件</span></span><br><span class="line">    event_base_dispatch(base);  <span class="comment">// 启动事件循环</span></span><br><span class="line"></span><br><span class="line">    event_base_free(base);  <span class="comment">// 清理资源</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-创建和管理事件"><a href="#2-2-创建和管理事件" class="headerlink" title="2.2 创建和管理事件"></a>2.2 创建和管理事件</h4><p><code>libevent</code> 提供了 <code>event</code> 对象来封装单个事件。通过 <code>event_new</code> 函数创建事件，并通过 <code>event_add</code> 将其添加到事件基础中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;event.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">on_read</span><span class="params">(<span class="type">int</span> fd, <span class="type">short</span> event, <span class="type">void</span> *arg)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Read event triggered on fd %d\n&quot;</span>, fd);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event_base</span> *<span class="title">base</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event</span> *<span class="title">ev</span>;</span></span><br><span class="line">    <span class="type">int</span> fd = <span class="number">0</span>;  <span class="comment">// 标准输入</span></span><br><span class="line"></span><br><span class="line">    base = event_base_new();  <span class="comment">// 创建事件基础</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个 I/O 事件，监听标准输入（fd = 0）是否可读</span></span><br><span class="line">    ev = event_new(base, fd, EV_READ | EV_PERSIST, on_read, <span class="literal">NULL</span>);</span><br><span class="line">    event_add(ev, <span class="literal">NULL</span>);  <span class="comment">// 将事件添加到事件循环</span></span><br><span class="line"></span><br><span class="line">    event_base_dispatch(base);  <span class="comment">// 启动事件循环</span></span><br><span class="line"></span><br><span class="line">    event_free(ev);  <span class="comment">// 清理资源</span></span><br><span class="line">    event_base_free(base);  <span class="comment">// 清理事件基础</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-定时器事件"><a href="#2-3-定时器事件" class="headerlink" title="2.3 定时器事件"></a>2.3 定时器事件</h4><p>可以使用 <code>event_new</code> 创建定时器事件，并使用 <code>event_add</code> 来添加事件。定时器事件会在指定时间触发回调。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;event.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">on_timeout</span><span class="params">(<span class="type">int</span> fd, <span class="type">short</span> event, <span class="type">void</span> *arg)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Timer expired\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event_base</span> *<span class="title">base</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event</span> *<span class="title">ev</span>;</span></span><br><span class="line"></span><br><span class="line">    base = event_base_new();  <span class="comment">// 创建事件基础</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建定时器事件，1000ms 后触发</span></span><br><span class="line">    ev = event_new(base, <span class="number">-1</span>, EV_TIMEOUT, on_timeout, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">tv</span> =</span> &#123;<span class="number">1</span>, <span class="number">0</span>&#125;;  <span class="comment">// 1秒</span></span><br><span class="line">    event_add(ev, &amp;tv);  <span class="comment">// 将定时器事件添加到事件循环</span></span><br><span class="line"></span><br><span class="line">    event_base_dispatch(base);  <span class="comment">// 启动事件循环</span></span><br><span class="line"></span><br><span class="line">    event_free(ev);  <span class="comment">// 清理资源</span></span><br><span class="line">    event_base_free(base);  <span class="comment">// 清理事件基础</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-信号事件"><a href="#2-4-信号事件" class="headerlink" title="2.4 信号事件"></a>2.4 信号事件</h4><p><code>libevent</code> 允许你注册信号处理器，以便在接收到特定信号时触发相应的回调函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;event.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">on_signal</span><span class="params">(<span class="type">int</span> sig, <span class="type">short</span> event, <span class="type">void</span> *arg)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Signal %d received\n&quot;</span>, sig);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event_base</span> *<span class="title">base</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">event</span> *<span class="title">ev</span>;</span></span><br><span class="line"></span><br><span class="line">    base = event_base_new();  <span class="comment">// 创建事件基础</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册处理 SIGINT 信号的事件</span></span><br><span class="line">    ev = evsignal_new(base, SIGINT, on_signal, <span class="literal">NULL</span>);</span><br><span class="line">    event_add(ev, <span class="literal">NULL</span>);  <span class="comment">// 添加事件</span></span><br><span class="line"></span><br><span class="line">    event_base_dispatch(base);  <span class="comment">// 启动事件循环</span></span><br><span class="line"></span><br><span class="line">    event_free(ev);  <span class="comment">// 清理资源</span></span><br><span class="line">    event_base_free(base);  <span class="comment">// 清理事件基础</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-支持的事件通知机制"><a href="#3-支持的事件通知机制" class="headerlink" title="3. 支持的事件通知机制"></a>3. <strong>支持的事件通知机制</strong></h3><p><code>libevent</code> 支持多个底层事件通知机制，可以根据系统的能力选择最合适的方式来实现事件通知。这些机制包括：</p>
+<ul>
+<li><strong>select</strong>：适用于所有操作系统的传统事件通知机制，但在高并发下性能较差。</li>
+<li><strong>poll</strong>：比 select 更高效，适用于大多数现代操作系统。</li>
+<li><strong>epoll</strong>：Linux 上的高效事件通知机制，适用于高并发场景。</li>
+<li><strong>kqueue</strong>：适用于 macOS 和 BSD 系统的事件通知机制。</li>
+<li>**IOCP (I&#x2F;O Completion Ports)**：Windows 上的高效事件通知机制。</li>
+</ul>
+<p><code>libevent</code> 会根据平台自动选择最佳的事件通知机制。</p>
+<h3 id="4-线程支持"><a href="#4-线程支持" class="headerlink" title="4. 线程支持"></a>4. <strong>线程支持</strong></h3><p><code>libevent</code> 默认情况下是单线程的，事件循环在一个线程中运行。然而，它也支持多线程，可以将事件分发到不同的线程中去处理。<code>libevent</code> 可以将事件轮询工作分配给多个线程，从而提高并发性能。</p>
+<h3 id="5-应用场景"><a href="#5-应用场景" class="headerlink" title="5. 应用场景"></a>5. <strong>应用场景</strong></h3><p><code>libevent</code> 被广泛应用于需要高性能网络通信、文件 I&#x2F;O 或信号处理的应用程序中。常见的应用场景包括：</p>
+<ul>
+<li><strong>高并发的网络服务器</strong>：例如 HTTP 服务器、聊天服务器、游戏服务器等。</li>
+<li><strong>异步 I&#x2F;O 程序</strong>：需要高效、非阻塞地处理大量文件操作或网络请求。</li>
+<li><strong>定时任务调度</strong>：需要精确控制时间和定时任务的执行。</li>
+<li><strong>跨平台高性能应用</strong>：需要在不同平台上运行的高并发应用。</li>
+</ul>
+<h3 id="6-与其他库的对比"><a href="#6-与其他库的对比" class="headerlink" title="6. 与其他库的对比"></a>6. <strong>与其他库的对比</strong></h3><ul>
+<li><p>**<code>libevent</code> vs <code>libuv</code>**：</p>
+<ul>
+<li><code>libevent</code> 和 <code>libuv</code> 都实现了事件驱动的 I&#x2F;O 模型，支持异步 I&#x2F;O 操作，但 <code>libevent</code> 更注重事件的灵活性和兼容性，适用于多种操作系统和不同类型的事件源。</li>
+<li><code>libuv</code> 更专注于 Node.js 环境，因此它提供了更为复杂的功能，如线程池、DNS 解析等。</li>
+</ul>
+</li>
+<li><p>**<code>libevent</code> vs <code>select</code> &#x2F; <code>poll</code>**：</p>
+<ul>
+<li><code>libevent</code> 是在 <code>select</code> 和 <code>poll</code> 等传统 I&#x2F;O 模型之上构建的，它提供了更为高级和抽象的接口，使得开发者可以更容易地实现事件驱动的程序。</li>
+<li>相比之下，<code>select</code> 和 <code>poll</code> 的编程接口较为低级且复杂。</li>
+</ul>
+</li>
+</ul>
+<h3 id="7-安装与使用"><a href="#7-安装与使用" class="headerlink" title="7. 安装与使用"></a>7. <strong>安装与使用</strong></h3><h4 id="安装（Linux）"><a href="#安装（Linux）" class="headerlink" title="安装（Linux）"></a>安装（Linux）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install libevent-dev</span><br></pre></td></tr></table></figure>
+
+<h4 id="编译（Linux）"><a href="#编译（Linux）" class="headerlink" title="编译（Linux）"></a>编译（Linux）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -o my_program my_program.c -levent</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-总结"><a href="#8-总结" class="headerlink" title="8. 总结"></a>8. <strong>总结</strong></h3><p><code>libevent</code> 是一个高效的事件通知库，适用于需要异步 I&#x2F;O、定时器和信号处理的应用程序。它提供了简洁的 API 并支持多种事件通知机制，能够帮助开发者实现高效的并发程序。通过利用 <code>libevent</code>，开发者可以避免阻塞和线程管理的复杂性，集中精力处理业务逻辑。</p>
+<h2 id="event2-event-h"><a href="#event2-event-h" class="headerlink" title="event2&#x2F;event.h"></a>event2&#x2F;event.h</h2><h3 id="struct-event-base"><a href="#struct-event-base" class="headerlink" title="struct event_base"></a>struct event_base</h3><ul>
+<li>用来保存Libevent分派循环的信息和状态。它是Libevent的核心，每一个应用程序都有一个event_base。它持续追踪着所有挂起和活跃的事件，并且将活跃的事件通知给你的应用。</li>
+<li>它是一个不透明的结构体，通过 event_base_new() 或者 event_base_new_with_config() 申请，通过 event_base_free() 释放。</li>
+</ul>
+<h3 id="struct-event"><a href="#struct-event" class="headerlink" title="struct event"></a>struct event</h3><ul>
+<li><p>它是表示单个事件的结构体。</p>
+</li>
+<li><p>事件可以表示一些基本条件：一个套接字变成可读，可写，可读可写，接收到的信号。</p>
+</li>
+<li><p>通常来说，你可以通过 event_new() 创建一个事件，然后通过 event_add() 使其挂起。当 event_base 在运行时，会调用那些条件被触发的事件的回调函数。当你不需要event时，可以通过 event_free() 释放。</p>
+</li>
+<li><p>一个事件可能处于 挂起状态，是指我们正在等待该事件的条件被触发</p>
+</li>
+<li><p>一个事件可能处于 活跃状态，是指条件已经被触发，回调函数即将运行的事件。</p>
+</li>
+<li><p>或者两个状态都不处于。</p>
+</li>
+<li><p>通过 event_assign() 或 event_new() 产生的事件，既不处于活跃状态，也不处于挂起状态。</p>
+</li>
+<li><p>通过 event_add() 使事件处于挂起状态，当这样做的时候，也可以为该事件设置一个超时时间。</p>
+</li>
+<li><p>在 event_base_loop() 调用期间，当事件的条件被触发，或者超时时间已过，该事件的状态会变成 活跃状态。</p>
+</li>
+<li><p>你可以通过 event_activate() 手动激活一个事件。</p>
+</li>
+<li><p>event_base 循环会调用处于活跃状态的事件的回调函数，当回调函数执行完毕，event_base 会将这些事件标记为非活跃状态(挂起)。</p>
+</li>
+<li><p>将事件传递给 event_del()，可以使该事件变为 非挂起事件。这也会使该事件变为 非活跃事件。</p>
+</li>
+<li><p>事件可以是 持久的 和 非持久的。非持久的事件一旦被触发就会变成非挂起事件。因此，每次调用 event_add() 最多只会运行一次。</p>
+</li>
+<li><p>持久化的事件即使变成活跃状态也会保持挂起状态。需要手动调用 event_del()，让它不再挂起。</p>
+</li>
+<li><p>当一个具有超时的持久化事件变为活跃状态时，它的超时会被重置。这意味着可以使用持久事件来实现周期性超时。</p>
+</li>
+<li><p>这应该被视为不透明的结构体。你永远不应该直接读或者写它的任何字段。</p>
+</li>
+<li><p>为了兼容旧代码，它定义在了 event2&#x2F;event_struct.h 头文件中。包含此头文件可能会使代码与其他版本的 libevent 不兼容。</p>
+</li>
+<li><p>与之相关的函数</p>
+<ul>
+<li>event_new()</li>
+<li>event_free()</li>
+<li>event_assign()</li>
+<li>event_get_assignment()</li>
+<li>event_add()</li>
+<li>event_del()</li>
+<li>event_activate()</li>
+<li>event_pending()</li>
+<li>event_get_fd()</li>
+<li>event_get_base()</li>
+<li>event_get_events()</li>
+<li>event_get_callback()</li>
+<li>event_get_callback_arg()</li>
+<li>event_priority_set()</li>
+</ul>
+</li>
+</ul>
+<h3 id="struct-event-config"><a href="#struct-event-config" class="headerlink" title="struct event_config"></a>struct event_config</h3><ul>
+<li>event_base的配置</li>
+<li>有许多选项可以改变event_base的行为和实现</li>
+<li>为了避免传递这些所有的参数时导致有很复杂的构造函数，我们提供了一个抽象的数据类型，在 event_base_new_with_config() 函数中要传递它，用来设置配置信息。</li>
+<li>与之相关的函数<ul>
+<li>event_config_new()</li>
+<li>event_config_free()</li>
+<li>event_base_new_with_config()</li>
+<li>event_config_avoid_method()</li>
+<li>event_config_require_features()</li>
+<li>event_config_set_flag()</li>
+<li>event_config_set_num_cpus_hint()</li>
+</ul>
+</li>
+</ul>
+<h3 id="void-event-enable-debug-mode-void"><a href="#void-event-enable-debug-mode-void" class="headerlink" title="void event_enable_debug_mode(void)"></a>void event_enable_debug_mode(void)</h3><ul>
+<li>在Libevent中启用一些通常会关闭的相对昂贵的调试检查。一般来说，这些检查会导致原本会莫名其妙的崩溃的代码在断言失败之前就失败了。需要注意的是，这个方法必须在任何事件或event_base被创建之前调用。</li>
+<li>调试模式能够捕获一下错误<ul>
+<li>添加一个被重复注册的事件</li>
+<li>任何调用非注册事件的函数</li>
+</ul>
+</li>
+<li>与之相关的函数<ul>
+<li>event_debug_unassign()</li>
+</ul>
+</li>
+</ul>
+<h3 id="void-event-debug-unassign-struct-event"><a href="#void-event-debug-unassign-struct-event" class="headerlink" title="void event_debug_unassign(struct event *)"></a>void event_debug_unassign(struct event *)</h3><ul>
+<li>当打开调试模式时，通知Livevent事件不再被认为是指定的，没有打开调试模式时，什么都不做。</li>
+<li>这个函数只能在未添加的事件上调用</li>
+</ul>
+<h3 id="struct-event-base-event-base-new-void"><a href="#struct-event-base-event-base-new-void" class="headerlink" title="struct event_base *event_base_new(void)"></a>struct event_base *event_base_new(void)</h3><ul>
+<li>创建并返回一个新的event_base，与Libeven的其余部分一起使用。</li>
+<li>成功，返回一个新的event_base；失败，返回NULL</li>
+<li>与之相关的函数<ul>
+<li>event_base_free()</li>
+<li>event_base_new_with_config()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-reinit-struct-event-base-base"><a href="#int-event-reinit-struct-event-base-base" class="headerlink" title="int event_reinit(struct event_base *base)"></a>int event_reinit(struct event_base *base)</h3><ul>
+<li>在fork之后重新初始化 event_base</li>
+<li>有些事件机制不能在fork中存在。event base 需要用 event_reinit() 函数重新初始化。</li>
+<li>成功，返回0；失败，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_base_new()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-dispatch-struct-event-base-base"><a href="#int-event-base-dispatch-struct-event-base-base" class="headerlink" title="int event_base_dispatch(struct event_base *base)"></a>int event_base_dispatch(struct event_base *base)</h3><ul>
+<li>事件分发循环</li>
+<li>这个循环会运行 event base，直到没有任何挂起，或者活跃，或者有什么调用了 event_base_loopbreak() 或者 event_base_loopexit().</li>
+<li>成功，返回0；如果有错误产生，返回-1；如果因为没有活跃或挂起的事件而退出，返回1.</li>
+</ul>
+<h3 id="const-char-event-base-get-method-const-struct-event-base-eb"><a href="#const-char-event-base-get-method-const-struct-event-base-eb" class="headerlink" title="const char *event_base_get_method(const struct event_base *eb)"></a>const char *event_base_get_method(const struct event_base *eb)</h3><ul>
+<li>获取Libevent使用的内核事件通知机制。</li>
+<li>返回一个标识内核事件机制的字符串(kqueue, epoll, win32, etc..)</li>
+</ul>
+<h3 id="const-char-event-base-get-signal-method-const-struct-event-base-eb"><a href="#const-char-event-base-get-signal-method-const-struct-event-base-eb" class="headerlink" title="const char *event_base_get_signal_method(const struct event_base *eb)"></a>const char *event_base_get_signal_method(const struct event_base *eb)</h3><ul>
+<li>获取Libevent使用的信号处理机制</li>
+<li>返回一个标识内核事件机制的字符串，signal 是传统UNIX信号处理，kqueue_signal 是 *BSD和macOS平台的kqueue(2)-based。signalfd_signal用于仅Linux方法。</li>
+</ul>
+<h3 id="const-char-event-get-supported-methods-void"><a href="#const-char-event-get-supported-methods-void" class="headerlink" title="const char **event_get_supported_methods(void)"></a>const char **event_get_supported_methods(void)</h3><ul>
+<li>获取Libevent支持的所有事件通知机制</li>
+<li>该函数按照Libevent首选的顺序返回事件机制。请注意，此列表将包括Libevent编译支持的所有后端，而不必检查操作系统是否具有所需的资源。</li>
+<li>成功，返回一个数组，其中包含指向支持方法名称的指针。数组的末尾为NULL；失败，返回NULL</li>
+</ul>
+<h3 id="int-event-gettime-monotonic-struct-event-base-base-struct-timeval-tp"><a href="#int-event-gettime-monotonic-struct-event-base-base-struct-timeval-tp" class="headerlink" title="int event_gettime_monotonic(struct event_base *base, struct timeval *tp)"></a>int event_gettime_monotonic(struct event_base *base, struct timeval *tp)</h3><ul>
+<li>从定时器查询 event_base 当前的单调时间(单次调用时间)</li>
+</ul>
+<h3 id="event-type-flag"><a href="#event-type-flag" class="headerlink" title="event type flag"></a>event type flag</h3><ul>
+<li>需要传递给 event_base_get_num_events()的标志位，用于指定我们希望汇总计数的事件种类。</li>
+<li>EVENT_BASE_COUNT_ACTIVE：统计已经被触发的活跃事件的数量</li>
+<li>EVENT_BASE_COUNT_VIRTUAL：统计虚拟事件的数量，这些虚拟事件被用来表示一种内部条件，而不是一个挂起事件，该内部条件使得循环不会退出。</li>
+<li>EVENT_BASE_COUNT_ADDED：统计已经被添加到 event_base 中的事件数量，包括内部事件。</li>
+</ul>
+<h3 id="int-event-base-get-num-events-struct-event-base-eb-unsigned-int-flags"><a href="#int-event-base-get-num-events-struct-event-base-eb-unsigned-int-flags" class="headerlink" title="int event_base_get_num_events(struct event_base *eb, unsigned int flags)"></a>int event_base_get_num_events(struct event_base *eb, unsigned int flags)</h3><ul>
+<li>获取event_base中使用标识指定的事件的数量</li>
+<li>由于event_base 添加了一些内部事件来实现某些功能，EVENT_BASE_COUNT_ADDED返回的事件数可能比 event_add() 添加的事件数要多。</li>
+<li>如果你将 EVENT_BASE_COUNT_ACTIVE 和 EVENT_BASE_COUNT_ADDED 一起传递，一个活跃事件将被计数两次。</li>
+<li>返回指定标志事件的数量。</li>
+</ul>
+<h3 id="int-event-base-get-max-events-struct-event-base-eb-unsigned-int-flags-int-clear"><a href="#int-event-base-get-max-events-struct-event-base-eb-unsigned-int-flags-int-clear" class="headerlink" title="int event_base_get_max_events(struct event_base *eb, unsigned int flags, int clear)"></a>int event_base_get_max_events(struct event_base *eb, unsigned int flags, int clear)</h3><ul>
+<li>获取在给定 event_base 中指定标识事件的最大数量。</li>
+<li>返回指定标识事件的数量</li>
+</ul>
+<h3 id="struct-event-config-event-config-new-void"><a href="#struct-event-config-event-config-new-void" class="headerlink" title="struct event_config *event_config_new(void)"></a>struct event_config *event_config_new(void)</h3><ul>
+<li>申请一个新的 事件配置对象</li>
+<li>这个事件配置对象可用于改变event_base的行为。</li>
+<li>成功，返回一个 用于存储配置信息的 event_config 对象；失败，返回NULL</li>
+</ul>
+<h3 id="void-event-config-free-struct-event-config-cfg"><a href="#void-event-config-free-struct-event-config-cfg" class="headerlink" title="void event_config_free(struct event_config *cfg)"></a>void event_config_free(struct event_config *cfg)</h3><ul>
+<li>释放与事件配置对象关联的所有内存</li>
+</ul>
+<h3 id="int-event-config-avoid-method-struct-event-config-cfg-const-char-method"><a href="#int-event-config-avoid-method-struct-event-config-cfg-const-char-method" class="headerlink" title="int event_config_avoid_method(struct event_config *cfg, const char *method)"></a>int event_config_avoid_method(struct event_config *cfg, const char *method)</h3><ul>
+<li>输入一个应该避免配置的事件方法。</li>
+<li>这可用于避免不支持某些文件描述符类型的事件机制，或用于避免某些事件机制。</li>
+<li>一个应用可以使用多个 event_base 来适应不兼容的文件描述符类型。</li>
+<li>成功，返回0；失败，返回-1</li>
+</ul>
+<h3 id="enum-event-method-feature"><a href="#enum-event-method-feature" class="headerlink" title="enum event_method_feature"></a>enum event_method_feature</h3><ul>
+<li>用于描述 event_base 必须提供哪些功能的标志。</li>
+<li>由于操作系统的限制，不是每一个Libevent后端都支持所有可能的功能。</li>
+<li>你可以在event_config_require_features（）中使用这种类型，告诉Libevent仅当你的event_base实现了给定的功能时才继续处理，并且你可以从event_base_get_features（）中接收这种类型，以查看哪些功能是可用的。</li>
+</ul>
+<h3 id="enum-event-base-config-flag"><a href="#enum-event-base-config-flag" class="headerlink" title="enum event_base_config_flag"></a>enum event_base_config_flag</h3><ul>
+<li>用于 event_config_set_flag() 的标志</li>
+<li>这些标志能够改变一个已分配的 event_base的行为。</li>
+<li>与之相关函数<ul>
+<li>event_config_set_flag()</li>
+<li>event_base_new_with_config()</li>
+<li>event_method_feature</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-get-features-const-struct-event-base-base"><a href="#int-event-base-get-features-const-struct-event-base-base" class="headerlink" title="int event_base_get_features(const struct event_base *base)"></a>int event_base_get_features(const struct event_base *base)</h3><ul>
+<li>返回由 event_base 实现的功能的位掩码</li>
+<li>这将是按位或event_method_feature的一个或多个值</li>
+</ul>
+<h3 id="int-event-config-require-features-struct-event-config-cfg-int-feature"><a href="#int-event-config-require-features-struct-event-config-cfg-int-feature" class="headerlink" title="int event_config_require_features(struct event_config *cfg, int feature)"></a>int event_config_require_features(struct event_config *cfg, int feature)</h3><ul>
+<li>输入应用程序所需要的事件方法特性。</li>
+<li>不是所有的特性或特性的组合在每个平台都支持的。代码需要准备处理 event_base_new_with_config() 返回空的情况。</li>
+<li>成功，返回0；失败，返回-1.</li>
+</ul>
+<h3 id="int-event-config-set-flag-struct-event-config-cfg-int-flag"><a href="#int-event-config-set-flag-struct-event-config-cfg-int-flag" class="headerlink" title="int event_config_set_flag(struct event_config *cfg, int flag)"></a>int event_config_set_flag(struct event_config *cfg, int flag)</h3><ul>
+<li>设置一个或多个标志，配置最终event_base的哪些部分将被初始化，以及它们将如何工作。</li>
+<li>与之相关的函数<ul>
+<li>event_base_config_flags</li>
+<li>event_base_new_with_config()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-config-set-num-cpus-hint-struct-event-config-cfg-int-cpus"><a href="#int-event-config-set-num-cpus-hint-struct-event-config-cfg-int-cpus" class="headerlink" title="int event_config_set_num_cpus_hint(struct event_config *cfg, int cpus)"></a>int event_config_set_num_cpus_hint(struct event_config *cfg, int cpus)</h3><ul>
+<li>记录系统中cpu数量的提示。这用于调优线程池等，以获得最佳性能。在Libevent 2.0版本中，它仅在 Windows，IOCP中使用。</li>
+<li>成功，返回0；失败，返回-1</li>
+</ul>
+<h3 id="int-event-config-set-max-dispatch-interval-struct-event-config-cfg-const-struct-timeval-max-interval-int-max-callbacks-int-min-priority"><a href="#int-event-config-set-max-dispatch-interval-struct-event-config-cfg-const-struct-timeval-max-interval-int-max-callbacks-int-min-priority" class="headerlink" title="int event_config_set_max_dispatch_interval(struct event_config *cfg, const struct timeval *max_interval, int max_callbacks, int min_priority)"></a>int event_config_set_max_dispatch_interval(struct event_config *cfg, const struct timeval *max_interval, int max_callbacks, int min_priority)</h3><ul>
+<li>记录一个间隔和&#x2F;或一些回调函数，之后 event base 将检查新的事件。默认情况下，在检查新事件之前，event base 将运行与最高激活优先级激活的事件数量相同的事件。如果通过设置max_interval来配置它，它将在每次回调之后检查时间，并且在检查新事件之前不允许超过max_interval。如果通过将max_callbacks设置为&gt;&#x3D; 0来配置它，那么在检查新事件之前，它将不会运行超过max_callbacks的回调函数。</li>
+<li>这个选项可以减少高优先级事件的延迟，并避免优先级反转，即多个低优先级事件导致无法轮询高优先级事件，但会以略微降低吞吐量为代价。请谨慎使用！</li>
+<li>成功，返回0；失败，返回-1.</li>
+</ul>
+<h3 id="struct-event-base-event-base-new-with-config-const-struct-event-config-cfg"><a href="#struct-event-base-event-base-new-with-config-const-struct-event-config-cfg" class="headerlink" title="struct event_base *event_base_new_with_config(const struct event_config *cfg)"></a>struct event_base *event_base_new_with_config(const struct event_config *cfg)</h3><ul>
+<li>初始化事件API</li>
+<li>使用 event_base_new_with_config() 按照指定的配置 初始化一个新的 event base。配置对象当前可用于避免某些事件通知机制。</li>
+<li>成功，返回一个能够用于注册事件的，已初始化的event_base；失败，返回NULL</li>
+<li>与之相关的函数<ul>
+<li>event_base_new()</li>
+<li>event_base_free()</li>
+<li>event_init()</li>
+<li>event_assign()</li>
+</ul>
+</li>
+</ul>
+<h3 id="void-event-base-free-struct-event-base-eb"><a href="#void-event-base-free-struct-event-base-eb" class="headerlink" title="void event_base_free(struct event_base *eb)"></a>void event_base_free(struct event_base *eb)</h3><ul>
+<li>释放所有与event base 相关的内存</li>
+<li>注意，这个函数不会关闭任何fd，也不会释放作为callback参数传递给event_new的内存。</li>
+<li>如果有任何待处理的终结器回调函数，这个函数会调用它们</li>
+</ul>
+<h3 id="void-event-base-free-nofinalize-struct-event-base"><a href="#void-event-base-free-nofinalize-struct-event-base" class="headerlink" title="void event_base_free_nofinalize(struct event_base *)"></a>void event_base_free_nofinalize(struct event_base *)</h3><ul>
+<li>和event_base_free类似，但是不会运行终结器</li>
+</ul>
+<h3 id="Log-severities"><a href="#Log-severities" class="headerlink" title="Log severities"></a>Log severities</h3><ul>
+<li>EVENT_LOG_DEBUG</li>
+<li>EVENT_LOG_MSG</li>
+<li>EVENT_LOG_WARN</li>
+<li>EVENT_LOG_ERR</li>
+</ul>
+<h3 id="typedef-void-event-log-cb-int-severity-const-char-msg"><a href="#typedef-void-event-log-cb-int-severity-const-char-msg" class="headerlink" title="typedef void (*event_log_cb)(int severity, const char *msg)"></a>typedef void (*event_log_cb)(int severity, const char *msg)</h3><ul>
+<li>一个回调函数，用于拦截Libevent的日志消息。</li>
+</ul>
+<h3 id="void-event-set-log-callback-event-log-cb-cb"><a href="#void-event-set-log-callback-event-log-cb-cb" class="headerlink" title="void event_set_log_callback(event_log_cb cb)"></a>void event_set_log_callback(event_log_cb cb)</h3><ul>
+<li>重定向Libevent的日志消息</li>
+<li>你提供的函数<strong>不能</strong>调用任何其他libevent功能。这样做可能会产生未定义的行为。</li>
+</ul>
+<h3 id="typedef-void-event-fatal-cb-int-err"><a href="#typedef-void-event-fatal-cb-int-err" class="headerlink" title="typedef void (*event_fatal_cb)(int err)"></a>typedef void (*event_fatal_cb)(int err)</h3><ul>
+<li>当Libevent遇到致命的内部错误时调用的函数。</li>
+</ul>
+<h3 id="void-event-set-fatal-callback-event-fatal-cb"><a href="#void-event-set-fatal-callback-event-fatal-cb" class="headerlink" title="void event_set_fatal_callback(event_fatal_cb)"></a>void event_set_fatal_callback(event_fatal_cb)</h3><ul>
+<li>在发生致命内部错误时，重写Libevent的行为。</li>
+<li>默认情况下，如果编程错误导致无法继续正确操作，Libevent将调用exit(1)。这个函数允许你提供另一个回调函数。请注意，如果调用该函数，则程序或Libevent有问题：任何后续对Libevent的调用都可能导致未定义的行为。</li>
+<li>Libevent（几乎）总是在调用该函数之前记录EVENT_LOG_ERR消息；查看最后一条日志消息，了解Libevent为什么会死亡。</li>
+</ul>
+<h3 id="void-event-enable-debug-logging-ev-uint32-t-which"><a href="#void-event-enable-debug-logging-ev-uint32-t-which" class="headerlink" title="void event_enable_debug_logging(ev_uint32_t which)"></a>void event_enable_debug_logging(ev_uint32_t which)</h3><ul>
+<li>打开调试日志，发送到默认日志处理器</li>
+<li>这是一个全局设置，如果你要调用它，必须确保在调用之前event_base是创建好的。你需要在任何多线程使用event_base之前调用它。</li>
+</ul>
+<h3 id="int-event-base-set-struct-event-base-eb-struct-event-ev"><a href="#int-event-base-set-struct-event-base-eb-struct-event-ev" class="headerlink" title="int event_base_set(struct event_base *eb, struct event *ev)"></a>int event_base_set(struct event_base *eb, struct event *ev)</h3><ul>
+<li>将一个不同的event_base 与一个事件绑定。</li>
+<li>被绑定的事件不能处于活跃或挂起状态。</li>
+<li>成功，返回0；失败，返回-1</li>
+</ul>
+<h3 id="Loop-flags"><a href="#Loop-flags" class="headerlink" title="Loop flags"></a>Loop flags</h3><ul>
+<li>这些标志控制着 event_base_loop() 的行为。</li>
+<li>EVLOOP_ONCE：阻塞直到有一个活动事件，然后在所有活动事件的回调函数运行完毕后退出。</li>
+<li>EVLOOP_NONBLOCK：不阻塞，看看哪些事件现在已经准备好了，运行优先级最高的回调函数，然后退出</li>
+<li>EVLOOP_NO_EXIT_NO_EMPTY：不要退出循环，因为没有挂起的事件。相反，继续运行，直到event_base_loopexit（）或event_base_loopbreak（）让我们停止</li>
+</ul>
+<h3 id="int-event-base-loop-struct-event-base-eb-int-flags"><a href="#int-event-base-loop-struct-event-base-eb-int-flags" class="headerlink" title="int event_base_loop(struct event_base *eb, int flags)"></a>int event_base_loop(struct event_base *eb, int flags)</h3><ul>
+<li>等待事件变为活跃状态，然后调用他们的回调函数</li>
+<li>这是 event_base_dispatch() 更灵活的版本</li>
+<li>默认情况下，这个循环将运行 event base，直到没有其他的挂起或活跃事件，或者直到调用了 event_base_loopbreak()，event_base_loopexit()。你可以通过参数flags覆盖它的行为。</li>
+<li>成功，返回0；有错误产生返回-1；没有活跃或挂起的事件返回1.</li>
+<li>与之相关的函数<ul>
+<li>event_base_loopexit()</li>
+<li>event_base_dispatch()</li>
+<li>EVLOOP_ONCE</li>
+<li>EVLOOP_NONBLOCK</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-loopexit-struct-event-base-eb-const-struct-timeval-tv"><a href="#int-event-base-loopexit-struct-event-base-eb-const-struct-timeval-tv" class="headerlink" title="int event_base_loopexit(struct event_base *eb,const struct timeval *tv)"></a>int event_base_loopexit(struct event_base *eb,const struct timeval *tv)</h3><ul>
+<li>在指定时间后退出事件循环。</li>
+<li>给定定时器到期后的下一个event_base_loop（）迭代将正常完成（处理所有排队的事件），然后退出，不会再次阻塞事件。</li>
+<li>后续对event_base_loop（）的调用将正常进行。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_base_loopbreak()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-loopbreak-struct-event-base-eb"><a href="#int-event-base-loopbreak-struct-event-base-eb" class="headerlink" title="int event_base_loopbreak(struct event_base *eb)"></a>int event_base_loopbreak(struct event_base *eb)</h3><ul>
+<li>立即中止活动的event_base_loop（）。</li>
+<li>Event_base_loop（）将在下一个事件完成后中止循环；Event_base_loopbreak（）通常在这个事件的回调函数中调用。这种行为类似于“break；”语句。</li>
+<li>后续对event_base_loop（）的调用将正常进行。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_base_loopexit()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-loopcontinue-struct-event-base-eb"><a href="#int-event-base-loopcontinue-struct-event-base-eb" class="headerlink" title="int event_base_loopcontinue(struct event_base *eb)"></a>int event_base_loopcontinue(struct event_base *eb)</h3><ul>
+<li>告诉正在运行的 event_base_loop() 立即扫描新的事件</li>
+<li>调用这个函数会让当前活动的event_base_loop（）在当前事件回调函数结束后再次开始循环（扫描新的事件）。如果事件循环没有运行，这个函数没有作用。</li>
+<li>Event_base_loopbreak（）通常在这个事件的回调函数中调用。这种行为类似于“continue;”语句。</li>
+<li>后续对event_base_loop（）的调用将正常进行。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_base_loopbreak()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-got-exit-struct-event-base-eb"><a href="#int-event-base-got-exit-struct-event-base-eb" class="headerlink" title="int event_base_got_exit(struct event_base *eb)"></a>int event_base_got_exit(struct event_base *eb)</h3><ul>
+<li>就这个事件循环是否通过event_base_loopexit()收到了退出指令。</li>
+<li>当调用了 event_loopexit()，这个函数会返回true，直到进入下一个循环。</li>
+<li>如果event_base_loopexit()被调用了，返回true；否则，返回0</li>
+<li>与之相关的函数<ul>
+<li>event_base_loopexit()</li>
+<li>event_base_got_break()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-got-break-struct-event-base-eb"><a href="#int-event-base-got-break-struct-event-base-eb" class="headerlink" title="int event_base_got_break(struct event_base *eb)"></a>int event_base_got_break(struct event_base *eb)</h3><ul>
+<li>检查event_base_loopbreak（）是否通知事件循环立即中止。</li>
+<li>如果event_base_loopbreak()被调用了，返回true；否则，返回0</li>
+<li>与之相关的函数<ul>
+<li>event_base_loopexit()</li>
+<li>event_base_got_break()</li>
+</ul>
+</li>
+</ul>
+<h3 id="event-flags"><a href="#event-flags" class="headerlink" title="event flags"></a>event flags</h3><ul>
+<li>要传递给event_new（）、event_assign（）、event_pending（）以及任何参数形式为“短事件”的参数的标志</li>
+<li>EV_TIMEOUT: 表示超时。没有必要将这个标志传递给event_for new()&#x2F;event_assign（）来获得超时时间。</li>
+<li>EV_READ: 等待一个套接字或文件描述符变为可读的</li>
+<li>EV_WRITE：等待一个套接字或文件描述符变为可写的。</li>
+<li>EV_SIGNAL：等到一个POSIX信号到达</li>
+<li>EV_PERSIST: 持久事件：激活时不会自动移除。在激活具有超时的持久事件时，其超时时间重置为0。</li>
+<li>EV_ET: 如果后端支持，选择边缘触发行为。</li>
+<li>EV_FINALIZE：如果提供了这个选项，那么event_del（）在等待另一个线程的事件回调完成时，不会在一个线程中阻塞。为了安全地使用这个选项，你可能需要使用event_finalize（）或event_free_finalize()，以便在多线程应用程序中安全地销毁事件。更多信息请参阅这些函数。</li>
+<li>EV_CLOSED: 检测连接关闭事件。您可以使用它来检测连接何时关闭，而不必从连接中读取所有挂起的数据。并非所有后端都支持EV_CLOSED。要检测或需要它，请使用特性标志EV_FEATURE_EARLY_CLOSE。</li>
+</ul>
+<h3 id="typedef-void-event-callback-fn-evutil-socket-t-short-void"><a href="#typedef-void-event-callback-fn-evutil-socket-t-short-void" class="headerlink" title="typedef void (*event_callback_fn)(evutil_socket_t, short, void *)"></a>typedef void (*event_callback_fn)(evutil_socket_t, short, void *)</h3><ul>
+<li>事件的回调函数，接受三个参数。</li>
+<li>与之相关的函数<ul>
+<li>event_new()</li>
+</ul>
+</li>
+</ul>
+<h3 id="void-event-self-cbarg-void"><a href="#void-event-self-cbarg-void" class="headerlink" title="void *event_self_cbarg(void)"></a>void *event_self_cbarg(void)</h3><ul>
+<li>返回一个值，用于指定必须将事件本身用作回调参数。</li>
+</ul>
+<h3 id="struct-event-event-new-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-callback-arg"><a href="#struct-event-event-new-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-callback-arg" class="headerlink" title="struct event *event_new(struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *callback_arg)"></a>struct event *event_new(struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *callback_arg)</h3><ul>
+<li>分配一个待添加的新事件结构。</li>
+<li>这个event_new() 函数返回的新事件可以在调用 event_add()和event_del()函数时使用。fd和events参数是触发事件的条件；回调函数和回调参数是告诉Libevent当事件变为活跃状态时应该做的动作。</li>
+<li>成功，返回一个必须由event_free()释放的事件结构体对象；有错误产生，返回NULL</li>
+<li>与之相关的函数<ul>
+<li>event_free()</li>
+<li>event_add()</li>
+<li>event_del()</li>
+<li>event_assign()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-assign-struct-event-ev-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-callback-arg"><a href="#int-event-assign-struct-event-ev-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-callback-arg" class="headerlink" title="int event_assign(struct event *ev, struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *callback_arg)"></a>int event_assign(struct event *ev, struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *callback_arg)</h3><ul>
+<li>准备一个新的、已经分配的事件结构，以便添加。</li>
+<li>event_assign()函数准备一个事件结构体对象用于在未来调用event_add()和event_del()时使用。与event_new()不同的是，他不申请任何内存，它需要的是已经申请好的事件结构体对象。这样做通常会使您的代码依赖于事件结构的大小，从而与Libevent的未来版本不兼容。</li>
+<li>成功，返回0；无效参数，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_new()</li>
+<li>event_add()</li>
+<li>event_del()</li>
+<li>event_base_once()</li>
+<li>event_get_struct_event_size()</li>
+</ul>
+</li>
+</ul>
+<h3 id="void-event-free-struct-event"><a href="#void-event-free-struct-event" class="headerlink" title="void event_free(struct event *)"></a>void event_free(struct event *)</h3><ul>
+<li>释放一个由event_new()申请的事件结构体对象。</li>
+<li>如果该事件处于挂起或活跃状态，这个函数先使它处于非挂起或非活跃状态。</li>
+</ul>
+<h3 id="typedef-void-event-finalize-callback-fn-struct-event-void"><a href="#typedef-void-event-finalize-callback-fn-struct-event-void" class="headerlink" title="typedef void (*event_finalize_callback_fn)(struct event *, void *)"></a>typedef void (*event_finalize_callback_fn)(struct event *, void *)</h3><ul>
+<li>用于 event_finalize()和event_free_finalize()的回调函数类型。</li>
+</ul>
+<h3 id="int-event-base-once-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-arg-const-struct-timeval-timeout"><a href="#int-event-base-once-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-arg-const-struct-timeval-timeout" class="headerlink" title="int event_base_once(struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *arg, const struct timeval *timeout)"></a>int event_base_once(struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *arg, const struct timeval *timeout)</h3><ul>
+<li>安排一次性的活动</li>
+<li>这个event_base_once()与event_new()相似。然而，它安排回调函数只被调用一次，并且不要求调用者准备事件结构。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+</ul>
+<h3 id="int-event-add-struct-event-ev-const-struct-timeval-timeout"><a href="#int-event-add-struct-event-ev-const-struct-timeval-timeout" class="headerlink" title="int event_add(struct event *ev, const struct timeval *timeout)"></a>int event_add(struct event *ev, const struct timeval *timeout)</h3><ul>
+<li>向挂起事件集合中添加一个事件。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_del()</li>
+<li>event_assign()</li>
+<li>event_new()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-remove-timer-struct-event-ev"><a href="#int-event-remove-timer-struct-event-ev" class="headerlink" title="int event_remove_timer(struct event *ev)"></a>int event_remove_timer(struct event *ev)</h3><ul>
+<li>从挂起事件中移除定时器，但不移除事件本身。</li>
+<li>如果事件有预定的超时时间，则此函数取消该事件的计划，但将事件留在待定状态。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+</ul>
+<h3 id="int-event-del-struct-event-ev"><a href="#int-event-del-struct-event-ev" class="headerlink" title="int event_del(struct event *ev)"></a>int event_del(struct event *ev)</h3><ul>
+<li>从监视事件集中删除事件。</li>
+<li>函数event_del（）将取消参数ev中的事件。如果事件已经被执行或者从未被添加，那么调用将不会有任何效果</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_add()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-del-nonblobk-struct-event-ev"><a href="#int-event-del-nonblobk-struct-event-ev" class="headerlink" title="int event_del_nonblobk(struct event *ev)"></a>int event_del_nonblobk(struct event *ev)</h3><ul>
+<li>当事件的回调函数在另一个线程中运行时，即使事件是在没有EV_FINALIZE标志的情况下构造的，也不会阻塞。</li>
+</ul>
+<h3 id="int-event-del-blobk-struct-event-ev"><a href="#int-event-del-blobk-struct-event-ev" class="headerlink" title="int event_del_blobk(struct event *ev)"></a>int event_del_blobk(struct event *ev)</h3><ul>
+<li>当事件的回调函数在另一个线程中运行时，即使事件是用EV_FINALIZE标志构造的，也总是会阻塞。</li>
+</ul>
+<h3 id="void-event-active-struct-event-ev-int-res-short-ncalls"><a href="#void-event-active-struct-event-ev-int-res-short-ncalls" class="headerlink" title="void event_active(struct event *ev, int res, short ncalls)"></a>void event_active(struct event *ev, int res, short ncalls)</h3><ul>
+<li>激活一个事件。</li>
+<li>你可以在挂起或非挂起事件上使用这个函数，使其成为活动事件，这样它的回调函数就会通过event_base_dispatch（）或event_base_loop（）运行。</li>
+<li>多线程程序中一个常见的用法是从另一个线程中唤醒运行event_base_loop（）的线程。</li>
+</ul>
+<h3 id="int-event-pending-const-struct-event-ev-short-events-struct-timeval-tv"><a href="#int-event-pending-const-struct-event-ev-short-events-struct-timeval-tv" class="headerlink" title="int event_pending(const struct event *ev, short events, struct timeval *tv)"></a>int event_pending(const struct event *ev, short events, struct timeval *tv)</h3><ul>
+<li>检查特定事件是否正在等待或计划中。</li>
+<li>如果事件正在等待<code>what</code>中的任何事件（也就是说，它已经被添加），则为True；如果事件没有被添加，则为0。</li>
+</ul>
+<h3 id="struct-event-event-base-get-running-event-struct-event-base-base"><a href="#struct-event-event-base-get-running-event-struct-event-base-base" class="headerlink" title="struct event *event_base_get_running_event(struct event_base *base)"></a>struct event *event_base_get_running_event(struct event_base *base)</h3><ul>
+<li>如果在事件的回调函数中调用，则返回该事件。</li>
+<li>当从事件的回调函数外部调用时，该函数的行为没有定义。</li>
+</ul>
+<h3 id="int-event-initialized-const-struct-event-ev"><a href="#int-event-initialized-const-struct-event-ev" class="headerlink" title="int event_initialized(const struct event *ev)"></a>int event_initialized(const struct event *ev)</h3><ul>
+<li>测试事件结构是否可以初始化。</li>
+<li>event_initialized（）函数可用于检查事件是否已经初始化.</li>
+<li>警告：此函数仅用于区分已清空的内存块和已初始化的事件，它很容易与未初始化的内存混淆。因此，它只能用于区分初始化事件和零事件。</li>
+<li>1表示该结构可以初始化，0表示尚未初始化</li>
+</ul>
+<h3 id="evutil-socket-t-event-get-fd-const-struct-event-ev"><a href="#evutil-socket-t-event-get-fd-const-struct-event-ev" class="headerlink" title="evutil_socket_t event_get_fd(const struct event *ev)"></a>evutil_socket_t event_get_fd(const struct event *ev)</h3><ul>
+<li>获取事件的套接字或信号，如果事件没有套接字，返回-1</li>
+</ul>
+<h3 id="struct-event-base-event-get-base-const-struct-event-ev"><a href="#struct-event-base-event-get-base-const-struct-event-ev" class="headerlink" title="struct event_base *event_get_base(const struct event *ev)"></a>struct event_base *event_get_base(const struct event *ev)</h3><ul>
+<li>获取与事件绑定的 event_base</li>
+</ul>
+<h3 id="event-callback-fn-event-get-callback-const-struct-event-ev"><a href="#event-callback-fn-event-get-callback-const-struct-event-ev" class="headerlink" title="event_callback_fn event_get_callback(const struct event *ev)"></a>event_callback_fn event_get_callback(const struct event *ev)</h3><ul>
+<li>获取与事件绑定的回调函数</li>
+</ul>
+<h3 id="void-event-get-callback-arg-const-struct-event-ev"><a href="#void-event-get-callback-arg-const-struct-event-ev" class="headerlink" title="void* event_get_callback_arg(const struct event* ev)"></a>void* event_get_callback_arg(const struct event* ev)</h3><ul>
+<li>获取与事件绑定的回调函数的参数</li>
+</ul>
+<h3 id="int-event-get-priority-const-struct-event-ev"><a href="#int-event-get-priority-const-struct-event-ev" class="headerlink" title="int event_get_priority(const struct event *ev)"></a>int event_get_priority(const struct event *ev)</h3><ul>
+<li>获取事件的优先级</li>
+<li>与之相关的函数<ul>
+<li>event_priority_init()</li>
+<li>event_get_priority()</li>
+</ul>
+</li>
+</ul>
+<h3 id="void-event-get-assignment-const-struct-event-event-struct-event-base-base-out-evutil-socket-t-fd-out-short-events-out-event-callback-fd-callback-out-void-arg-out"><a href="#void-event-get-assignment-const-struct-event-event-struct-event-base-base-out-evutil-socket-t-fd-out-short-events-out-event-callback-fd-callback-out-void-arg-out" class="headerlink" title="void event_get_assignment(const struct event *event, struct event_base **base_out, evutil_socket_t *fd_out, short *events_out, event_callback_fd *callback_out, void **arg_out)"></a>void event_get_assignment(const struct event *event, struct event_base **base_out, evutil_socket_t *fd_out, short *events_out, event_callback_fd *callback_out, void **arg_out)</h3><ul>
+<li>提取用于构造给定事件的<strong>所有</strong>参数。</li>
+<li>event_base被复制到<em>base_out， fd被复制到</em>fd_out，以此类推</li>
+<li>如果任何一个“_out”参数为NULL，它将被忽略。</li>
+</ul>
+<h3 id="size-t-event-get-struct-event-size-void"><a href="#size-t-event-get-struct-event-size-void" class="headerlink" title="size_t event_get_struct_event_size(void)"></a>size_t event_get_struct_event_size(void)</h3><ul>
+<li>返回编译Libevent库时使用的struct event的大小</li>
+</ul>
+<h3 id="const-char-event-get-version-void"><a href="#const-char-event-get-version-void" class="headerlink" title="const char *event_get_version(void)"></a>const char *event_get_version(void)</h3><ul>
+<li>获取Libevent的版本</li>
+</ul>
+<h3 id="event-get-vision-number"><a href="#event-get-vision-number" class="headerlink" title="event_get_vision_number()"></a>event_get_vision_number()</h3><ul>
+<li>获取Libevent版本号</li>
+</ul>
+<h3 id="int-event-base-priority-init-struct-event-base-eb-int-npriorities"><a href="#int-event-base-priority-init-struct-event-base-eb-int-npriorities" class="headerlink" title="int event_base_priority_init(struct event_base *eb, int npriorities)"></a>int event_base_priority_init(struct event_base *eb, int npriorities)</h3><ul>
+<li>设置不同事件优先级的个数</li>
+<li>默认情况下，Libevent给所有活跃事件设置相同的优先级。然后，在某些情况下需要使用更高的优先级优先处理某些事件。</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+<li>与之相关的函数<ul>
+<li>event_priority_set()</li>
+</ul>
+</li>
+</ul>
+<h3 id="int-event-base-get-npriorities-struct-event-base-eb"><a href="#int-event-base-get-npriorities-struct-event-base-eb" class="headerlink" title="int event_base_get_npriorities(struct event_base *eb)"></a>int event_base_get_npriorities(struct event_base *eb)</h3><ul>
+<li>获取不同事件优先级的数量。</li>
+</ul>
+<h3 id="int-event-priority-set-struct-event-ev-int-priority"><a href="#int-event-priority-set-struct-event-ev-int-priority" class="headerlink" title="int event_priority_set(struct event *ev, int priority)"></a>int event_priority_set(struct event *ev, int priority)</h3><ul>
+<li>为一个事件设置优先级</li>
+<li>成功，返回0；有错误产生，返回-1</li>
+</ul>
+<h3 id="const-struct-timeval-event-base-init-common-timeout-struct-event-base-base-const-struct-timeval-duration"><a href="#const-struct-timeval-event-base-init-common-timeout-struct-event-base-base-const-struct-timeval-duration" class="headerlink" title="const struct timeval *event_base_init_common_timeout(struct event_base *base, const struct timeval *duration)"></a>const struct timeval *event_base_init_common_timeout(struct event_base *base, const struct timeval *duration)</h3><ul>
+<li>准备一个event_base，以使用相同时间的大量超时</li>
+</ul>
+<h3 id="void-event-base-dump-events-struct-event-base-base-FILE-output"><a href="#void-event-base-dump-events-struct-event-base-base-FILE-output" class="headerlink" title="void event_base_dump_events(struct event_base *base, FILE *output)"></a>void event_base_dump_events(struct event_base *base, FILE *output)</h3><ul>
+<li>将所有插入和&#x2F;或活动事件的可读描述写入提供的stdio流。</li>
+<li>这是为了调试。它的格式不能保证在libevent版本之间是相同的。</li>
+</ul>
+<h3 id="void-event-base-active-by-fd-struct-event-base-base-evutil-socket-t-fd-short-events"><a href="#void-event-base-active-by-fd-struct-event-base-base-evutil-socket-t-fd-short-events" class="headerlink" title="void event_base_active_by_fd(struct event_base *base, evutil_socket_t fd, short events)"></a>void event_base_active_by_fd(struct event_base *base, evutil_socket_t fd, short events)</h3><ul>
+<li>激活给定fd和事件掩码的所有挂起事件。</li>
+</ul>
+<h3 id="void-event-base-active-by-signal-struct-event-base-base-int-sig"><a href="#void-event-base-active-by-signal-struct-event-base-base-int-sig" class="headerlink" title="void event_base_active_by_signal(struct event_base *base, int sig)"></a>void event_base_active_by_signal(struct event_base *base, int sig)</h3><ul>
+<li>激活给定信号编号的所有挂起信号</li>
+<li>该函数只激活挂起事件。未添加的事件不会变为活动状态。</li>
+</ul>
+<h3 id="typedef-int-event-base-foreach-event-cb-const-struct-event-base-const-struct-event-void"><a href="#typedef-int-event-base-foreach-event-cb-const-struct-event-base-const-struct-event-void" class="headerlink" title="typedef int (*event_base_foreach_event_cb)(const struct event_base *, const struct event *, void *)"></a>typedef int (*event_base_foreach_event_cb)(const struct event_base *, const struct event *, void *)</h3><ul>
+<li>通过event_base_foreach_event在事件基中迭代事件的回调</li>
+</ul>
+<h3 id="int-event-base-foreach-event-struct-event-base-base-event-base-foreach-event-cb-fn-void-arg"><a href="#int-event-base-foreach-event-struct-event-base-base-event-base-foreach-event-cb-fn-void-arg" class="headerlink" title="int event_base_foreach_event(struct event_base *base, event_base_foreach_event_cb, fn, void *arg)"></a>int event_base_foreach_event(struct event_base *base, event_base_foreach_event_cb, fn, void *arg)</h3><ul>
+<li>在事件循环中遍历所有添加或活动的事件，并对每个事件调用给定的回调函数。</li>
+</ul>
+<h3 id="int-event-base-gettimeofday-cached-struct-event-base-base-struct-timeval-tv"><a href="#int-event-base-gettimeofday-cached-struct-event-base-base-struct-timeval-tv" class="headerlink" title="int event_base_gettimeofday_cached(struct event_base *base, struct timeval *tv)"></a>int event_base_gettimeofday_cached(struct event_base *base, struct timeval *tv)</h3><ul>
+<li>将<code>tv</code>设置为当前时间（由gettimeofday（）返回），如果可能，查看<code>base</code>中缓存的值，如果没有缓存的时间，则适当调用gettimeofday（）或clock_gettime（）。</li>
+<li>成功，返回0；失败，返回负值</li>
+</ul>
+<h3 id="int-event-base-update-cache-time-struct-event-base-base"><a href="#int-event-base-update-cache-time-struct-event-base-base" class="headerlink" title="int event_base_update_cache_time(struct event_base *base)"></a>int event_base_update_cache_time(struct event_base *base)</h3><ul>
+<li>将<code>base</code>中的cached_tv更新为当前时间</li>
+<li>成功，返回0；失败，返回-1</li>
+</ul>
+<h3 id="void-libevent-global-shutdown-void"><a href="#void-libevent-global-shutdown-void" class="headerlink" title="void libevent_global_shutdown(void)"></a>void libevent_global_shutdown(void)</h3><ul>
+<li>释放所有由Libevent分配的全局资源。</li>
+<li>该函数不会释放开发人员控制的资源，如event_bases、events、bufferevents、listeners等。它只释放像全局锁这样没有其他释放方式的资源。</li>
+<li>实际上没有必要在退出前调用这个函数：它释放的每一个资源都会在退出时被释放。它的存在主要是为了使资源泄漏调试工具不会将Libevent视为在退出时持有资源。</li>
+<li>只有在不调用其他Libevent函数时，才应该调用此函数——例如，当干净地退出程序时。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C-libevent/" rel="tag"># C_libevent</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/01/14/notebook/SoftwareEngineering/2025-01-14-%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84/" rel="prev" title="事件驱动型架构">
+      <i class="fa fa-chevron-left"></i> 事件驱动型架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libuv/" rel="next" title="libuv库">
+      libuv库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libevent-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">libevent 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">1. 核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%EF%BC%88Event-Loop%EF%BC%89"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1 事件循环（Event Loop）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B%EF%BC%88Event-Driven-Model%EF%BC%89"><span class="nav-number">2.1.2.</span> <span class="nav-text">1.2 事件驱动模型（Event-Driven Model）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-%E4%BA%8B%E4%BB%B6%E6%BA%90%EF%BC%88Event-Sources%EF%BC%89"><span class="nav-number">2.1.3.</span> <span class="nav-text">1.3 事件源（Event Sources）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-libevent-%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84%E5%92%8C-API"><span class="nav-number">2.2.</span> <span class="nav-text">2. libevent 的基本结构和 API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E5%88%9B%E5%BB%BA%E4%BA%8B%E4%BB%B6%E5%9F%BA%E7%A1%80"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 创建事件基础</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E5%88%9B%E5%BB%BA%E5%92%8C%E7%AE%A1%E7%90%86%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 创建和管理事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-%E5%AE%9A%E6%97%B6%E5%99%A8%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 定时器事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-%E4%BF%A1%E5%8F%B7%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.2.4.</span> <span class="nav-text">2.4 信号事件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%94%AF%E6%8C%81%E7%9A%84%E4%BA%8B%E4%BB%B6%E9%80%9A%E7%9F%A5%E6%9C%BA%E5%88%B6"><span class="nav-number">2.3.</span> <span class="nav-text">3. 支持的事件通知机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%BA%BF%E7%A8%8B%E6%94%AF%E6%8C%81"><span class="nav-number">2.4.</span> <span class="nav-text">4. 线程支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.5.</span> <span class="nav-text">5. 应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E4%B8%8E%E5%85%B6%E4%BB%96%E5%BA%93%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-number">2.6.</span> <span class="nav-text">6. 与其他库的对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8"><span class="nav-number">2.7.</span> <span class="nav-text">7. 安装与使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%EF%BC%88Linux%EF%BC%89"><span class="nav-number">2.7.1.</span> <span class="nav-text">安装（Linux）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%EF%BC%88Linux%EF%BC%89"><span class="nav-number">2.7.2.</span> <span class="nav-text">编译（Linux）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%80%BB%E7%BB%93"><span class="nav-number">2.8.</span> <span class="nav-text">8. 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#event2-event-h"><span class="nav-number">3.</span> <span class="nav-text">event2&#x2F;event.h</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-base"><span class="nav-number">3.1.</span> <span class="nav-text">struct event_base</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event"><span class="nav-number">3.2.</span> <span class="nav-text">struct event</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-config"><span class="nav-number">3.3.</span> <span class="nav-text">struct event_config</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-enable-debug-mode-void"><span class="nav-number">3.4.</span> <span class="nav-text">void event_enable_debug_mode(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-debug-unassign-struct-event"><span class="nav-number">3.5.</span> <span class="nav-text">void event_debug_unassign(struct event *)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-base-event-base-new-void"><span class="nav-number">3.6.</span> <span class="nav-text">struct event_base *event_base_new(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-reinit-struct-event-base-base"><span class="nav-number">3.7.</span> <span class="nav-text">int event_reinit(struct event_base *base)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-dispatch-struct-event-base-base"><span class="nav-number">3.8.</span> <span class="nav-text">int event_base_dispatch(struct event_base *base)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const-char-event-base-get-method-const-struct-event-base-eb"><span class="nav-number">3.9.</span> <span class="nav-text">const char *event_base_get_method(const struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const-char-event-base-get-signal-method-const-struct-event-base-eb"><span class="nav-number">3.10.</span> <span class="nav-text">const char *event_base_get_signal_method(const struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const-char-event-get-supported-methods-void"><span class="nav-number">3.11.</span> <span class="nav-text">const char **event_get_supported_methods(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-gettime-monotonic-struct-event-base-base-struct-timeval-tp"><span class="nav-number">3.12.</span> <span class="nav-text">int event_gettime_monotonic(struct event_base *base, struct timeval *tp)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#event-type-flag"><span class="nav-number">3.13.</span> <span class="nav-text">event type flag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-get-num-events-struct-event-base-eb-unsigned-int-flags"><span class="nav-number">3.14.</span> <span class="nav-text">int event_base_get_num_events(struct event_base *eb, unsigned int flags)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-get-max-events-struct-event-base-eb-unsigned-int-flags-int-clear"><span class="nav-number">3.15.</span> <span class="nav-text">int event_base_get_max_events(struct event_base *eb, unsigned int flags, int clear)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-config-event-config-new-void"><span class="nav-number">3.16.</span> <span class="nav-text">struct event_config *event_config_new(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-config-free-struct-event-config-cfg"><span class="nav-number">3.17.</span> <span class="nav-text">void event_config_free(struct event_config *cfg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-config-avoid-method-struct-event-config-cfg-const-char-method"><span class="nav-number">3.18.</span> <span class="nav-text">int event_config_avoid_method(struct event_config *cfg, const char *method)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#enum-event-method-feature"><span class="nav-number">3.19.</span> <span class="nav-text">enum event_method_feature</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#enum-event-base-config-flag"><span class="nav-number">3.20.</span> <span class="nav-text">enum event_base_config_flag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-get-features-const-struct-event-base-base"><span class="nav-number">3.21.</span> <span class="nav-text">int event_base_get_features(const struct event_base *base)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-config-require-features-struct-event-config-cfg-int-feature"><span class="nav-number">3.22.</span> <span class="nav-text">int event_config_require_features(struct event_config *cfg, int feature)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-config-set-flag-struct-event-config-cfg-int-flag"><span class="nav-number">3.23.</span> <span class="nav-text">int event_config_set_flag(struct event_config *cfg, int flag)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-config-set-num-cpus-hint-struct-event-config-cfg-int-cpus"><span class="nav-number">3.24.</span> <span class="nav-text">int event_config_set_num_cpus_hint(struct event_config *cfg, int cpus)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-config-set-max-dispatch-interval-struct-event-config-cfg-const-struct-timeval-max-interval-int-max-callbacks-int-min-priority"><span class="nav-number">3.25.</span> <span class="nav-text">int event_config_set_max_dispatch_interval(struct event_config *cfg, const struct timeval *max_interval, int max_callbacks, int min_priority)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-base-event-base-new-with-config-const-struct-event-config-cfg"><span class="nav-number">3.26.</span> <span class="nav-text">struct event_base *event_base_new_with_config(const struct event_config *cfg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-base-free-struct-event-base-eb"><span class="nav-number">3.27.</span> <span class="nav-text">void event_base_free(struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-base-free-nofinalize-struct-event-base"><span class="nav-number">3.28.</span> <span class="nav-text">void event_base_free_nofinalize(struct event_base *)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Log-severities"><span class="nav-number">3.29.</span> <span class="nav-text">Log severities</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#typedef-void-event-log-cb-int-severity-const-char-msg"><span class="nav-number">3.30.</span> <span class="nav-text">typedef void (*event_log_cb)(int severity, const char *msg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-set-log-callback-event-log-cb-cb"><span class="nav-number">3.31.</span> <span class="nav-text">void event_set_log_callback(event_log_cb cb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#typedef-void-event-fatal-cb-int-err"><span class="nav-number">3.32.</span> <span class="nav-text">typedef void (*event_fatal_cb)(int err)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-set-fatal-callback-event-fatal-cb"><span class="nav-number">3.33.</span> <span class="nav-text">void event_set_fatal_callback(event_fatal_cb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-enable-debug-logging-ev-uint32-t-which"><span class="nav-number">3.34.</span> <span class="nav-text">void event_enable_debug_logging(ev_uint32_t which)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-set-struct-event-base-eb-struct-event-ev"><span class="nav-number">3.35.</span> <span class="nav-text">int event_base_set(struct event_base *eb, struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Loop-flags"><span class="nav-number">3.36.</span> <span class="nav-text">Loop flags</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-loop-struct-event-base-eb-int-flags"><span class="nav-number">3.37.</span> <span class="nav-text">int event_base_loop(struct event_base *eb, int flags)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-loopexit-struct-event-base-eb-const-struct-timeval-tv"><span class="nav-number">3.38.</span> <span class="nav-text">int event_base_loopexit(struct event_base *eb,const struct timeval *tv)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-loopbreak-struct-event-base-eb"><span class="nav-number">3.39.</span> <span class="nav-text">int event_base_loopbreak(struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-loopcontinue-struct-event-base-eb"><span class="nav-number">3.40.</span> <span class="nav-text">int event_base_loopcontinue(struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-got-exit-struct-event-base-eb"><span class="nav-number">3.41.</span> <span class="nav-text">int event_base_got_exit(struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-got-break-struct-event-base-eb"><span class="nav-number">3.42.</span> <span class="nav-text">int event_base_got_break(struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#event-flags"><span class="nav-number">3.43.</span> <span class="nav-text">event flags</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#typedef-void-event-callback-fn-evutil-socket-t-short-void"><span class="nav-number">3.44.</span> <span class="nav-text">typedef void (*event_callback_fn)(evutil_socket_t, short, void *)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-self-cbarg-void"><span class="nav-number">3.45.</span> <span class="nav-text">void *event_self_cbarg(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-event-new-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-callback-arg"><span class="nav-number">3.46.</span> <span class="nav-text">struct event *event_new(struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *callback_arg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-assign-struct-event-ev-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-callback-arg"><span class="nav-number">3.47.</span> <span class="nav-text">int event_assign(struct event *ev, struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *callback_arg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-free-struct-event"><span class="nav-number">3.48.</span> <span class="nav-text">void event_free(struct event *)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#typedef-void-event-finalize-callback-fn-struct-event-void"><span class="nav-number">3.49.</span> <span class="nav-text">typedef void (*event_finalize_callback_fn)(struct event *, void *)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-once-struct-event-base-base-evutil-socket-t-fd-short-events-event-callback-fn-callback-void-arg-const-struct-timeval-timeout"><span class="nav-number">3.50.</span> <span class="nav-text">int event_base_once(struct event_base *base, evutil_socket_t fd, short events, event_callback_fn callback, void *arg, const struct timeval *timeout)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-add-struct-event-ev-const-struct-timeval-timeout"><span class="nav-number">3.51.</span> <span class="nav-text">int event_add(struct event *ev, const struct timeval *timeout)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-remove-timer-struct-event-ev"><span class="nav-number">3.52.</span> <span class="nav-text">int event_remove_timer(struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-del-struct-event-ev"><span class="nav-number">3.53.</span> <span class="nav-text">int event_del(struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-del-nonblobk-struct-event-ev"><span class="nav-number">3.54.</span> <span class="nav-text">int event_del_nonblobk(struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-del-blobk-struct-event-ev"><span class="nav-number">3.55.</span> <span class="nav-text">int event_del_blobk(struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-active-struct-event-ev-int-res-short-ncalls"><span class="nav-number">3.56.</span> <span class="nav-text">void event_active(struct event *ev, int res, short ncalls)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-pending-const-struct-event-ev-short-events-struct-timeval-tv"><span class="nav-number">3.57.</span> <span class="nav-text">int event_pending(const struct event *ev, short events, struct timeval *tv)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-event-base-get-running-event-struct-event-base-base"><span class="nav-number">3.58.</span> <span class="nav-text">struct event *event_base_get_running_event(struct event_base *base)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-initialized-const-struct-event-ev"><span class="nav-number">3.59.</span> <span class="nav-text">int event_initialized(const struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#evutil-socket-t-event-get-fd-const-struct-event-ev"><span class="nav-number">3.60.</span> <span class="nav-text">evutil_socket_t event_get_fd(const struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-event-base-event-get-base-const-struct-event-ev"><span class="nav-number">3.61.</span> <span class="nav-text">struct event_base *event_get_base(const struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#event-callback-fn-event-get-callback-const-struct-event-ev"><span class="nav-number">3.62.</span> <span class="nav-text">event_callback_fn event_get_callback(const struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-get-callback-arg-const-struct-event-ev"><span class="nav-number">3.63.</span> <span class="nav-text">void* event_get_callback_arg(const struct event* ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-get-priority-const-struct-event-ev"><span class="nav-number">3.64.</span> <span class="nav-text">int event_get_priority(const struct event *ev)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-get-assignment-const-struct-event-event-struct-event-base-base-out-evutil-socket-t-fd-out-short-events-out-event-callback-fd-callback-out-void-arg-out"><span class="nav-number">3.65.</span> <span class="nav-text">void event_get_assignment(const struct event *event, struct event_base **base_out, evutil_socket_t *fd_out, short *events_out, event_callback_fd *callback_out, void **arg_out)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#size-t-event-get-struct-event-size-void"><span class="nav-number">3.66.</span> <span class="nav-text">size_t event_get_struct_event_size(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const-char-event-get-version-void"><span class="nav-number">3.67.</span> <span class="nav-text">const char *event_get_version(void)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#event-get-vision-number"><span class="nav-number">3.68.</span> <span class="nav-text">event_get_vision_number()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-priority-init-struct-event-base-eb-int-npriorities"><span class="nav-number">3.69.</span> <span class="nav-text">int event_base_priority_init(struct event_base *eb, int npriorities)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-get-npriorities-struct-event-base-eb"><span class="nav-number">3.70.</span> <span class="nav-text">int event_base_get_npriorities(struct event_base *eb)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-priority-set-struct-event-ev-int-priority"><span class="nav-number">3.71.</span> <span class="nav-text">int event_priority_set(struct event *ev, int priority)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const-struct-timeval-event-base-init-common-timeout-struct-event-base-base-const-struct-timeval-duration"><span class="nav-number">3.72.</span> <span class="nav-text">const struct timeval *event_base_init_common_timeout(struct event_base *base, const struct timeval *duration)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-base-dump-events-struct-event-base-base-FILE-output"><span class="nav-number">3.73.</span> <span class="nav-text">void event_base_dump_events(struct event_base *base, FILE *output)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-base-active-by-fd-struct-event-base-base-evutil-socket-t-fd-short-events"><span class="nav-number">3.74.</span> <span class="nav-text">void event_base_active_by_fd(struct event_base *base, evutil_socket_t fd, short events)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-event-base-active-by-signal-struct-event-base-base-int-sig"><span class="nav-number">3.75.</span> <span class="nav-text">void event_base_active_by_signal(struct event_base *base, int sig)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#typedef-int-event-base-foreach-event-cb-const-struct-event-base-const-struct-event-void"><span class="nav-number">3.76.</span> <span class="nav-text">typedef int (*event_base_foreach_event_cb)(const struct event_base *, const struct event *, void *)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-foreach-event-struct-event-base-base-event-base-foreach-event-cb-fn-void-arg"><span class="nav-number">3.77.</span> <span class="nav-text">int event_base_foreach_event(struct event_base *base, event_base_foreach_event_cb, fn, void *arg)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-gettimeofday-cached-struct-event-base-base-struct-timeval-tv"><span class="nav-number">3.78.</span> <span class="nav-text">int event_base_gettimeofday_cached(struct event_base *base, struct timeval *tv)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#int-event-base-update-cache-time-struct-event-base-base"><span class="nav-number">3.79.</span> <span class="nav-text">int event_base_update_cache_time(struct event_base *base)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#void-libevent-global-shutdown-void"><span class="nav-number">3.80.</span> <span class="nav-text">void libevent_global_shutdown(void)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

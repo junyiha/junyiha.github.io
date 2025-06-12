@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 HTTP协议理论基础知识  分块传输编码 分块传输编码(Chunked transfer encoding)是超文本传输协议（HTTP）中的一种数据传输机制，允许HTTP由网页服务器发送给客户端应用（ 通常是网页浏览器）的数据可以分成多个部分。分块传输编码只在HTTP协议1.1版本（HTTP&#x2F;1.1）中提供。  通常，HTTP应答消息中发送的数据是整个发送的，Content-Len">
+<meta property="og:type" content="article">
+<meta property="og:title" content="http_1_协议基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Network/2024-05-22-http_1_%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 HTTP协议理论基础知识  分块传输编码 分块传输编码(Chunked transfer encoding)是超文本传输协议（HTTP）中的一种数据传输机制，允许HTTP由网页服务器发送给客户端应用（ 通常是网页浏览器）的数据可以分成多个部分。分块传输编码只在HTTP协议1.1版本（HTTP&#x2F;1.1）中提供。  通常，HTTP应答消息中发送的数据是整个发送的，Content-Len">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.427Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="HTTP">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Network/2024-05-22-http_1_%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>http_1_协议基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Network/2024-05-22-http_1_%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          http_1_协议基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Network/" itemprop="url" rel="index"><span itemprop="name">Network</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>HTTP协议理论基础知识</li>
+</ul>
+<h2 id="分块传输编码"><a href="#分块传输编码" class="headerlink" title="分块传输编码"></a>分块传输编码</h2><ul>
+<li><p>分块传输编码(Chunked transfer encoding)是超文本传输协议（HTTP）中的一种数据传输机制，允许HTTP由网页服务器发送给客户端应用（ 通常是网页浏览器）的数据可以分成多个部分。分块传输编码只在HTTP协议1.1版本（HTTP&#x2F;1.1）中提供。</p>
+</li>
+<li><p>通常，HTTP应答消息中发送的数据是整个发送的，Content-Length消息头字段表示数据的长度。数据的长度很重要，因为客户端需要知道哪里是应答消息的结束，以及后续应答消息的开始。然而，使用分块传输编码，数据分解成一系列数据块，并以一个或多个块发送，这样服务器可以发送数据而不需要预先知道发送内容的总大小。通常数据块的大小是一致的，但也不总是这种情况。</p>
+</li>
+<li><p>分块传输编码的原理</p>
+<ul>
+<li>HTTP分块传输编码允许服务器为动态生成的内容维持HTTP持久链接。通常，持久链接需要服务器在开始发送消息体前发送Content-Length消息头字段，但是对于动态生成的内容来说，在内容创建完之前是不可知的</li>
+<li>分块传输编码允许服务器在最后发送消息头字段。对于那些头字段值在内容被生成之前无法知道的情形非常重要，例如消息的内容要使用散列进行签名，散列的结果通过HTTP消息头字段进行传输。没有分块传输编码时，服务器必须缓冲内容直到完成后计算头字段的值并在发送内容前发送这些头字段的值。</li>
+<li>HTTP服务器有时使用压缩 （gzip或deflate）以缩短传输花费的时间。分块传输编码可以用来分隔压缩对象的多个部分。在这种情况下，块不是分别压缩的，而是整个负载进行压缩，压缩的输出使用本文描述的方案进行分块传输。在压缩的情形中，分块编码有利于一边进行压缩一边发送数据，而不是先完成压缩过程以得知压缩后数据的大小。</li>
+</ul>
+</li>
+<li><p>分块传输编码的格式</p>
+<ul>
+<li>如果一个HTTP消息（包括客户端发送的请求消息或服务器返回的应答消息）的Transfer-Encoding消息头的值为chunked，那么，消息体由数量未定的块组成，并以最后一个大小为0的块为结束</li>
+<li>每一个非空的块都以该块包含数据的字节数（字节数以十六进制表示）开始，跟随一个CRLF （回车及换行），然后是数据本身，最后块CRLF结束。在一些实现中，块大小和CRLF之间填充有白空格（0x20）。</li>
+<li>最后一块是单行，由块大小（0），一些可选的填充白空格，以及CRLF。最后一块不再包含任何数据，但是可以发送可选的尾部，包括消息头字段</li>
+<li>消息最后以CRLF结尾</li>
+</ul>
+</li>
+</ul>
+<h2 id="HTTP-Content-Type"><a href="#HTTP-Content-Type" class="headerlink" title="HTTP Content-Type"></a>HTTP Content-Type</h2><ul>
+<li><p>Content-Type（内容类型），一般是指网页中存在的 Content-Type，用于定义网络文件的类型和网页的编码，决定浏览器将以什么形式、什么编码读取这个文件，这就是经常看到一些 PHP 网页点击的结果却是下载一个文件或一张图片的原因。</p>
+</li>
+<li><p>Content-Type 标头告诉客户端实际返回的内容的内容类型。</p>
+</li>
+<li><p>语法格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Content-Type: multipart/form-data; boundary=something</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>常见的媒体格式类型如下：</p>
+<ul>
+<li>text&#x2F;html ： HTML格式</li>
+<li>text&#x2F;plain ：纯文本格式</li>
+<li>text&#x2F;xml ： XML格式</li>
+<li>image&#x2F;gif ：gif图片格式</li>
+<li>image&#x2F;jpeg ：jpg图片格式</li>
+<li>image&#x2F;png：png图片格式</li>
+</ul>
+</li>
+<li><p>以application开头的媒体格式类型：</p>
+<ul>
+<li>application&#x2F;xhtml+xml ：XHTML格式</li>
+<li>application&#x2F;xml： XML数据格式</li>
+<li>application&#x2F;atom+xml ：Atom XML聚合格式</li>
+<li>application&#x2F;json： JSON数据格式</li>
+<li>application&#x2F;pdf：pdf格式</li>
+<li>application&#x2F;msword ： Word文档格式</li>
+<li>application&#x2F;octet-stream ： 二进制流数据（如常见的文件下载）</li>
+<li>application&#x2F;x-www-form-urlencoded ： <form encType=””>中默认的encType，form表单数据被编码为key&#x2F;value格式发送到服务器（表单默认的提交数据的格式）</li>
+</ul>
+</li>
+<li><p>另外一种常见的媒体格式是上传文件之时使用的：</p>
+</li>
+<li><p>multipart&#x2F;form-data ： 需要在表单中进行文件上传时，就需要使用该格式</p>
+</li>
+</ul>
+<h2 id="HTTP-请求报文"><a href="#HTTP-请求报文" class="headerlink" title="HTTP 请求报文"></a>HTTP 请求报文</h2><p>HTTP 请求报文由请求行（Request Line）、请求头部（Headers）和请求主体（Body）三部分组成。下面是 HTTP 请求报文的一般格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;请求方法&gt; &lt;请求目标&gt; &lt;协议版本&gt;</span><br><span class="line">&lt;请求头部字段&gt;: &lt;值&gt;</span><br><span class="line">&lt;请求头部字段&gt;: &lt;值&gt;</span><br><span class="line">...</span><br><span class="line">&lt;空行&gt;</span><br><span class="line">&lt;请求主体&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中，各部分的含义如下：</p>
+<ol>
+<li>请求方法（Request Method）：表示客户端请求的动作类型，常见的方法有 GET、POST、PUT、DELETE 等。</li>
+<li>请求目标（Request Target）：指定请求的目标资源的位置，可以是一个 URL 或绝对路径。</li>
+<li>协议版本（Protocol Version）：指定所使用的 HTTP 协议的版本，通常是 HTTP&#x2F;1.1 或 HTTP&#x2F;2。</li>
+<li>请求头部字段（Headers）：包含了关于请求的附加信息，每个字段都以字段名和对应的值组成，每个字段占据一行。</li>
+<li>空行：表示请求头部结束的标志，用于与请求主体进行分隔。</li>
+<li>请求主体（Body）：可选的，包含了实际要发送给服务器的数据，比如表单数据或上传的文件内容。</li>
+</ol>
+<p>以下是一个示例 HTTP 请求报文：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /api/users HTTP/1.1</span><br><span class="line">Host: example.com</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 48</span><br><span class="line"></span><br><span class="line">&#123;&quot;username&quot;: &quot;john_doe&quot;, &quot;password&quot;: &quot;secretpassword&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中：</p>
+<ul>
+<li>请求方法为 <code>POST</code>，请求目标为 <code>/api/users</code>，协议版本为 <code>HTTP/1.1</code>。</li>
+<li>请求头部包含了 <code>Host</code>、<code>Content-Type</code> 和 <code>Content-Length</code> 等字段，用于指定主机名、请求体的类型和长度等信息。</li>
+<li>空行表示请求头部结束。</li>
+<li>请求主体为一个 JSON 格式的字符串，包含了用户名和密码的数据。</li>
+</ul>
+<p>请注意，请求报文中的每一行都应该以回车符（\r）和换行符（\n）作为行结束符号。请求头部字段和值之间使用冒号和空格进行分隔（例如 <code>Content-Type: application/json</code>）。</p>
+<p>以上是 HTTP 请求报文的基本结构，实际的请求报文内容和格式会根据具体的请求需求和要求而有所不同。</p>
+<hr>
+<h2 id="HTTP-协议文档"><a href="#HTTP-协议文档" class="headerlink" title="HTTP 协议文档"></a>HTTP 协议文档</h2><p>HTTP协议的官方文档是由互联网工程任务组（IETF）发布的一系列文档，主要包括以下两个规范：</p>
+<ol>
+<li><p>HTTP&#x2F;1.1规范：HTTP&#x2F;1.1是当前广泛使用的HTTP协议版本。其规范文档定义了HTTP&#x2F;1.1协议的语义、语法、请求方法、状态码、首部字段、缓存机制等各个方面的内容。HTTP&#x2F;1.1的规范文档由RFC 2616定义。</p>
+<p>可以通过以下链接访问HTTP&#x2F;1.1的规范文档：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc2616">RFC 2616 - Hypertext Transfer Protocol – HTTP&#x2F;1.1</a></li>
+</ul>
+</li>
+<li><p>HTTP&#x2F;2规范：HTTP&#x2F;2是HTTP协议的下一代版本，旨在提供更高的性能和效率。它引入了二进制协议、多路复用、头部压缩、服务器推送等新特性。HTTP&#x2F;2的规范文档由RFC 7540定义。</p>
+<p>可以通过以下链接访问HTTP&#x2F;2的规范文档：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7540">RFC 7540 - Hypertext Transfer Protocol Version 2 (HTTP&#x2F;2)</a></li>
+</ul>
+</li>
+</ol>
+<p>除了上述主要的HTTP协议规范文档外，IETF还发布了其他与HTTP相关的文档，包括扩展协议、安全性、代理、缓存等方面的规范和建议。</p>
+<p>可以通过IETF的官方网站访问这些文档的在线版本：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://datatracker.ietf.org/wg/httpbis/documents/">IETF - Hypertext Transfer Protocol (HTTP) Working Group</a></li>
+</ul>
+<p>注意：HTTP&#x2F;1.1的规范文档（RFC 2616）发布于1999年，并于2014年被废弃。后续对HTTP&#x2F;1.1的修订和更新工作由HTTPbis工作组负责，并将最新的规范文档发布为一系列独立的RFC文档。因此，最新的HTTP&#x2F;1.1规范文档应该参考HTTPbis工作组发布的相关文档。</p>
+<hr>
+<h2 id="HTTP-表单是什么"><a href="#HTTP-表单是什么" class="headerlink" title="HTTP 表单是什么"></a>HTTP 表单是什么</h2><p>HTTP表单（HTTP form）是一种用于在Web应用程序中收集和提交用户数据的机制。它是基于HTTP协议的一种数据传输方式，通过在Web页面上展示给用户一组输入字段（例如文本框、复选框、下拉列表等），用户可以在这些字段中输入数据，并将数据提交到服务器进行处理。</p>
+<p>HTTP表单常用于实现用户注册、登录、搜索、提交评论等交互性操作。用户在表单中输入数据后，通过点击提交按钮，表单数据将被封装为HTTP请求发送给服务器。服务器接收到请求后，可以解析表单数据，并根据需要进行相应的处理，例如保存数据到数据库、执行搜索操作、生成动态内容等。</p>
+<p>HTTP表单通过使用HTML（Hypertext Markup Language）和一些特定的表单元素来定义和呈现表单。HTML表单元素包括<code>&lt;form&gt;</code>标签、<code>&lt;input&gt;</code>标签、<code>&lt;select&gt;</code>标签、<code>&lt;textarea&gt;</code>标签等，它们用于定义表单的结构、各种输入字段以及提交按钮。</p>
+<p>在提交表单时，可以使用不同的HTTP请求方法，常见的有GET和POST方法。GET方法将表单数据附加在URL的查询字符串中，而POST方法将表单数据包含在请求的主体中。这取决于表单的性质和数据的敏感性。</p>
+<p>在服务器端，可以使用不同的技术（如PHP、Python、Java等）来处理接收到的表单数据。这些技术提供了解析和处理表单数据的函数、类或库，使开发人员能够轻松地处理表单提交的数据，并进行相应的业务逻辑操作。</p>
+<p>总结起来，HTTP表单是一种用于在Web应用程序中收集和提交用户数据的机制，它利用HTML表单元素定义和呈现表单，通过HTTP协议将用户输入的数据发送到服务器进行处理。</p>
+<hr>
+<h2 id="HTTP协议-表单数据"><a href="#HTTP协议-表单数据" class="headerlink" title="HTTP协议 表单数据"></a>HTTP协议 表单数据</h2><p>HTTP 协议中的表单数据是通过 POST 请求或 GET 请求来传输的，具体的格式和处理方式如下：</p>
+<ol>
+<li><p>GET 请求传输表单数据：</p>
+<ul>
+<li>表单数据会被附加在 URL 的查询字符串中，即通过 URL 参数传递。</li>
+<li>数据以键值对的形式出现，使用<code>key=value</code>的格式。</li>
+<li>多个键值对之间使用<code>&amp;</code>符号进行分隔。</li>
+</ul>
+</li>
+<li><p>POST 请求传输表单数据：</p>
+<ul>
+<li>表单数据会被放置在请求体中，并通过 Content-Type 头部指定数据的编码方式，常见的编码方式有 application&#x2F;x-www-form-urlencoded 和 multipart&#x2F;form-data。</li>
+<li>application&#x2F;x-www-form-urlencoded 编码方式：<ul>
+<li>表单数据以键值对的形式出现，使用<code>key=value</code>的格式。</li>
+<li>多个键值对之间使用<code>&amp;</code>符号进行分隔。</li>
+</ul>
+</li>
+<li>multipart&#x2F;form-data 编码方式：<ul>
+<li>表单数据会以多部分的形式进行传输。</li>
+<li>每个部分都有自己的头部信息，包括 Content-Disposition 和 Content-Type。</li>
+<li>表单字段会出现在各自的部分中，以字段名作为标识。</li>
+<li>文件上传时，文件数据会以二进制形式出现在对应的部分中。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>对于服务器端的处理，常见的 Web 框架会提供相应的解析和处理表单数据的功能，开发者可以根据框架的文档和要求来编写处理表单数据的代码。</p>
+<p>需要注意的是，HTTP 协议的表单数据传输并不加密，因此在传输敏感信息时应使用安全的 HTTPS 协议来保护数据的安全性。</p>
+<h2 id="application-x-www-form-urlencoded-详解"><a href="#application-x-www-form-urlencoded-详解" class="headerlink" title="application&#x2F;x-www-form-urlencoded 详解"></a>application&#x2F;x-www-form-urlencoded 详解</h2><p><code>application/x-www-form-urlencoded</code>是一种常见的MIME类型，用于在HTTP请求中传输表单数据。它是一种URL编码的数据格式，适用于通过HTTP POST请求将表单数据发送到服务器。</p>
+<p>详细解释<code>application/x-www-form-urlencoded</code>的含义如下：</p>
+<ol>
+<li><p>数据格式：<code>application/x-www-form-urlencoded</code>表示表单数据以URL编码的形式进行传输。它使用特定的编码规则将表单字段和值进行编码，并使用”&amp;”符号分隔字段。例如，假设有一个表单字段<code>name</code>的值为<code>John Doe</code>，编码后的数据格式将是<code>name=John%20Doe</code>。</p>
+</li>
+<li><p>字符编码：<code>application/x-www-form-urlencoded</code>使用URL编码对特殊字符进行转义。这样可以确保数据能够在HTTP请求中正确传输，不会被解析为URL的特殊字符或者参数分隔符。</p>
+</li>
+<li><p>请求方法：<code>application/x-www-form-urlencoded</code>通常与HTTP POST请求方法一起使用。表单数据会被封装在请求的主体部分，并以<code>key=value</code>的形式进行传输。服务器端可以根据具体的编程语言或框架，解析这些键值对数据并进行处理。</p>
+</li>
+<li><p>Content-Type头部：在HTTP请求中，<code>Content-Type</code>头部用于指定请求主体的媒体类型。当使用<code>application/x-www-form-urlencoded</code>传输表单数据时，可以设置<code>Content-Type</code>头部为<code>application/x-www-form-urlencoded</code>来标识数据格式。</p>
+</li>
+</ol>
+<p>使用示例：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/submit-form</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>example.com</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line"><span class="language-apache"><span class="attribute">name</span>=John%<span class="number">20</span>Doe&amp;email=johndoe%<span class="number">40</span>example.com&amp;message=Hello%<span class="number">20</span>World</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，我们通过HTTP POST请求将表单数据发送到<code>example.com/submit-form</code>路径。请求头部指定了<code>Content-Type: application/x-www-form-urlencoded</code>，表示表单数据以<code>application/x-www-form-urlencoded</code>格式进行传输。请求主体部分包含了编码后的表单数据。</p>
+<p>总结：<code>application/x-www-form-urlencoded</code>是一种URL编码的数据格式，常用于HTTP POST请求中传输表单数据。它使用特定的编码规则对字段和值进行编码，并以<code>key=value</code>的形式传输数据。服务器端可以根据Content-Type头部为<code>application/x-www-form-urlencoded</code>来解析和处理这些数据。</p>
+<hr>
+<h2 id="HTTP协议-响应报文"><a href="#HTTP协议-响应报文" class="headerlink" title="HTTP协议 响应报文"></a>HTTP协议 响应报文</h2><p>HTTP协议中的响应报文包含多个字段，每个字段都有特定的作用和含义。以下是HTTP响应报文中常见的字段及其详细解释：</p>
+<ol>
+<li><p>状态行（Status Line）：状态行包含了HTTP协议的版本号、状态码和状态消息。它的格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br></pre></td></tr></table></figure>
+<p>其中，<code>HTTP/1.1</code>表示使用的HTTP版本号，<code>200</code>是状态码，<code>OK</code>是状态消息。</p>
+</li>
+<li><p>响应头（Response Headers）：响应头包含了关于响应的附加信息。它的格式为<code>字段名: 值</code>，每个字段占据一行。常见的响应头字段包括：</p>
+<ul>
+<li><code>Content-Type</code>：指定响应体的媒体类型，例如<code>text/html</code>表示HTML文档。</li>
+<li><code>Content-Length</code>：指定响应体的长度，以字节为单位。</li>
+<li><code>Date</code>：指定响应发送的日期和时间。</li>
+<li><code>Server</code>：指定服务器的软件名称和版本号。</li>
+<li><code>Set-Cookie</code>：用于在客户端存储会话信息的HTTP Cookie。</li>
+</ul>
+</li>
+<li><p>空行（Blank Line）：空行用于分隔响应头和响应体。</p>
+</li>
+<li><p>响应体（Response Body）：响应体包含了实际的响应数据，例如网页的HTML内容或者文件的内容。</p>
+</li>
+</ol>
+<p>需要注意的是，除了以上常见的字段之外，HTTP响应报文还可以包含其他自定义的字段，具体的字段内容和含义可以根据应用程序和服务器的需求进行定义和解析。</p>
+<hr>
+<h2 id="HTTP-Cache-Control"><a href="#HTTP-Cache-Control" class="headerlink" title="HTTP Cache-Control"></a>HTTP Cache-Control</h2><p>HTTP的Cache-Control字段用于控制缓存的行为，指示缓存如何处理响应以及如何在将来的请求中使用缓存。Cache-Control字段可以在HTTP请求头和响应头中使用。</p>
+<p>在HTTP请求头中，Cache-Control字段用于指示客户端对服务器的请求希望如何进行缓存。常见的指令包括：</p>
+<ul>
+<li><code>no-cache</code>：表示客户端要求服务器每次都提供最新的响应，不使用缓存副本。</li>
+<li><code>no-store</code>：表示客户端和中间缓存都不应该存储请求或响应的任何副本。</li>
+<li><code>max-age=&lt;seconds&gt;</code>：表示响应的有效时间，以秒为单位。客户端可以在这个时间内使用缓存副本而不向服务器发起新的请求。</li>
+<li><code>min-fresh=&lt;seconds&gt;</code>：表示客户端希望在指定的时间内获取新的响应，而不使用缓存。如果缓存的响应的新鲜度低于指定的时间，客户端将向服务器发起新的请求。</li>
+<li><code>max-stale[=&lt;seconds&gt;]</code>：表示客户端允许使用过期的缓存副本，即使超过了缓存的有效时间。可选的秒数表示允许的最大过期时间。</li>
+<li><code>only-if-cached</code>：表示客户端只接受缓存的响应，不向服务器发起新的请求。</li>
+</ul>
+<p>在HTTP响应头中，Cache-Control字段用于指示缓存如何处理响应。常见的指令包括：</p>
+<ul>
+<li><code>public</code>：表示响应可以被任何缓存（包括客户端和中间缓存）缓存。</li>
+<li><code>private</code>：表示响应只能被客户端缓存，中间缓存不能缓存该响应。</li>
+<li><code>no-cache</code>：表示响应可以被缓存，但必须先与服务器确认其有效性。</li>
+<li><code>no-store</code>：表示响应不能被缓存，客户端和中间缓存都不应该存储该响应。</li>
+<li><code>max-age=&lt;seconds&gt;</code>：表示响应的有效时间，以秒为单位。</li>
+<li><code>s-maxage=&lt;seconds&gt;</code>：表示响应在共享缓存（如代理服务器）中的有效时间，以秒为单位。</li>
+</ul>
+<p>以上是Cache-Control字段的一些常见指令和用法，可以根据具体的需求和情况进行灵活设置，以实现更好的缓存控制和性能优化。</p>
+<hr>
+<h2 id="HTTP-Cache-control-must-revalidate"><a href="#HTTP-Cache-control-must-revalidate" class="headerlink" title="HTTP Cache-control must-revalidate"></a>HTTP Cache-control must-revalidate</h2><p>HTTP头字段”Cache-Control: must-revalidate”用于指示客户端在使用缓存响应之前必须与服务器进行重新验证，即使缓存的响应具有新鲜的过期时间。</p>
+<p>当响应中包含”Cache-Control: must-revalidate”指令时，意味着缓存的响应在未经服务器重新验证之前不应被视为有效。客户端必须向服务器发送一个条件请求（通常是带有”If-Modified-Since”或”If-None-Match”头字段），以检查缓存的响应是否仍然有效。</p>
+<p>如果服务器以304 Not Modified状态码响应，表示缓存的响应仍然有效，客户端可以使用缓存副本。然而，如果服务器响应了新版本的资源或不同的状态码，客户端需要相应地更新其缓存。</p>
+<p>“Cache-Control: must-revalidate”指令在确保缓存的响应是最新且准确的情况下非常有用。通过要求重新验证，它有助于保持客户端和服务器之间的数据一致性。</p>
+<p>以下是带有”Cache-Control: must-revalidate”指令的HTTP响应头的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Cache-Control: must-revalidate</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，”Cache-Control: must-revalidate”头字段指示客户端在使用缓存响应之前必须重新验证。</p>
+<p>需要注意的是，”must-revalidate”只是Cache-Control头字段的一个指令，还可以有其他指令，如”max-age”或”no-cache”等，用于修改缓存行为。这些指令的组合可以提供对特定资源的缓存处理进行精细控制。</p>
+<hr>
+<h2 id="HTTP-Cache-control-max-age"><a href="#HTTP-Cache-control-max-age" class="headerlink" title="HTTP Cache-control max-age"></a>HTTP Cache-control max-age</h2><p>HTTP头字段”Cache-Control: max-age”用于指定缓存的响应在被认为过期之前的最长时间（以秒为单位）。</p>
+<p>“max-age”指令用于定义响应的新鲜度期限，即客户端可以在该期限内使用缓存的响应而无需向服务器发送请求。如果一个资源的缓存副本在”max-age”指定的时间内仍然有效，则客户端可以使用该缓存副本而无需向服务器进行请求。</p>
+<p>以下是一个使用”Cache-Control: max-age”的HTTP响应头的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Cache-Control: max-age=3600</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，”Cache-Control: max-age&#x3D;3600”指示客户端可以在3600秒（1小时）内使用该缓存的响应而无需向服务器发送请求。如果在此期限内发起的请求与此资源相关，则客户端可以直接使用缓存副本。</p>
+<p>“max-age”指令是相对于响应的日期和时间来计算的。当客户端接收到带有”max-age”指令的响应时，它会根据响应的日期和时间以及”max-age”指定的秒数来计算出响应的有效期限。</p>
+<p>需要注意以下几点：</p>
+<ol>
+<li><p>“max-age”指令优先级高于其他指令，如”no-cache”或”must-revalidate”。如果同时存在这些指令，”max-age”会覆盖它们。</p>
+</li>
+<li><p>“max-age”指令不依赖于服务器的时间，而是依赖于响应中的日期和时间。这可以避免因为客户端和服务器之间的时钟不一致而导致缓存失效。</p>
+</li>
+<li><p>如果同时存在”Expires”头字段和”max-age”指令，”max-age”优先级更高。”max-age”用于指定相对时间，而”Expires”用于指定绝对时间。</p>
+</li>
+</ol>
+<p>总结起来，”Cache-Control: max-age”指令用于指定缓存的响应在被认为过期之前的最长时间。客户端可以在指定的时间内使用缓存副本而无需发送请求。这可以提高性能并减轻服务器负载，特别是对于不经常更改的静态资源。</p>
+<hr>
+<h2 id="HTTP-Pragma"><a href="#HTTP-Pragma" class="headerlink" title="HTTP Pragma"></a>HTTP Pragma</h2><p>HTTP Pragma字段是一种HTTP头字段，用于向服务器传递特定的指令或控制信息。它是HTTP&#x2F;1.0版本中引入的，目的是为了提供与缓存相关的指令。</p>
+<p>在HTTP请求头中，Pragma字段可以用于向服务器发送请求指令。在实践中，Pragma字段很少被使用，因为在HTTP&#x2F;1.1中引入了更强大和灵活的Cache-Control字段来管理缓存。常见的Pragma指令包括：</p>
+<ul>
+<li><code>no-cache</code>：表示客户端要求服务器每次都提供最新的响应，不使用缓存副本。与Cache-Control中的<code>no-cache</code>指令功能类似。</li>
+</ul>
+<p>在HTTP响应头中，Pragma字段用于向客户端传递响应的指令或信息。在实践中，Pragma字段同样很少被使用，因为Cache-Control字段已经提供了更广泛和强大的缓存控制功能。</p>
+<p>需要注意的是，HTTP&#x2F;1.1规范中建议不再使用Pragma字段来控制缓存，而是使用Cache-Control字段。因此，当处理HTTP协议时，应优先考虑Cache-Control字段，而将Pragma字段视为过时和不推荐使用的。</p>
+<hr>
+<h2 id="HTTP-Expires"><a href="#HTTP-Expires" class="headerlink" title="HTTP Expires"></a>HTTP Expires</h2><p>HTTP Expires字段是一种响应头字段，用于指定响应的过期时间。它告诉客户端在过期时间之前可以直接使用缓存的响应，而无需向服务器发起新的请求。</p>
+<p>Expires字段的值是一个日期时间，表示响应的过期时间点。客户端可以在该时间点之前使用缓存的响应。如果客户端在过期时间之后发起请求，缓存将被视为无效，客户端需要向服务器获取最新的响应。</p>
+<p>例如，下面是一个使用Expires字段的响应头示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Expires: Thu, 17 Jun 2023 12:00:00 GMT</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，Expires字段的值是”Thu, 17 Jun 2023 12:00:00 GMT”，表示响应的过期时间为2023年6月17日12:00:00 GMT。在过期时间之前，客户端可以直接使用缓存的响应。</p>
+<p>需要注意的是，Expires字段的缺点是它使用的是服务器的时间，而客户端的时间可能与服务器的时间不一致。为了解决这个问题，HTTP&#x2F;1.1引入了Cache-Control字段，其中的<code>max-age</code>指令提供了更可靠的缓存过期时间控制，并以秒为单位指定相对时间。相比之下，Expires字段更适用于在HTTP&#x2F;1.0环境下进行缓存控制。在HTTP&#x2F;1.1中，Cache-Control字段被认为是更优先和更可靠的缓存控制机制。</p>
+<hr>
+<h2 id="HTTP-Content-Type-1"><a href="#HTTP-Content-Type-1" class="headerlink" title="HTTP Content-Type"></a>HTTP Content-Type</h2><p>HTTP Content-Type是一种HTTP头字段，用于指示传输的实体（如请求体或响应体）的媒体类型（Media Type）。它告诉接收方如何解析和处理实体的内容。</p>
+<p>Content-Type字段通常出现在HTTP请求头和响应头中。在请求头中，它指示客户端发送的实体的媒体类型。在响应头中，它指示服务器返回的实体的媒体类型。</p>
+<p>Content-Type字段的值通常由两部分组成：</p>
+<ol>
+<li>主类型（Main Type）：表示实体的大类，例如文本（text）、图像（image）、音频（audio）、视频（video）、应用程序（application）等。</li>
+<li>子类型（Sub Type）：表示主类型下的具体细分，例如文本可以是纯文本（plain）或HTML文档（html），图像可以是JPEG（jpeg）或PNG（png）等。</li>
+</ol>
+<p>Content-Type字段的格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: 主类型/子类型</span><br></pre></td></tr></table></figure>
+
+<p>例如，下面是一些常见的Content-Type值示例：</p>
+<ul>
+<li>文本类型：<ul>
+<li>纯文本：<code>text/plain</code></li>
+<li>HTML文档：<code>text/html</code></li>
+<li>XML文档：<code>text/xml</code></li>
+</ul>
+</li>
+<li>图像类型：<ul>
+<li>JPEG图像：<code>image/jpeg</code></li>
+<li>PNG图像：<code>image/png</code></li>
+<li>GIF图像：<code>image/gif</code></li>
+</ul>
+</li>
+<li>音频类型：<ul>
+<li>MP3音频：<code>audio/mpeg</code></li>
+<li>WAV音频：<code>audio/wav</code></li>
+</ul>
+</li>
+<li>视频类型：<ul>
+<li>MPEG视频：<code>video/mpeg</code></li>
+<li>MP4视频：<code>video/mp4</code></li>
+</ul>
+</li>
+<li>应用程序类型：<ul>
+<li>JSON数据：<code>application/json</code></li>
+<li>PDF文档：<code>application/pdf</code></li>
+</ul>
+</li>
+</ul>
+<p>通过Content-Type字段，客户端和服务器可以彼此了解和解释实体的内容类型，从而正确处理和解析数据。这对于正确显示网页、处理文件上传、进行API通信等非常重要。</p>
+<h2 id="HTTP-Content-Type-multipart-x-mixed-replace"><a href="#HTTP-Content-Type-multipart-x-mixed-replace" class="headerlink" title="HTTP Content-Type multipart&#x2F;x-mixed-replace"></a>HTTP Content-Type multipart&#x2F;x-mixed-replace</h2><p>HTTP Content-Type字段中的<code>multipart/x-mixed-replace</code>是一种特殊的媒体类型，用于在单个HTTP响应中连续发送多个部分（或实体）。它常用于实时流式传输或服务器推送，其中每个部分都代表一个独立的数据块或事件。</p>
+<p><code>multipart/x-mixed-replace</code>的工作原理是，服务器发送一系列的部分，每个部分都有自己的Content-Type和内容。接收方（通常是浏览器）会逐个解析和处理这些部分，并按照其各自的Content-Type进行相应的处理。</p>
+<p>每个部分由一个唯一的分隔符（boundary）分隔。分隔符是一个随机生成的字符串，用于标识部分的起始和结束。在响应中，Content-Type字段中的boundary参数指定了分隔符。</p>
+<p>下面是一个示例HTTP响应头，展示了使用<code>multipart/x-mixed-replace</code>的格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: multipart/x-mixed-replace; boundary=boundary123</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>multipart/x-mixed-replace</code>指定了响应使用该媒体类型。<code>boundary=boundary123</code>指定了分隔符为”boundary123”。</p>
+<p>响应体的内容将按照以下格式进行发送：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">--boundary123</span><br><span class="line">Content-Type: image/jpeg</span><br><span class="line"></span><br><span class="line">&lt;JPEG image data&gt;</span><br><span class="line">--boundary123</span><br><span class="line">Content-Type: text/plain</span><br><span class="line"></span><br><span class="line">Some text data</span><br><span class="line">--boundary123--</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，首先发送了一个JPEG图像部分，然后是一个纯文本部分。每个部分都以<code>--boundary123</code>开头，并以<code>--boundary123--</code>表示结束。</p>
+<p>客户端会解析每个部分，并根据各自的Content-Type进行相应的处理，例如显示图像或显示文本数据。</p>
+<p><code>multipart/x-mixed-replace</code>的特点是，在接收到一个部分后，客户端会立即丢弃之前接收到的部分。这使得它适用于实时更新的场景，如视频流、监控摄像头等，因为客户端只处理最新的部分，而不会保留之前的部分。</p>
+<p>注意：由于<code>multipart/x-mixed-replace</code>在HTTP&#x2F;1.1中没有官方标准，不同的实现可能会有差异。因此，对于具体使用情况，最好查阅相关文档或参考实现的要求。</p>
+<hr>
+<h2 id="HTTP-Content-Length"><a href="#HTTP-Content-Length" class="headerlink" title="HTTP Content-Length"></a>HTTP Content-Length</h2><p>HTTP Content-Length是一个HTTP响应头字段，用于指示响应体的长度（以字节为单位）。它告诉接收方在接收完指定长度的数据后停止接收，可以用于确定完整的响应体的大小。</p>
+<p>Content-Length字段的值是一个十进制整数，表示响应体的字节长度。例如，Content-Length: 1024表示响应体的长度为1024字节。</p>
+<p>使用Content-Length字段的好处是接收方可以根据指定的长度来正确读取和处理响应体。这在处理固定长度的数据时非常有用，如文件下载、二进制数据传输等。</p>
+<p>以下是一个使用Content-Length字段的HTTP响应头示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 4096</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，Content-Length字段的值为4096，表示响应体的长度为4096字节。</p>
+<p>需要注意的是，Content-Length字段仅适用于具有确定长度的响应体。对于动态生成的或以流式传输的方式提供的响应，Content-Length字段可能无法准确指示响应体的总长度。在这种情况下，通常使用分块传输编码（chunked transfer encoding）或其他适当的机制来指示响应体的传输方式和结束。</p>
+<p>另外，Content-Length字段通常不会出现在HTTP请求头中，因为请求体的长度往往由客户端动态确定，并在请求头中使用Transfer-Encoding或其他字段进行传输长度的指示。</p>
+<hr>
+<h2 id="HTTP-Connection"><a href="#HTTP-Connection" class="headerlink" title="HTTP Connection"></a>HTTP Connection</h2><p>HTTP Connection字段（或头字段）是一个HTTP请求头和响应头中的字段，用于指示是否需要在请求或响应完成后关闭TCP连接或保持连接打开。</p>
+<p>在HTTP&#x2F;1.0中，Connection字段的值可以是”keep-alive”或”close”，分别表示保持连接打开或关闭连接。如果使用”keep-alive”，则表示客户端或服务器希望保持TCP连接打开，以便在后续请求或响应中复用该连接。如果使用”close”，则表示请求或响应完成后关闭连接。</p>
+<p>以下是一个示例，在HTTP&#x2F;1.0中使用Connection字段的请求头和响应头：</p>
+<p>请求头：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /example HTTP/1.0</span><br><span class="line">Host: www.example.com</span><br><span class="line">Connection: keep-alive</span><br></pre></td></tr></table></figure>
+
+<p>响应头：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.0 200 OK</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br><span class="line">Connection: close</span><br></pre></td></tr></table></figure>
+
+<p>在HTTP&#x2F;1.1中，Connection字段的语义有所变化。它成为一个逐跳（hop-by-hop）头字段，用于指示仅对单个连接有效，而不是整个传输链路。常见的Connection字段值包括：</p>
+<ul>
+<li>“keep-alive”：表示请求或响应后保持连接打开，以便进行后续请求或响应的复用。</li>
+<li>“close”：表示请求或响应完成后关闭连接。</li>
+<li>其他特定的头字段：表示请求或响应中有特定的头字段需要逐跳处理，如”Upgrade”、”Transfer-Encoding”等。</li>
+</ul>
+<p>以下是一个示例，在HTTP&#x2F;1.1中使用Connection字段的请求头和响应头：</p>
+<p>请求头：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /example HTTP/1.1</span><br><span class="line">Host: www.example.com</span><br><span class="line">Connection: keep-alive</span><br></pre></td></tr></table></figure>
+
+<p>响应头：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br><span class="line">Connection: close</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，HTTP&#x2F;1.1默认使用持久连接（persistent connection），即默认情况下会保持连接打开。如果不希望保持连接打开，可以在请求头或响应头中使用”Connection: close”指示关闭连接。</p>
+<p>在HTTP&#x2F;2中，Connection字段被废弃，取而代之的是使用专门的帧（frame）来管理连接的生命周期。连接的打开和关闭由协议自身管理，而不需要应用层显式地指示。</p>
+<p>总之，HTTP Connection字段用于指示是否保持连接打开或关闭，具体的语义和行为取决于HTTP协议版本和字段的值。</p>
+<hr>
+<h2 id="HTTP-响应报文字段Server"><a href="#HTTP-响应报文字段Server" class="headerlink" title="HTTP 响应报文字段Server"></a>HTTP 响应报文字段Server</h2><p>HTTP响应报文中的<code>Server</code>字段是一个可选的响应头字段，用于指示提供HTTP响应的服务器软件或应用程序的名称和版本信息。</p>
+<p><code>Server</code>字段的值通常是服务器软件的名称和版本号的组合。例如，<code>Server: Apache/2.4.29</code>表示使用的是Apache HTTP Server软件的2.4.29版本。</p>
+<p>这个字段可以提供有关服务器的一些信息，但并不是强制要求的，因此服务器可以选择是否在响应中包含<code>Server</code>字段。</p>
+<p>以下是一个示例HTTP响应头，展示了使用<code>Server</code>字段的格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: Apache/2.4.29</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>Server: Apache/2.4.29</code>指示服务器使用的是Apache HTTP Server软件的2.4.29版本。</p>
+<p>需要注意的是，由于<code>Server</code>字段提供了有关服务器的信息，因此在安全性方面需要谨慎处理。恶意用户可能会利用这些信息来进行攻击或针对特定的服务器漏洞。</p>
+<p>出于安全性的考虑，一些服务器管理员可能选择隐藏或修改<code>Server</code>字段的值，以减少被攻击的风险。这可以通过配置服务器软件或使用专门的安全模块来实现。</p>
+<p>总结：<code>Server</code>字段是HTTP响应报文中的一个可选字段，用于指示提供响应的服务器软件或应用程序的名称和版本信息。它提供了有关服务器的一些信息，但在安全性方面需要注意保护。</p>
+<hr>
+<h2 id="HTTP-Access-Control-Allow-Origin"><a href="#HTTP-Access-Control-Allow-Origin" class="headerlink" title="HTTP Access-Control-Allow-Origin"></a>HTTP Access-Control-Allow-Origin</h2><p>HTTP Access-Control-Allow-Origin是一个HTTP响应头字段，用于指示允许访问资源的跨域请求源。</p>
+<p>在跨域资源共享（CORS）机制中，浏览器会在发送跨域请求时向服务器发送一个预检请求（OPTIONS请求），以确定是否允许该跨域请求。服务器在预检请求的响应中可以包含Access-Control-Allow-Origin字段，用于指定允许访问资源的来源。</p>
+<p>Access-Control-Allow-Origin字段的值可以是以下三种情况之一：</p>
+<ol>
+<li><p>具体的源：可以指定一个具体的来源，例如<code>Access-Control-Allow-Origin: https://www.example.com</code>，表示只允许来自<code>https://www.example.com</code>的请求访问资源。</p>
+</li>
+<li><p>通配符（*）：可以使用通配符来表示允许任何来源的请求访问资源，例如<code>Access-Control-Allow-Origin: *</code>。</p>
+</li>
+<li><p>不包含该字段：如果响应中不包含Access-Control-Allow-Origin字段，或者该字段的值为空，浏览器会阻止跨域请求访问资源。</p>
+</li>
+</ol>
+<p>需要注意的是，服务器返回的Access-Control-Allow-Origin字段仅在预检请求的响应中才起作用。对于实际的跨域请求，浏览器会根据预检请求中的结果来判断是否允许访问资源。</p>
+<p>以下是一个示例，展示了Access-Control-Allow-Origin字段的使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Access-Control-Allow-Origin: https://www.example.com</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，Access-Control-Allow-Origin字段的值为<code>https://www.example.com</code>，表示只允许来自该来源的请求访问资源。</p>
+<p>通过设置Access-Control-Allow-Origin字段，服务器可以控制哪些跨域请求被允许访问资源，提供了一种基于服务器端的跨域访问控制机制。</p>
+<hr>
+<h2 id="HTTP-Access-Control-Allow-Methods"><a href="#HTTP-Access-Control-Allow-Methods" class="headerlink" title="HTTP Access-Control-Allow-Methods"></a>HTTP Access-Control-Allow-Methods</h2><p>HTTP Access-Control-Allow-Methods是一个HTTP响应头字段，用于指示服务器支持的跨域请求方法。</p>
+<p>在跨域资源共享（CORS）机制中，浏览器会发送一个预检请求（OPTIONS请求）到服务器，以确定是否允许特定跨域请求。预检请求中会包含一个Access-Control-Request-Method字段，用于指示实际请求所使用的方法（如GET、POST、PUT、DELETE等）。</p>
+<p>服务器在预检请求的响应中可以包含Access-Control-Allow-Methods字段，用于指示服务器支持的跨域请求方法。</p>
+<p>Access-Control-Allow-Methods字段的值是一个逗号分隔的HTTP方法列表，表示服务器允许的跨域请求方法。例如，<code>Access-Control-Allow-Methods: GET, POST, PUT</code>表示服务器允许使用GET、POST和PUT方法的跨域请求。</p>
+<p>以下是一个示例，展示了Access-Control-Allow-Methods字段的使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Access-Control-Allow-Origin: https://www.example.com</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, PUT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Content-Length: 1024</span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，Access-Control-Allow-Methods字段的值为<code>GET, POST, PUT</code>，表示服务器支持GET、POST和PUT方法的跨域请求。</p>
+<p>通过设置Access-Control-Allow-Methods字段，服务器可以明确指定支持的跨域请求方法，从而对跨域请求进行细粒度的控制。</p>
+<p>需要注意的是，Access-Control-Allow-Methods字段只在预检请求的响应中起作用。对于实际的跨域请求，浏览器会根据预检请求的结果来判断是否允许使用特定的请求方法。</p>
+<p>此外，服务器还可以使用其他相关的响应头字段，如Access-Control-Allow-Headers和Access-Control-Allow-Credentials，来进一步控制和配置跨域资源共享。</p>
+<p>总结：HTTP Access-Control-Allow-Methods是一个HTTP响应头字段，用于指示服务器支持的跨域请求方法。通过设置该字段，服务器可以明确指定允许的跨域请求方法，实现跨域资源共享的细粒度控制。</p>
+<hr>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Network/2024-05-22-%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87%E5%9F%BA%E7%A1%80/" rel="prev" title="网络设备基础">
+      <i class="fa fa-chevron-left"></i> 网络设备基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Math/2024-05-22-%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/" rel="next" title="线性代数">
+      线性代数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">分块传输编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Content-Type"><span class="nav-number">3.</span> <span class="nav-text">HTTP Content-Type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87"><span class="nav-number">4.</span> <span class="nav-text">HTTP 请求报文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E5%8D%8F%E8%AE%AE%E6%96%87%E6%A1%A3"><span class="nav-number">5.</span> <span class="nav-text">HTTP 协议文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E8%A1%A8%E5%8D%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">6.</span> <span class="nav-text">HTTP 表单是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP%E5%8D%8F%E8%AE%AE-%E8%A1%A8%E5%8D%95%E6%95%B0%E6%8D%AE"><span class="nav-number">7.</span> <span class="nav-text">HTTP协议 表单数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#application-x-www-form-urlencoded-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">application&#x2F;x-www-form-urlencoded 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP%E5%8D%8F%E8%AE%AE-%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87"><span class="nav-number">9.</span> <span class="nav-text">HTTP协议 响应报文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Cache-Control"><span class="nav-number">10.</span> <span class="nav-text">HTTP Cache-Control</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Cache-control-must-revalidate"><span class="nav-number">11.</span> <span class="nav-text">HTTP Cache-control must-revalidate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Cache-control-max-age"><span class="nav-number">12.</span> <span class="nav-text">HTTP Cache-control max-age</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Pragma"><span class="nav-number">13.</span> <span class="nav-text">HTTP Pragma</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Expires"><span class="nav-number">14.</span> <span class="nav-text">HTTP Expires</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Content-Type-1"><span class="nav-number">15.</span> <span class="nav-text">HTTP Content-Type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Content-Type-multipart-x-mixed-replace"><span class="nav-number">16.</span> <span class="nav-text">HTTP Content-Type multipart&#x2F;x-mixed-replace</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Content-Length"><span class="nav-number">17.</span> <span class="nav-text">HTTP Content-Length</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Connection"><span class="nav-number">18.</span> <span class="nav-text">HTTP Connection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87%E5%AD%97%E6%AE%B5Server"><span class="nav-number">19.</span> <span class="nav-text">HTTP 响应报文字段Server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Access-Control-Allow-Origin"><span class="nav-number">20.</span> <span class="nav-text">HTTP Access-Control-Allow-Origin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Access-Control-Allow-Methods"><span class="nav-number">21.</span> <span class="nav-text">HTTP Access-Control-Allow-Methods</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

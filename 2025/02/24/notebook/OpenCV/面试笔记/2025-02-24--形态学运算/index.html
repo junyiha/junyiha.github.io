@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 OpenCV 形态学运算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV 形态学运算">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/24/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-24--%E5%BD%A2%E6%80%81%E5%AD%A6%E8%BF%90%E7%AE%97/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 OpenCV 形态学运算">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-24T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.449Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/24/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-24--%E5%BD%A2%E6%80%81%E5%AD%A6%E8%BF%90%E7%AE%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>OpenCV 形态学运算 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/24/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-24--%E5%BD%A2%E6%80%81%E5%AD%A6%E8%BF%90%E7%AE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenCV 形态学运算
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-24 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-24T09:00:00+08:00">2025-02-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>OpenCV 形态学运算</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="详细解释形态学运算"><a href="#详细解释形态学运算" class="headerlink" title="详细解释形态学运算"></a>详细解释形态学运算</h2><h3 id="形态学运算（Mathematical-Morphology）详细解析"><a href="#形态学运算（Mathematical-Morphology）详细解析" class="headerlink" title="形态学运算（Mathematical Morphology）详细解析"></a><strong>形态学运算（Mathematical Morphology）详细解析</strong></h3><h4 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a><strong>1. 概述</strong></h4><p>形态学运算是一种基于集合论和拓扑学的图像处理技术，主要用于分析和处理二值图像和灰度图像。它主要通过结构元素（Structuring Element, SE）对图像进行形态变换，从而提取图像中的几何结构，如边缘、骨架、连通区域等。</p>
+<h4 id="2-基本操作"><a href="#2-基本操作" class="headerlink" title="2. 基本操作"></a><strong>2. 基本操作</strong></h4><p>形态学运算的核心是<strong>膨胀（Dilation）</strong>和<strong>腐蚀（Erosion）</strong>，基于这两个基本操作，可以构造更复杂的形态学变换，如<strong>开运算（Opening）</strong>和<strong>闭运算（Closing）</strong>。</p>
+<h5 id="2-1-腐蚀（Erosion）"><a href="#2-1-腐蚀（Erosion）" class="headerlink" title="2.1 腐蚀（Erosion）"></a><strong>2.1 腐蚀（Erosion）</strong></h5><p>腐蚀操作用于去除图像中的小区域或细小的物体，使得前景（白色区域）收缩。</p>
+<p><strong>定义</strong>：<br>对于二值图像 ( A ) 和结构元素 ( B )，腐蚀运算定义为：<br>[<br>A \ominus B &#x3D; { z \mid B_z \subseteq A }<br>]<br>即，将结构元素 ( B ) 在图像 ( A ) 上滑动，如果 ( B ) 完全包含在 ( A ) 之中，则保留中心点，否则移除该点。</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>去除噪声</li>
+<li>分割图像</li>
+<li>细化对象</li>
+</ul>
+<h5 id="2-2-膨胀（Dilation）"><a href="#2-2-膨胀（Dilation）" class="headerlink" title="2.2 膨胀（Dilation）"></a><strong>2.2 膨胀（Dilation）</strong></h5><p>膨胀操作用于扩展图像中的前景区域，使得前景（白色区域）增长。</p>
+<p><strong>定义</strong>：<br>[<br>A \oplus B &#x3D; { z \mid (B_z \cap A) \neq \emptyset }<br>]<br>即，结构元素 ( B ) 在 ( A ) 上滑动，只要 ( B ) 与 ( A ) 有交集，就在输出图像中保留该点。</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>填充孔洞</li>
+<li>连接分离的区域</li>
+<li>使对象变厚</li>
+</ul>
+<h5 id="2-3-开运算（Opening）"><a href="#2-3-开运算（Opening）" class="headerlink" title="2.3 开运算（Opening）"></a><strong>2.3 开运算（Opening）</strong></h5><p>开运算是<strong>先腐蚀后膨胀</strong>的过程，主要用于去除小的噪声区域，同时保持整体形状。</p>
+<p>[<br>A \circ B &#x3D; (A \ominus B) \oplus B<br>]</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>平滑对象边界</li>
+<li>去除细小噪声</li>
+<li>断开细小的连接部分</li>
+</ul>
+<h5 id="2-4-闭运算（Closing）"><a href="#2-4-闭运算（Closing）" class="headerlink" title="2.4 闭运算（Closing）"></a><strong>2.4 闭运算（Closing）</strong></h5><p>闭运算是<strong>先膨胀后腐蚀</strong>的过程，主要用于填充小孔洞，同时保持整体形状。</p>
+<p>[<br>A \bullet B &#x3D; (A \oplus B) \ominus B<br>]</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>填补小洞</li>
+<li>连接分离的区域</li>
+<li>平滑对象边界</li>
+</ul>
+<hr>
+<h4 id="3-进阶形态学运算"><a href="#3-进阶形态学运算" class="headerlink" title="3. 进阶形态学运算"></a><strong>3. 进阶形态学运算</strong></h4><p>除了基本的腐蚀、膨胀、开闭运算外，还有一些更复杂的形态学运算。</p>
+<h5 id="3-1-形态学梯度（Morphological-Gradient）"><a href="#3-1-形态学梯度（Morphological-Gradient）" class="headerlink" title="3.1 形态学梯度（Morphological Gradient）"></a><strong>3.1 形态学梯度（Morphological Gradient）</strong></h5><p>形态学梯度表示膨胀和腐蚀之间的差异，通常用于边缘检测。</p>
+<p>[<br>\text{Gradient} &#x3D; A \oplus B - A \ominus B<br>]</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>提取边缘信息</li>
+</ul>
+<h5 id="3-2-顶帽变换（Top-hat-Transform）"><a href="#3-2-顶帽变换（Top-hat-Transform）" class="headerlink" title="3.2 顶帽变换（Top-hat Transform）"></a><strong>3.2 顶帽变换（Top-hat Transform）</strong></h5><p>顶帽变换是原图像与开运算结果的差值，用于提取比周围区域亮的小结构。</p>
+<p>[<br>\text{Top-hat} &#x3D; A - (A \circ B)<br>]</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>识别亮度高于背景的小目标</li>
+</ul>
+<h5 id="3-3-底帽变换（Black-hat-Transform）"><a href="#3-3-底帽变换（Black-hat-Transform）" class="headerlink" title="3.3 底帽变换（Black-hat Transform）"></a><strong>3.3 底帽变换（Black-hat Transform）</strong></h5><p>底帽变换是闭运算结果与原图像的差值，用于提取比周围区域暗的小结构。</p>
+<p>[<br>\text{Black-hat} &#x3D; (A \bullet B) - A<br>]</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>识别亮度低于背景的小目标</li>
+</ul>
+<hr>
+<h4 id="4-结构元素的选择"><a href="#4-结构元素的选择" class="headerlink" title="4. 结构元素的选择"></a><strong>4. 结构元素的选择</strong></h4><p>结构元素（Structuring Element）决定了形态学运算的效果，常见形状包括：</p>
+<ul>
+<li><strong>矩形</strong>（如 ( 3 \times 3 )）</li>
+<li><strong>十字形</strong>（Cross-shaped）</li>
+<li><strong>椭圆形</strong>（Ellipse-shaped）</li>
+<li><strong>菱形</strong>（Diamond-shaped）</li>
+</ul>
+<p>结构元素的大小和形状会影响最终的处理结果，如：</p>
+<ul>
+<li><strong>较小的结构元素</strong> 更适合去除细小噪声</li>
+<li><strong>较大的结构元素</strong> 适用于处理更大规模的结构变化</li>
+</ul>
+<hr>
+<h4 id="5-典型应用"><a href="#5-典型应用" class="headerlink" title="5. 典型应用"></a><strong>5. 典型应用</strong></h4><ul>
+<li><strong>图像去噪</strong>：使用开运算去除小噪声点</li>
+<li><strong>边缘检测</strong>：使用形态学梯度提取边缘信息</li>
+<li><strong>目标提取</strong>：使用顶帽或底帽变换突出特定区域</li>
+<li><strong>孔洞填充</strong>：使用闭运算填补缺失部分</li>
+<li><strong>骨架提取</strong>：用于提取物体的中心线</li>
+</ul>
+<hr>
+<h4 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h4><p>形态学运算通过简单的集合操作，可以有效处理二值图像和灰度图像中的几何结构信息。腐蚀和膨胀是最基本的操作，开闭运算用于噪声处理，而更复杂的形态学变换（如梯度、顶帽、底帽）可用于边缘检测、特征提取等任务。选择合适的结构元素对于形态学运算的效果至关重要。</p>
+<p>如果你有特定的应用场景或代码实现需求，可以告诉我，我可以提供更具体的示例代码！ 😊</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/24/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-24--%E4%BC%A0%E7%BB%9FCV%E7%AE%97%E6%B3%95/" rel="prev" title="传统计算机视觉算法">
+      <i class="fa fa-chevron-left"></i> 传统计算机视觉算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/25/notebook/Projects/2025-02-25--%E9%81%97%E7%95%99%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="next" title="遗留物检测">
+      遗留物检测 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A%E5%BD%A2%E6%80%81%E5%AD%A6%E8%BF%90%E7%AE%97"><span class="nav-number">2.</span> <span class="nav-text">详细解释形态学运算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%A2%E6%80%81%E5%AD%A6%E8%BF%90%E7%AE%97%EF%BC%88Mathematical-Morphology%EF%BC%89%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">形态学运算（Mathematical Morphology）详细解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-%E8%85%90%E8%9A%80%EF%BC%88Erosion%EF%BC%89"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">2.1 腐蚀（Erosion）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-%E8%86%A8%E8%83%80%EF%BC%88Dilation%EF%BC%89"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">2.2 膨胀（Dilation）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-%E5%BC%80%E8%BF%90%E7%AE%97%EF%BC%88Opening%EF%BC%89"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">2.3 开运算（Opening）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4-%E9%97%AD%E8%BF%90%E7%AE%97%EF%BC%88Closing%EF%BC%89"><span class="nav-number">2.1.2.4.</span> <span class="nav-text">2.4 闭运算（Closing）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%BF%9B%E9%98%B6%E5%BD%A2%E6%80%81%E5%AD%A6%E8%BF%90%E7%AE%97"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 进阶形态学运算</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-%E5%BD%A2%E6%80%81%E5%AD%A6%E6%A2%AF%E5%BA%A6%EF%BC%88Morphological-Gradient%EF%BC%89"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">3.1 形态学梯度（Morphological Gradient）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-%E9%A1%B6%E5%B8%BD%E5%8F%98%E6%8D%A2%EF%BC%88Top-hat-Transform%EF%BC%89"><span class="nav-number">2.1.3.2.</span> <span class="nav-text">3.2 顶帽变换（Top-hat Transform）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-%E5%BA%95%E5%B8%BD%E5%8F%98%E6%8D%A2%EF%BC%88Black-hat-Transform%EF%BC%89"><span class="nav-number">2.1.3.3.</span> <span class="nav-text">3.3 底帽变换（Black-hat Transform）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E7%BB%93%E6%9E%84%E5%85%83%E7%B4%A0%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">2.1.4.</span> <span class="nav-text">4. 结构元素的选择</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8"><span class="nav-number">2.1.5.</span> <span class="nav-text">5. 典型应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">2.1.6.</span> <span class="nav-text">6. 总结</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

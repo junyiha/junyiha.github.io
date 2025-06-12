@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 图像标注">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图像标注">
+<meta property="og:url" content="https://junyiha.github.io/2025/05/13/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-05-13--YOLO%E5%9B%BE%E5%83%8F%E6%A0%87%E6%B3%A8/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 图像标注">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-13T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-05T00:37:29.266Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="AI部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/05/13/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-05-13--YOLO%E5%9B%BE%E5%83%8F%E6%A0%87%E6%B3%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>图像标注 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/05/13/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-05-13--YOLO%E5%9B%BE%E5%83%8F%E6%A0%87%E6%B3%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图像标注
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-05-13 09:00:00" itemprop="dateCreated datePublished" datetime="2025-05-13T09:00:00+08:00">2025-05-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-06-05 08:37:29" itemprop="dateModified" datetime="2025-06-05T08:37:29+08:00">2025-06-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>图像标注</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="YOLO数据集格式"><a href="#YOLO数据集格式" class="headerlink" title="YOLO数据集格式"></a>YOLO数据集格式</h2><ul>
+<li>YOLO数据集的格式主要包括以下几个部分：<ul>
+<li>图像文件：这是数据集中的图像文件，通常是 jpg 或 png 格式</li>
+<li>标注文件：这是一个文本文件，包含了每张图像中目标对象的类别和位置信息</li>
+<li>类别文件：这是一个文本文件，包含了数据集中所有目标对象的类别信息</li>
+</ul>
+</li>
+<li>注：<ul>
+<li>除扩展名外，标注文件的名称必须和图像的名称保持一致</li>
+</ul>
+</li>
+</ul>
+<h2 id="标注文件格式"><a href="#标注文件格式" class="headerlink" title="标注文件格式"></a>标注文件格式</h2><ul>
+<li>主要包含了以下内容：<ul>
+<li>每个目标对象的类别编号</li>
+<li>目标对象在图像中的中心位置(x, y)</li>
+<li>目标对象的宽度和高度(w, h)</li>
+</ul>
+</li>
+<li>x, y, w, h是小于1的浮点数。因为是经过对图像进行了归一化处理得到的值，也就是目标的真实x, w值 除以图像的宽度， y, h除以图像的高度。</li>
+</ul>
+<h2 id="类别文件格式"><a href="#类别文件格式" class="headerlink" title="类别文件格式"></a>类别文件格式</h2><ul>
+<li><p>主要包含了以下内容：</p>
+<ul>
+<li>每个类别的编号</li>
+<li>每个类别的名称</li>
+</ul>
+</li>
+<li><p>一行代表一个类别，行号代表类别id(从0开始)。</p>
+</li>
+</ul>
+<h2 id="YOLO图像标注"><a href="#YOLO图像标注" class="headerlink" title="YOLO图像标注"></a>YOLO图像标注</h2><ul>
+<li>YOLO(You Only Look Once)是一种实时目标检测系统，广泛应用于图像处理和计算机视觉领域。</li>
+<li>为了训练YOLO模型检测自定义目标，首先需要对图像进行标注。</li>
+</ul>
+<h2 id="使用LabelImg工具进行YOLO图像标注"><a href="#使用LabelImg工具进行YOLO图像标注" class="headerlink" title="使用LabelImg工具进行YOLO图像标注"></a>使用LabelImg工具进行YOLO图像标注</h2><ul>
+<li><p>安装LabelImg工具</p>
+<ul>
+<li>pip install labelimg</li>
+</ul>
+</li>
+<li><p>使用LabelImg进行标注</p>
+<ul>
+<li>打开软件：输入 labelimg 命令启动</li>
+<li>打开文件夹：点击界面上的按钮，打开包含待标注图片的文件夹</li>
+<li>框选目标：使用鼠标框选目标区域，选择保存为YOLO格式(即将标记信息保存为txt格式)</li>
+<li>保存标注：点击 Save 按钮，将标注信息保存到指定文件夹。注意，保存的文件名要与原始图片文件名保持一致</li>
+</ul>
+</li>
+</ul>
+<h2 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h2><ul>
+<li>准备数据集：新建训练集和验证集文件夹，分别命名为 train 和 val。每个文件夹中包含 images 和 labels 子文件夹，分别存放图片和对应的标注文件</li>
+<li>分配数据：将75%的标注图片和标签放入train文件夹，其余放入val文件夹</li>
+<li>创建yaml文件：根据需要创建一个yaml配置文件，指定训练和验证数据路径</li>
+<li>运行训练脚本：修改train.py中的参数，运行脚本开始训练。训练结果将存储在 runs&#x2F;train&#x2F;exp4&#x2F;weights目录下</li>
+</ul>
+<h2 id="yolo-目标检测-详细介绍数据标注基本原则"><a href="#yolo-目标检测-详细介绍数据标注基本原则" class="headerlink" title="yolo 目标检测 详细介绍数据标注基本原则"></a>yolo 目标检测 详细介绍数据标注基本原则</h2><p>以下内容将从标注格式、标注原则与规范、标注流程及常见注意事项等方面，较为详尽地介绍用于 YOLO（You Only Look Once）目标检测的数据标注基本原则，帮助你在标注过程中保证高质量、高一致性，从而提升模型训练效果。</p>
+<hr>
+<h2 id="一、YOLO-数据标注的基本格式"><a href="#一、YOLO-数据标注的基本格式" class="headerlink" title="一、YOLO 数据标注的基本格式"></a>一、YOLO 数据标注的基本格式</h2><p>在 YOLO 框架下，常见的数据标注格式为每张图片对应一个同名 <code>.txt</code> 文件，文本文件中的每一行表示一个目标实例，其字段顺序及含义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;class_id&gt; &lt;x_center&gt; &lt;y_center&gt; &lt;width&gt; &lt;height&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>class_id</strong>：目标类别的整数编码（从 0 开始计数），对应于训练时所指定的类别列表（例如 <code>person</code>→0, <code>car</code>→1 等）。</p>
+</li>
+<li><p><strong>x_center, y_center, width, height</strong>：所有坐标值均为相对于图片宽高归一化（Normalized）的浮点数，范围皆在 (0, 1) 之间。</p>
+<ul>
+<li><code>x_center = (xmin + xmax) / 2 / image_width</code></li>
+<li><code>y_center = (ymin + ymax) / 2 / image_height</code></li>
+<li><code>width  = (xmax - xmin) / image_width</code></li>
+<li><code>height = (ymax - ymin) / image_height</code></li>
+</ul>
+</li>
+</ul>
+<p>举例说明：若一张 1280×720 的图片中，检测框的左上角为 (xmin&#x3D;320, ymin&#x3D;180)，右下角为 (xmax&#x3D;960, ymax&#x3D;540)，则：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x_center = (320 + 960) / 2 / 1280 = 640/1280 = 0.5</span><br><span class="line">y_center = (180 + 540) / 2 / 720  = 360/720  = 0.5</span><br><span class="line">width    = (960 - 320)   / 1280    = 640/1280 = 0.5</span><br><span class="line">height   = (540 - 180)   / 720     = 360/720  = 0.5</span><br></pre></td></tr></table></figure>
+
+<p>如果该目标类别对应的 <code>class_id</code> 为 3，则标注行写作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">3 0.5 0.5 0.5 0.5</span><br></pre></td></tr></table></figure>
+
+<p><strong>要点提醒</strong>：</p>
+<ol>
+<li>YOLO 采用的是中心点 + 宽高格式，方便网络预测。同时归一化能够提高对不同分辨率图片的兼容性。</li>
+<li>所有数值都需保留小数精度（一般保留小数点后 4~6 位即可，但完全没要求只要确保精度一致即可），否则容易造成精度丢失导致模型定位不准确。</li>
+</ol>
+<hr>
+<h2 id="二、标注前需要统一的准备工作"><a href="#二、标注前需要统一的准备工作" class="headerlink" title="二、标注前需要统一的准备工作"></a>二、标注前需要统一的准备工作</h2><p>在正式动手标注之前，应当先进行以下准备，以保证数据集标注的连贯性与准确性。</p>
+<h3 id="1-确定类别列表（Class-List）"><a href="#1-确定类别列表（Class-List）" class="headerlink" title="1. 确定类别列表（Class List）"></a>1. 确定类别列表（Class List）</h3><ul>
+<li><p><strong>事先定义所有目标类别的编号和名称</strong>。例如如果要检测行人、汽车、自行车，就可以约定：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0 person</span><br><span class="line">1 car</span><br><span class="line">2 bicycle</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>类别命名要具有可读性且互不重复</strong>，例如不要用 <code>car1</code>、<code>car2</code> 这种容易混淆的命名，如果场景中需要区分轿车（sedan）、货车（truck）等，应当直接用“sedan”“truck”进行区分，而不是在一个“car”类别中再通过后缀区分。</p>
+</li>
+<li><p>在后续标注时，标注工具与训练脚本需要引用同样的类别列表文件（如 <code>obj.names</code> 或 <code>classes.txt</code>），务必保证与实际标注文件中 <code>class_id</code> 一一对应，否则网络训练会找不到对应的类别或产生混乱。</p>
+</li>
+</ul>
+<h3 id="2-选择并统一标注工具"><a href="#2-选择并统一标注工具" class="headerlink" title="2. 选择并统一标注工具"></a>2. 选择并统一标注工具</h3><p>常用标注工具有：</p>
+<ul>
+<li><strong>LabelImg</strong>（开源、界面简单）：可以导出多种格式，包括 VOC（XML）、COCO（JSON）、YOLO（TXT）。</li>
+<li><strong>Labelme</strong>（支持多边形标注、灵活度高）：也可以输出 COCO、VOC、YOLO 等格式，但需要手动配置转换脚本。</li>
+<li><strong>Roboflow Annotation</strong>、<strong>CVAT</strong>（团队协作较方便）</li>
+<li><strong>MakeSense.ai</strong>、<strong>Supervise.ly</strong> 等在线工具</li>
+</ul>
+<p>标注前一定要在工具中做好以下设置：</p>
+<ol>
+<li><strong>导出格式</strong>：选择 YOLO TXT 格式，或 VOC&#x2F;COCO 格式后再通过脚本统一转换成 YOLO 格式。</li>
+<li><strong>图像尺寸信息</strong>：有些工具默认会在标签文件里写明图像原始尺寸，有些不记录尺寸，这就要求后续脚本读入图片时一定要动态获取其宽高，否则归一化会出错。</li>
+<li><strong>坐标显示方式</strong>：确保用的是左上角坐标 + 右下角坐标进行拖框标注，而非绕过中点或边长等模式，因为部分工具默认用的是这种方式，需要确认并开启“标注为：YOLO Darknet 格式”或类似选项，以避免先前标注纠错。</li>
+</ol>
+<hr>
+<h2 id="三、标注时的基本原则与规范"><a href="#三、标注时的基本原则与规范" class="headerlink" title="三、标注时的基本原则与规范"></a>三、标注时的基本原则与规范</h2><p>针对 YOLO 目标检测，需要遵守以下几个核心原则，以保证标注数据质量高且具有可用性。</p>
+<h3 id="1-边界框（Bounding-Box）的准确性"><a href="#1-边界框（Bounding-Box）的准确性" class="headerlink" title="1. 边界框（Bounding Box）的准确性"></a>1. 边界框（Bounding Box）的准确性</h3><ul>
+<li><p><strong>精确包围目标</strong>：标注框应尽量贴合目标物体且包含其全部边缘，但不应过多包含背景。过宽的框会干扰模型学习到与目标无关的背景特征；过窄的框则会丢失目标部分信息。</p>
+</li>
+<li><p><strong>排除无关物体与遮挡区</strong>：如果目标部分被遮挡，例如行人被挡住了一只手臂，要判断是否仍然可识别。一般原则是：<strong>超过 50% 被遮挡，可不标注</strong>；若仅部分遮挡且能大致判断物体轮廓，则尽量用框包住全体可见区域。</p>
+</li>
+<li><p><strong>多视角与小目标处理</strong>：</p>
+<ul>
+<li>对于小目标（bounding box 占图片面积 &lt; 1%），仍然要做标注，但需格外注意归一化之后的宽高是否大于极小值（如 &lt;0.01）。如果某些小目标框过小，可能模型不好学习，可酌情扩大框，使其至少能覆盖目标中心。</li>
+<li>对于目标与背景相近的情况，一定要仔细放大预览，避免出现“利用背景线索去检测”的情况。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-类别分配要准确、一致"><a href="#2-类别分配要准确、一致" class="headerlink" title="2. 类别分配要准确、一致"></a>2. 类别分配要准确、一致</h3><ul>
+<li><p><strong>尽量遵循“单一物体归为一个类别”原则</strong>，例如“交通灯”与“红绿灯”不要混用。如果场景有不同种类的信号灯，则应分开定义标签。</p>
+</li>
+<li><p><strong>对于嵌套目标或成组目标</strong>：</p>
+<ul>
+<li>如果检测的是“一只猫”，但图里有一群猫，需区分单只个体，就要标注每个猫的框；如果业务仅需要检测“猫”的存在，可以只标注一个大框包住整群，但务必在标注说明里写明“仅检测整体群体，非单独个体”。</li>
+<li>如果检测“桌面上的物品”，要明确是否需要同时标注桌子（table）与其上的物品（如手机、笔）；如果只是物品检测，就不要标注桌子本身。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-坐标归一化与数据一致性"><a href="#3-坐标归一化与数据一致性" class="headerlink" title="3. 坐标归一化与数据一致性"></a>3. 坐标归一化与数据一致性</h3><ul>
+<li><strong>严格按照 “相对坐标 &lt;0,1&gt;” 规范</strong> 进行归一化。每次标注完一个框，务必确认 <code>x_center</code>, <code>y_center</code>, <code>width</code>, <code>height</code> 都在 (0, 1) 区间内。</li>
+<li><strong>不要让标注框超出图像边界</strong>。如果框部分位于图像外，就需要裁剪到图像范围内，或者直接删除该框再重新标。</li>
+<li><strong>同一张图每个目标只能标注一次</strong>。不要给同一个目标标注多个高度重叠的框；如果相邻框重叠率（IoU）超过 0.8，要确认是否为同一个物体的重复标注。若训练中需要进行“锚框（anchors）优化”、“NMS（Non-Maximum Suppression）”等，可在后续自动化阶段处理，标注阶段应降低重复。</li>
+</ul>
+<h3 id="4-模糊、遮挡与难例的处理"><a href="#4-模糊、遮挡与难例的处理" class="headerlink" title="4. 模糊、遮挡与难例的处理"></a>4. 模糊、遮挡与难例的处理</h3><ol>
+<li><p><strong>模糊目标</strong></p>
+<ul>
+<li>如果目标被轻微模糊，但仍可辨识（例如轻微运动模糊），应依旧标注，理由是：模型能从轮廓与纹理信息中学习。</li>
+<li>如果目标严重模糊到几乎看不清，如仅留下一团色块、无法确定类别，就可以选择不标注，或者打 “难例”，在后续训练时决定是否使用（做“困难样本挖掘”）。</li>
+</ul>
+</li>
+<li><p><strong>遮挡目标</strong></p>
+<ul>
+<li><p><strong>少量遮挡（&lt;50%）</strong>：仍然标注完整目标框。</p>
+</li>
+<li><p><strong>大面积遮挡（&gt;50%）</strong>：视业务场景决定：</p>
+<ul>
+<li>若业务对遮挡目标仍需检测，可标注剩余可见部分，同时在内部注释文件（如 <code>labels.txt</code>）中说明“该目标被遮挡，仅标注可见部分”。</li>
+<li>若大面积遮挡到不可识别，则跳过该目标。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>“难以界定”目标</strong></p>
+<ul>
+<li>例如阴影、反光、透明玻璃后物体、镜中倒影等。这些时效性与可见度都很差，可能对模型训练产生干扰。一般建议不予标注，或者为其添加“难例”类别标签（例如 <code>ignore</code> 类别），并在训练阶段设置损失函数忽略这部分。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="四、具体标注流程与步骤"><a href="#四、具体标注流程与步骤" class="headerlink" title="四、具体标注流程与步骤"></a>四、具体标注流程与步骤</h2><p>下面给出一个推荐的通用标注流程，帮助你系统化地组织标注工作。</p>
+<ol>
+<li><p><strong>图像预处理与筛选</strong></p>
+<ul>
+<li>将所有要标注的图像按统一尺寸（如 1280×720、1920×1080 等）或固定纵横比进行归一化处理，便于后续归一化坐标计算与模型训练。</li>
+<li>确保图像的方向（横&#x2F;竖）一致，若某些图为旋转状态，请先复位。</li>
+<li>按照场景或拍摄时间、拍摄点等信息进行分组分类，便于后续训练集&#x2F;验证集&#x2F;测试集划分。</li>
+</ul>
+</li>
+<li><p><strong>建立类别列表文件</strong></p>
+<ul>
+<li>创建一个文本文件（例如 <code>classes.txt</code>），每行写一个类别名称，顺序即代表对应的 <code>class_id</code>。</li>
+<li>确保类名与标注工具配置一致。</li>
+</ul>
+</li>
+<li><p><strong>使用标注工具进行初始标注</strong></p>
+<ul>
+<li><p>在标注软件中加载 图片 目录，并加载 <code>classes.txt</code> 作为类别参考。</p>
+</li>
+<li><p>对每张图片中的目标进行拖框标注，看见一个目标就框一个框，框住目标最外层可视边界。</p>
+</li>
+<li><p>标注时保持<strong>手动校验</strong>：</p>
+<ul>
+<li>标注框边线要紧贴目标，不要留太多空隙；</li>
+<li>若有多个目标，确保相互之间不混淆，例如两个行人靠得很近时，需要在放大状态下逐个框选，避免漏标或重叠标注。</li>
+</ul>
+</li>
+<li><p>对于每个标注实例，都要检查其是否符合“完整”、“可识别”、“符合类别定义”三大核心要求。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>初步质量自检</strong></p>
+<ul>
+<li><p>在标注完成一套图像后，先抽取一部分标注文件，用预览脚本可视化标注框效果（如把归一化坐标转换回像素坐标，以及在图像上画出矩形框）。</p>
+</li>
+<li><p>重点检查：</p>
+<ul>
+<li><strong>坐标是否在 [0, 1] 范围</strong></li>
+<li><strong>标注框是否正确覆盖目标</strong></li>
+<li><strong>是否有遗漏与误标</strong></li>
+<li><strong>相同物体是否标注两次或多次</strong></li>
+</ul>
+</li>
+<li><p>通过可视化脚本（例如使用 OpenCV 或 PIL）把标注结果叠加到图片上，目测检查 5%~10% 的数据，看是否存在明显偏差。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>团队或第三方复核</strong></p>
+<ul>
+<li>如果标注量较大（如几千张以上），建议进行二次审核，由另一个标注人员检查。可以在标注工具中开启“审核模式”，由第二人只对已标注内容进行“删除&#x2F;修改”操作。</li>
+<li>如果有预算，也可考虑使用众包平台（例如 Amazon Mechanical Turk、Supervise.ly 团队版）进行额外复核，并将结果与初次标注对比，筛查一致性差异较大的样本进行重点校正。</li>
+</ul>
+</li>
+<li><p><strong>生成最终训练&#x2F;验证&#x2F;测试集清单</strong></p>
+<ul>
+<li>按照一定比例（例如 80% 训练 + 10% 验证 + 10% 测试）将图像文件均匀分配，并把对应的图片路径与标注路径写入相应的列表文件（例如 <code>train.txt</code>、<code>val.txt</code>、<code>test.txt</code>）。</li>
+<li><strong>注意</strong>：如果是场景视频中截帧得到的图片，可能相邻两帧非常相似，不应将相邻帧分到训练集与测试集，以免出现“数据泄露”导致模型泛化能力被高估。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="五、标注过程中的常见注意事项与建议"><a href="#五、标注过程中的常见注意事项与建议" class="headerlink" title="五、标注过程中的常见注意事项与建议"></a>五、标注过程中的常见注意事项与建议</h2><h3 id="1-保持标注一致性"><a href="#1-保持标注一致性" class="headerlink" title="1. 保持标注一致性"></a>1. 保持标注一致性</h3><ul>
+<li><strong>统一标注规范</strong>：建议团队内部出一份“标注手册”，详细描述“如何框”、“何时不框”、“如何处理特殊情况”，让所有标注人员都参考同一份手册。</li>
+<li><strong>定期对齐沟通</strong>：标注过程中出现争议样本时，团队应定期开会讨论并形成最终裁定，更新到标注手册中，避免重复走弯路。</li>
+</ul>
+<h3 id="2-特殊场景下的标注策略"><a href="#2-特殊场景下的标注策略" class="headerlink" title="2. 特殊场景下的标注策略"></a>2. 特殊场景下的标注策略</h3><ol>
+<li><p><strong>遮挡与重叠</strong></p>
+<ul>
+<li>针对遮挡严重的场景，可在标注时额外添加一个“遮挡程度”属性（例如轻度、中度、重度），便于后续分析或做难例挖掘。</li>
+<li>当两个目标相互遮挡时，尽量“各自框起可见部分”，不要将两者合并为一个大框，除非业务要求只检测整体。</li>
+</ul>
+</li>
+<li><p><strong>分辨率与规模差异</strong></p>
+<ul>
+<li>如果图片中既有大目标（占整图 50% 以上）又有小目标（占整图 &lt;1%），建议在标注时采用“分场景标注”或“多尺度训练”策略，即在后续训练中对小目标进行数据增强（如放大、拼接）以缓解样本不平衡。</li>
+</ul>
+</li>
+<li><p><strong>运动模糊与低光照</strong></p>
+<ul>
+<li>某些场景下帧间运动较快，导致目标模糊；或者夜间光照不足导致较多噪点。在这种情况下，如果目标轮廓仍可辨识，应尽量标注。若完全无法分辨，就跳过该框。</li>
+<li>如果该类别在后续模型中表现很差，可考虑做“数据增强”或“生成式增强”补充这类样本。</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-避免过标或少标"><a href="#3-避免过标或少标" class="headerlink" title="3. 避免过标或少标"></a>3. 避免过标或少标</h3><ul>
+<li><strong>过标</strong>：给同一个物体框多个稍微有差异的框，或者把背景中充当“对象”的阴影、反光等误标为目标。这样会干扰模型，不仅降低准确率，还会浪费标注成本。</li>
+<li><strong>少标</strong>：漏标图片中存在但未被标注的目标，例如标注人员疲劳或漏看，会导致训练时“负样本”误导模型，使模型在推理时漏检或误判。</li>
+<li><strong>解决策略</strong>：可采用“双人交叉标注 + 自动对比脚本检测”手段。例如，一人标注后，运行一个后处理脚本检测“一个类别在一张图上标注数量是否异常”（若场景中行人通常是 1~3 个，但这张图标注 10 个，需要人工复核）。或采用简单的 “标注密度” 统计，比如统计所有图片每个类别平均标注数，若某张图与平均相差太多则拉入复核队列。</li>
+</ul>
+<h3 id="4-记录与版本管理"><a href="#4-记录与版本管理" class="headerlink" title="4. 记录与版本管理"></a>4. 记录与版本管理</h3><ul>
+<li><strong>在标注文件夹外单独维护标注日志</strong>：记录每天每个标注人员标注了多少张、哪些特殊情况、哪些样本做了修改。</li>
+<li><strong>使用版本控制（Git、SVN 等）</strong>：将标注结果（<code>.txt</code> 文件）纳入版本管理，并在重要里程碑（如“完成 50% 标注”、“完成 100% 标注”）打标签，方便后续追溯。</li>
+<li><strong>定期备份</strong>：因为标注数据往往量大且谨慎性高，一旦丢失或误删修复困难。可选用云盘、NAS 等工具进行每日增量备份。</li>
+</ul>
+<hr>
+<h2 id="六、标注完成后的验证与常用工具"><a href="#六、标注完成后的验证与常用工具" class="headerlink" title="六、标注完成后的验证与常用工具"></a>六、标注完成后的验证与常用工具</h2><h3 id="1-可视化验证脚本"><a href="#1-可视化验证脚本" class="headerlink" title="1. 可视化验证脚本"></a>1. 可视化验证脚本</h3><p>即使在标注工具中可以预览，也建议写一个简单的可视化脚本对整批标注实行 <strong>批量抽样</strong> 检查。示例伪代码（Python + OpenCV）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"></span><br><span class="line">image_dir = <span class="string">&quot;images/&quot;</span></span><br><span class="line">label_dir = <span class="string">&quot;labels/&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> img_name <span class="keyword">in</span> os.listdir(image_dir):</span><br><span class="line">    img_path = os.path.join(image_dir, img_name)</span><br><span class="line">    lbl_path = os.path.join(label_dir, img_name.replace(<span class="string">&quot;.jpg&quot;</span>, <span class="string">&quot;.txt&quot;</span>))</span><br><span class="line">    img = cv2.imread(img_path)</span><br><span class="line">    h, w, _ = img.shape</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(lbl_path, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> f.readlines():</span><br><span class="line">            cls, x_c, y_c, box_w, box_h = <span class="built_in">map</span>(<span class="built_in">float</span>, line.strip().split())</span><br><span class="line">            x_c *= w; y_c *= h</span><br><span class="line">            box_w *= w; box_h *= h</span><br><span class="line">            x1 = <span class="built_in">int</span>(x_c - box_w/<span class="number">2</span>)</span><br><span class="line">            y1 = <span class="built_in">int</span>(y_c - box_h/<span class="number">2</span>)</span><br><span class="line">            x2 = <span class="built_in">int</span>(x_c + box_w/<span class="number">2</span>)</span><br><span class="line">            y2 = <span class="built_in">int</span>(y_c + box_h/<span class="number">2</span>)</span><br><span class="line">            cv2.rectangle(img, (x1, y1), (x2, y2), (<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">            cv2.putText(img, <span class="built_in">str</span>(<span class="built_in">int</span>(cls)), (x1, y1 - <span class="number">5</span>), cv2.FONT_HERSHEY_SIMPLEX, </span><br><span class="line">                        <span class="number">0.5</span>, (<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line">    cv2.imshow(<span class="string">&quot;ann&quot;</span>, img)</span><br><span class="line">    key = cv2.waitKey(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> key == <span class="built_in">ord</span>(<span class="string">&#x27;q&#x27;</span>):</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<p>通过此脚本，你可以直观地看到标注框与原图是否吻合，也能及时发现归一化坐标异常或标错类别的情况。</p>
+<h3 id="2-自动一致性检查脚本"><a href="#2-自动一致性检查脚本" class="headerlink" title="2. 自动一致性检查脚本"></a>2. 自动一致性检查脚本</h3><p>除了可视化，还可以写脚本进行以下自动化检查：</p>
+<ul>
+<li><strong>坐标越界</strong>：检查 <code>x_center - width/2 &lt; 0</code>、<code>x_center + width/2 &gt; 1</code>、<code>y_center - height/2 &lt; 0</code>、<code>y_center + height/2 &gt; 1</code> 等。</li>
+<li><strong>零面积框</strong>：检查宽或高是否为 0。</li>
+<li><strong>异常比例</strong>：检查单一样本中某一类框数量过多（与平均值差距大）。</li>
+<li><strong>重复框</strong>：可以根据 IoU 阈值（如 0.9）检测同类别两个框是否高度重叠，如果是则提示人工复核。</li>
+<li><strong>缺少标注</strong>：如果某些图片中按照场景常理应有目标但标注数为 0，可以列入复核列表（如人脸检测，如果某些街景图片中没有标任何人脸则要检查是否漏标）。</li>
+</ul>
+<h3 id="3-数据增强与后续处理"><a href="#3-数据增强与后续处理" class="headerlink" title="3. 数据增强与后续处理"></a>3. 数据增强与后续处理</h3><p>标注只是第一步，还需要考虑：</p>
+<ul>
+<li><strong>数据增强</strong>：随机翻转、缩放、亮度&#x2F;对比度调整等，需要同步对标注框做变换。YOLO 很多开源框架都内置了数据增强功能，如果手动做增强需要编写脚本实时更新标注。</li>
+<li><strong>锚框（Anchor）聚类</strong>：在 YOLOv3、YOLOv5 等版本里，需要根据真实标注框尺寸做 k-means++ 聚类，算出最优锚框配置，提高召回效果。</li>
+<li><strong>划分训练&#x2F;验证&#x2F;测试集</strong>：在标注后要仔细设计抽样比例，并确保每个划分中各类别样本分布均匀、场景多样，否则会影响模型泛化能力。</li>
+</ul>
+<hr>
+<h2 id="七、总结与补充建议"><a href="#七、总结与补充建议" class="headerlink" title="七、总结与补充建议"></a>七、总结与补充建议</h2><ol>
+<li><p><strong>标注质量决定模型上限</strong><br>高质量的标注不仅要框得准确，还要在 <strong>类别分配、遮挡处理、归一化一致性</strong> 等方面做到规范化。随意、含糊或不一致的标注会导致模型训练效果大打折扣。</p>
+</li>
+<li><p><strong>标注效率与标注准确度的平衡</strong></p>
+<ul>
+<li>对同一批图像，先做一次粗略标注（快速划框），然后再做一次精细复核。这样既保证了进度，又能兼顾准确性。</li>
+<li>标注速度太快容易疏漏，太慢又会导致成本过高。一般建议每小时标注 50~80 张中等分辨率图（如果是多类别、复杂场景可能更低），并留出 20%~30% 的时间进行复核。</li>
+</ul>
+</li>
+<li><p><strong>团队协作与沟通机制</strong></p>
+<ul>
+<li>采用在线协作平台，可以实时查看标注进度、分配任务。</li>
+<li>建立 <strong>标注问题反馈机制</strong>：如微信群&#x2F;Slack 群里设立“标注疑问”频道，标注人员遇到不确定样本及时举例讨论、更新“标注手册”后统一执行。</li>
+</ul>
+</li>
+<li><p><strong>迭代与优化</strong></p>
+<ul>
+<li>在第一次训练后，往往会发现某些类别误检率高或漏检率高针对这些问题样本进行二次标注或补充样本，逐步提升检测效果。</li>
+<li>定期检查新数据的分布是否与已标注数据分布一致，否则需要做 <strong>领域自适应</strong> 或在原有标注规范上做调整。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>通过以上从“标注格式”、“前期准备”、“标注原则”、“标注流程”、“复核与验证”、“后续处理”到“总结建议” 的系统化介绍，希望你对如何为 YOLO 目标检测构建高质量的数据集有一个较为清晰且全面的认识。标注过程是整个目标检测任务中耗时且极其关键的一环，只有投入足够的时间对标注规范严格把关，才能为后续模型训练打下坚实基础。祝你标注顺利、检测性能节节提升！</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E9%83%A8%E7%BD%B2/" rel="tag"># AI部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/12/notebook/ComputerVision/2025-05-12--%E6%A8%A1%E6%9D%BF%E5%8C%B9%E9%85%8D/" rel="prev" title="模板匹配">
+      <i class="fa fa-chevron-left"></i> 模板匹配
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/05/14/notebook/Python/python_4_%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/2025-05-14--HEIC%E8%BD%ACJPG/" rel="next" title="HEIC转JPG">
+      HEIC转JPG <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO%E6%95%B0%E6%8D%AE%E9%9B%86%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">YOLO数据集格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E6%B3%A8%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">标注文件格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%88%AB%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">类别文件格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO%E5%9B%BE%E5%83%8F%E6%A0%87%E6%B3%A8"><span class="nav-number">5.</span> <span class="nav-text">YOLO图像标注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8LabelImg%E5%B7%A5%E5%85%B7%E8%BF%9B%E8%A1%8CYOLO%E5%9B%BE%E5%83%8F%E6%A0%87%E6%B3%A8"><span class="nav-number">6.</span> <span class="nav-text">使用LabelImg工具进行YOLO图像标注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">7.</span> <span class="nav-text">训练模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yolo-%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8D%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8%E5%9F%BA%E6%9C%AC%E5%8E%9F%E5%88%99"><span class="nav-number">8.</span> <span class="nav-text">yolo 目标检测 详细介绍数据标注基本原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81YOLO-%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.</span> <span class="nav-text">一、YOLO 数据标注的基本格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%87%E6%B3%A8%E5%89%8D%E9%9C%80%E8%A6%81%E7%BB%9F%E4%B8%80%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">10.</span> <span class="nav-text">二、标注前需要统一的准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%A1%AE%E5%AE%9A%E7%B1%BB%E5%88%AB%E5%88%97%E8%A1%A8%EF%BC%88Class-List%EF%BC%89"><span class="nav-number">10.1.</span> <span class="nav-text">1. 确定类别列表（Class List）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%80%89%E6%8B%A9%E5%B9%B6%E7%BB%9F%E4%B8%80%E6%A0%87%E6%B3%A8%E5%B7%A5%E5%85%B7"><span class="nav-number">10.2.</span> <span class="nav-text">2. 选择并统一标注工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%A0%87%E6%B3%A8%E6%97%B6%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E5%88%99%E4%B8%8E%E8%A7%84%E8%8C%83"><span class="nav-number">11.</span> <span class="nav-text">三、标注时的基本原则与规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%BE%B9%E7%95%8C%E6%A1%86%EF%BC%88Bounding-Box%EF%BC%89%E7%9A%84%E5%87%86%E7%A1%AE%E6%80%A7"><span class="nav-number">11.1.</span> <span class="nav-text">1. 边界框（Bounding Box）的准确性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%B1%BB%E5%88%AB%E5%88%86%E9%85%8D%E8%A6%81%E5%87%86%E7%A1%AE%E3%80%81%E4%B8%80%E8%87%B4"><span class="nav-number">11.2.</span> <span class="nav-text">2. 类别分配要准确、一致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%9D%90%E6%A0%87%E5%BD%92%E4%B8%80%E5%8C%96%E4%B8%8E%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">11.3.</span> <span class="nav-text">3. 坐标归一化与数据一致性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%A8%A1%E7%B3%8A%E3%80%81%E9%81%AE%E6%8C%A1%E4%B8%8E%E9%9A%BE%E4%BE%8B%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">11.4.</span> <span class="nav-text">4. 模糊、遮挡与难例的处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%85%B7%E4%BD%93%E6%A0%87%E6%B3%A8%E6%B5%81%E7%A8%8B%E4%B8%8E%E6%AD%A5%E9%AA%A4"><span class="nav-number">12.</span> <span class="nav-text">四、具体标注流程与步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%A0%87%E6%B3%A8%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%E4%B8%8E%E5%BB%BA%E8%AE%AE"><span class="nav-number">13.</span> <span class="nav-text">五、标注过程中的常见注意事项与建议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BF%9D%E6%8C%81%E6%A0%87%E6%B3%A8%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">13.1.</span> <span class="nav-text">1. 保持标注一致性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%89%B9%E6%AE%8A%E5%9C%BA%E6%99%AF%E4%B8%8B%E7%9A%84%E6%A0%87%E6%B3%A8%E7%AD%96%E7%95%A5"><span class="nav-number">13.2.</span> <span class="nav-text">2. 特殊场景下的标注策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%81%BF%E5%85%8D%E8%BF%87%E6%A0%87%E6%88%96%E5%B0%91%E6%A0%87"><span class="nav-number">13.3.</span> <span class="nav-text">3. 避免过标或少标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%AE%B0%E5%BD%95%E4%B8%8E%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86"><span class="nav-number">13.4.</span> <span class="nav-text">4. 记录与版本管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%A0%87%E6%B3%A8%E5%AE%8C%E6%88%90%E5%90%8E%E7%9A%84%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7"><span class="nav-number">14.</span> <span class="nav-text">六、标注完成后的验证与常用工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%8F%AF%E8%A7%86%E5%8C%96%E9%AA%8C%E8%AF%81%E8%84%9A%E6%9C%AC"><span class="nav-number">14.1.</span> <span class="nav-text">1. 可视化验证脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%87%AA%E5%8A%A8%E4%B8%80%E8%87%B4%E6%80%A7%E6%A3%80%E6%9F%A5%E8%84%9A%E6%9C%AC"><span class="nav-number">14.2.</span> <span class="nav-text">2. 自动一致性检查脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA%E4%B8%8E%E5%90%8E%E7%BB%AD%E5%A4%84%E7%90%86"><span class="nav-number">14.3.</span> <span class="nav-text">3. 数据增强与后续处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93%E4%B8%8E%E8%A1%A5%E5%85%85%E5%BB%BA%E8%AE%AE"><span class="nav-number">15.</span> <span class="nav-text">七、总结与补充建议</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

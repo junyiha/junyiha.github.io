@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 关于串口通信的学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="串口通信">
+<meta property="og:url" content="https://junyiha.github.io/2025/01/20/notebook/Network/2025-01-20-%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 关于串口通信的学习笔记">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://junyiha.github.io/images/Network/UART%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%A0%BC%E5%BC%8F.png">
+<meta property="article:published_time" content="2025-01-20T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.427Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="SerialPort">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://junyiha.github.io/images/Network/UART%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%A0%BC%E5%BC%8F.png">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/01/20/notebook/Network/2025-01-20-%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>串口通信 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/20/notebook/Network/2025-01-20-%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          串口通信
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-01-20 09:00:00" itemprop="dateCreated datePublished" datetime="2025-01-20T09:00:00+08:00">2025-01-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Network/" itemprop="url" rel="index"><span itemprop="name">Network</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>关于串口通信的学习笔记</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="维基百科中关于串口通信"><a href="#维基百科中关于串口通信" class="headerlink" title="维基百科中关于串口通信"></a>维基百科中关于串口通信</h2><ul>
+<li>串行接口(Serial port)，也称串行接口或串行端口，串行通信接口，COM接口，简称串口。主要用于串行式逐位数据传输。常见的有一般电脑应用的RS-232(使用25针或9针连接器)和工业电脑应用的半双工RS-485与全双工RS-422.</li>
+<li>串行接口按电气标准及协议来分，包括RS-232-C，RS-422,RS485,USB等。RS-232-C，RS-422与RS-485标准只对接口的电气特性做出规定，不涉及插件，电缆或协议。USB是近几年发展起来的新型接口标准，主要应用于高速数据传输领域。</li>
+</ul>
+<h3 id="RS-232-C"><a href="#RS-232-C" class="headerlink" title="RS-232-C"></a>RS-232-C</h3><ul>
+<li>它也称标准串口，是目前最常用的一种串行通讯串口。它是在1970年由美国电子工业协会(EIA)，联合贝尔系统，调制解调器厂家及计算机终端生产厂家共同制定的用于串行通讯的标准。</li>
+<li>它的全名是：数据终端设备(DTE)和数据通讯设备(DCE)之间串行二进制数据交换接口技术标准。</li>
+<li>电脑一般有两个串行口：COM1和COM2，9针D型接口通常在计算机后面能看到。现在有很多手机数据线或者物流接收器都采用COM口与计算机相连。</li>
+</ul>
+<h3 id="RS-422"><a href="#RS-422" class="headerlink" title="RS-422"></a>RS-422</h3><ul>
+<li>为改进RS-232通信距离短，速率低的缺点，RS-422定义了一种平衡通信接口，将传输速率提高到10Mb&#x2F;s，传输距离延长到4000英尺，并允许在一条平衡总线上连接最多10个接收器。</li>
+<li>RS-422是一种单机发送，多机接收的单向，平衡传输规范，被命名为 TIA&#x2F;EIA-422-A标准</li>
+</ul>
+<h3 id="RS-485"><a href="#RS-485" class="headerlink" title="RS-485"></a>RS-485</h3><ul>
+<li>为扩展应用范围，EIA又于1983年在RS-422基础上定制了RS-485标准，增加了多点，双向通信能力，即允许多个发送器连接到同一条总线上，同时增加了发送器的驱动能力和冲突保护特性，扩展了总线共模范围，后命名为TIA&#x2F;EIA-485-A标准。</li>
+</ul>
+<h3 id="Universal-Serial-Bus-通用串行总线"><a href="#Universal-Serial-Bus-通用串行总线" class="headerlink" title="Universal Serial Bus(通用串行总线)"></a>Universal Serial Bus(通用串行总线)</h3><ul>
+<li>简称USB，是目前电脑上应用较广泛的接口规范，由Intel,Microsoft, Compaq, IBM,NEC,Northern Telcom等几家大厂商发起的新型外设标准。USB接口是电脑主板上的一种四针，其中中间两个针传输数据，两边两个针给外设供电。USB接口速度快，连接简单，不需要外界电源，传输速度5Gbps。</li>
+</ul>
+<h3 id="串口通信"><a href="#串口通信" class="headerlink" title="串口通信"></a>串口通信</h3><ul>
+<li>串口通信的方式包括串口同步通信和串口异步通信<ul>
+<li>串口同步通信：在约定的通信速率下，发送端和接收端的时钟信号频率和相位始终保持同步，以保证通信双方在发送和接收数据时具有完全一样的定时关系。</li>
+<li>串口异步通信：也称为起止式异步通信，是以字符为单位进行传输的，字符之间没有固定的时间间隔要求，每个字符中的各位则以固定的时间传送。</li>
+</ul>
+</li>
+</ul>
+<h2 id="串口通信原理详解"><a href="#串口通信原理详解" class="headerlink" title="串口通信原理详解"></a>串口通信原理详解</h2><ul>
+<li>串行接口简称串口，也称串口通信接口(通常指COM接口)，是采用串行通信方式的扩展接口。</li>
+<li>串行通讯的特点是<ul>
+<li>数据是按位(bit)逐位依次传输的，只需一根传输线即可完成单项传输通信。</li>
+<li>如果有一对传输线就可以实现双向全双工通信(可以直接利用电话线作为传输线)，从而大大降低了成本，特别适用于远距离通信，但传送速度较慢。</li>
+</ul>
+</li>
+</ul>
+<h3 id="串口划分标准"><a href="#串口划分标准" class="headerlink" title="串口划分标准"></a>串口划分标准</h3><ul>
+<li>串行接口按时钟同步方式不同，可以分为同步串行接口和异步串行接口。同步串行通信接口(Synchronous Serial Interface，简称SSI)是一种常用的工业通信接口。常见的SPI接口也是同步串行接口的一种。</li>
+<li>异步串行通信接口，一般特指通用异步收发送器(Universal Asynchronous Receiver&#x2F;Transmitter, 简称UART)。它包括了RS232，RS499，RS423，RS422和RS485等接口标准规范和总线标准规范，即UART是异步串行通信口的总称。说到串口，如果不指明同步或异步，则通常特指异步串行接口。</li>
+<li>UART本身并没有规定电气特性，而RS232，RS499，RS423，RS422和RS485等，是对各种异步串行通信口的接口标准和总线标准，它规定了通信口的电气特性，传输速率，连接特性和接口的机械特性等内容，实际上是属于通信网络中的物理层的概念，于通信协议没有直接关系。而通信协议，是属于通信网络中的数据链路层的概念。</li>
+</ul>
+<h3 id="串口通信协议"><a href="#串口通信协议" class="headerlink" title="串口通信协议"></a>串口通信协议</h3><ul>
+<li><p>UART协议是全双工的异步收发协议，数据发送信号线TX和接收信号线RX各自独立并行工作，互不影响。通讯双方的传输速度(波特率)，校验位类型，停止位数目需要事先相互约定，否则无法正确通讯。</p>
+</li>
+<li><p>通过UART协议每传输的一个字节数据，都要在前面增加其同步作为的起始位，后面还要增加校验位及停止位。</p>
+<ul>
+<li>起始位是逻辑 0 电平，要求必须从下降沿开始，也就是说在起始位前沿必须是 1(停止位或者空闲位)</li>
+<li>而停止位没有前沿的要求，只要是 1 即可。在不传输数据是，数据线上必须保持 1(空闲位)</li>
+</ul>
+</li>
+<li><p>注意，除了空闲位，其他位的宽度都是相同的(等于波特率)，如果串口数据连续无延迟发送，则每一字节发送完毕后经过停止位后不会插入空闲位。<br><img src="/images/Network/UART%E7%9A%84%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%A0%BC%E5%BC%8F.png" alt="UART的数据传输格式"></p>
+</li>
+<li><p>关于波特率的概念说明</p>
+<ul>
+<li>波特率(BaudRate)表示每秒钟传输的bit数，其单位是 bps(bit per second)，这里的bit不仅仅是指数据位，还包括起始位，校验位，停止位，而且每1位的时间宽度都是 1&#x2F;BaudRate</li>
+<li>假设串口配置为(9600bps,1个起始位，8个数据位，1个奇校验位，1个停止位，共11位)，则每秒可以传输的字节数为 9600 &#x2F; 11 &#x3D; 872 Bytes</li>
+</ul>
+</li>
+</ul>
+<h2 id="串口通讯协议"><a href="#串口通讯协议" class="headerlink" title="串口通讯协议"></a>串口通讯协议</h2><p><a target="_blank" rel="noopener" href="https://docusaurus.wiki-power.com/%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE-%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1">通信协议-串口通信</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SerialPort/" rel="tag"># SerialPort</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/01/20/notebook/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2025-01-20-20-QTextStream/" rel="prev" title="QTextStream">
+      <i class="fa fa-chevron-left"></i> QTextStream
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/21/notebook/Qt/%E5%B8%B8%E8%A7%81%E7%B1%BB/2025-01-21-21-QTcpSocket/" rel="next" title="QTcpSocket">
+      QTcpSocket <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91%E4%B8%AD%E5%85%B3%E4%BA%8E%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1"><span class="nav-number">2.</span> <span class="nav-text">维基百科中关于串口通信</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RS-232-C"><span class="nav-number">2.1.</span> <span class="nav-text">RS-232-C</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RS-422"><span class="nav-number">2.2.</span> <span class="nav-text">RS-422</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RS-485"><span class="nav-number">2.3.</span> <span class="nav-text">RS-485</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Universal-Serial-Bus-%E9%80%9A%E7%94%A8%E4%B8%B2%E8%A1%8C%E6%80%BB%E7%BA%BF"><span class="nav-number">2.4.</span> <span class="nav-text">Universal Serial Bus(通用串行总线)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1"><span class="nav-number">2.5.</span> <span class="nav-text">串口通信</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">串口通信原理详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B2%E5%8F%A3%E5%88%92%E5%88%86%E6%A0%87%E5%87%86"><span class="nav-number">3.1.</span> <span class="nav-text">串口划分标准</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B2%E5%8F%A3%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.2.</span> <span class="nav-text">串口通信协议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">串口通讯协议</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

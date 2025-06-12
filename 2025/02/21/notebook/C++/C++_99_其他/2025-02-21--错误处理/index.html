@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 C++中的错误处理 返回错误码 异常处理 断言 日志记录 资源管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中的错误处理">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/21/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-21--%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 C++中的错误处理 返回错误码 异常处理 断言 日志记录 资源管理">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-02-21T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.232Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppOthers">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/21/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-21--%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++中的错误处理 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/21/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-21--%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++中的错误处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-21 10:00:00" itemprop="dateCreated datePublished" datetime="2025-02-21T10:00:00+08:00">2025-02-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>C++中的错误处理<ul>
+<li>返回错误码</li>
+<li>异常处理</li>
+<li>断言</li>
+<li>日志记录</li>
+<li>资源管理</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="设计模式中关于错误处理的设计"><a href="#设计模式中关于错误处理的设计" class="headerlink" title="设计模式中关于错误处理的设计"></a>设计模式中关于错误处理的设计</h2><p>在设计模式中，与错误处理相关的模式主要包括以下几种，它们可以帮助提高系统的健壮性、可维护性和可扩展性：</p>
+<hr>
+<h3 id="1-异常对象模式（Exception-Object-Pattern）"><a href="#1-异常对象模式（Exception-Object-Pattern）" class="headerlink" title="1. 异常对象模式（Exception Object Pattern）"></a>1. <strong>异常对象模式（Exception Object Pattern）</strong></h3><p><strong>概念</strong>：<br>将错误信息封装到异常对象中，并使用对象传递错误，而不是通过返回码或标志位。</p>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>需要详细描述错误信息，如错误码、错误消息、发生时间等。</li>
+<li>需要在不同层级的代码中传递错误，而不丢失上下文信息。</li>
+</ul>
+<p><strong>示例（C++）</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdexcept&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomException</span> : <span class="keyword">public</span> std::exception &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string message;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">CustomException</span><span class="params">(<span class="type">const</span> std::string&amp; msg)</span> : message(msg) &#123;</span>&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">what</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> message.<span class="built_in">c_str</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">processFile</span><span class="params">(<span class="type">const</span> std::string&amp; filename)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (filename.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="built_in">CustomException</span>(<span class="string">&quot;文件名不能为空&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 文件处理逻辑</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="built_in">processFile</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> CustomException&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;发生错误：&quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>通过继承 <code>std::exception</code> 结构化错误信息。</li>
+<li>提供更详细的错误信息，提高可读性。</li>
+</ul>
+<hr>
+<h3 id="2-责任链模式（Chain-of-Responsibility-Pattern）"><a href="#2-责任链模式（Chain-of-Responsibility-Pattern）" class="headerlink" title="2. 责任链模式（Chain of Responsibility Pattern）"></a>2. <strong>责任链模式（Chain of Responsibility Pattern）</strong></h3><p><strong>概念</strong>：<br>将多个错误处理对象串联在一起，错误发生时，依次尝试不同的处理者，直到某个处理者能够处理该错误。</p>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>需要多个对象协作处理错误，并且希望动态调整处理流程。</li>
+<li>不希望在调用方硬编码所有可能的错误处理逻辑。</li>
+</ul>
+<p><strong>示例（C++）</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 抽象错误处理者</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ErrorHandler</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">handleError</span><span class="params">(<span class="type">int</span> errorCode)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setNext</span><span class="params">(std::shared_ptr&lt;ErrorHandler&gt; nextHandler)</span> </span>&#123;</span><br><span class="line">        next = nextHandler;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    std::shared_ptr&lt;ErrorHandler&gt; next;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体错误处理者</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileErrorHandler</span> : <span class="keyword">public</span> ErrorHandler &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handleError</span><span class="params">(<span class="type">int</span> errorCode)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (errorCode == <span class="number">1</span>) &#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;文件错误处理&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (next) &#123;</span><br><span class="line">            next-&gt;<span class="built_in">handleError</span>(errorCode);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NetworkErrorHandler</span> : <span class="keyword">public</span> ErrorHandler &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handleError</span><span class="params">(<span class="type">int</span> errorCode)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (errorCode == <span class="number">2</span>) &#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;网络错误处理&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (next) &#123;</span><br><span class="line">            next-&gt;<span class="built_in">handleError</span>(errorCode);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> fileHandler = std::<span class="built_in">make_shared</span>&lt;FileErrorHandler&gt;();</span><br><span class="line">    <span class="keyword">auto</span> networkHandler = std::<span class="built_in">make_shared</span>&lt;NetworkErrorHandler&gt;();</span><br><span class="line"></span><br><span class="line">    fileHandler-&gt;<span class="built_in">setNext</span>(networkHandler);</span><br><span class="line"></span><br><span class="line">    fileHandler-&gt;<span class="built_in">handleError</span>(<span class="number">2</span>);  <span class="comment">// 触发网络错误处理</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>使代码更加模块化，每个错误类型有独立的处理逻辑。</li>
+<li>处理流程可以动态调整，便于扩展。</li>
+</ul>
+<hr>
+<h3 id="3-状态模式（State-Pattern）"><a href="#3-状态模式（State-Pattern）" class="headerlink" title="3. 状态模式（State Pattern）"></a>3. <strong>状态模式（State Pattern）</strong></h3><p><strong>概念</strong>：<br>系统在不同状态下可能需要不同的错误处理方式，使用状态模式可以在运行时动态改变错误处理策略。</p>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>需要根据程序当前状态采用不同的错误处理方式。</li>
+<li>需要减少 <code>if-else</code> 逻辑，提升代码可读性。</li>
+</ul>
+<p><strong>示例（C++）</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 抽象错误处理状态</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ErrorState</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">handleError</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体状态类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NormalState</span> : <span class="keyword">public</span> ErrorState &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handleError</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;普通错误处理&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CriticalState</span> : <span class="keyword">public</span> ErrorState &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">handleError</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;严重错误处理&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 状态管理类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ErrorContext</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::shared_ptr&lt;ErrorState&gt; state;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setState</span><span class="params">(std::shared_ptr&lt;ErrorState&gt; newState)</span> </span>&#123;</span><br><span class="line">        state = newState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">processError</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (state) &#123;</span><br><span class="line">            state-&gt;<span class="built_in">handleError</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ErrorContext context;</span><br><span class="line">    context.<span class="built_in">setState</span>(std::<span class="built_in">make_shared</span>&lt;NormalState&gt;());</span><br><span class="line">    context.<span class="built_in">processError</span>();  <span class="comment">// 输出：普通错误处理</span></span><br><span class="line"></span><br><span class="line">    context.<span class="built_in">setState</span>(std::<span class="built_in">make_shared</span>&lt;CriticalState&gt;());</span><br><span class="line">    context.<span class="built_in">processError</span>();  <span class="comment">// 输出：严重错误处理</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>使错误处理逻辑更加灵活，能够在运行时动态切换错误处理策略。</li>
+<li>降低耦合，使不同状态的错误处理逻辑更加清晰。</li>
+</ul>
+<hr>
+<h3 id="4-观察者模式（Observer-Pattern）"><a href="#4-观察者模式（Observer-Pattern）" class="headerlink" title="4. 观察者模式（Observer Pattern）"></a>4. <strong>观察者模式（Observer Pattern）</strong></h3><p><strong>概念</strong>：<br>当错误发生时，多个监听者（观察者）会被通知，并可以采取相应的处理措施。</p>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>需要在错误发生时通知多个组件（如日志系统、告警系统、UI 界面等）。</li>
+<li>需要解耦错误发生方和错误处理方。</li>
+</ul>
+<p><strong>示例（C++）</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 观察者接口</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ErrorObserver</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onError</span><span class="params">(<span class="type">const</span> std::string&amp; message)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体观察者</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Logger</span> : <span class="keyword">public</span> ErrorObserver &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onError</span><span class="params">(<span class="type">const</span> std::string&amp; message)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;日志记录错误: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AlertSystem</span> : <span class="keyword">public</span> ErrorObserver &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">onError</span><span class="params">(<span class="type">const</span> std::string&amp; message)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;发送警报: &quot;</span> &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 被观察者（错误管理器）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ErrorManager</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::vector&lt;std::shared_ptr&lt;ErrorObserver&gt;&gt; observers;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addObserver</span><span class="params">(std::shared_ptr&lt;ErrorObserver&gt; observer)</span> </span>&#123;</span><br><span class="line">        observers.<span class="built_in">push_back</span>(observer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">notifyError</span><span class="params">(<span class="type">const</span> std::string&amp; message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; observer : observers) &#123;</span><br><span class="line">            observer-&gt;<span class="built_in">onError</span>(message);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> manager = std::<span class="built_in">make_shared</span>&lt;ErrorManager&gt;();</span><br><span class="line">    manager-&gt;<span class="built_in">addObserver</span>(std::<span class="built_in">make_shared</span>&lt;Logger&gt;());</span><br><span class="line">    manager-&gt;<span class="built_in">addObserver</span>(std::<span class="built_in">make_shared</span>&lt;AlertSystem&gt;());</span><br><span class="line"></span><br><span class="line">    manager-&gt;<span class="built_in">notifyError</span>(<span class="string">&quot;数据库连接失败&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>使错误处理逻辑更加灵活，可以动态添加新的错误处理方式。</li>
+<li>促进模块解耦，提高代码复用性。</li>
+</ul>
+<hr>
+<h3 id="结论："><a href="#结论：" class="headerlink" title="结论："></a>结论：</h3><table>
+<thead>
+<tr>
+<th>设计模式</th>
+<th>适用场景</th>
+<th>优势</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>异常对象模式</strong></td>
+<td>需要结构化管理异常信息</td>
+<td>提供详细错误信息，便于追踪</td>
+</tr>
+<tr>
+<td><strong>责任链模式</strong></td>
+<td>需要多个错误处理对象协作</td>
+<td>处理流程清晰，易扩展</td>
+</tr>
+<tr>
+<td><strong>状态模式</strong></td>
+<td>错误处理方式依赖于程序状态</td>
+<td>代码清晰，可动态改变处理逻辑</td>
+</tr>
+<tr>
+<td><strong>观察者模式</strong></td>
+<td>需要通知多个组件错误发生</td>
+<td>解耦错误触发和错误处理</td>
+</tr>
+</tbody></table>
+<p>选择合适的设计模式，可以帮助你构建健壮、灵活、易维护的错误处理系统。</p>
+<h2 id="C-错误处理一般设计思路"><a href="#C-错误处理一般设计思路" class="headerlink" title="C++ 错误处理一般设计思路"></a>C++ 错误处理一般设计思路</h2><h3 id="C-错误处理一般设计思路-1"><a href="#C-错误处理一般设计思路-1" class="headerlink" title="C++ 错误处理一般设计思路"></a><strong>C++ 错误处理一般设计思路</strong></h3><p>在 C++ 代码中，错误处理是提高程序健壮性和可靠性的关键部分。通常可以采用以下方法进行设计：</p>
+<hr>
+<h2 id="1-错误处理策略"><a href="#1-错误处理策略" class="headerlink" title="1. 错误处理策略"></a><strong>1. 错误处理策略</strong></h2><p>C++ 的错误处理主要分为以下几种方式：</p>
+<ol>
+<li><strong>返回错误码（Return Codes）</strong> - 适用于简单程序或低级 API。</li>
+<li><strong>异常处理（Exceptions）</strong> - 适用于复杂系统，提供更清晰的错误传播。</li>
+<li><strong>断言（Assertions）</strong> - 适用于调试阶段，检查不应发生的错误。</li>
+<li><strong>日志记录（Logging）</strong> - 记录错误信息，便于调试和分析。</li>
+<li><strong>资源管理（RAII）</strong> - 避免资源泄露，提高代码健壮性。</li>
+</ol>
+<hr>
+<h2 id="2-错误码（Return-Codes）"><a href="#2-错误码（Return-Codes）" class="headerlink" title="2. 错误码（Return Codes）"></a><strong>2. 错误码（Return Codes）</strong></h2><p><strong>适用场景</strong>：  </p>
+<ul>
+<li>适用于嵌入式系统、驱动程序或 C 风格的库（如 POSIX API）。</li>
+<li>可以通过 <code>enum</code> 定义错误类型，提高可读性。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">ErrorCode</span> &#123;</span><br><span class="line">    SUCCESS = <span class="number">0</span>,</span><br><span class="line">    FILE_NOT_FOUND = <span class="number">1</span>,</span><br><span class="line">    PERMISSION_DENIED = <span class="number">2</span>,</span><br><span class="line">    UNKNOWN_ERROR = <span class="number">-1</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">ErrorCode <span class="title">readFile</span><span class="params">(<span class="type">const</span> std::string&amp; filename)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (filename.<span class="built_in">empty</span>()) <span class="keyword">return</span> FILE_NOT_FOUND;</span><br><span class="line">    <span class="comment">// 其他逻辑</span></span><br><span class="line">    <span class="keyword">return</span> SUCCESS;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ErrorCode result = <span class="built_in">readFile</span>(<span class="string">&quot;config.txt&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (result != SUCCESS) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;Error: &quot;</span> &lt;&lt; result &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优缺点</strong>：<br>✔ <strong>优点</strong>：</p>
+<ul>
+<li>低开销，易于理解。</li>
+<li>在高性能应用（如游戏引擎、嵌入式系统）中表现良好。</li>
+</ul>
+<p>❌ <strong>缺点</strong>：</p>
+<ul>
+<li>需要手动检查返回值，容易遗漏错误处理。</li>
+<li>可读性较差，错误传播不方便。</li>
+</ul>
+<hr>
+<h2 id="3-异常处理（Exceptions）"><a href="#3-异常处理（Exceptions）" class="headerlink" title="3. 异常处理（Exceptions）"></a><strong>3. 异常处理（Exceptions）</strong></h2><p><strong>适用场景</strong>：  </p>
+<ul>
+<li>适用于 C++ 标准库、面向对象程序设计（OOP）。</li>
+<li>适用于复杂流程控制，如文件 I&#x2F;O、数据库访问、网络通信等。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdexcept&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">readFile</span><span class="params">(<span class="type">const</span> std::string&amp; filename)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (filename.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> std::<span class="built_in">runtime_error</span>(<span class="string">&quot;文件名不能为空&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 其他逻辑</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="built_in">readFile</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> std::runtime_error&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;捕获异常: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优缺点</strong>：<br>✔ <strong>优点</strong>：</p>
+<ul>
+<li>代码可读性强，错误可以自动传播。</li>
+<li>可以捕获不同类型的错误（<code>std::exception</code>）。</li>
+</ul>
+<p>❌ <strong>缺点</strong>：</p>
+<ul>
+<li>可能影响性能（如栈回溯）。</li>
+<li>滥用异常可能导致代码结构复杂。</li>
+</ul>
+<p><strong>设计原则</strong>：</p>
+<ul>
+<li>只在<strong>异常情况下</strong>使用异常（如无法恢复的错误）。</li>
+<li>不要用异常做流程控制。</li>
+<li>异常要尽可能提供详细的错误信息（如错误码、文件名、行号）。</li>
+</ul>
+<hr>
+<h2 id="4-断言（Assertions）"><a href="#4-断言（Assertions）" class="headerlink" title="4. 断言（Assertions）"></a><strong>4. 断言（Assertions）</strong></h2><p><strong>适用场景</strong>：</p>
+<ul>
+<li>主要用于<strong>开发阶段</strong>，检查不应发生的错误。</li>
+<li>可用于防止非法参数传递。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">process</span><span class="params">(<span class="type">int</span> value)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">assert</span>(value &gt;= <span class="number">0</span> &amp;&amp; <span class="string">&quot;value 不能是负数&quot;</span>);</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;处理值: &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">process</span>(<span class="number">-1</span>);  <span class="comment">// 运行时会触发断言失败</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优缺点</strong>：<br>✔ <strong>优点</strong>：</p>
+<ul>
+<li>性能影响小，错误检测简单。</li>
+<li>可在 Debug 模式启用，在 Release 模式关闭（<code>NDEBUG</code>）。</li>
+</ul>
+<p>❌ <strong>缺点</strong>：</p>
+<ul>
+<li>仅适用于开发阶段，不能用于错误恢复。</li>
+</ul>
+<hr>
+<h2 id="5-日志记录（Logging）"><a href="#5-日志记录（Logging）" class="headerlink" title="5. 日志记录（Logging）"></a><strong>5. 日志记录（Logging）</strong></h2><p><strong>适用场景</strong>：</p>
+<ul>
+<li>适用于长期运行的系统，如服务器、嵌入式设备。</li>
+<li>用于调试和故障分析。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">logError</span><span class="params">(<span class="type">const</span> std::string&amp; message)</span> </span>&#123;</span><br><span class="line">    <span class="function">std::ofstream <span class="title">logFile</span><span class="params">(<span class="string">&quot;error.log&quot;</span>, std::ios::app)</span></span>;</span><br><span class="line">    logFile &lt;&lt; message &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">logError</span>(<span class="string">&quot;发生错误: 文件未找到&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优缺点</strong>：<br>✔ <strong>优点</strong>：</p>
+<ul>
+<li>方便调试，适用于生产环境。</li>
+<li>可以存储详细的错误信息。</li>
+</ul>
+<p>❌ <strong>缺点</strong>：</p>
+<ul>
+<li>需要额外的 I&#x2F;O 资源（可异步写入日志）。</li>
+</ul>
+<hr>
+<h2 id="6-RAII（资源管理）"><a href="#6-RAII（资源管理）" class="headerlink" title="6. RAII（资源管理）"></a><strong>6. RAII（资源管理）</strong></h2><p><strong>适用场景</strong>：</p>
+<ul>
+<li>防止资源泄露（文件、内存、锁）。</li>
+<li>适用于 C++ 智能指针（<code>std::unique_ptr</code>, <code>std::shared_ptr</code>）。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileHandler</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::ifstream file;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">FileHandler</span>(<span class="type">const</span> std::string&amp; filename) &#123;</span><br><span class="line">        file.<span class="built_in">open</span>(filename);</span><br><span class="line">        <span class="keyword">if</span> (!file) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::<span class="built_in">runtime_error</span>(<span class="string">&quot;无法打开文件: &quot;</span> + filename);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">FileHandler</span>() &#123;</span><br><span class="line">        <span class="keyword">if</span> (file.<span class="built_in">is_open</span>()) &#123;</span><br><span class="line">            file.<span class="built_in">close</span>();</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;文件已关闭&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="function">FileHandler <span class="title">fh</span><span class="params">(<span class="string">&quot;test.txt&quot;</span>)</span></span>;</span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;错误: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优缺点</strong>：<br>✔ <strong>优点</strong>：</p>
+<ul>
+<li>资源自动释放，减少内存泄露风险。</li>
+<li>结合 <code>std::unique_ptr</code> 进行智能内存管理。</li>
+</ul>
+<p>❌ <strong>缺点</strong>：</p>
+<ul>
+<li>需要正确设计类的生命周期，避免循环引用（可用 <code>std::weak_ptr</code>）。</li>
+</ul>
+<hr>
+<h2 id="7-结合使用"><a href="#7-结合使用" class="headerlink" title="7. 结合使用"></a><strong>7. 结合使用</strong></h2><p>在大型 C++ 项目中，通常会<strong>结合多种错误处理策略</strong>：</p>
+<ul>
+<li><strong>返回值 + 日志</strong>（适用于库函数）。</li>
+<li><strong>异常 + RAII</strong>（适用于复杂对象管理）。</li>
+<li><strong>断言</strong>（仅用于调试）。</li>
+<li><strong>断路器 + 重试</strong>（用于网络通信）。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdexcept&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// RAII 处理文件资源</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileHandler</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::ifstream file;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">FileHandler</span>(<span class="type">const</span> std::string&amp; filename) &#123;</span><br><span class="line">        file.<span class="built_in">open</span>(filename);</span><br><span class="line">        <span class="keyword">if</span> (!file) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::<span class="built_in">runtime_error</span>(<span class="string">&quot;无法打开文件: &quot;</span> + filename);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">FileHandler</span>() &#123;</span><br><span class="line">        <span class="keyword">if</span> (file.<span class="built_in">is_open</span>()) &#123;</span><br><span class="line">            file.<span class="built_in">close</span>();</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;文件已关闭&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">processFile</span><span class="params">(<span class="type">const</span> std::string&amp; filename)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="function">FileHandler <span class="title">fh</span><span class="params">(filename)</span></span>;</span><br><span class="line">        <span class="comment">// 文件处理逻辑...</span></span><br><span class="line">    &#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">&quot;错误: &quot;</span> &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">processFile</span>(<span class="string">&quot;data.txt&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>适用场景</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>返回值</td>
+<td>简单函数、嵌入式</td>
+<td>低开销</td>
+<td>易忽略错误</td>
+</tr>
+<tr>
+<td>异常</td>
+<td>复杂系统、OOP</td>
+<td>代码清晰</td>
+<td>性能开销</td>
+</tr>
+<tr>
+<td>断言</td>
+<td>开发阶段</td>
+<td>低成本</td>
+<td>不能用于恢复</td>
+</tr>
+<tr>
+<td>日志</td>
+<td>生产环境</td>
+<td>可追溯</td>
+<td>需额外存储</td>
+</tr>
+<tr>
+<td>RAII</td>
+<td>资源管理</td>
+<td>避免泄露</td>
+<td>需良好设计</td>
+</tr>
+</tbody></table>
+<p>你希望针对哪种情况做更详细的优化呢？</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppOthers/" rel="tag"># CppOthers</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/21/notebook/Tools/2025-02-21--%E6%95%85%E9%9A%9C%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1%E8%B0%83%E7%A0%94/" rel="prev" title="故障模块设计调研">
+      <i class="fa fa-chevron-left"></i> 故障模块设计调研
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/22/notebook/OpenCV/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/2025-02-22--%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AE%B0/" rel="next" title="OpenCV 面试笔记">
+      OpenCV 面试笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%AD%E5%85%B3%E4%BA%8E%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">设计模式中关于错误处理的设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%BC%82%E5%B8%B8%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F%EF%BC%88Exception-Object-Pattern%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">1. 异常对象模式（Exception Object Pattern）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F%EF%BC%88Chain-of-Responsibility-Pattern%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2. 责任链模式（Chain of Responsibility Pattern）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F%EF%BC%88State-Pattern%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">3. 状态模式（State Pattern）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%EF%BC%88Observer-Pattern%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">4. 观察者模式（Observer Pattern）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">结论：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%80%E8%88%AC%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="nav-number">3.</span> <span class="nav-text">C++ 错误处理一般设计思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#C-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%80%E8%88%AC%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF-1"><span class="nav-number">3.1.</span> <span class="nav-text">C++ 错误处理一般设计思路</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E7%AD%96%E7%95%A5"><span class="nav-number">4.</span> <span class="nav-text">1. 错误处理策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E9%94%99%E8%AF%AF%E7%A0%81%EF%BC%88Return-Codes%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">2. 错误码（Return Codes）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%EF%BC%88Exceptions%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">3. 异常处理（Exceptions）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%96%AD%E8%A8%80%EF%BC%88Assertions%EF%BC%89"><span class="nav-number">7.</span> <span class="nav-text">4. 断言（Assertions）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95%EF%BC%88Logging%EF%BC%89"><span class="nav-number">8.</span> <span class="nav-text">5. 日志记录（Logging）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-RAII%EF%BC%88%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%EF%BC%89"><span class="nav-number">9.</span> <span class="nav-text">6. RAII（资源管理）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%BB%93%E5%90%88%E4%BD%BF%E7%94%A8"><span class="nav-number">10.</span> <span class="nav-text">7. 结合使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 websocket相关函数  struct mg_ws_message 简介：  该结构代表Websocket消息。这个flag元素对应于RFC 6455第5.2节中所述的第一个字节。(https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;rfc&#x2F;rfc6455#section-5.2)   原型： 1234struct mg_ws_message &#123;  struct mg_str">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoose_websocket">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_websocket/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 websocket相关函数  struct mg_ws_message 简介：  该结构代表Websocket消息。这个flag元素对应于RFC 6455第5.2节中所述的第一个字节。(https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;rfc&#x2F;rfc6455#section-5.2)   原型： 1234struct mg_ws_message &#123;  struct mg_str">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.414Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Mongoose">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_websocket/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mongoose_websocket | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_websocket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mongoose_websocket
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>websocket相关函数</li>
+</ul>
+<h2 id="struct-mg-ws-message"><a href="#struct-mg-ws-message" class="headerlink" title="struct mg_ws_message"></a>struct mg_ws_message</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>该结构代表Websocket消息。这个<code>flag</code>元素对应于<code>RFC 6455</code>第5.2节中所述的第一个字节。(<code>https://www.rfc-editor.org/rfc/rfc6455#section-5.2</code>)</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_ws_message</span> &#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> data; <span class="comment">// WebSocket message data</span></span><br><span class="line">  <span class="type">uint8_t</span> flags;      <span class="comment">// WebSocket message flags</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="websocket-message-type"><a href="#websocket-message-type" class="headerlink" title="websocket message type"></a>websocket message type</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>要从传入消息中提取消息类型，在结构体<code>mg_ws_message</code>的<code>flag</code>元素中检查四个<code>LSBs</code></li>
+</ul>
+</li>
+<li><p>可能存在的WebSocket消息类型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> WEBSOCKET_OP_CONTINUE 0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WEBSOCKET_OP_TEXT 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WEBSOCKET_OP_BINARY 2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WEBSOCKET_OP_CLOSE 8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WEBSOCKET_OP_PING 9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WEBSOCKET_OP_PONG 10</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Mongoose events handler</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">int</span> ev, <span class="type">void</span> *ev_data, <span class="type">void</span> *fn_data)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (ev == MG_EV_WS_MSG) &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">mg_ws_message</span> *wm = (<span class="keyword">struct</span> mg_ws_message *) ev_data;</span><br><span class="line">    msgtype = wm-&gt;flags &amp; <span class="number">0x0F</span>;</span><br><span class="line">    <span class="keyword">if</span> (msgtype == WEBSOCKET_OP_BINARY) &#123;</span><br><span class="line">      <span class="comment">// This is a binary data message</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (msgtype == WEBSOCKET_OP_TEXT) &#123;</span><br><span class="line">      <span class="comment">// This is a text data message</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注：</p>
+<ul>
+<li>当调用<code>mg_ws_send()</code>或<code>ms_ws_printf()</code>发送消息时，请使用<code>RFC 6455</code>第5.6节中所述的正确消息类型进行数据帧(<code>https://www.rfc-editor.org/rfc/rfc6455#section-5.6</code>)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="mg-ws-connect"><a href="#mg-ws-connect" class="headerlink" title="mg_ws_connect"></a>mg_ws_connect</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>创建客户端Websocket连接。这个函数不能连接到对端，它仅仅分配需要的资源和启动连接进程。当对端真正连接好了，会向连接事件处理函数发送一个<code>MG_EV_CONNECT</code>事件</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_connection</span> *<span class="built_in">mg_ws_connect</span>(<span class="keyword">struct</span> mg_mgr *mgr, <span class="type">const</span> <span class="type">char</span> *url, <span class="type">mg_event_handler_t</span> fn, <span class="type">void</span> *fn_data, <span class="type">const</span> <span class="type">char</span> *fmt, ...);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>mgr</code>  –  使用的事件管理结构体</li>
+<li><code>url</code>  –  指定的远程URL。例如：<code>http://google.com</code></li>
+<li><code>fn</code>   –  一个事件处理函数</li>
+<li><code>fn_data</code>  –  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>返回一个指向创建的连接</li>
+<li>返回NULL表示错误</li>
+</ul>
+</li>
+<li><p>示例</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_connection</span> *c = <span class="built_in">mg_ws_connect</span>(&amp;mgr, <span class="string">&quot;ws://test_ws_server.com:1000&quot;</span>,</span><br><span class="line">                                        handler, <span class="literal">NULL</span>, <span class="string">&quot;%s&quot;</span>, <span class="string">&quot;Sec-WebSocket-Protocol: echo\r\n&quot;</span>);</span><br><span class="line"><span class="keyword">if</span>(c == <span class="literal">NULL</span>) <span class="built_in">fatal</span>(<span class="string">&quot;Cannot create connection&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="mg-ws-upgrade"><a href="#mg-ws-upgrade" class="headerlink" title="mg_ws_upgrade"></a>mg_ws_upgrade</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>升级给定HTTP连接到Websocket。<code>fmt</code>是一个类似于<code>printf()</code>格式的字符串，用于额外的HTTP标头，返回给Websocket握手的客户端。如果不需要额外的标头，将<code>fmt</code>设置为空</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_ws_upgrade</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="keyword">struct</span> mg_http_message *, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>c</code>    –  使用的连接</li>
+<li><code>hm</code>   –  HTTP消息</li>
+<li><code>fmt</code>  –  类似于<code>printf</code>的格式字符串，用于附加<code>HTTP</code>标头或为null</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>无</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Mongoose events handler</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">int</span> ev, <span class="type">void</span> *ev_data, <span class="type">void</span> *fn_data)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">mg_http_message</span> *hm = (<span class="keyword">struct</span> mg_http_message *) ev_data;</span><br><span class="line">    <span class="built_in">mg_ws_upgrade</span>(c, hm, <span class="literal">NULL</span>);  <span class="comment">// Upgrade HTTP to WS</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="mg-ws-send"><a href="#mg-ws-send" class="headerlink" title="mg_ws_send"></a>mg_ws_send</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>向WebSocket对端发送数据</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">mg_ws_send</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> op)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>c</code>  –  使用的连接</li>
+<li><code>buf</code>  –  需要发送的数据</li>
+<li><code>len</code>  –  需要发送的数据大小</li>
+<li><code>op</code>   –  WebSocket消息类型，参见WebSocket message type</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>返回发送的字节数</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Mongoose events handler</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">fn</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">int</span> ev, <span class="type">void</span> *ev_data, <span class="type">void</span> *fn_data)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (ev == MG_EV_WS_OPEN) &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">mg_http_message</span> *hm = (<span class="keyword">struct</span> mg_http_message *) ev_data;</span><br><span class="line">    <span class="built_in">mg_ws_send</span>(c, <span class="string">&quot;opened&quot;</span>, <span class="number">6</span>, WEBSOCKET_OP_BINARY);  <span class="comment">// Send &quot;opened&quot; to web socket connection</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="mg-ws-printf-mg-ws-vprintf"><a href="#mg-ws-printf-mg-ws-vprintf" class="headerlink" title="mg_ws_printf, mg_ws_vprintf"></a>mg_ws_printf, mg_ws_vprintf</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>和<code>ms_ws_send()</code>相同，但是使用<code>printf()</code>语义格式化数据</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">mg_ws_printf</span><span class="params">(<span class="keyword">struct</span> mg_connection *, <span class="type">int</span> op, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">mg_ws_vprintf</span><span class="params">(<span class="keyword">struct</span> mg_connection *, <span class="type">int</span> op, <span class="type">const</span> <span class="type">char</span> *fmt, va_list *)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>c</code>   –  使用的连接</li>
+<li><code>op</code>  –  WebSocket消息类型，参见WebSocket message type</li>
+<li><code>fmt</code> –  使用<code>printf()</code>语义格式化的字符串</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>返回发送的字节数</li>
+</ul>
+</li>
+<li><p>示例:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mg_ws_printf</span>(c, WEBSOCKET_OP_TEXT, <span class="string">&quot;Hello, %s!&quot;</span>, <span class="string">&quot;world&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="mg-ws-wrap"><a href="#mg-ws-wrap" class="headerlink" title="mg_ws_wrap"></a>mg_ws_wrap</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>将输出缓冲区中的数据转换为Websocket格式。有用然后通过WebSocket实施协议。具体示例参见<code>examples/mqtt-over-ws-client</code></li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">mg_ws_wrap</span><span class="params">(<span class="keyword">struct</span> mg_connection *c, <span class="type">size_t</span> len, <span class="type">int</span> op)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><code>c</code>  –  使用的连接</li>
+<li><code>len</code>  –  转换的字节数</li>
+<li><code>op</code>   –  WebSocket消息类型</li>
+</ul>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>返回连接结构体中输出缓冲区新的大小</li>
+</ul>
+</li>
+<li><p>示例:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> len = c-&gt;send.len;         <span class="comment">// Store output buffer len</span></span><br><span class="line"><span class="built_in">mg_mqtt_login</span>(c, s_url, &amp;opts);   <span class="comment">// Write MQTT login message</span></span><br><span class="line"><span class="built_in">mg_ws_wrap</span>(c, c-&gt;send.len - len, WEBSOCKET_OP_BINARY); <span class="comment">// Wrap it into WS</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mongoose/" rel="tag"># Mongoose</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-question_%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" rel="prev" title="question_问题与解决方案">
+      <i class="fa fa-chevron-left"></i> question_问题与解决方案
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_url/" rel="next" title="mongoose_url">
+      mongoose_url <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-ws-message"><span class="nav-number">2.</span> <span class="nav-text">struct mg_ws_message</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#websocket-message-type"><span class="nav-number">3.</span> <span class="nav-text">websocket message type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-ws-connect"><span class="nav-number">4.</span> <span class="nav-text">mg_ws_connect</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-ws-upgrade"><span class="nav-number">5.</span> <span class="nav-text">mg_ws_upgrade</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-ws-send"><span class="nav-number">6.</span> <span class="nav-text">mg_ws_send</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-ws-printf-mg-ws-vprintf"><span class="nav-number">7.</span> <span class="nav-text">mg_ws_printf, mg_ws_vprintf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-ws-wrap"><span class="nav-number">8.</span> <span class="nav-text">mg_ws_wrap</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

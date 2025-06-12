@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 模型前处理相关学习笔记  深度学习模型部署 前处理在深度学习模型的部署过程中，前处理是一个至关重要的步骤。前处理的目标是将原始数据转换为模型可以接受的格式，以确保推理结果的准确性和一致性。以下是前处理的一些常见操作及其实现方法。  前处理的主要步骤1. 数据加载 从文件、摄像头、传感器、API 等读取数据。 支持的格式可能包括图像（JPEG&#x2F;PNG）、文本、视频、音频等。 常用库：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前处理">
+<meta property="og:url" content="https://junyiha.github.io/2024/12/31/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E5%89%8D%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 模型前处理相关学习笔记  深度学习模型部署 前处理在深度学习模型的部署过程中，前处理是一个至关重要的步骤。前处理的目标是将原始数据转换为模型可以接受的格式，以确保推理结果的准确性和一致性。以下是前处理的一些常见操作及其实现方法。  前处理的主要步骤1. 数据加载 从文件、摄像头、传感器、API 等读取数据。 支持的格式可能包括图像（JPEG&#x2F;PNG）、文本、视频、音频等。 常用库：">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://junyiha.github.io/images/Deeplearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/%E5%BD%92%E4%B8%80%E5%8C%96%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E5%85%AC%E5%BC%8F.png">
+<meta property="og:image" content="https://junyiha.github.io/images/Deeplearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/%E6%A0%87%E5%87%86%E5%8C%96%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E5%85%AC%E5%BC%8F.png">
+<meta property="article:published_time" content="2024-12-31T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.291Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="DL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://junyiha.github.io/images/Deeplearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/%E5%BD%92%E4%B8%80%E5%8C%96%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E5%85%AC%E5%BC%8F.png">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/12/31/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E5%89%8D%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>前处理 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/12/31/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E5%89%8D%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          前处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-31 09:00:00" itemprop="dateCreated datePublished" datetime="2024-12-31T09:00:00+08:00">2024-12-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>模型前处理相关学习笔记</li>
+</ul>
+<h2 id="深度学习模型部署-前处理"><a href="#深度学习模型部署-前处理" class="headerlink" title="深度学习模型部署 前处理"></a>深度学习模型部署 前处理</h2><p>在深度学习模型的部署过程中，前处理是一个至关重要的步骤。前处理的目标是将原始数据转换为模型可以接受的格式，以确保推理结果的准确性和一致性。以下是前处理的一些常见操作及其实现方法。</p>
+<hr>
+<h3 id="前处理的主要步骤"><a href="#前处理的主要步骤" class="headerlink" title="前处理的主要步骤"></a>前处理的主要步骤</h3><h4 id="1-数据加载"><a href="#1-数据加载" class="headerlink" title="1. 数据加载"></a>1. <strong>数据加载</strong></h4><ul>
+<li>从文件、摄像头、传感器、API 等读取数据。</li>
+<li>支持的格式可能包括图像（JPEG&#x2F;PNG）、文本、视频、音频等。</li>
+<li>常用库：<ul>
+<li>图像：<code>OpenCV</code>、<code>Pillow</code></li>
+<li>文本：<code>NLTK</code>、<code>spaCy</code></li>
+<li>音频：<code>librosa</code>、<code>torchaudio</code></li>
+<li>视频：<code>OpenCV</code>、<code>moviepy</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="2-尺寸调整-Resizing"><a href="#2-尺寸调整-Resizing" class="headerlink" title="2. 尺寸调整 (Resizing)"></a>2. <strong>尺寸调整 (Resizing)</strong></h4><ul>
+<li>模型通常需要固定大小的输入，例如 224x224。</li>
+<li>工具：<ul>
+<li><strong>Python</strong>:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line">resized = cv2.resize(image, (<span class="number">224</span>, <span class="number">224</span>))</span><br></pre></td></tr></table></figure></li>
+<li><strong>C++</strong> (OpenCV):<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">resize</span>(image, resized_image, cv::<span class="built_in">Size</span>(<span class="number">224</span>, <span class="number">224</span>));</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h4 id="3-归一化-Normalization"><a href="#3-归一化-Normalization" class="headerlink" title="3. 归一化 (Normalization)"></a>3. <strong>归一化 (Normalization)</strong></h4><ul>
+<li>将输入数据的像素值范围调整到 <code>[0, 1]</code> 或 <code>[-1, 1]</code>。</li>
+<li>公式：<br>[<br>x_{\text{normalized}} &#x3D; \frac{x - \text{mean}}{\text{std}}<br>]</li>
+<li>常用库实现：<ul>
+<li>PyTorch：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torchvision.transforms <span class="keyword">as</span> transforms</span><br><span class="line">transform = transforms.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>], std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])</span><br><span class="line">normalized_image = transform(image)</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h4 id="4-数据格式转换"><a href="#4-数据格式转换" class="headerlink" title="4. 数据格式转换"></a>4. <strong>数据格式转换</strong></h4><ul>
+<li>深度学习模型可能需要特定的数据格式（例如 NHWC 或 NCHW）。<ul>
+<li><strong>NHWC</strong>: <code>[Batch, Height, Width, Channels]</code>（TensorFlow 通常使用）</li>
+<li><strong>NCHW</strong>: <code>[Batch, Channels, Height, Width]</code>（PyTorch 通常使用）</li>
+</ul>
+</li>
+<li>转换：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">nhwc_image = image.transpose(<span class="number">0</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>)  <span class="comment"># NCHW -&gt; NHWC</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="5-类型转换"><a href="#5-类型转换" class="headerlink" title="5. 类型转换"></a>5. <strong>类型转换</strong></h4><ul>
+<li>确保数据的类型与模型要求一致，例如 <code>float32</code>、<code>int8</code> 等。</li>
+<li>转换：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">float_image = image.astype(<span class="string">&#x27;float32&#x27;</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="6-数据归一化与标准化的结合"><a href="#6-数据归一化与标准化的结合" class="headerlink" title="6. 数据归一化与标准化的结合"></a>6. <strong>数据归一化与标准化的结合</strong></h4><ul>
+<li>对于图像：<ul>
+<li>首先缩放到 <code>[0, 1]</code> 范围。</li>
+<li>再进行归一化（减去均值，除以标准差）。</li>
+</ul>
+</li>
+<li>对于文本或序列数据：<ul>
+<li>可能需要 Tokenization 和 Padding。</li>
+</ul>
+</li>
+</ul>
+<h4 id="7-其他特定处理"><a href="#7-其他特定处理" class="headerlink" title="7. 其他特定处理"></a>7. <strong>其他特定处理</strong></h4><ul>
+<li>数据增强：裁剪、旋转、翻转（在推理时一般用于 TTA）。</li>
+<li>嵌入：对文本进行词嵌入转换。</li>
+<li>频谱图：将音频信号转换为频谱图。</li>
+</ul>
+<hr>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><p>以下是一个典型的图像模型的前处理示例，使用 Python：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">preprocess_image</span>(<span class="params">image_path, input_size=(<span class="params"><span class="number">224</span>, <span class="number">224</span></span>)</span>):</span><br><span class="line">    <span class="comment"># 加载图像</span></span><br><span class="line">    image = cv2.imread(image_path)</span><br><span class="line">    <span class="keyword">if</span> image <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">raise</span> ValueError(<span class="string">&quot;Image not found or unable to read!&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 调整大小</span></span><br><span class="line">    resized = cv2.resize(image, input_size)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 转换为浮点数并归一化到 [0, 1]</span></span><br><span class="line">    normalized = resized / <span class="number">255.0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 转换为 NCHW 格式</span></span><br><span class="line">    nchw_image = np.transpose(normalized, (<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 增加 Batch 维度并转换为 float32</span></span><br><span class="line">    batch_image = np.expand_dims(nchw_image, axis=<span class="number">0</span>).astype(np.float32)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> batch_image</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="部署中的前处理工具"><a href="#部署中的前处理工具" class="headerlink" title="部署中的前处理工具"></a>部署中的前处理工具</h3><ol>
+<li><p><strong>TensorFlow&#x2F;TF-Serving</strong></p>
+<ul>
+<li>使用 <code>tf.image</code> 模块进行前处理。</li>
+<li>可将前处理代码直接集成到模型中（SavedModel）。</li>
+</ul>
+</li>
+<li><p><strong>PyTorch&#x2F;TorchServe</strong></p>
+<ul>
+<li>使用 <code>torchvision.transforms</code> 执行前处理。</li>
+<li>在自定义 <code>Handler</code> 中实现前处理。</li>
+</ul>
+</li>
+<li><p><strong>ONNX Runtime</strong></p>
+<ul>
+<li>在推理时依赖外部前处理，但支持优化后的动态尺寸输入。</li>
+</ul>
+</li>
+<li><p><strong>OpenCV&#x2F;DNN 模块</strong></p>
+<ul>
+<li>OpenCV 支持直接加载和推理模型，可在前处理阶段使用其高效工具。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="前处理常见问题与优化"><a href="#前处理常见问题与优化" class="headerlink" title="前处理常见问题与优化"></a>前处理常见问题与优化</h3><ol>
+<li><p><strong>不匹配问题</strong></p>
+<ul>
+<li>原因：模型训练和推理时的前处理设置不同。</li>
+<li>解决：确保推理阶段与训练一致（归一化参数、数据格式等）。</li>
+</ul>
+</li>
+<li><p><strong>性能问题</strong></p>
+<ul>
+<li>原因：前处理耗时过长。</li>
+<li>解决：<ul>
+<li>使用并行库（如 DALI）。</li>
+<li>在 GPU&#x2F;TPU 上完成前处理。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>动态尺寸</strong></p>
+<ul>
+<li>原因：输入尺寸不固定。</li>
+<li>解决：使用动态尺寸模型，或在前处理阶段适配输入。</li>
+</ul>
+</li>
+</ol>
+<p>如果你有具体的部署场景（如平台或数据类型），我可以提供更细致的实现建议！</p>
+<h2 id="前处理-数据加载"><a href="#前处理-数据加载" class="headerlink" title="前处理 数据加载"></a>前处理 数据加载</h2><p>在深度学习模型部署中，<strong>前处理</strong>的目的是将原始输入数据转换为模型可以接受的格式和结构。数据加载是前处理的重要组成部分，涉及从存储中读取数据、对数据进行解析、归一化、格式化等步骤，为后续的推理做好准备。</p>
+<p>以下是深度学习模型部署中 <strong>数据加载</strong> 的详细解析：</p>
+<hr>
+<h3 id="1-数据加载的核心任务"><a href="#1-数据加载的核心任务" class="headerlink" title="1. 数据加载的核心任务"></a><strong>1. 数据加载的核心任务</strong></h3><p>数据加载的主要任务包括：</p>
+<ol>
+<li><p><strong>从各种来源读取数据</strong>  </p>
+<ul>
+<li>常见数据来源：文件系统、数据库、API、消息队列等。</li>
+<li>文件格式：图片（JPEG&#x2F;PNG）、视频（MP4）、音频（WAV&#x2F;MP3）、文本（JSON&#x2F;CSV）、二进制数据等。</li>
+</ul>
+</li>
+<li><p><strong>解析和转换数据</strong>  </p>
+<ul>
+<li>解析数据格式（如图片解码、JSON 解析）。</li>
+<li>将数据转化为模型可用的张量（Tensor）格式。</li>
+</ul>
+</li>
+<li><p><strong>批量加载和优化性能</strong>  </p>
+<ul>
+<li>支持批量加载（Batching）以提高吞吐量。</li>
+<li>利用多线程或异步加载优化性能。</li>
+</ul>
+</li>
+<li><p><strong>对输入数据进行前处理</strong>  </p>
+<ul>
+<li>标准化、归一化。</li>
+<li>调整大小、裁剪、填充。</li>
+<li>数据增强（如旋转、翻转等）。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="2-数据加载的典型步骤"><a href="#2-数据加载的典型步骤" class="headerlink" title="2. 数据加载的典型步骤"></a><strong>2. 数据加载的典型步骤</strong></h3><h4 id="1-数据读取"><a href="#1-数据读取" class="headerlink" title="(1) 数据读取"></a><strong>(1) 数据读取</strong></h4><p>根据数据来源和格式，选择适当的读取方法：</p>
+<ul>
+<li><strong>本地文件系统：</strong> 使用操作系统原生文件读写函数（如 <code>open()</code>、<code>fopen()</code>）。</li>
+<li><strong>云存储&#x2F;网络资源：</strong> 使用库（如 <code>requests</code>、<code>boto3</code>）下载文件。</li>
+<li><strong>数据库：</strong> 使用 SQL 或 NoSQL 查询获取数据。</li>
+</ul>
+<p>示例（读取本地图片）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line">image = Image.<span class="built_in">open</span>(<span class="string">&quot;image.jpg&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-数据解析"><a href="#2-数据解析" class="headerlink" title="(2) 数据解析"></a><strong>(2) 数据解析</strong></h4><ul>
+<li>将原始数据解析为内存中的对象。例如：<ul>
+<li>图片数据解码为像素矩阵。</li>
+<li>JSON 数据解析为 Python 字典。</li>
+<li>CSV 数据解析为 DataFrame 或数组。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-数据转换为张量"><a href="#3-数据转换为张量" class="headerlink" title="(3) 数据转换为张量"></a><strong>(3) 数据转换为张量</strong></h4><p>将解析后的数据转换为深度学习框架支持的张量（如 PyTorch 的 <code>torch.Tensor</code> 或 TensorFlow 的 <code>tf.Tensor</code>）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> transforms</span><br><span class="line"></span><br><span class="line">transform = transforms.ToTensor()</span><br><span class="line">tensor = transform(image)</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-数据预处理"><a href="#4-数据预处理" class="headerlink" title="(4) 数据预处理"></a><strong>(4) 数据预处理</strong></h4><p>根据模型需求对数据进行调整：</p>
+<ul>
+<li><strong>归一化：</strong> 将像素值缩放到 [0, 1] 或 [-1, 1] 区间。</li>
+<li><strong>调整大小：</strong> 将图片调整为固定尺寸。</li>
+<li><strong>格式转换：</strong> 如 RGB -&gt; BGR 或 NHWC -&gt; NCHW。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),   <span class="comment"># 调整大小</span></span><br><span class="line">    transforms.ToTensor(),           <span class="comment"># 转为张量</span></span><br><span class="line">    transforms.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>], std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])  <span class="comment"># 归一化</span></span><br><span class="line">])</span><br><span class="line">processed_image = transform(image)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-高效数据加载技巧"><a href="#3-高效数据加载技巧" class="headerlink" title="3. 高效数据加载技巧"></a><strong>3. 高效数据加载技巧</strong></h3><h4 id="1-批量加载"><a href="#1-批量加载" class="headerlink" title="(1) 批量加载"></a><strong>(1) 批量加载</strong></h4><p>通过批量加载数据，可以减少 I&#x2F;O 操作的开销，提高吞吐量。</p>
+<ul>
+<li><strong>示例（PyTorch DataLoader）：</strong><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader, Dataset</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomDataset</span>(<span class="title class_ inherited__">Dataset</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, file_paths, transform=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.file_paths = file_paths</span><br><span class="line">        <span class="variable language_">self</span>.transform = transform</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__len__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">len</span>(<span class="variable language_">self</span>.file_paths)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__getitem__</span>(<span class="params">self, idx</span>):</span><br><span class="line">        image = Image.<span class="built_in">open</span>(<span class="variable language_">self</span>.file_paths[idx])</span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.transform:</span><br><span class="line">            image = <span class="variable language_">self</span>.transform(image)</span><br><span class="line">        <span class="keyword">return</span> image</span><br><span class="line"></span><br><span class="line">dataset = CustomDataset(file_paths=[<span class="string">&quot;img1.jpg&quot;</span>, <span class="string">&quot;img2.jpg&quot;</span>], transform=transform)</span><br><span class="line">data_loader = DataLoader(dataset, batch_size=<span class="number">32</span>, shuffle=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-异步加载"><a href="#2-异步加载" class="headerlink" title="(2) 异步加载"></a><strong>(2) 异步加载</strong></h4><p>使用多线程或多进程加载数据，在数据加载的同时进行推理。</p>
+<ul>
+<li><strong>示例（PyTorch 的多进程加载）：</strong><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data_loader = DataLoader(dataset, batch_size=<span class="number">32</span>, shuffle=<span class="literal">True</span>, num_workers=<span class="number">4</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-数据缓存"><a href="#3-数据缓存" class="headerlink" title="(3) 数据缓存"></a><strong>(3) 数据缓存</strong></h4><p>对于频繁使用的数据，可以将其缓存到内存或更快的存储设备（如 SSD），减少加载时间。</p>
+<hr>
+<h3 id="4-常见的数据加载场景"><a href="#4-常见的数据加载场景" class="headerlink" title="4. 常见的数据加载场景"></a><strong>4. 常见的数据加载场景</strong></h3><h4 id="1-图片数据加载"><a href="#1-图片数据加载" class="headerlink" title="(1) 图片数据加载"></a><strong>(1) 图片数据加载</strong></h4><ul>
+<li><strong>格式：</strong> JPEG、PNG、TIFF 等。</li>
+<li><strong>前处理：</strong> <ul>
+<li>调整大小、裁剪。</li>
+<li>归一化为 [0, 1] 或 [-1, 1]。</li>
+</ul>
+</li>
+<li><strong>库支持：</strong> OpenCV、Pillow、Torchvision、TensorFlow。</li>
+</ul>
+<h4 id="2-视频数据加载"><a href="#2-视频数据加载" class="headerlink" title="(2) 视频数据加载"></a><strong>(2) 视频数据加载</strong></h4><ul>
+<li><strong>格式：</strong> MP4、AVI 等。</li>
+<li><strong>前处理：</strong><ul>
+<li>抽帧、调整帧率。</li>
+<li>归一化。</li>
+</ul>
+</li>
+<li><strong>库支持：</strong> OpenCV、FFmpeg、Decord。</li>
+</ul>
+<h4 id="3-文本数据加载"><a href="#3-文本数据加载" class="headerlink" title="(3) 文本数据加载"></a><strong>(3) 文本数据加载</strong></h4><ul>
+<li><strong>格式：</strong> JSON、CSV、纯文本。</li>
+<li><strong>前处理：</strong><ul>
+<li>分词、去停用词。</li>
+<li>将文本转换为向量（如词嵌入）。</li>
+</ul>
+</li>
+<li><strong>库支持：</strong> pandas、NLTK、Hugging Face。</li>
+</ul>
+<h4 id="4-音频数据加载"><a href="#4-音频数据加载" class="headerlink" title="(4) 音频数据加载"></a><strong>(4) 音频数据加载</strong></h4><ul>
+<li><strong>格式：</strong> WAV、MP3。</li>
+<li><strong>前处理：</strong><ul>
+<li>采样率调整。</li>
+<li>转换为梅尔频谱或 MFCC 特征。</li>
+</ul>
+</li>
+<li><strong>库支持：</strong> librosa、torchaudio。</li>
+</ul>
+<hr>
+<h3 id="5-数据加载中的常见问题及优化"><a href="#5-数据加载中的常见问题及优化" class="headerlink" title="5. 数据加载中的常见问题及优化"></a><strong>5. 数据加载中的常见问题及优化</strong></h3><h4 id="问题-1：数据加载瓶颈"><a href="#问题-1：数据加载瓶颈" class="headerlink" title="问题 1：数据加载瓶颈"></a><strong>问题 1：数据加载瓶颈</strong></h4><ul>
+<li><strong>原因：</strong> 数据加载速度不足以跟上推理速度。</li>
+<li><strong>优化：</strong><ul>
+<li>增加 <code>num_workers</code> 使用多线程&#x2F;多进程。</li>
+<li>缓存数据。</li>
+<li>使用高效的数据格式（如 TFRecord）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="问题-2：内存占用过高"><a href="#问题-2：内存占用过高" class="headerlink" title="问题 2：内存占用过高"></a><strong>问题 2：内存占用过高</strong></h4><ul>
+<li><strong>原因：</strong> 一次性加载过多数据。</li>
+<li><strong>优化：</strong><ul>
+<li>使用生成器或流式加载。</li>
+<li>控制批量大小。</li>
+</ul>
+</li>
+</ul>
+<h4 id="问题-3：数据预处理耗时长"><a href="#问题-3：数据预处理耗时长" class="headerlink" title="问题 3：数据预处理耗时长"></a><strong>问题 3：数据预处理耗时长</strong></h4><ul>
+<li><strong>原因：</strong> 复杂的预处理步骤在加载时完成。</li>
+<li><strong>优化：</strong><ul>
+<li>将预处理离线完成，保存为中间格式。</li>
+<li>使用 GPU 加速数据预处理（如 DALI）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="6-高级工具与框架支持"><a href="#6-高级工具与框架支持" class="headerlink" title="6. 高级工具与框架支持"></a><strong>6. 高级工具与框架支持</strong></h3><ul>
+<li><p><strong>NVIDIA DALI（Data Loading Library）：</strong></p>
+<ul>
+<li>高效的数据加载和预处理库，支持 GPU 加速。</li>
+<li>示例：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nvidia.dali.pipeline <span class="keyword">import</span> Pipeline</span><br><span class="line"><span class="keyword">import</span> nvidia.dali.ops <span class="keyword">as</span> ops</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SimplePipeline</span>(<span class="title class_ inherited__">Pipeline</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, batch_size, num_threads, device_id</span>):</span><br><span class="line">        <span class="built_in">super</span>(SimplePipeline, <span class="variable language_">self</span>).__init__(batch_size, num_threads, device_id)</span><br><span class="line">        <span class="variable language_">self</span>.decode = ops.ImageDecoder(device=<span class="string">&quot;mixed&quot;</span>)</span><br><span class="line">        <span class="variable language_">self</span>.resize = ops.Resize(resize_x=<span class="number">224</span>, resize_y=<span class="number">224</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">define_graph</span>(<span class="params">self</span>):</span><br><span class="line">        images = <span class="variable language_">self</span>.decode(<span class="variable language_">self</span>.<span class="built_in">input</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.resize(images)</span><br><span class="line"></span><br><span class="line">pipe = SimplePipeline(batch_size=<span class="number">32</span>, num_threads=<span class="number">4</span>, device_id=<span class="number">0</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>TensorFlow Data API：</strong></p>
+<ul>
+<li>支持高效的输入管道。</li>
+<li>示例：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">dataset = tf.data.Dataset.list_files(<span class="string">&quot;images/*.jpg&quot;</span>)</span><br><span class="line">dataset = dataset.<span class="built_in">map</span>(<span class="keyword">lambda</span> x: preprocess(x))</span><br><span class="line">dataset = dataset.batch(<span class="number">32</span>).prefetch(tf.data.AUTOTUNE)</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>数据加载在深度学习模型部署中至关重要。通过高效的读取、解析、转换、批量加载和预处理，能够显著提升模型推理的性能与可靠性。根据具体场景选择合适的工具和优化策略，可以大大改善部署效果。</p>
+<h2 id="图像数据转为模型可用的张量格式-详解"><a href="#图像数据转为模型可用的张量格式-详解" class="headerlink" title="图像数据转为模型可用的张量格式 详解"></a>图像数据转为模型可用的张量格式 详解</h2><p>将图像数据转换为深度学习模型可用的张量格式，是图像处理和模型前处理中的关键步骤。不同的深度学习框架（如 TensorFlow、PyTorch）对张量的具体格式要求略有不同，但总体过程类似。</p>
+<p>以下是将图像数据转为模型可用的张量格式的详细步骤和注意事项：</p>
+<hr>
+<h3 id="1-张量的基本要求"><a href="#1-张量的基本要求" class="headerlink" title="1. 张量的基本要求"></a><strong>1. 张量的基本要求</strong></h3><p>张量是一个多维数组，常见的格式包括：</p>
+<ol>
+<li><strong>形状（Shape）：</strong> 模型通常要求特定形状的输入，例如 <code>(Batch, Channels, Height, Width)</code> 或 <code>(Batch, Height, Width, Channels)</code>。</li>
+<li><strong>数据类型（Data Type）：</strong> 常用 <code>float32</code> 或 <code>float16</code>。</li>
+<li><strong>数值范围：</strong> <ul>
+<li>一般要求归一化为 <code>[0, 1]</code> 或标准化为均值为 0、方差为 1。</li>
+<li>部分模型（如 ResNet、MobileNet）可能要求特定的归一化范围或通道顺序。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="2-转换步骤"><a href="#2-转换步骤" class="headerlink" title="2. 转换步骤"></a><strong>2. 转换步骤</strong></h3><h4 id="1-读取图像数据"><a href="#1-读取图像数据" class="headerlink" title="(1) 读取图像数据"></a><strong>(1) 读取图像数据</strong></h4><ul>
+<li>使用图像处理库读取图像文件，将其转化为像素矩阵（通常是 <code>Height x Width x Channels</code> 格式）。</li>
+<li>常用库：<ul>
+<li><strong>OpenCV (<code>cv2</code>)：</strong> 默认读取为 BGR 格式。</li>
+<li><strong>Pillow (<code>PIL</code>)：</strong> 默认读取为 RGB 格式。</li>
+</ul>
+</li>
+</ul>
+<p>示例（读取图片）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line">image = Image.<span class="built_in">open</span>(<span class="string">&quot;image.jpg&quot;</span>)  <span class="comment"># 使用 Pillow 读取图片</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-调整尺寸"><a href="#2-调整尺寸" class="headerlink" title="(2) 调整尺寸"></a><strong>(2) 调整尺寸</strong></h4><ul>
+<li>深度学习模型通常要求固定尺寸的输入图像，例如 <code>224x224</code>。</li>
+<li>可以通过调整大小（<code>resize</code>）、裁剪（<code>crop</code>）、填充（<code>pad</code>）等方式实现。</li>
+</ul>
+<p>示例（调整大小）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image = image.resize((<span class="number">224</span>, <span class="number">224</span>))  <span class="comment"># 调整到 224x224</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-转换为数组"><a href="#3-转换为数组" class="headerlink" title="(3) 转换为数组"></a><strong>(3) 转换为数组</strong></h4><ul>
+<li>将图像对象转换为数值数组（通常为 NumPy 数组）。</li>
+</ul>
+<p>示例（Pillow 转 NumPy）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">image_array = np.array(image)  <span class="comment"># 转换为 NumPy 数组</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="4-归一化或标准化"><a href="#4-归一化或标准化" class="headerlink" title="(4) 归一化或标准化"></a><strong>(4) 归一化或标准化</strong></h4><ul>
+<li>将像素值范围从 <code>[0, 255]</code> 转换为 <code>[0, 1]</code> 或 [-1, 1]。</li>
+<li>如果模型要求，可以使用特定均值和标准差进行标准化。</li>
+</ul>
+<p>示例（归一化为 [0, 1]）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image_array = image_array / <span class="number">255.0</span></span><br></pre></td></tr></table></figure>
+
+<p>示例（标准化）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mean = [<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>]</span><br><span class="line">std = [<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>]</span><br><span class="line">image_array = (image_array - mean) / std</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-调整通道顺序"><a href="#5-调整通道顺序" class="headerlink" title="(5) 调整通道顺序"></a><strong>(5) 调整通道顺序</strong></h4><ul>
+<li>不同框架要求的张量通道顺序可能不同：<ul>
+<li><strong>PyTorch:</strong> 通道优先，即 <code>(Channels, Height, Width)</code>。</li>
+<li><strong>TensorFlow&#x2F;Keras:</strong> 通道最后，即 <code>(Height, Width, Channels)</code>。</li>
+</ul>
+</li>
+<li>可以通过 <code>transpose</code> 改变通道顺序。</li>
+</ul>
+<p>示例（HWC 转为 CHW）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image_array = np.transpose(image_array, (<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>))  <span class="comment"># 从 HWC 转为 CHW</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="6-转换为张量"><a href="#6-转换为张量" class="headerlink" title="(6) 转换为张量"></a><strong>(6) 转换为张量</strong></h4><ul>
+<li>将 NumPy 数组转换为深度学习框架支持的张量。</li>
+<li>框架示例：<ul>
+<li><strong>PyTorch：<code>torch.Tensor</code></strong></li>
+<li><strong>TensorFlow：<code>tf.convert_to_tensor</code></strong></li>
+</ul>
+</li>
+</ul>
+<p>示例（PyTorch 张量转换）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">image_tensor = torch.tensor(image_array, dtype=torch.float32)  <span class="comment"># 转为张量</span></span><br><span class="line">image_tensor = image_tensor.unsqueeze(<span class="number">0</span>)  <span class="comment"># 增加 Batch 维度</span></span><br></pre></td></tr></table></figure>
+
+<p>示例（TensorFlow 张量转换）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">image_tensor = tf.convert_to_tensor(image_array, dtype=tf.float32)  <span class="comment"># 转为张量</span></span><br><span class="line">image_tensor = tf.expand_dims(image_tensor, axis=<span class="number">0</span>)  <span class="comment"># 增加 Batch 维度</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-不同框架的常见操作"><a href="#3-不同框架的常见操作" class="headerlink" title="3. 不同框架的常见操作"></a><strong>3. 不同框架的常见操作</strong></h3><h4 id="1-PyTorch"><a href="#1-PyTorch" class="headerlink" title="(1) PyTorch"></a><strong>(1) PyTorch</strong></h4><p>使用 <code>torchvision.transforms</code> 提供了高效的图像预处理工具。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> transforms</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line">transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),  <span class="comment"># 调整大小</span></span><br><span class="line">    transforms.ToTensor(),          <span class="comment"># 转为张量并归一化为 [0, 1]</span></span><br><span class="line">    transforms.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>], std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])  <span class="comment"># 标准化</span></span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">image = Image.<span class="built_in">open</span>(<span class="string">&quot;image.jpg&quot;</span>)</span><br><span class="line">image_tensor = transform(image).unsqueeze(<span class="number">0</span>)  <span class="comment"># 增加 Batch 维度</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-TensorFlow"><a href="#2-TensorFlow" class="headerlink" title="(2) TensorFlow"></a><strong>(2) TensorFlow</strong></h4><p>使用 <code>tf.image</code> 提供了一系列操作。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">image = tf.io.read_file(<span class="string">&quot;image.jpg&quot;</span>)</span><br><span class="line">image = tf.image.decode_jpeg(image, channels=<span class="number">3</span>)</span><br><span class="line">image = tf.image.resize(image, [<span class="number">224</span>, <span class="number">224</span>])  <span class="comment"># 调整大小</span></span><br><span class="line">image = image / <span class="number">255.0</span>  <span class="comment"># 归一化</span></span><br><span class="line">image = tf.expand_dims(image, axis=<span class="number">0</span>)  <span class="comment"># 增加 Batch 维度</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-常见问题与优化"><a href="#4-常见问题与优化" class="headerlink" title="4. 常见问题与优化"></a><strong>4. 常见问题与优化</strong></h3><h4 id="问题-1：通道顺序错误"><a href="#问题-1：通道顺序错误" class="headerlink" title="问题 1：通道顺序错误"></a><strong>问题 1：通道顺序错误</strong></h4><ul>
+<li>模型可能因通道顺序不同而报错（如 TensorFlow 使用 NHWC，而 PyTorch 使用 NCHW）。</li>
+<li><strong>解决：</strong> 确认模型要求并调整顺序。</li>
+</ul>
+<h4 id="问题-2：未归一化或标准化"><a href="#问题-2：未归一化或标准化" class="headerlink" title="问题 2：未归一化或标准化"></a><strong>问题 2：未归一化或标准化</strong></h4><ul>
+<li>部分模型对输入的数值范围敏感，未归一化可能导致推理结果异常。</li>
+<li><strong>解决：</strong> 检查模型要求并按需处理。</li>
+</ul>
+<h4 id="问题-3：性能瓶颈"><a href="#问题-3：性能瓶颈" class="headerlink" title="问题 3：性能瓶颈"></a><strong>问题 3：性能瓶颈</strong></h4><ul>
+<li>数据加载和预处理可能成为瓶颈，尤其是在实时推理中。</li>
+<li><strong>解决：</strong> <ul>
+<li>使用多线程&#x2F;多进程。</li>
+<li>将预处理步骤迁移到 GPU（如 NVIDIA DALI）。</li>
+<li>提前预处理并保存为高效格式（如 TFRecord）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a><strong>5. 总结</strong></h3><p>将图像数据转为模型可用的张量格式是模型推理的关键步骤，核心流程包括：</p>
+<ol>
+<li>读取图像数据（文件、内存或流式读取）。</li>
+<li>调整尺寸、归一化、标准化。</li>
+<li>转换通道顺序和数据类型。</li>
+<li>将数据打包为张量格式并加入批量维度。</li>
+</ol>
+<p>不同框架提供了便利的工具和 API 支持，高效实现图像的张量化，能够显著提升模型的推理性能和兼容性。</p>
+<h2 id="前处理中的归一化-详解"><a href="#前处理中的归一化-详解" class="headerlink" title="前处理中的归一化 详解"></a>前处理中的归一化 详解</h2><h3 id="深度学习前处理中的归一化详解"><a href="#深度学习前处理中的归一化详解" class="headerlink" title="深度学习前处理中的归一化详解"></a><strong>深度学习前处理中的归一化详解</strong></h3><p><strong>归一化</strong>是深度学习模型训练和推理中的重要步骤之一，旨在将输入数据的特征值范围调整到特定范围或分布，以提高模型的收敛速度和预测稳定性。本文将详细解析归一化的概念、目的、方法、应用场景和注意事项。</p>
+<hr>
+<h3 id="1-为什么需要归一化？"><a href="#1-为什么需要归一化？" class="headerlink" title="1. 为什么需要归一化？"></a><strong>1. 为什么需要归一化？</strong></h3><ol>
+<li><p><strong>减少特征尺度差异：</strong></p>
+<ul>
+<li>输入数据可能具有不同的特征范围（例如像素值范围为 <code>[0, 255]</code>，而温度值范围为 <code>[-30, 50]</code>）。</li>
+<li>归一化可以让特征值具有相似的尺度，避免某些特征对模型的影响过大。</li>
+</ul>
+</li>
+<li><p><strong>加速模型收敛：</strong></p>
+<ul>
+<li>无归一化的数据可能导致梯度下降过程缓慢或震荡，归一化能够稳定梯度下降。</li>
+</ul>
+</li>
+<li><p><strong>增强数值稳定性：</strong></p>
+<ul>
+<li>极端数值可能导致计算不稳定，归一化可以避免溢出或下溢。</li>
+</ul>
+</li>
+<li><p><strong>适应特定模型需求：</strong></p>
+<ul>
+<li>某些预训练模型要求输入数据在特定范围（如 <code>[0, 1]</code> 或 <code>[-1, 1]</code>）或具有特定的均值和标准差。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="2-常见的归一化方法"><a href="#2-常见的归一化方法" class="headerlink" title="2. 常见的归一化方法"></a><strong>2. 常见的归一化方法</strong></h3><p>归一化的方法根据应用场景和数据类型有所不同，以下是常见的归一化技术。</p>
+<h4 id="1-Min-Max-归一化"><a href="#1-Min-Max-归一化" class="headerlink" title="(1) Min-Max 归一化"></a><strong>(1) Min-Max 归一化</strong></h4><ul>
+<li><p><strong>公式：</strong><br>[<br>x_{\text{norm}} &#x3D; \frac{x - x_{\min}}{x_{\max} - x_{\min}}<br>]</p>
+</li>
+<li><p><strong>范围：</strong> 通常将数据归一化到 <code>[0, 1]</code>，或通过线性变换调整为其他范围（如 <code>[-1, 1]</code>）。</p>
+</li>
+<li><p><strong>应用场景：</strong></p>
+<ul>
+<li>图像像素值归一化到 <code>[0, 1]</code>。</li>
+<li>特征值范围固定的数据。</li>
+</ul>
+</li>
+<li><p><strong>示例：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">data = np.array([<span class="number">50</span>, <span class="number">100</span>, <span class="number">150</span>, <span class="number">200</span>])</span><br><span class="line">data_min = np.<span class="built_in">min</span>(data)</span><br><span class="line">data_max = np.<span class="built_in">max</span>(data)</span><br><span class="line">normalized_data = (data - data_min) / (data_max - data_min)</span><br><span class="line"><span class="built_in">print</span>(normalized_data)  <span class="comment"># 输出 [0. , 0.333, 0.666, 1. ]</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-均值-标准差标准化（Z-Score-标准化）"><a href="#2-均值-标准差标准化（Z-Score-标准化）" class="headerlink" title="(2) 均值-标准差标准化（Z-Score 标准化）"></a><strong>(2) 均值-标准差标准化（Z-Score 标准化）</strong></h4><ul>
+<li><p><strong>公式：</strong><br>[<br>x_{\text{norm}} &#x3D; \frac{x - \mu}{\sigma}<br>]<br>其中 ( \mu ) 是均值，( \sigma ) 是标准差。</p>
+</li>
+<li><p><strong>范围：</strong> 数据转换为均值为 <code>0</code>，标准差为 <code>1</code> 的分布。</p>
+</li>
+<li><p><strong>应用场景：</strong></p>
+<ul>
+<li>特征值分布不固定（如自然语言处理中的词向量）。</li>
+<li>深度学习预训练模型（如 ImageNet 预训练模型）常使用固定均值和标准差归一化。</li>
+</ul>
+</li>
+<li><p><strong>示例：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mean = np.mean(data)</span><br><span class="line">std = np.std(data)</span><br><span class="line">standardized_data = (data - mean) / std</span><br><span class="line"><span class="built_in">print</span>(standardized_data)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-归一化到特定均值和标准差"><a href="#3-归一化到特定均值和标准差" class="headerlink" title="(3) 归一化到特定均值和标准差"></a><strong>(3) 归一化到特定均值和标准差</strong></h4><ul>
+<li><p><strong>公式：</strong><br>[<br>x_{\text{norm}} &#x3D; \frac{x - \mu}{\sigma}<br>]<br>并根据目标分布调整：<br>[<br>x_{\text{scaled}} &#x3D; x_{\text{norm}} \times \sigma_{\text{target}} + \mu_{\text{target}}<br>]</p>
+</li>
+<li><p><strong>应用场景：</strong></p>
+<ul>
+<li>针对预训练模型（如 ResNet、VGG 等），调整到特定的均值和标准差。</li>
+</ul>
+</li>
+<li><p><strong>示例（PyTorch）：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> transforms</span><br><span class="line">transform = transforms.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>], std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="4-对数归一化（Log-Normalization）"><a href="#4-对数归一化（Log-Normalization）" class="headerlink" title="(4) 对数归一化（Log Normalization）"></a><strong>(4) 对数归一化（Log Normalization）</strong></h4><ul>
+<li><p><strong>公式：</strong><br>[<br>x_{\text{norm}} &#x3D; \log(x + 1)<br>]</p>
+</li>
+<li><p><strong>应用场景：</strong></p>
+<ul>
+<li>数据分布具有较大偏态（如高光强度图像、文档字频统计）。</li>
+</ul>
+</li>
+<li><p><strong>注意：</strong></p>
+<ul>
+<li>输入值必须非负。</li>
+</ul>
+</li>
+<li><p><strong>示例：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log_normalized_data = np.log(data + <span class="number">1</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="5-最大绝对值归一化"><a href="#5-最大绝对值归一化" class="headerlink" title="(5) 最大绝对值归一化"></a><strong>(5) 最大绝对值归一化</strong></h4><ul>
+<li><strong>公式：</strong><br>[<br>x_{\text{norm}} &#x3D; \frac{x}{\max(|x|)}<br>]</li>
+<li><strong>范围：</strong> 归一化到 <code>[-1, 1]</code>。</li>
+<li><strong>应用场景：</strong><ul>
+<li>数据具有正负值，但范围不固定。</li>
+</ul>
+</li>
+</ul>
+<h4 id="6-L2-归一化"><a href="#6-L2-归一化" class="headerlink" title="(6) L2 归一化"></a><strong>(6) L2 归一化</strong></h4><ul>
+<li><strong>公式：</strong><br>[<br>x_{\text{norm}} &#x3D; \frac{x}{|x|_2}<br>]<br>其中 ( |x|_2 &#x3D; \sqrt{\sum x_i^2} )。</li>
+<li><strong>范围：</strong> 单位向量，适合向量空间建模。</li>
+<li><strong>应用场景：</strong><ul>
+<li>特征向量的相似性计算（如余弦相似度）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="3-图像数据中的归一化"><a href="#3-图像数据中的归一化" class="headerlink" title="3. 图像数据中的归一化"></a><strong>3. 图像数据中的归一化</strong></h3><p>在图像处理中，归一化的目标是将原始像素值（通常是 <code>[0, 255]</code>）转换为深度学习模型所需的格式。</p>
+<h4 id="1-常见归一化方法"><a href="#1-常见归一化方法" class="headerlink" title="(1) 常见归一化方法"></a><strong>(1) 常见归一化方法</strong></h4><ol>
+<li><strong>归一化到 <code>[0, 1]</code>：</strong><ul>
+<li>公式：<code>x / 255.0</code></li>
+<li>应用于大多数深度学习框架。</li>
+</ul>
+</li>
+<li><strong>归一化到 <code>[-1, 1]</code>：</strong><ul>
+<li>公式：<code>(x / 127.5) - 1</code></li>
+<li>常用于 GAN 和部分图像处理模型。</li>
+</ul>
+</li>
+<li><strong>均值和标准差标准化：</strong><ul>
+<li>对应 ImageNet 的 RGB 通道均值和标准差：<ul>
+<li>均值：<code>[0.485, 0.456, 0.406]</code></li>
+<li>标准差：<code>[0.229, 0.224, 0.225]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="2-示例代码"><a href="#2-示例代码" class="headerlink" title="(2) 示例代码"></a><strong>(2) 示例代码</strong></h4><p><strong>归一化到 <code>[0, 1]</code>：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">image = np.random.randint(<span class="number">0</span>, <span class="number">256</span>, (<span class="number">224</span>, <span class="number">224</span>, <span class="number">3</span>), dtype=np.uint8)</span><br><span class="line">image_normalized = image / <span class="number">255.0</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>归一化到特定均值和标准差：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> transforms</span><br><span class="line"></span><br><span class="line">transform = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    transforms.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>], std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 假设 image 是一个 PIL.Image 对象</span></span><br><span class="line">normalized_image = transform(image)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-深度学习框架中的归一化工具"><a href="#4-深度学习框架中的归一化工具" class="headerlink" title="4. 深度学习框架中的归一化工具"></a><strong>4. 深度学习框架中的归一化工具</strong></h3><h4 id="1-PyTorch-1"><a href="#1-PyTorch-1" class="headerlink" title="(1) PyTorch"></a><strong>(1) PyTorch</strong></h4><p><code>torchvision.transforms.Normalize</code></p>
+<ul>
+<li>用法：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">transforms.Normalize(mean, std)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-TensorFlow-Keras"><a href="#2-TensorFlow-Keras" class="headerlink" title="(2) TensorFlow&#x2F;Keras"></a><strong>(2) TensorFlow&#x2F;Keras</strong></h4><p><code>tf.image.per_image_standardization</code> 或手动实现归一化。</p>
+<hr>
+<h3 id="5-注意事项"><a href="#5-注意事项" class="headerlink" title="5. 注意事项"></a><strong>5. 注意事项</strong></h3><ol>
+<li><strong>模型需求：</strong> 确保归一化过程符合模型的预处理要求。</li>
+<li><strong>一致性：</strong> 训练和推理时的归一化方式必须一致。</li>
+<li><strong>异常值处理：</strong> 对异常值进行裁剪或忽略，避免对归一化结果产生不利影响。</li>
+</ol>
+<hr>
+<p>归一化是模型预处理中的关键步骤，能够显著提升模型性能。根据不同场景选择合适的归一化方法，有助于稳定和加速训练，同时提高推理精度。</p>
+<h2 id="归一化"><a href="#归一化" class="headerlink" title="归一化"></a>归一化</h2><ul>
+<li>常用的方法是通过对原始数据进行线性变换把数据映射到 [0, 1] 或 [-1, 1]之间。主要是：<ul>
+<li>为了数据处理方便，更加便捷快速。</li>
+<li>把有量纲表达式变为无量纲表达式，便于不同单位或量级的指标能够进行比较和加权。</li>
+</ul>
+</li>
+<li>归一化是一种简化计算的方式，即将有量纲的表达式，经过变换，化为无量纲的表达式，成为 纯量</li>
+<li>变换函数为：<br><img src="/images/Deeplearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/%E5%BD%92%E4%B8%80%E5%8C%96%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E5%85%AC%E5%BC%8F.png" alt="归一化线性变换公式"></li>
+</ul>
+<h2 id="标准化"><a href="#标准化" class="headerlink" title="标准化"></a>标准化</h2><ul>
+<li>常用的方法是 z-score 标准化，经过处理后的数据均值为0，标准差为1</li>
+<li>在机器学习中，我们可能要处理不同种类的资料。例如，音讯和图片上的像素值，这些资料可能是高纬度的，资料标准化后使每个特征中的数值平均变为0(将每个特征的值都减掉原始资料中该特征的平均)，标准差变为1，这个方法被广泛的使用在许多机器学习中，例如：支持向量机，逻辑回归和类神经网络<br><img src="/images/Deeplearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/%E6%A0%87%E5%87%86%E5%8C%96%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%E5%85%AC%E5%BC%8F.png" alt="标准化线性变换公式"></li>
+</ul>
+<h2 id="归一化和标准化的区别"><a href="#归一化和标准化的区别" class="headerlink" title="归一化和标准化的区别"></a>归一化和标准化的区别</h2><ul>
+<li>归一化是将样本的特征值转换到同一量纲下把数据映射到 [0, 1]或者 [-1, 1]区间内，仅由变量的极值决定，因区间放缩法是归一化的一种。</li>
+<li>标准化是依照特征矩阵的列处理数据，其通过求z-score的方法，转换为标准正态分布，和整体样本分布相关，每个样本点都能对标准化产生影响。</li>
+<li>它们的相同点在于都能取消由于量纲不同引起的误差；都是一种线性变换，都是对向量X按照比例压缩再进行平移。</li>
+</ul>
+<hr>
+<h2 id="标准化和中心化的区别"><a href="#标准化和中心化的区别" class="headerlink" title="标准化和中心化的区别"></a>标准化和中心化的区别</h2><ul>
+<li>标准化是原始分数减去平均数然后除以标准差</li>
+<li>中心化是原始分数减去平均数。所以一般流程为先中心化再标准化。</li>
+</ul>
+<h2 id="无量纲"><a href="#无量纲" class="headerlink" title="无量纲"></a>无量纲</h2><ul>
+<li>无量纲，是通过某种方法能去表实际过程中的单位，从而简化计算。</li>
+</ul>
+<h2 id="为什么要归一化-标准化"><a href="#为什么要归一化-标准化" class="headerlink" title="为什么要归一化&#x2F;标准化"></a>为什么要归一化&#x2F;标准化</h2><ul>
+<li><p>归一化&#x2F;标准化实质是一种线性变换，线性变换有很多良好的性质，这些性质决定了对数据改变后不会造成失效，反而能提高数据的表现，这些性质是归一化&#x2F;标准化的前提。比如有一个很重要的性质：线性变换不会改变原始数据的数值排序。</p>
+</li>
+<li><p>简单来说有以下好处</p>
+<ul>
+<li>由于原始数据值的范围差异很大，因此在某些机器学习算法中，如果没有归一化，目标函数将无法正常工作。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DL/" rel="tag"># DL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/31/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2/2024-12-31-%E6%8E%A8%E7%90%86/" rel="prev" title="推理">
+      <i class="fa fa-chevron-left"></i> 推理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/05/notebook/DeepLearning/OpenVINO/2025-01-05-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="next" title="常见编程技巧">
+      常见编程技巧 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B%E9%83%A8%E7%BD%B2-%E5%89%8D%E5%A4%84%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">深度学习模型部署 前处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E5%A4%84%E7%90%86%E7%9A%84%E4%B8%BB%E8%A6%81%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.1.</span> <span class="nav-text">前处理的主要步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 数据加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%B0%BA%E5%AF%B8%E8%B0%83%E6%95%B4-Resizing"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 尺寸调整 (Resizing)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%BD%92%E4%B8%80%E5%8C%96-Normalization"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 归一化 (Normalization)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.1.4.</span> <span class="nav-text">4. 数据格式转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.1.5.</span> <span class="nav-text">5. 类型转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E6%95%B0%E6%8D%AE%E5%BD%92%E4%B8%80%E5%8C%96%E4%B8%8E%E6%A0%87%E5%87%86%E5%8C%96%E7%9A%84%E7%BB%93%E5%90%88"><span class="nav-number">2.1.6.</span> <span class="nav-text">6. 数据归一化与标准化的结合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-%E5%85%B6%E4%BB%96%E7%89%B9%E5%AE%9A%E5%A4%84%E7%90%86"><span class="nav-number">2.1.7.</span> <span class="nav-text">7. 其他特定处理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%E4%B8%AD%E7%9A%84%E5%89%8D%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7"><span class="nav-number">2.3.</span> <span class="nav-text">部署中的前处理工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E5%A4%84%E7%90%86%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">2.4.</span> <span class="nav-text">前处理常见问题与优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E5%A4%84%E7%90%86-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.</span> <span class="nav-text">前处理 数据加载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.1.</span> <span class="nav-text">1. 数据加载的核心任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E7%9A%84%E5%85%B8%E5%9E%8B%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.2.</span> <span class="nav-text">2. 数据加载的典型步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96"><span class="nav-number">3.2.1.</span> <span class="nav-text">(1) 数据读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E8%A7%A3%E6%9E%90"><span class="nav-number">3.2.2.</span> <span class="nav-text">(2) 数据解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%BC%A0%E9%87%8F"><span class="nav-number">3.2.3.</span> <span class="nav-text">(3) 数据转换为张量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">3.2.4.</span> <span class="nav-text">(4) 数据预处理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%AB%98%E6%95%88%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E6%8A%80%E5%B7%A7"><span class="nav-number">3.3.</span> <span class="nav-text">3. 高效数据加载技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%89%B9%E9%87%8F%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.3.1.</span> <span class="nav-text">(1) 批量加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%BC%82%E6%AD%A5%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.3.2.</span> <span class="nav-text">(2) 异步加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%95%B0%E6%8D%AE%E7%BC%93%E5%AD%98"><span class="nav-number">3.3.3.</span> <span class="nav-text">(3) 数据缓存</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%B8%B8%E8%A7%81%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E5%9C%BA%E6%99%AF"><span class="nav-number">3.4.</span> <span class="nav-text">4. 常见的数据加载场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%9B%BE%E7%89%87%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.4.1.</span> <span class="nav-text">(1) 图片数据加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%A7%86%E9%A2%91%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.4.2.</span> <span class="nav-text">(2) 视频数据加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%96%87%E6%9C%AC%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.4.3.</span> <span class="nav-text">(3) 文本数据加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%9F%B3%E9%A2%91%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="nav-number">3.4.4.</span> <span class="nav-text">(4) 音频数据加载</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E5%8F%8A%E4%BC%98%E5%8C%96"><span class="nav-number">3.5.</span> <span class="nav-text">5. 数据加载中的常见问题及优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-1%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E7%93%B6%E9%A2%88"><span class="nav-number">3.5.1.</span> <span class="nav-text">问题 1：数据加载瓶颈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-2%EF%BC%9A%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E8%BF%87%E9%AB%98"><span class="nav-number">3.5.2.</span> <span class="nav-text">问题 2：内存占用过高</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-3%EF%BC%9A%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86%E8%80%97%E6%97%B6%E9%95%BF"><span class="nav-number">3.5.3.</span> <span class="nav-text">问题 3：数据预处理耗时长</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E9%AB%98%E7%BA%A7%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A1%86%E6%9E%B6%E6%94%AF%E6%8C%81"><span class="nav-number">3.6.</span> <span class="nav-text">6. 高级工具与框架支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.7.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E6%95%B0%E6%8D%AE%E8%BD%AC%E4%B8%BA%E6%A8%A1%E5%9E%8B%E5%8F%AF%E7%94%A8%E7%9A%84%E5%BC%A0%E9%87%8F%E6%A0%BC%E5%BC%8F-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">图像数据转为模型可用的张量格式 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%BC%A0%E9%87%8F%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%A6%81%E6%B1%82"><span class="nav-number">4.1.</span> <span class="nav-text">1. 张量的基本要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%AC%E6%8D%A2%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.2.</span> <span class="nav-text">2. 转换步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%AF%BB%E5%8F%96%E5%9B%BE%E5%83%8F%E6%95%B0%E6%8D%AE"><span class="nav-number">4.2.1.</span> <span class="nav-text">(1) 读取图像数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%B0%83%E6%95%B4%E5%B0%BA%E5%AF%B8"><span class="nav-number">4.2.2.</span> <span class="nav-text">(2) 调整尺寸</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%BD%AC%E6%8D%A2%E4%B8%BA%E6%95%B0%E7%BB%84"><span class="nav-number">4.2.3.</span> <span class="nav-text">(3) 转换为数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%BD%92%E4%B8%80%E5%8C%96%E6%88%96%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">4.2.4.</span> <span class="nav-text">(4) 归一化或标准化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E8%B0%83%E6%95%B4%E9%80%9A%E9%81%93%E9%A1%BA%E5%BA%8F"><span class="nav-number">4.2.5.</span> <span class="nav-text">(5) 调整通道顺序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%BC%A0%E9%87%8F"><span class="nav-number">4.2.6.</span> <span class="nav-text">(6) 转换为张量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%B8%8D%E5%90%8C%E6%A1%86%E6%9E%B6%E7%9A%84%E5%B8%B8%E8%A7%81%E6%93%8D%E4%BD%9C"><span class="nav-number">4.3.</span> <span class="nav-text">3. 不同框架的常见操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-PyTorch"><span class="nav-number">4.3.1.</span> <span class="nav-text">(1) PyTorch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-TensorFlow"><span class="nav-number">4.3.2.</span> <span class="nav-text">(2) TensorFlow</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">4.4.</span> <span class="nav-text">4. 常见问题与优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-1%EF%BC%9A%E9%80%9A%E9%81%93%E9%A1%BA%E5%BA%8F%E9%94%99%E8%AF%AF"><span class="nav-number">4.4.1.</span> <span class="nav-text">问题 1：通道顺序错误</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-2%EF%BC%9A%E6%9C%AA%E5%BD%92%E4%B8%80%E5%8C%96%E6%88%96%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">4.4.2.</span> <span class="nav-text">问题 2：未归一化或标准化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-3%EF%BC%9A%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88"><span class="nav-number">4.4.3.</span> <span class="nav-text">问题 3：性能瓶颈</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">4.5.</span> <span class="nav-text">5. 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E5%A4%84%E7%90%86%E4%B8%AD%E7%9A%84%E5%BD%92%E4%B8%80%E5%8C%96-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">前处理中的归一化 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%89%8D%E5%A4%84%E7%90%86%E4%B8%AD%E7%9A%84%E5%BD%92%E4%B8%80%E5%8C%96%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.1.</span> <span class="nav-text">深度学习前处理中的归一化详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%BD%92%E4%B8%80%E5%8C%96%EF%BC%9F"><span class="nav-number">5.2.</span> <span class="nav-text">1. 为什么需要归一化？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%BD%92%E4%B8%80%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">5.3.</span> <span class="nav-text">2. 常见的归一化方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Min-Max-%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">5.3.1.</span> <span class="nav-text">(1) Min-Max 归一化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%9D%87%E5%80%BC-%E6%A0%87%E5%87%86%E5%B7%AE%E6%A0%87%E5%87%86%E5%8C%96%EF%BC%88Z-Score-%E6%A0%87%E5%87%86%E5%8C%96%EF%BC%89"><span class="nav-number">5.3.2.</span> <span class="nav-text">(2) 均值-标准差标准化（Z-Score 标准化）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%BD%92%E4%B8%80%E5%8C%96%E5%88%B0%E7%89%B9%E5%AE%9A%E5%9D%87%E5%80%BC%E5%92%8C%E6%A0%87%E5%87%86%E5%B7%AE"><span class="nav-number">5.3.3.</span> <span class="nav-text">(3) 归一化到特定均值和标准差</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%AF%B9%E6%95%B0%E5%BD%92%E4%B8%80%E5%8C%96%EF%BC%88Log-Normalization%EF%BC%89"><span class="nav-number">5.3.4.</span> <span class="nav-text">(4) 对数归一化（Log Normalization）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%9C%80%E5%A4%A7%E7%BB%9D%E5%AF%B9%E5%80%BC%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">5.3.5.</span> <span class="nav-text">(5) 最大绝对值归一化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-L2-%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">5.3.6.</span> <span class="nav-text">(6) L2 归一化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%9B%BE%E5%83%8F%E6%95%B0%E6%8D%AE%E4%B8%AD%E7%9A%84%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">5.4.</span> <span class="nav-text">3. 图像数据中的归一化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%B8%B8%E8%A7%81%E5%BD%92%E4%B8%80%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">5.4.1.</span> <span class="nav-text">(1) 常见归一化方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">5.4.2.</span> <span class="nav-text">(2) 示例代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6%E4%B8%AD%E7%9A%84%E5%BD%92%E4%B8%80%E5%8C%96%E5%B7%A5%E5%85%B7"><span class="nav-number">5.5.</span> <span class="nav-text">4. 深度学习框架中的归一化工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-PyTorch-1"><span class="nav-number">5.5.1.</span> <span class="nav-text">(1) PyTorch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-TensorFlow-Keras"><span class="nav-number">5.5.2.</span> <span class="nav-text">(2) TensorFlow&#x2F;Keras</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">5.6.</span> <span class="nav-text">5. 注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">归一化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">7.</span> <span class="nav-text">标准化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E4%B8%80%E5%8C%96%E5%92%8C%E6%A0%87%E5%87%86%E5%8C%96%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">8.</span> <span class="nav-text">归一化和标准化的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E5%8C%96%E5%92%8C%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">9.</span> <span class="nav-text">标准化和中心化的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E9%87%8F%E7%BA%B2"><span class="nav-number">10.</span> <span class="nav-text">无量纲</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BD%92%E4%B8%80%E5%8C%96-%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">11.</span> <span class="nav-text">为什么要归一化&#x2F;标准化</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 C++ 标准库  C++ std::map 两个值作为一个map中的键在 C++ 中，如果你想要使用两个值作为 std::map 的键，可以通过定义一个 std::pair 来实现。std::pair 能够将两个值组合成一个键，同时也支持字典序的比较，因此可以很好地用作 std::map 的键。 代码示例12345678910111213141516171819202122232425262">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++_10_31_map">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_31_map/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 C++ 标准库  C++ std::map 两个值作为一个map中的键在 C++ 中，如果你想要使用两个值作为 std::map 的键，可以通过定义一个 std::pair 来实现。std::pair 能够将两个值组合成一个键，同时也支持字典序的比较，因此可以很好地用作 std::map 的键。 代码示例12345678910111213141516171819202122232425262">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.191Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppSTL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_31_map/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++_10_31_map | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_31_map/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++_10_31_map
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>C++ <map>标准库</li>
+</ul>
+<h2 id="C-std-map-两个值作为一个map中的键"><a href="#C-std-map-两个值作为一个map中的键" class="headerlink" title="C++ std::map 两个值作为一个map中的键"></a>C++ std::map 两个值作为一个map中的键</h2><p>在 C++ 中，如果你想要使用两个值作为 <code>std::map</code> 的键，可以通过定义一个 <code>std::pair</code> 来实现。<code>std::pair</code> 能够将两个值组合成一个键，同时也支持字典序的比较，因此可以很好地用作 <code>std::map</code> 的键。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span>  <span class="comment">// std::pair</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用 std::pair 作为键，int 作为值</span></span><br><span class="line">    std::map&lt;std::pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;, <span class="type">int</span>&gt; myMap;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 插入元素</span></span><br><span class="line">    myMap[&#123;<span class="number">1</span>, <span class="number">2</span>&#125;] = <span class="number">100</span>;</span><br><span class="line">    myMap[&#123;<span class="number">3</span>, <span class="number">4</span>&#125;] = <span class="number">200</span>;</span><br><span class="line">    myMap[&#123;<span class="number">1</span>, <span class="number">3</span>&#125;] = <span class="number">300</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历和访问元素</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;entry : myMap) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Key: (&quot;</span> &lt;&lt; entry.first.first &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; entry.first.second </span><br><span class="line">                  &lt;&lt; <span class="string">&quot;) -&gt; Value: &quot;</span> &lt;&lt; entry.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查找特定键</span></span><br><span class="line">    std::pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt; key = &#123;<span class="number">1</span>, <span class="number">2</span>&#125;;</span><br><span class="line">    <span class="keyword">if</span> (myMap.<span class="built_in">find</span>(key) != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Value for key (1, 2): &quot;</span> &lt;&lt; myMap[key] &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><ul>
+<li>在这个例子中，<code>myMap</code> 的键类型是 <code>std::pair&lt;int, int&gt;</code>，值类型是 <code>int</code>。</li>
+<li>通过 <code>&#123;1, 2&#125;</code> 这样的语法，可以直接构造 <code>std::pair&lt;int, int&gt;</code> 并作为键插入到 <code>std::map</code> 中。</li>
+<li><code>std::map</code> 会根据键的字典序进行排序，即先比较第一个元素，再比较第二个元素。</li>
+</ul>
+<h3 id="自定义比较"><a href="#自定义比较" class="headerlink" title="自定义比较"></a>自定义比较</h3><p>如果你希望使用自定义的排序规则，也可以通过定义一个自定义的比较器类并传入 <code>std::map</code> 构造函数。例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">CustomCompare</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> std::pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&amp; a, <span class="type">const</span> std::pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&amp; b)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 自定义排序逻辑</span></span><br><span class="line">        <span class="keyword">if</span> (a.first == b.first) &#123;</span><br><span class="line">            <span class="keyword">return</span> a.second &lt; b.second;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> a.first &lt; b.first;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">std::map&lt;std::pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;, <span class="type">int</span>, CustomCompare&gt; customMap;</span><br></pre></td></tr></table></figure>
+
+<h2 id="有序关联容器"><a href="#有序关联容器" class="headerlink" title="有序关联容器"></a>有序关联容器</h2><ul>
+<li>与顺序关联容器不同，有序关联容器不采用线性方式保存元素。相反，有序关联容器将键映射到值。通常情况下，有序关联容器的插入，删除和查找时间是相等的。</li>
+<li>标准库提供的4个有序关联容器分别为: map, multimap, set, multiset。</li>
+<li>每种有序关联容器都将元素保存在类似于树的有序数据结构。</li>
+<li>还有4个无序关联容器: unordered_map, unordered_multimap, unordered_set, unordered_multiset</li>
+</ul>
+<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><ul>
+<li>map定义在<map>头文件中，它保存的是键&#x2F;值对，而不是只保存值</li>
+<li>插入，查找和删除操作都是基于键的，值只不过是附属品。从概念上讲，map这个术语源于容器将键映射到值</li>
+<li>当需要根据键保存或获取元素时，以及需要按照特定顺序保存元素时，应该使用map</li>
+</ul>
+<h3 id="构建map"><a href="#构建map" class="headerlink" title="构建map"></a>构建map</h3><ul>
+<li>map类模板接受4种类型: 键类型，值类型，比较类型以及分配器类型</li>
+<li>如果忽略比较参数和分配器参数，那么map的构建和vector或list的构建是一样的，区别在于模板实例化中需要分别指定键和值的类型。</li>
+<li>例如构建一个map，使用int值作为键，Data类的对象作为值，map&lt;int, Data&gt; dataMap;在内部，dataMap为map中的每个元素存储一个pair&lt;int, Data&gt;</li>
+</ul>
+<h3 id="插入元素"><a href="#插入元素" class="headerlink" title="插入元素"></a>插入元素</h3><ul>
+<li><p>向顺序容器(例如vector和list)插入元素时，总是需要指定要插入元素的位置，而map不一样，它和其他关联容器都不需要指定插入位置。</p>
+</li>
+<li><p>map的内部实现会决定要保存新元素的位置，只需要提供键和值即可。</p>
+</li>
+<li><p>insert()方法。</p>
+</li>
+<li><p>可以使用insert()方法向map添加元素，它有一个好处：允许判断键是否已经存在。insert()方法的一个问题是必须将键&#x2F;值对指定为pair对象或initializer_list。</p>
+</li>
+<li><p>insert()的基本形式的返回类型是迭代器和布尔值组成的pair。返回类型这么复杂的原因是：</p>
+<ul>
+<li>如果指定的键已经存在，那么insert()不会改写元素值。返回的pair中的bool元素指出insert()是否真的插入了新的键&#x2F;值对。</li>
+<li>迭代器引用是map中带有指定键的元素(根据插入成功与否这个键对应的值可能是新值或旧值)</li>
+</ul>
+</li>
+<li><p>operator[]</p>
+</li>
+<li><p>向map插入元素的另一种方法是通过重载的operator[]。这种方法的区别主要在于语法：键和值分别是指定的。</p>
+</li>
+<li><p>此外，operator[]总是成功的。如果给定键没有对应的元素值，那么就会创建带有对应键值的新元素。如果具有给定键的元素已经存在，operator[]会将元素值替换为新指定的值。</p>
+</li>
+<li><p>不过operator[]有一点要注意：</p>
+<ul>
+<li>它总会构建一个新的值对象，即并不需要使用这个值对象，也同样如此。</li>
+<li>因为需要为元素提供一个默认的构造函数，这样可能会比insert()的效率低</li>
+</ul>
+</li>
+<li><p>emplace方法</p>
+</li>
+<li><p>map支持emplace()和emplace_hint()，从而在原位置构建元素，这与vector的emplace方法类似。</p>
+</li>
+<li><p>还有一个try_emplace()方法，如果给定的键还不存在，那么它将在原位置插入元素；如果map中 已经存在相应的键，则什么也不做。</p>
+</li>
+</ul>
+<h3 id="查找元素"><a href="#查找元素" class="headerlink" title="查找元素"></a>查找元素</h3><ul>
+<li>map可根据指定的键查找元素，时间复杂度为指数时间</li>
+<li>如果只想指导在map中是否存在具有给定键的元素，那么可以使用count()成员函数。这个函数返回map中给定键的元素个数。对于map来说，这个函数返回的结果不是0就是1,因为map中不允许具有重复键的元素。</li>
+</ul>
+<h2 id="C-std-map-find-函数-详解"><a href="#C-std-map-find-函数-详解" class="headerlink" title="C++ std::map::find() 函数 详解"></a>C++ std::map::find() 函数 详解</h2><p><code>std::map::find()</code> 是 C++ 标准模板库（STL）中 <code>std::map</code> 类的成员函数之一，用于在 map 中查找给定键的位置。以下是该函数的详细解释：</p>
+<p><strong>函数签名：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">iterator <span class="title">find</span><span class="params">(<span class="type">const</span> key_type&amp; k)</span></span>;</span><br><span class="line"><span class="function">const_iterator <span class="title">find</span><span class="params">(<span class="type">const</span> key_type&amp; k)</span> <span class="type">const</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>参数：</strong></p>
+<ul>
+<li><code>k</code>：要查找的键值。</li>
+</ul>
+<p><strong>返回值：</strong></p>
+<ul>
+<li>如果找到了给定键，则返回指向该键值对的迭代器；</li>
+<li>如果未找到，则返回指向 <code>end()</code> 的迭代器。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::map&lt;<span class="type">int</span>, std::string&gt; myMap;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 插入一些键值对</span></span><br><span class="line">    myMap[<span class="number">1</span>] = <span class="string">&quot;One&quot;</span>;</span><br><span class="line">    myMap[<span class="number">2</span>] = <span class="string">&quot;Two&quot;</span>;</span><br><span class="line">    myMap[<span class="number">3</span>] = <span class="string">&quot;Three&quot;</span>;</span><br><span class="line">    myMap[<span class="number">4</span>] = <span class="string">&quot;Four&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查找键为2的位置</span></span><br><span class="line">    <span class="keyword">auto</span> it = myMap.<span class="built_in">find</span>(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查结果</span></span><br><span class="line">    <span class="keyword">if</span> (it != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Key found: &quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <span class="string">&quot;, Value: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Key not found&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 尝试查找不存在的键</span></span><br><span class="line">    it = myMap.<span class="built_in">find</span>(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查结果</span></span><br><span class="line">    <span class="keyword">if</span> (it != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Key found: &quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <span class="string">&quot;, Value: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Key not found&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，我们使用 <code>myMap.find(2)</code> 查找键为2的位置，并输出结果。然后，我们尝试使用 <code>myMap.find(5)</code> 查找不存在的键，并输出结果。通过使用 <code>find</code> 函数，我们可以有效地检查某个键是否存在于 <code>std::map</code> 中，以及在存在的情况下获取相应的值。</p>
+<h2 id="C-标准库"><a href="#C-标准库" class="headerlink" title="C++ 标准库"></a>C++ <map>标准库</h2><p><code>&lt;map&gt;</code> 是 C++ 标准库中的头文件，定义了一组容器类模板，用于实现键-值对形式的关联容器。</p>
+<h3 id="std-map："><a href="#std-map：" class="headerlink" title="std::map："></a>std::map：</h3><ul>
+<li><code>std::map</code> 是一个关联容器，用于存储一组键值对（key-value pairs）。</li>
+<li>每个元素都是一个键值对，其中键（key）唯一，用于索引和快速查找值（value）。</li>
+<li>内部元素按照键的严格弱顺序（默认是升序）排列。</li>
+<li>主要特点：<ul>
+<li>键值对按照键的严格弱顺序排列。</li>
+<li>键是唯一的，不允许重复。</li>
+<li>支持快速的查找、插入和删除操作。</li>
+</ul>
+</li>
+</ul>
+<h3 id="主要操作："><a href="#主要操作：" class="headerlink" title="主要操作："></a>主要操作：</h3><ul>
+<li><code>insert(const value_type&amp; val)</code>: 插入键值对。</li>
+<li><code>erase(const_iterator position)</code>: 删除指定位置的元素。</li>
+<li><code>find(const key_type&amp; key)</code>: 查找键对应的值。</li>
+<li><code>size()</code>: 返回 map 中元素的数量。</li>
+<li><code>empty()</code>: 判断 map 是否为空。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::map&lt;std::string, <span class="type">int</span>&gt; myMap;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 插入键值对</span></span><br><span class="line">    myMap[<span class="string">&quot;Alice&quot;</span>] = <span class="number">25</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Bob&quot;</span>] = <span class="number">30</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Charlie&quot;</span>] = <span class="number">35</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查找元素</span></span><br><span class="line">    <span class="keyword">auto</span> it = myMap.<span class="built_in">find</span>(<span class="string">&quot;Bob&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (it != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob&#x27;s age: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob not found in map&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出 map 中的元素</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; pair : myMap) &#123;</span><br><span class="line">        std::cout &lt;&lt; pair.first &lt;&lt; <span class="string">&quot;: &quot;</span> &lt;&lt; pair.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例展示了 <code>std::map</code> 的基本使用方法，包括插入键值对、查找元素、遍历输出 map 中的键值对等操作。</p>
+<h2 id="C-标准库-详解"><a href="#C-标准库-详解" class="headerlink" title="C++ 标准库 详解"></a>C++ <map>标准库 详解</h2><p><code>&lt;map&gt;</code> 是 C++ 标准库中的头文件，定义了一组容器类模板，用于实现关联容器，允许存储一组唯一键和对应的值。主要包括 <code>std::map</code> 和 <code>std::multimap</code>。</p>
+<h3 id="std-map：-1"><a href="#std-map：-1" class="headerlink" title="std::map："></a>std::map：</h3><ul>
+<li><code>std::map</code> 是一个关联容器，存储键值对，其中每个键都是唯一的，用于快速查找对应的值。</li>
+<li>主要特点：<ul>
+<li>键值对是按照键的严格弱顺序（默认是升序）排列。</li>
+<li>键是唯一的，不允许重复。</li>
+</ul>
+</li>
+<li>主要操作：<ul>
+<li><code>insert(const value_type&amp; val)</code>: 插入键值对。</li>
+<li><code>erase(const_iterator position)</code>: 删除指定位置的元素。</li>
+<li><code>find(const key_type&amp; key)</code>: 查找键对应的值。</li>
+<li><code>size()</code>: 返回 map 中元素的数量。</li>
+<li><code>empty()</code>: 判断 map 是否为空。</li>
+</ul>
+</li>
+</ul>
+<h3 id="std-multimap："><a href="#std-multimap：" class="headerlink" title="std::multimap："></a>std::multimap：</h3><ul>
+<li><code>std::multimap</code> 与 <code>std::map</code> 类似，但允许键重复出现。</li>
+<li>主要特点：<ul>
+<li>键值对是按照键的严格弱顺序（默认是升序）排列。</li>
+<li>键允许重复。</li>
+</ul>
+</li>
+<li>主要操作与 <code>std::map</code> 类似。</li>
+</ul>
+<h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::map&lt;std::string, <span class="type">int</span>&gt; myMap;</span><br><span class="line"></span><br><span class="line">    myMap[<span class="string">&quot;Alice&quot;</span>] = <span class="number">25</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Bob&quot;</span>] = <span class="number">30</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Charlie&quot;</span>] = <span class="number">35</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> it = myMap.<span class="built_in">find</span>(<span class="string">&quot;Bob&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (it != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob&#x27;s age: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob not found in map&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; pair : myMap) &#123;</span><br><span class="line">        std::cout &lt;&lt; pair.first &lt;&lt; <span class="string">&quot;: &quot;</span> &lt;&lt; pair.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了 <code>std::map</code> 的基本用法，包括插入键值对、查找元素、遍历输出 map 中的键值对等操作。<code>std::multimap</code> 的使用与此类似，但允许键重复出现。</p>
+<h2 id="C-标准库-常用的类和函数"><a href="#C-标准库-常用的类和函数" class="headerlink" title="C++ 标准库 常用的类和函数"></a>C++ <map>标准库 常用的类和函数</h2><p>在 C++ <code>&lt;map&gt;</code> 标准库中，最常用的类是 <code>std::map</code> 和 <code>std::multimap</code>，它们提供了操作键-值对集合的常用函数和方法。</p>
+<h3 id="主要类："><a href="#主要类：" class="headerlink" title="主要类："></a>主要类：</h3><ol>
+<li><p><strong>std::map</strong>：</p>
+<ul>
+<li>用于存储一组唯一的键值对，其中每个键是唯一的。</li>
+<li>特点：<ul>
+<li>键值对按照键的严格弱顺序（默认是升序）排列。</li>
+<li>键是唯一的，不允许重复。</li>
+</ul>
+</li>
+<li>主要方法：<ul>
+<li><code>insert(const value_type&amp; val)</code>: 插入键值对。</li>
+<li><code>erase(const_iterator position)</code>: 删除指定位置的元素。</li>
+<li><code>find(const key_type&amp; key)</code>: 查找键对应的值。</li>
+<li><code>size()</code>: 返回 map 中元素的数量。</li>
+<li><code>empty()</code>: 判断 map 是否为空。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>std::multimap</strong>：</p>
+<ul>
+<li>与 <code>std::map</code> 类似，但允许键重复出现。</li>
+<li>特点：<ul>
+<li>键值对按照键的严格弱顺序（默认是升序）排列。</li>
+<li>键允许重复。</li>
+</ul>
+</li>
+<li>主要方法与 <code>std::map</code> 类似。</li>
+</ul>
+</li>
+</ol>
+<h3 id="常用方法："><a href="#常用方法：" class="headerlink" title="常用方法："></a>常用方法：</h3><ul>
+<li><code>insert(const value_type&amp; val)</code>: 插入键值对。</li>
+<li><code>erase(const_iterator position)</code>: 删除指定位置的元素。</li>
+<li><code>find(const key_type&amp; key)</code>: 查找键对应的值。</li>
+<li><code>size()</code>: 返回 map 中元素的数量。</li>
+<li><code>empty()</code>: 判断 map 是否为空。</li>
+</ul>
+<h3 id="示例：-2"><a href="#示例：-2" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::map&lt;std::string, <span class="type">int</span>&gt; myMap;</span><br><span class="line"></span><br><span class="line">    myMap[<span class="string">&quot;Alice&quot;</span>] = <span class="number">25</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Bob&quot;</span>] = <span class="number">30</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Charlie&quot;</span>] = <span class="number">35</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> it = myMap.<span class="built_in">find</span>(<span class="string">&quot;Bob&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (it != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob&#x27;s age: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob not found in map&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; pair : myMap) &#123;</span><br><span class="line">        std::cout &lt;&lt; pair.first &lt;&lt; <span class="string">&quot;: &quot;</span> &lt;&lt; pair.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例展示了 <code>std::map</code> 的基本用法，包括插入键值对、查找元素、遍历输出 map 中的键值对等操作。<code>std::multimap</code> 的使用与此类似，但允许键重复出现。</p>
+<h2 id="std-map"><a href="#std-map" class="headerlink" title="std::map"></a>std::map</h2><p><code>std::map</code> 是 C++ 标准库中的关联容器，用于存储一组键值对（key-value pairs）。每个键都是唯一的，可以快速查找对应的值。</p>
+<h3 id="特点："><a href="#特点：" class="headerlink" title="特点："></a>特点：</h3><ul>
+<li><strong>有序性：</strong> 内部元素按照键的严格弱顺序（默认是升序）排列。</li>
+<li><strong>唯一键：</strong> 键是唯一的，每个键对应一个值，不允许键的重复。</li>
+<li><strong>底层实现：</strong> 通常使用平衡二叉树（红黑树）来实现。</li>
+</ul>
+<h3 id="主要操作：-1"><a href="#主要操作：-1" class="headerlink" title="主要操作："></a>主要操作：</h3><ul>
+<li><code>insert(const value_type&amp; val)</code>: 插入键值对。</li>
+<li><code>erase(const_iterator position)</code>: 删除指定位置的元素。</li>
+<li><code>find(const key_type&amp; key)</code>: 查找键对应的值。</li>
+<li><code>size()</code>: 返回 map 中键值对的数量。</li>
+<li><code>empty()</code>: 判断 map 是否为空。</li>
+</ul>
+<h3 id="示例：-3"><a href="#示例：-3" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::map&lt;std::string, <span class="type">int</span>&gt; myMap;</span><br><span class="line"></span><br><span class="line">    myMap[<span class="string">&quot;Alice&quot;</span>] = <span class="number">25</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Bob&quot;</span>] = <span class="number">30</span>;</span><br><span class="line">    myMap[<span class="string">&quot;Charlie&quot;</span>] = <span class="number">35</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> it = myMap.<span class="built_in">find</span>(<span class="string">&quot;Bob&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (it != myMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob&#x27;s age: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob not found in map&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; pair : myMap) &#123;</span><br><span class="line">        std::cout &lt;&lt; pair.first &lt;&lt; <span class="string">&quot;: &quot;</span> &lt;&lt; pair.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例展示了 <code>std::map</code> 的基本用法，包括插入键值对、查找元素、遍历输出 map 中的键值对等操作。</p>
+<h2 id="std-multimap"><a href="#std-multimap" class="headerlink" title="std::multimap"></a>std::multimap</h2><p><code>std::multimap</code> 是 C++ 标准库中的关联容器，类似于 <code>std::map</code>，但允许键重复出现。</p>
+<h3 id="特点：-1"><a href="#特点：-1" class="headerlink" title="特点："></a>特点：</h3><ul>
+<li><strong>有序性：</strong> 内部元素按照键的严格弱顺序（默认是升序）排列。</li>
+<li><strong>允许重复键：</strong> <code>std::multimap</code> 中的键允许重复出现，即允许多个键对应不同的值。</li>
+<li><strong>底层实现：</strong> 通常使用平衡二叉树（红黑树）来实现。</li>
+</ul>
+<h3 id="主要操作：-2"><a href="#主要操作：-2" class="headerlink" title="主要操作："></a>主要操作：</h3><ul>
+<li><code>insert(const value_type&amp; val)</code>: 插入键值对。</li>
+<li><code>erase(const_iterator position)</code>: 删除指定位置的元素。</li>
+<li><code>find(const key_type&amp; key)</code>: 查找键对应的值。</li>
+<li><code>size()</code>: 返回 multimap 中键值对的数量。</li>
+<li><code>empty()</code>: 判断 multimap 是否为空。</li>
+</ul>
+<h3 id="示例：-4"><a href="#示例：-4" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;map&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    std::multimap&lt;std::string, <span class="type">int</span>&gt; myMultiMap;</span><br><span class="line"></span><br><span class="line">    myMultiMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>(<span class="string">&quot;Alice&quot;</span>, <span class="number">25</span>));</span><br><span class="line">    myMultiMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>(<span class="string">&quot;Bob&quot;</span>, <span class="number">30</span>));</span><br><span class="line">    myMultiMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>(<span class="string">&quot;Charlie&quot;</span>, <span class="number">35</span>));</span><br><span class="line">    myMultiMap.<span class="built_in">insert</span>(std::<span class="built_in">make_pair</span>(<span class="string">&quot;Bob&quot;</span>, <span class="number">32</span>)); <span class="comment">// 允许重复键</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> it = myMultiMap.<span class="built_in">find</span>(<span class="string">&quot;Bob&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (it != myMultiMap.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob&#x27;s age: &quot;</span> &lt;&lt; it-&gt;second &lt;&lt; std::endl;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Bob not found in multimap&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; pair : myMultiMap) &#123;</span><br><span class="line">        std::cout &lt;&lt; pair.first &lt;&lt; <span class="string">&quot;: &quot;</span> &lt;&lt; pair.second &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例展示了 <code>std::multimap</code> 的基本用法，包括插入键值对、查找元素、遍历输出 multimap 中的键值对等操作。与 <code>std::map</code> 不同，<code>std::multimap</code> 允许多个键对应不同的值。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppSTL/" rel="tag"># CppSTL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_32_iomanip/" rel="prev" title="C++_10_32_iomanip">
+      <i class="fa fa-chevron-left"></i> C++_10_32_iomanip
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_10_%E6%A0%87%E5%87%86%E5%BA%93/2024-05-22-C++_10_30_set/" rel="next" title="C++_10_30_set">
+      C++_10_30_set <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-map-%E4%B8%A4%E4%B8%AA%E5%80%BC%E4%BD%9C%E4%B8%BA%E4%B8%80%E4%B8%AAmap%E4%B8%AD%E7%9A%84%E9%94%AE"><span class="nav-number">2.</span> <span class="nav-text">C++ std::map 两个值作为一个map中的键</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.1.</span> <span class="nav-text">代码示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">2.2.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%AF%94%E8%BE%83"><span class="nav-number">2.3.</span> <span class="nav-text">自定义比较</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E5%85%B3%E8%81%94%E5%AE%B9%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">有序关联容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#map"><span class="nav-number">4.</span> <span class="nav-text">map</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BAmap"><span class="nav-number">4.1.</span> <span class="nav-text">构建map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%85%83%E7%B4%A0"><span class="nav-number">4.2.</span> <span class="nav-text">插入元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE%E5%85%83%E7%B4%A0"><span class="nav-number">4.3.</span> <span class="nav-text">查找元素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-std-map-find-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">C++ std::map::find() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93"><span class="nav-number">6.</span> <span class="nav-text">C++ 标准库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#std-map%EF%BC%9A"><span class="nav-number">6.1.</span> <span class="nav-text">std::map：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">6.2.</span> <span class="nav-text">主要操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">6.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">C++ 标准库 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#std-map%EF%BC%9A-1"><span class="nav-number">7.1.</span> <span class="nav-text">std::map：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#std-multimap%EF%BC%9A"><span class="nav-number">7.2.</span> <span class="nav-text">std::multimap：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">7.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E6%A0%87%E5%87%86%E5%BA%93-%E5%B8%B8%E7%94%A8%E7%9A%84%E7%B1%BB%E5%92%8C%E5%87%BD%E6%95%B0"><span class="nav-number">8.</span> <span class="nav-text">C++ 标准库 常用的类和函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%B1%BB%EF%BC%9A"><span class="nav-number">8.1.</span> <span class="nav-text">主要类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">8.2.</span> <span class="nav-text">常用方法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">8.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-map"><span class="nav-number">9.</span> <span class="nav-text">std::map</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9%EF%BC%9A"><span class="nav-number">9.1.</span> <span class="nav-text">特点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%93%8D%E4%BD%9C%EF%BC%9A-1"><span class="nav-number">9.2.</span> <span class="nav-text">主要操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-3"><span class="nav-number">9.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-multimap"><span class="nav-number">10.</span> <span class="nav-text">std::multimap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9%EF%BC%9A-1"><span class="nav-number">10.1.</span> <span class="nav-text">特点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%93%8D%E4%BD%9C%EF%BC%9A-2"><span class="nav-number">10.2.</span> <span class="nav-text">主要操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-4"><span class="nav-number">10.3.</span> <span class="nav-text">示例：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

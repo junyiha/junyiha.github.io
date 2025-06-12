@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 学习并整理Linux系统中关于网络编程的知识。 一方面用于巩固知识，更加深入理解网络编程，建立良好的体系结构； 另一方面用于当前的面试，学到的东西能够说出来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 网络编程">
+<meta property="og:url" content="https://junyiha.github.io/2025/02/15/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-15--Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 学习并整理Linux系统中关于网络编程的知识。 一方面用于巩固知识，更加深入理解网络编程，建立良好的体系结构； 另一方面用于当前的面试，学到的东西能够说出来。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE%E7%8A%B6%E6%80%81%E5%9B%BE.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/TCP%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%AD%A3%E5%B8%B8%E5%BB%BA%E7%AB%8B.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/TCP%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%AD%A3%E5%B8%B8%E7%BB%88%E6%AD%A2.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/TCP_CLOSE.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/C++Socket%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/C++Windows%E5%92%8CLinux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/socket%E4%B8%AD%E5%8F%91%E9%80%81%E7%9A%84TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.png">
+<meta property="og:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/socket%E4%B8%AD%E5%8F%91%E9%80%81%E7%9A%84TCP%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B.png">
+<meta property="article:published_time" content="2025-02-15T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.230Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppOthers">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://junyiha.github.io/images/C++/C++_99_%E5%85%B6%E4%BB%96/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE%E7%8A%B6%E6%80%81%E5%9B%BE.png">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/02/15/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-15--Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Linux 网络编程 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/02/15/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-15--Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux 网络编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-02-15 09:00:00" itemprop="dateCreated datePublished" datetime="2025-02-15T09:00:00+08:00">2025-02-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>学习并整理Linux系统中关于网络编程的知识。<ul>
+<li>一方面用于巩固知识，更加深入理解网络编程，建立良好的体系结构；</li>
+<li>另一方面用于当前的面试，学到的东西能够说出来。</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="网络编程基础概念"><a href="#网络编程基础概念" class="headerlink" title="网络编程基础概念"></a>网络编程基础概念</h2><ul>
+<li>协议(protocol): 通信双方必须遵守地规矩，由ISO(组织)规定,RPC(标准)文档</li>
+<li>现存地网络中主要用的是TCP&#x2F;IP模型</li>
+<li>TCP&#x2F;IP模型为四层<ul>
+<li><strong>应用层</strong>：http(超文本传输协议)，ftp(文件传输协议)，telnet(远程登录)，ssh(安全外壳协议)，stmp(简单邮件发送)，pop3(收邮件)</li>
+<li><strong>传输层</strong>：tcp(传输控制协议)，udp(用户数据包协议)</li>
+<li><strong>网络层</strong>：ip(网际互连协议)，icmp(网络控制消息协议)，igmp(网络组管理协议)</li>
+<li><strong>网络接口层</strong>：arp(地址转换协议)，rarp(反向地址转换协议)，mpls(多协议标签交换)</li>
+</ul>
+</li>
+</ul>
+<h3 id="传输控制协议-–-TCP"><a href="#传输控制协议-–-TCP" class="headerlink" title="传输控制协议 – TCP"></a>传输控制协议 – TCP</h3><ul>
+<li><p>传输控制协议(Transmission Control Protocol, TCP)是一种面向连接地，可靠地，基于字节流地传输层通信协议，由IETF地RFC 793定义。</p>
+</li>
+<li><p>在简化地计算机网络OSI模型中，它完成第四层传输层所指定地功能。用户数据报协议(UDP)是同一层内另一个重要的传输协议。</p>
+</li>
+<li><p>在因特网协议族(Internet protocol suite)中，TCP层是位于IP层之上，应用层之下地中间层。不同主机地应用层之间经常需要可靠地，像管道一样地连接，但是IP层不提供这样的流机制，而是提供不可靠的包交换。</p>
+</li>
+<li><p>应用层向TCP层发送用于网间传输的，用8位字节表示的数据流，然后TCP把数据流分割成适当长度的报文段(通常受该计算机连接的网络的数据链路层的最大传输单元(MTU)的限制)。</p>
+</li>
+<li><p>之后TCP把结果包传给IP层，由它来透过网络将包传送给接收端实体的TCP层。</p>
+</li>
+<li><p>TCP为了保证不发生丢包，就给每个包一个序号，同时序号也保证了传送到接收端实体的包的按序接收。</p>
+</li>
+<li><p>然后接收端实体对已成功收到的包发回一个相应的确认信息(ACK)；</p>
+</li>
+<li><p>如果发送端实体在合理的往返时延(RTT)内未收到确认，那么对应的数据包就被假设为已丢失并进行重传。</p>
+</li>
+<li><p>TCP用一个校验和函数来检验数据是否有错误，在发送和接收时都要计算校验和。</p>
+</li>
+<li><p>数据在TCP层称为流(Stream)，数据分组称为分段(Segment)。</p>
+</li>
+<li><p>作为比较，数据在IP层称为Datagram，数据分组称为分片(Fragment)。</p>
+</li>
+<li><p>UDP中分组称为 Message</p>
+</li>
+</ul>
+<h4 id="运作方式"><a href="#运作方式" class="headerlink" title="运作方式"></a>运作方式</h4><ul>
+<li>TCP协议的运行可划分为三个阶段：<ul>
+<li>连接建立(connection establishment)</li>
+<li>数据传送(data transfer)</li>
+<li>连接终止(connection termination)</li>
+</ul>
+</li>
+<li>操作系统将TCP连接抽象为套接字表示的本地端点(local end-point)，作为编程接口给程序使用。在TCP连接的声明期内，本地端点要经历一系列的状态改变。<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE%E7%8A%B6%E6%80%81%E5%9B%BE.png" alt="传输控制协议状态图"></li>
+</ul>
+<h4 id="建立通路"><a href="#建立通路" class="headerlink" title="建立通路"></a>建立通路</h4><ul>
+<li><p>TCP用三次握手(或称三路握手, three-way handshake)过程建立一个连接。在连接建立过程中，很多参数要被初始化，例如序号被初始化以保证按序传输和连接的强壮性。</p>
+</li>
+<li><p>一对终端同时初始化一个它们之间的连接是可能的。但通常是由一端(服务器端)打开一个套接字(socket)然后监听来自另一方(客户端)的连接，这就是通常所指的<strong>被动打开</strong>(passive open)。服务器端被动打开以后，客户端就能开始建立<strong>主动打开</strong>(active open)<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/TCP%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%AD%A3%E5%B8%B8%E5%BB%BA%E7%AB%8B.png" alt="TCP连接的正常建立"></p>
+</li>
+<li><p>服务端执行了 listen() 后，就在服务器上建立起两个队列</p>
+<ul>
+<li><strong>SYN队列</strong>：存放完成了二次握手的结果。队列长度由 listen() 的参数 backlog 指定。</li>
+<li><strong>ACCEPT队列</strong>：存放完成了三次握手的结果。队列长度由 listen() 的参数 backlog 指定。</li>
+</ul>
+</li>
+<li><p>三次握手协议的过程：</p>
+<ul>
+<li>客户端（通过执行connect函数）向服务器端发送一个SYN包，请求一个主动打开。该包携带客户端为这个连接请求而设定的随机数A作为消息序列号。</li>
+<li>服务器端收到一个合法的SYN包后，把该包放入SYN队列中；回送一个SYN&#x2F;ACK。ACK的确认码应为A+1，SYN&#x2F;ACK包本身携带一个随机产生的序号B。</li>
+<li>客户端收到SYN&#x2F;ACK包后，发送一个ACK包，该包的序号被设定为A+1，而ACK的确认码则为B+1。然后客户端的connect函数成功返回。当服务器端收到这个ACK包的时候，把请求帧从SYN队列中移出，放至ACCEPT队列中；这时accept函数如果处于阻塞状态，可以被唤醒，从ACCEPT队列中取出ACK包，重新建立一个新的用于双向通信的sockfd，并返回。</li>
+</ul>
+</li>
+<li><p>如果服务器端接到了客户端发的SYN后回了SYN-ACK后客户端掉线了，服务器端没有收到客户端回来的ACK，那么，这个连接处于一个中间状态，既没成功，也没失败。于是，服务器端如果在一定时间内没有收到的TCP会重发SYN-ACK。</p>
+</li>
+<li><p>在Linux下，默认重试次数为5次，重试的间隔时间从1s开始每次都翻倍，5次的重试时间间隔为1s, 2s, 4s, 8s, 16s，总共31s，第5次发出后还要等32s才知道第5次也超时了，所以，总共需要 1s + 2s + 4s+ 8s+ 16s + 32s &#x3D; 63s，TCP才会断开这个连接。使用三个TCP参数来调整行为：tcp_synack_retries 减少重试次数；tcp_max_syn_backlog，增大SYN连接数；tcp_abort_on_overflow决定超出能力时的行为。</p>
+</li>
+<li><p>“三次握手”的目的是：</p>
+<ul>
+<li>为了防止已失效的连接(connect)请求报文段传送到了服务端，因而产生错误”，也即为了解决“网络中存在延迟的重复分组”问题。</li>
+<li>例如：client发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的滞留了，以致延误到连接释放以后的某个时间才到达server。本来这是一个早已失效的报文段。但server收到此失效的连接请求报文段后，就误认为是client发出的一个新的连接请求。于是就向client发出确认报文段，同意建立连接。假设不采用“三次握手”，那么只要server发出确认，新的连接就建立了。由于现在client并没有发出建立连接的请求，因此不会理睬server的确认，也不会向server发送数据。但server却以为新的运输连接已经建立，并一直等待client发来数据。这样，server的很多资源就白白浪费掉了。</li>
+<li>采用“三次握手”的办法可以防止上述现象发生，<strong>client不会向server的确认发出确认。server由于收不到确认，就知道client并没有要求建立连接。</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="资源使用"><a href="#资源使用" class="headerlink" title="资源使用"></a>资源使用</h4><ul>
+<li>主机收到一个TCP包时，用两端的<strong>IP地址与端口号</strong>来标识这个TCP包属于哪个session。使用一张表来存储所有的session，表中的每条称作Transmission Control Block（TCB），tcb结构的定义包括连接使用的源端口、目的端口、目的ip、序号、应答序号、对方窗口大小、己方窗口大小、tcp状态、tcp输入&#x2F;输出队列、应用层输出队列、tcp的重传有关变量等。</li>
+<li><strong>服务器端的连接数量是无限的，只受内存的限制</strong>。客户端的连接数量，过去由于在发送第一个SYN到服务器之前需要先分配一个随机空闲的端口，这限制了客户端IP地址的对外发出连接的数量上限。</li>
+<li>从Linux 4.2开始，有了socket选项IP_BIND_ADDRESS_NO_PORT，它通知Linux内核不保留usingbind使用端口号为0时内部使用的临时端口（ephemeral port），在connect时会自动选择端口以组成独一无二的四元组（同一个客户端端口可用于连接不同的服务器套接字；同一个服务器端口可用于接受不同客户端套接字的连接）</li>
+<li>对于不能确认的包、接收但还没读取的数据，都会占用操作系统的资源。</li>
+</ul>
+<h4 id="数据传输"><a href="#数据传输" class="headerlink" title="数据传输"></a>数据传输</h4><ul>
+<li>在TCP的数据传送状态，很多重要的机制保证了TCP的可靠性和强壮性。它们包括：<ul>
+<li>使用序号，对收到的TCP报文段进行排序以及检测重复的数据；</li>
+<li>使用校验和检测报文段的错误，即无错传输；</li>
+<li>使用确认和计时器来检测和纠正丢包或延时；</li>
+<li>流控制（Flow control）；</li>
+<li>拥塞控制（Congestion control）；</li>
+<li>丢失包的重传。</li>
+</ul>
+</li>
+</ul>
+<h4 id="终结通路"><a href="#终结通路" class="headerlink" title="终结通路"></a>终结通路</h4><ul>
+<li>连接终止使用了四路握手过程（或称四次握手，four-way handshake），在这个过程中连接的每一侧都独立地被终止。当一个端点要停止它这一侧的连接，就向对侧发送FIN，对侧回复ACK表示确认。因此，拆掉一侧的连接过程需要一对FIN和ACK，分别由两侧端点发出。<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/TCP%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%AD%A3%E5%B8%B8%E7%BB%88%E6%AD%A2.png" alt="TCP连接的正常终止"></li>
+<li>首先发出FIN的一侧，如果给对侧的FIN响应了ACK，那么就会超时等待2*MSL时间，然后关闭连接。在这段超时等待时间内，本地的端口不能被新连接使用；避免延时的包的到达与随后的新连接相混淆。RFC793定义了MSL为2分钟，Linux设置成了30s。参数tcp_max_tw_buckets控制并发的TIME_WAIT的数量，默认值是180000，如果超限，那么，系统会把多的TIME_WAIT状态的连接给destory掉，然后在日志里打一个警告（如：time wait bucket table overflow）</li>
+<li>连接可以工作在TCP半开状态。即一侧关闭了连接，不再发送数据；但另一侧没有关闭连接，仍可以发送数据。已关闭的一侧仍然应接收数据，直至对侧也关闭了连接。</li>
+<li>也可以通过测三次握手关闭连接。主机A发出FIN，主机B回复FIN &amp; ACK，然后主机A回复ACK.<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/TCP_CLOSE.png" alt="TCP_CLOSE"></li>
+</ul>
+<h4 id="端口"><a href="#端口" class="headerlink" title="端口"></a>端口</h4><ul>
+<li>TCP使用了通信端口（Port number）的概念来标识发送方和接收方的应用层。对每个TCP连接的一端都有一个相关的16位的无符号端口号分配给它们。</li>
+<li>端口被分为三类：众所周知的、注册的和动态&#x2F;私有的。<ul>
+<li>众所周知的端口号是由因特网赋号管理局（IANA）来分配的，并且通常被用于系统一级或根进程。众所周知的应用程序作为服务器程序来运行，并被动地侦听经常使用这些端口的连接。例如：FTP、TELNET、SMTP、HTTP、IMAP、POP3等。</li>
+<li>注册的端口号通常被用来作为终端用户连接服务器时短暂地使用的源端口号，但它们也可以用来标识已被第三方注册了的、被命名的服务。</li>
+<li>动态&#x2F;私有的端口号在任何特定的TCP连接外不具有任何意义。可能的、被正式承认的端口号有65535个。</li>
+</ul>
+</li>
+</ul>
+<h4 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h4><ul>
+<li>TCP并不是对所有的应用都适合，一些新的带有一些内在的脆弱性的运输层协议也被设计出来。比如，实时应用并不需要甚至无法忍受TCP的可靠传输机制。</li>
+<li>在这种类型的应用中，通常允许一些丢包、出错或拥塞，而不是去校正它们。例如通常不使用TCP的应用有：流媒体、网络游戏、IP电话（VoIP）等等。任何不是很需要可靠性或者是想将功能减到最少的应用可以避免使用TCP。在很多情况下，当只需要多路复用应用服务时，用户数据报协议（UDP）可以代替TCP为应用提供服务。</li>
+<li>除外，由于TCP的实现是由操作系统提供，而TCP的悠久历史、系统级别的配置机制，一些特性在特定的网络环境下会成为一种累赘而且无法优化，所以也有一些通过在UDP上重新实现用户层级的类似TCP的面向连接的、可靠的、基于字节流的类传输层协议，来代替TCP，例如基于UDP的数据传输协议、QUIC。</li>
+</ul>
+<h3 id="用户数据报协议-UDP"><a href="#用户数据报协议-UDP" class="headerlink" title="用户数据报协议 UDP"></a>用户数据报协议 UDP</h3><ul>
+<li>用户数据报协议(User Datagram Protocol, UDP，又称用户数据包协议)是一个简单的面向数据包的通信协议，位于OSI模型的传输层。该协议由David P. Reed在1980年设计且在RFC 768中被规范。典型网络上的众多使用UDP协议的关键应用在一定程度上是相似的。</li>
+<li>在TCP&#x2F;IP模型中，UDP为网络层以上和应用层以下提供了一个简单的接口。UDP只提供数据的不可靠传递，它一旦把应用程序发给网络层的数据发送出去，就不保留数据备份（所以UDP有时候也被认为是不可靠的数据包协议）。UDP在IP数据包的头部仅仅加入了复用和数据校验字段</li>
+<li>UDP适用于不需要或在程序中执行错误检查和纠正的应用，它避免了协议栈中此类处理的开销。对时间有较高要求的应用程序通常使用UDP，因为丢弃数据包比等待或重传导致延迟更可取</li>
+</ul>
+<h4 id="可靠性"><a href="#可靠性" class="headerlink" title="可靠性"></a>可靠性</h4><ul>
+<li>由于UDP缺乏可靠性且属于无连接协议，所以应用程序通常必须容许一些丢失、错误或重复的数据包。某些应用程序（如TFTP）可能会根据需要在应用程序层中添加基本的可靠性机制。</li>
+<li>一些应用程序不太需要可靠性机制，甚至可能因为引入可靠性机制而降低性能，所以它们使用UDP这种缺乏可靠性的协议。流媒体，实时多人游戏和IP语音（VoIP）是经常使用UDP的应用程序。 在这些特定应用中，丢包通常不是重大问题。如果应用程序需要高度可靠性，则可以使用诸如TCP之类的协议。</li>
+<li>例如，在VoIP中延迟和抖动是主要问题。如果使用TCP，那么任何数据包丢失或错误都将导致抖动，因为TCP在请求及重传丢失数据时不向应用程序提供后续数据。如果使用TCP，那么应用程序则需要提供必要的握手，例如实时确认已收到的消息。</li>
+<li>由于UDP缺乏拥塞控制，所以需要基于网络的机制来减少因失控和高速UDP流量负荷而导致的拥塞崩溃效应。换句话说，因为UDP发送端无法检测拥塞，所以像使用包队列和丢弃技术的路由器之类的网络基础设备会被用于降低UDP过大流量。数据拥塞控制协议（DCCP）设计成通过在诸如流媒体类型的高速率UDP流中增加主机拥塞控制，来减小这个潜在的问题</li>
+</ul>
+<h4 id="应用-1"><a href="#应用-1" class="headerlink" title="应用"></a>应用</h4><ul>
+<li>许多关键的互联网应用程序使用UDP，包括：<ul>
+<li>域名系统（DNS），其中查询阶段必须快速，并且只包含单个请求，后跟单个回复数据包</li>
+<li>动态主机配置协议（DHCP），用于动态分配IP地址；</li>
+<li>简单网络管理协议（SNMP）；</li>
+<li>路由信息协议（RIP）；</li>
+<li>网络时间协议（NTP）。</li>
+</ul>
+</li>
+<li>流媒体、在线游戏流量通常使用UDP传输。 实时视频流和音频流应用程序旨在处理偶尔丢失、错误的数据包，因此只会发生质量轻微下降，而避免了重传数据包带来的高延迟。</li>
+<li>由于TCP和UDP都在同一网络上运行，因此一些企业发现来自这些实时应用程序的UDP流量影响了使用TCP的应用程序的性能，例如销售、会计和数据库系统。 当TCP检测到数据包丢失时，它将限制其数据速率使用率。由于实时和业务应用程序对企业都很重要，因此一些人认为开发服务质量解决方案至关重要</li>
+<li>某些VPN应用（如OpenVPN）使用UDP并可以在应用程序级别实现可靠连接和错误检查。</li>
+</ul>
+<h2 id="Socket-基本概念与基本流程"><a href="#Socket-基本概念与基本流程" class="headerlink" title="Socket 基本概念与基本流程"></a>Socket 基本概念与基本流程</h2><ul>
+<li><p>Socket起源于Unix，Unix&#x2F;Linux基本哲学之一就是<strong>一切皆文件</strong>(普通文件，目录，硬件设备，进程，管道都是文件)，Socket也可以被认为是文件，所以也可以对Socket使用文件I&#x2F;O地相关操作，可以用 打开(open)-&gt;读写(read&#x2F;write)-&gt;关闭(close) 模式来进行操作。</p>
+</li>
+<li><p>socket一词的起源</p>
+<ul>
+<li>在组网领域的首次使用是在1970年2月12日发布的文献IETF RFC33中发现的，撰写者为Stephen Carr、Steve Crocker和Vint Cerf。根据美国计算机历史博物馆的记载，Croker写道：“命名空间的元素都可称为套接字接口。一个套接字接口构成一个连接的一端，而一个连接可完全由一对套接字接口规定。”计算机历史博物馆补充道：“这比BSD的套接字接口定义早了大约12年。”</li>
+</ul>
+</li>
+<li><p>Linux平台下，socket() 返回地值被称为文件描述符fd(File Descriptor)，用来唯一标识一个套接字，在Windows平台它称为句柄(handle)。</p>
+</li>
+<li><p>套接字的主流程很简单，在服务端下：</p>
+<ul>
+<li>使用 socket() 创建套接字</li>
+<li>使用 bind() 分配IP地址和端口号</li>
+<li>使用 listen() 将套接字转换为可受连接状态，开始监听前面分配的IP和端口号</li>
+<li>使用 accept() 受理连接请求</li>
+<li>使用 write()&#x2F;read() 来和客户端交换数据</li>
+<li>使用 close() 关闭连接。</li>
+</ul>
+</li>
+<li><p>在客户端下：</p>
+<ul>
+<li>不需要 bind() 分配IP和端口号，而是由 connect() 自动分配端口号加上自身的IP</li>
+<li>使用 write()&#x2F;read() 和服务端交换数据</li>
+<li>使用 close() 关闭连接<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/C++Socket%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png" alt="C++Socket套接字基本流程"></li>
+</ul>
+</li>
+<li><p>Windows平台和Linux的差别较小，在创建套接字之前需要调用 WSAStartUp()，关闭连接使用 closesocket()，关闭连接之后使用 WSACleanUp() 注销，其他没有差别了，所以在项目中可以很方便地通过 <em>WIN32</em> 宏来判断环境编写跨平台代码。<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/C++Windows%E5%92%8CLinux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B.png" alt="C++Windows和Linux网络编程基本流程"></p>
+</li>
+<li><p>socket是对TCP&#x2F;IP协议的封装，它本身并不是协议，而是一个调用接口(API)，通过它才能使用TCP&#x2F;IP协议</p>
+</li>
+<li><p>socket是对TCP&#x2F;IP协议族的一种封装，是应用层与TCP&#x2F;IP协议族通信的中间软件抽象层。</p>
+</li>
+</ul>
+<h2 id="网络字节序与主机字节序"><a href="#网络字节序与主机字节序" class="headerlink" title="网络字节序与主机字节序"></a>网络字节序与主机字节序</h2><ul>
+<li><strong>主机字节序</strong>就是我们平常说的大端和小端模式：不同的CPU有不同的字节序类型，这些字节序是指整数在内存中保存的顺序，这个叫做主机序。引用标准的Big-Endian和Little-Endian的定义如下：<ul>
+<li><strong>Little-Endian</strong>就是低位字节排放在内存的低地址端，高位字节排放在内存的高地址端。</li>
+<li><strong>Big-Endian</strong>就是高位字节排放在内存的低地址端，低位字节排放在内存的高地址端。</li>
+</ul>
+</li>
+<li><strong>网络字节序</strong>：4个字节的32 bit值以下面的次序传输：首先是0～7bit，其次8～15bit，然后16～23bit，最后是24~31bit。这种传输次序称作大端字节序。<strong>由于TCP&#x2F;IP首部中所有的二进制整数在网络中传输时都要求以这种次序，因此它又称作网络字节序</strong>。顾名思义字节的顺序，就是大于一个字节类型的数据在内存中的存放顺序，一个字节的数据没有顺序的问题了。</li>
+<li><strong>所以</strong>：<ul>
+<li>在将一个地址绑定到socket的时候，请先将主机字节序转换成为网络字节序，而不要假定主机字节序跟网络字节序一样使用的是Big-Endian。</li>
+</ul>
+</li>
+</ul>
+<h2 id="socket的基本操作"><a href="#socket的基本操作" class="headerlink" title="socket的基本操作"></a>socket的基本操作</h2><ul>
+<li>既然socket是“open—write&#x2F;read—close”模式的一种实现，那么socket就提供了这些操作对应的函数接口。下面以TCP为例，介绍几个基本的socket接口函数。</li>
+</ul>
+<h3 id="socket-函数"><a href="#socket-函数" class="headerlink" title="socket()函数"></a>socket()函数</h3><ul>
+<li>使用 socket() 函数创建一个套接字<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li>socket函数对应于普通文件的打开操作。普通文件的打开操作返回一个文件描述字，而socket()用于创建一个<strong>socket描述符</strong>（socket descriptor），它唯一标识一个socket。这个socket描述字跟文件描述字一样，后续的操作都有用到它，把它作为参数，通过它来进行一些读写操作</li>
+<li>正如可以给fopen的传入不同参数值，以打开不同的文件。创建socket的时候，也可以指定不同的参数创建不同的socket描述符，socket函数的三个参数分别为：<ul>
+<li><strong>domain</strong>：即协议域，又称为协议族（family）。常用的协议族有，AF_INET、AF_INET6、AF_LOCAL（或称AF_UNIX，Unix域socket）、AF_ROUTE等等。协议族决定了socket的地址类型，在通信中必须采用对应的地址，如AF_INET决定了要用ipv4地址（32位的）与端口号（16位的）的组合、AF_UNIX决定了要用一个绝对路径名作为地址。</li>
+<li><strong>type</strong>：指定socket类型。常用的socket类型有，SOCK_STREAM、SOCK_DGRAM、SOCK_RAW、SOCK_PACKET、SOCK_SEQPACKET等等（socket的类型有哪些？）。</li>
+<li><strong>protocol</strong>：故名思意，就是指定协议。常用的协议有，IPPROTO_TCP、IPPTOTO_UDP、IPPROTO_SCTP、IPPROTO_TIPC等，它们分别对应TCP传输协议、UDP传输协议、STCP传输协议、TIPC传输协议</li>
+</ul>
+</li>
+<li>注意：并不是上面的type和protocol可以随意组合的，如SOCK_STREAM不可以跟IPPROTO_UDP组合。当protocol为0时，会自动选择type类型对应的默认协议。</li>
+<li>当我们调用socket创建一个socket时，返回的socket描述字它存在于协议族（address family，AF_XXX）空间中，但没有一个具体的地址。<strong>如果想要给它赋值一个地址，就必须调用bind()函数，否则就当调用connect()、listen()时系统会自动随机分配一个端口</strong>。</li>
+</ul>
+<h3 id="bind-函数"><a href="#bind-函数" class="headerlink" title="bind() 函数"></a>bind() 函数</h3><ul>
+<li><p>正如上面所说bind()函数把一个地址族中的特定地址赋给socket。例如对应AF_INET、AF_INET6就是把一个ipv4或ipv6地址和端口号组合赋给socket。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">bind</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>sockfd</strong>：即socket描述字，它是通过socket()函数创建了，唯一标识一个socket。bind()函数就是将给这个描述字绑定一个名字。</p>
+</li>
+<li><p><strong>addr</strong>：一个const struct sockaddr *指针，指向要绑定给sockfd的协议地址。这个地址结构根据地址创建socket时的地址协议族的不同而不同</p>
+<ul>
+<li>ipv4对应的是：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> &#123;</span><br><span class="line">    <span class="type">sa_family_t</span>    sin_family; <span class="comment">/* address family: AF_INET */</span></span><br><span class="line">    <span class="type">in_port_t</span>      sin_port;   <span class="comment">/* port in network byte order */</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">in_addr</span> sin_addr;   <span class="comment">/* internet address */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Internet address. */</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">in_addr</span> &#123;</span><br><span class="line">    <span class="type">uint32_t</span>       s_addr;     <span class="comment">/* address in network byte order */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>ipv6对应的是：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">sockaddr_in6</span> &#123; </span><br><span class="line">    <span class="type">sa_family_t</span>     sin6_family;   <span class="comment">/* AF_INET6 */</span> </span><br><span class="line">    <span class="type">in_port_t</span>       sin6_port;     <span class="comment">/* port number */</span> </span><br><span class="line">    <span class="type">uint32_t</span>        sin6_flowinfo; <span class="comment">/* IPv6 flow information */</span> </span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">in6_addr</span> sin6_addr;     <span class="comment">/* IPv6 address */</span> </span><br><span class="line">    <span class="type">uint32_t</span>        sin6_scope_id; <span class="comment">/* Scope ID (new in 2.4) */</span> </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">in6_addr</span> &#123; </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span>   s6_addr[<span class="number">16</span>];   <span class="comment">/* IPv6 address */</span> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>Unix域对应的是<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> UNIX_PATH_MAX    108</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">sockaddr_un</span> &#123; </span><br><span class="line">    <span class="type">sa_family_t</span> sun_family;               <span class="comment">/* AF_UNIX */</span> </span><br><span class="line">    <span class="type">char</span>        sun_path[UNIX_PATH_MAX];  <span class="comment">/* pathname */</span> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><strong>addrlen</strong>：对应的是地址的长度。</p>
+</li>
+<li><p>通常服务器在启动的时候都会绑定一个众所周知的地址（如<strong>ip地址+端口号</strong>），用于提供服务，客户就可以通过它来接连服务器；而客户端就不用指定，由系统自动分配一个端口号和自身的ip地址组合。</p>
+</li>
+<li><p>这就是为什么通常服务器端在listen之前会调用bind()，而客户端就不会调用，而是在connect()时由系统随机生成一个。</p>
+</li>
+</ul>
+<h3 id="listen-connect-函数"><a href="#listen-connect-函数" class="headerlink" title="listen(), connect() 函数"></a>listen(), connect() 函数</h3><ul>
+<li>如果作为一个服务器，在调用socket()、bind()之后就会调用listen()来监听这个socket，</li>
+<li>如果客户端这时调用connect()发出连接请求，服务器端就会接收到这个请求。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">listen</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> backlog)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">connect</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li>listen函数的第一个参数即为要监听的socket描述字，第二个参数为相应socket可以排队的最大连接个数。socket()函数创建的socket默认是一个<strong>主动类型</strong>的，listen函数将socket变为<strong>被动类型</strong>的，等待客户的连接请求。</li>
+<li>connect函数的第一个参数即为客户端的socket描述字，第二参数为服务器的socket地址，第三个参数为socket地址的长度。客户端通过调用connect函数来建立与TCP服务器的连接。</li>
+</ul>
+<h3 id="accept-函数"><a href="#accept-函数" class="headerlink" title="accept() 函数"></a>accept() 函数</h3><ul>
+<li>TCP服务器端依次调用socket()、bind()、listen()之后，就会监听指定的socket地址了。</li>
+<li>TCP客户端依次调用socket()、connect()之后就想TCP服务器发送了一个连接请求。</li>
+<li>TCP服务器监听到这个请求之后，就会调用accept()函数去接收请求，这样连接就建立好了。之后就可以开始网络I&#x2F;O操作了，即类同于普通文件的读写I&#x2F;O操作。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">accept</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> *addrlen)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li>accept函数的第一个参数为服务器的socket描述字；第二个参数为指向struct sockaddr *的指针，用于返回客户端的协议地址；第三个参数为协议地址的长度。</li>
+<li>如果accpet成功，那么其返回值是<strong>由内核自动生成的一个全新的描述字</strong>，代表与返回客户的TCP连接。</li>
+<li><strong>注意</strong><ul>
+<li>accept的第一个参数为服务器的socket描述字，是服务器开始调用socket()函数生成的，称为<strong>监听socket描述字</strong>；而accept函数返回的是<strong>已连接的socket描述字</strong>。</li>
+<li>一个服务器通常通常仅仅只创建一个监听socket描述字，它在该服务器的生命周期内一直存在。</li>
+<li>内核为每个由服务器进程接受的客户连接创建了一个已连接socket描述字，当服务器完成了对某个客户的服务，相应的已连接socket描述字就被关闭。</li>
+</ul>
+</li>
+</ul>
+<h3 id="read-write-等函数"><a href="#read-write-等函数" class="headerlink" title="read(), write() 等函数"></a>read(), write() 等函数</h3><ul>
+<li>至此服务器与客户端已经建立好连接了，可以调用网络I&#x2F;O进行读写操作，即实现了网络中不同进程之间的通信。</li>
+<li>网络I&#x2F;O操作有下面几组<ul>
+<li>read()&#x2F;write()</li>
+<li>recv()&#x2F;send()</li>
+<li>readv()&#x2F;writev()</li>
+<li>recvmsg()&#x2F;sendmsg()</li>
+<li>recvfrom()&#x2F;sendto()</li>
+</ul>
+</li>
+<li>推荐使用recvmsg()&#x2F;sendmsg()函数，这两个函数是最通用的I&#x2F;O函数，实际上可以把上面的其它函数都替换成这两个函数。它们的声明如下：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">read</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span></span>;</span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">write</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">send</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span></span>;</span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">recv</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span></span><br><span class="line"><span class="params"><span class="function">              <span class="type">const</span> <span class="keyword">struct</span> sockaddr *dest_addr, <span class="type">socklen_t</span> addrlen)</span></span>;</span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span></span><br><span class="line"><span class="params"><span class="function">                <span class="keyword">struct</span> sockaddr *src_addr, <span class="type">socklen_t</span> *addrlen)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">sendmsg</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> msghdr *msg, <span class="type">int</span> flags)</span></span>;</span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">recvmsg</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> msghdr *msg, <span class="type">int</span> flags)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li><strong>read函数</strong>是负责从fd中读取内容.当读成功时，read返回实际所读的字节数，如果返回的值是0表示已经读到文件的结束了，小于0表示出现了错误。如果错误为EINTR说明读是由中断引起的，如果是ECONNREST表示网络连接出了问题。</li>
+<li><strong>write函数</strong>将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数。失败时返回-1，并设置errno变量。</li>
+<li>在网络程序中，当我们向套接字文件描述符写时有俩种可能。<ul>
+<li>write的返回值大于0，表示写了<strong>部分</strong>或者是<strong>全部的数据</strong>。</li>
+<li>返回的值小于0,此时出现了错误。我们要根据错误类型来处理。<ul>
+<li>如果错误为EINTR表示在写的时候出现了中断错误。</li>
+<li>如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接)。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="close-函数"><a href="#close-函数" class="headerlink" title="close() 函数"></a>close() 函数</h3><ul>
+<li>在服务器与客户端建立连接之后，会进行一些读写操作，完成了读写操作就要关闭相应的socket描述字，好比操作完打开的文件要调用fclose关闭打开的文件。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">close</span><span class="params">(<span class="type">int</span> fd)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li>close一个TCP socket的缺省行为时把该socket标记为以关闭，然后立即返回到调用进程。该描述字不能再由调用进程使用，也就是说不能再作为read或write的第一个参数。</li>
+<li><strong>注意</strong>：<ul>
+<li>close操作只是使相应socket描述字的引用计数-1，只有<strong>当引用计数为0的时候</strong>，才会触发TCP客户端向服务器发送终止连接请求。</li>
+</ul>
+</li>
+</ul>
+<h2 id="socket中TCP的三次握手建立连接详解"><a href="#socket中TCP的三次握手建立连接详解" class="headerlink" title="socket中TCP的三次握手建立连接详解"></a>socket中TCP的三次握手建立连接详解</h2><ul>
+<li>我们知道tcp建立连接要进行“三次握手”，即交换三个分组。大致流程如下：<ul>
+<li>客户端向服务器发送一个SYN J</li>
+<li>服务器向客户端响应一个SYN K，并对SYN J进行确认ACK J+1</li>
+<li>客户端再想服务器发一个确认ACK K+1</li>
+</ul>
+</li>
+<li>只有就完了三次握手，但是这个三次握手发生在socket的那几个函数中呢？请看下图：<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/socket%E4%B8%AD%E5%8F%91%E9%80%81%E7%9A%84TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.png" alt="socket中发送的TCP三次握手"></li>
+<li>从图中可以看出，当客户端调用connect时，触发了连接请求，向服务器发送了SYN J包，这时connect进入阻塞状态；</li>
+<li>服务器监听到连接请求，即收到SYN J包，调用accept函数接收请求向客户端发送SYN K ，ACK J+1，这时accept进入阻塞状态；</li>
+<li>客户端收到服务器的SYN K ，ACK J+1之后，这时connect返回，并对SYN K进行确认；</li>
+<li>服务器收到ACK K+1时，accept返回，至此三次握手完毕，连接建立。</li>
+<li><strong>总结</strong>：<ul>
+<li>客户端的connect在<strong>三次握手的第二次</strong>返回，而服务器端的accept在<strong>三次握手的第三次</strong>返回。</li>
+</ul>
+</li>
+</ul>
+<h2 id="socket中TCP的四次握手释放连接详解"><a href="#socket中TCP的四次握手释放连接详解" class="headerlink" title="socket中TCP的四次握手释放连接详解"></a>socket中TCP的四次握手释放连接详解</h2><ul>
+<li>上面介绍了socket中TCP的三次握手建立过程，及其涉及的socket函数。现在我们介绍socket中的四次握手释放连接的过程，请看下图：<br><img src="/images/C++/C++_99_%E5%85%B6%E4%BB%96/socket%E4%B8%AD%E5%8F%91%E9%80%81%E7%9A%84TCP%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B.png" alt="socket中发送的TCP四次握手"></li>
+<li>图示过程如下：<ul>
+<li>某个应用进程首先调用close主动关闭连接，这时TCP发送一个FIN M；</li>
+<li>另一端接收到FIN M之后，执行被动关闭，对这个FIN进行确认。它的接收也作为文件结束符传递给应用进程，因为FIN的接收意味着应用进程在相应的连接上再也接收不到额外数据；</li>
+<li>一段时间之后，接收到文件结束符的应用进程调用close关闭它的socket。这导致它的TCP也发送一个FIN N；</li>
+<li>接收到这个FIN的源发送端TCP对它进行确认。</li>
+</ul>
+</li>
+<li>这样每个方向上都有一个FIN和ACK。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppOthers/" rel="tag"># CppOthers</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/14/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2025-02-14--C++%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="prev" title="C++多线程">
+      <i class="fa fa-chevron-left"></i> C++多线程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/15/notebook/Tools/2025-02-15--OpenVPN/" rel="next" title="OpenVPN">
+      OpenVPN <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">网络编程基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE-%E2%80%93-TCP"><span class="nav-number">2.1.</span> <span class="nav-text">传输控制协议 – TCP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E4%BD%9C%E6%96%B9%E5%BC%8F"><span class="nav-number">2.1.1.</span> <span class="nav-text">运作方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E9%80%9A%E8%B7%AF"><span class="nav-number">2.1.2.</span> <span class="nav-text">建立通路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E4%BD%BF%E7%94%A8"><span class="nav-number">2.1.3.</span> <span class="nav-text">资源使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="nav-number">2.1.4.</span> <span class="nav-text">数据传输</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%88%E7%BB%93%E9%80%9A%E8%B7%AF"><span class="nav-number">2.1.5.</span> <span class="nav-text">终结通路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3"><span class="nav-number">2.1.6.</span> <span class="nav-text">端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">2.1.7.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E6%8A%A5%E5%8D%8F%E8%AE%AE-UDP"><span class="nav-number">2.2.</span> <span class="nav-text">用户数据报协议 UDP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E9%9D%A0%E6%80%A7"><span class="nav-number">2.2.1.</span> <span class="nav-text">可靠性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socket-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">Socket 基本概念与基本流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%AD%97%E8%8A%82%E5%BA%8F%E4%B8%8E%E4%B8%BB%E6%9C%BA%E5%AD%97%E8%8A%82%E5%BA%8F"><span class="nav-number">4.</span> <span class="nav-text">网络字节序与主机字节序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">socket的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#socket-%E5%87%BD%E6%95%B0"><span class="nav-number">5.1.</span> <span class="nav-text">socket()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bind-%E5%87%BD%E6%95%B0"><span class="nav-number">5.2.</span> <span class="nav-text">bind() 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#listen-connect-%E5%87%BD%E6%95%B0"><span class="nav-number">5.3.</span> <span class="nav-text">listen(), connect() 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accept-%E5%87%BD%E6%95%B0"><span class="nav-number">5.4.</span> <span class="nav-text">accept() 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#read-write-%E7%AD%89%E5%87%BD%E6%95%B0"><span class="nav-number">5.5.</span> <span class="nav-text">read(), write() 等函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#close-%E5%87%BD%E6%95%B0"><span class="nav-number">5.6.</span> <span class="nav-text">close() 函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket%E4%B8%ADTCP%E7%9A%84%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">socket中TCP的三次握手建立连接详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket%E4%B8%ADTCP%E7%9A%84%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B%E9%87%8A%E6%94%BE%E8%BF%9E%E6%8E%A5%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">socket中TCP的四次握手释放连接详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

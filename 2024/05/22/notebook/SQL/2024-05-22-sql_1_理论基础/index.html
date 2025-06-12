@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 sql的相关理论知识  ODB 详解ODB（Object-Relational Mapping Database）是一个开源的 C++ 对象关系映射（ORM）工具，用于将 C++ 对象和数据库之间进行映射。它提供了一个简洁的接口和代码生成工具，用于自动生成和维护数据库访问代码。以下是关于 ODB 的一些详解：  定义数据模型：使用 ODB，你可以使用 C++ 类来定义数据模型。通过在类声明中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/SQL/2024-05-22-sql_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 sql的相关理论知识  ODB 详解ODB（Object-Relational Mapping Database）是一个开源的 C++ 对象关系映射（ORM）工具，用于将 C++ 对象和数据库之间进行映射。它提供了一个简洁的接口和代码生成工具，用于自动生成和维护数据库访问代码。以下是关于 ODB 的一些详解：  定义数据模型：使用 ODB，你可以使用 C++ 类来定义数据模型。通过在类声明中">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.506Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="SQL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/SQL/2024-05-22-sql_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>sql_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/SQL/2024-05-22-sql_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sql_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>sql的相关理论知识</li>
+</ul>
+<h2 id="ODB-详解"><a href="#ODB-详解" class="headerlink" title="ODB 详解"></a>ODB 详解</h2><p>ODB（Object-Relational Mapping Database）是一个开源的 C++ 对象关系映射（ORM）工具，用于将 C++ 对象和数据库之间进行映射。它提供了一个简洁的接口和代码生成工具，用于自动生成和维护数据库访问代码。以下是关于 ODB 的一些详解：</p>
+<ol>
+<li><p><strong>定义数据模型</strong>：使用 ODB，你可以使用 C++ 类来定义数据模型。通过在类声明中添加 ODB 注解，你可以指定类和成员变量与数据库表格和字段的映射关系。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">// ODB 表格声明</span></span><br><span class="line">        <span class="meta">#<span class="keyword">pragma</span> db table(<span class="string">&quot;people&quot;</span>)</span></span><br><span class="line">        <span class="keyword">class</span> <span class="title class_">DbTable</span> &#123;</span><br><span class="line">            <span class="keyword">public</span>:</span><br><span class="line">                <span class="comment">// ODB 字段声明</span></span><br><span class="line">                <span class="meta">#<span class="keyword">pragma</span> db id</span></span><br><span class="line">                <span class="type">int</span> id;</span><br><span class="line">                std::string name;</span><br><span class="line">                <span class="type">int</span> age;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 成员变量与表格字段的映射</span></span><br><span class="line">        <span class="type">int</span> id;</span><br><span class="line">        std::string name;</span><br><span class="line">        <span class="type">int</span> age;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>代码生成工具</strong>：ODB 提供了一个代码生成工具，用于根据定义的数据模型自动生成数据库访问代码。你可以使用 ODB 编译器来处理类定义文件，并生成与数据库交互的代码。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">odb --std c++14 --database sqlite --generate-query --generate-schema Person.hpp</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>查询和持久化</strong>：使用 ODB，你可以通过简单的 C++ 语法进行数据库查询和持久化操作。ODB 提供了类型安全的查询接口，支持复杂的查询条件和结果集的处理。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">odb::query&lt;Person&gt; <span class="title">q</span><span class="params">(odb::query&lt;Person&gt;::name == <span class="string">&quot;John&quot;</span> &amp;&amp; odb::query&lt;Person&gt;::age &gt; <span class="number">18</span>)</span></span>;</span><br><span class="line"><span class="function">odb::result&lt;Person&gt; <span class="title">result</span><span class="params">(db.query&lt;Person&gt;(q))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; person : result) &#123;</span><br><span class="line">    <span class="comment">// 处理查询结果</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person person;</span><br><span class="line">person.name = <span class="string">&quot;Jane&quot;</span>;</span><br><span class="line">person.age = <span class="number">25</span>;</span><br><span class="line">db.<span class="built_in">persist</span>(person);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>事务处理</strong>：ODB 支持事务操作，你可以使用 <code>odb::transaction</code> 对象来管理一系列数据库操作的原子性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="function">odb::transaction <span class="title">txn</span><span class="params">(db)</span></span>;</span><br><span class="line">    <span class="comment">// 执行一系列的数据库操作</span></span><br><span class="line">    txn.<span class="built_in">commit</span>(); <span class="comment">// 提交事务</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>错误处理</strong>：ODB 使用异常来处理错误情况。当出现错误时，它会抛出异常，你可以使用 try-catch 块来捕获并处理这些异常。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 执行数据库操作</span></span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> odb::exception&amp; e) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>ODB 提供了详细的文档和示例代码，以帮助你更深入地了解和使用它。你可以在 ODB 的官方网站上找到更多信息：<a target="_blank" rel="noopener" href="https://www.codesynthesis.com/products/odb/">https://www.codesynthesis.com/products/odb/</a></p>
+<p>需要注意的是，ODB 是一个功能强大且全面的 C++ ORM 工具，它提供了许多高级特性和灵活性。使用 ODB 需要一些学习和配置的成本，但它能够显著简化和加速与数据库的交互。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 ODB！如果你有更多问题，请随时提问。</p>
+<h2 id="ORMpp-详解"><a href="#ORMpp-详解" class="headerlink" title="ORMpp 详解"></a>ORMpp 详解</h2><p>ORMpp 是一个轻量级的 C++ ORM（对象关系映射）库，专为 SQLite3 数据库设计。它提供了简单的接口和注解，用于定义数据模型和数据库关系。以下是关于 ORMpp 的一些详解：</p>
+<ol>
+<li><p><strong>定义数据模型</strong>：使用 ORMpp，你可以使用 C++ 结构体或类来定义数据模型。你可以使用注解来标记成员变量，指定表格名称、字段名称、字段类型和约束等。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">    <span class="built_in">ORMPP_ENTITY</span>(Person) <span class="comment">// 声明实体</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">ORMPP_ID</span>(<span class="type">int</span>, id) <span class="comment">// 主键字段</span></span><br><span class="line">    <span class="built_in">ORMPP_FIELD</span>(std::string, name) <span class="comment">// 字符串字段</span></span><br><span class="line">    <span class="built_in">ORMPP_FIELD</span>(<span class="type">int</span>, age) <span class="comment">// 整数字段</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>数据库迁移</strong>：ORMpp 支持数据库迁移，可以自动创建和更新数据库表格结构。你可以使用 <code>ormpp::data_migration</code> 对象来定义表格的创建、修改和删除操作。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ormpp::data_migration dm;</span><br><span class="line">dm.<span class="built_in">create_table</span>&lt;Person&gt;(); <span class="comment">// 创建表格</span></span><br><span class="line">dm.<span class="built_in">add_column</span>&lt;Person&gt;(<span class="string">&quot;address&quot;</span>, <span class="string">&quot;TEXT&quot;</span>); <span class="comment">// 添加字段</span></span><br><span class="line">dm.<span class="built_in">drop_table</span>&lt;Person&gt;(); <span class="comment">// 删除表格</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>查询构建器</strong>：ORMpp 提供了查询构建器，使得构建 SQL 查询变得更加简单。你可以使用链式方法来构建查询条件、排序和限制。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ormpp::sql_query query;</span><br><span class="line">query.<span class="built_in">select</span>(<span class="string">&quot;*&quot;</span>).<span class="built_in">from</span>&lt;Person&gt;().<span class="built_in">where</span>(ormpp::<span class="built_in">c</span>(&amp;Person::age) &gt; <span class="number">18</span>).<span class="built_in">order_by</span>(<span class="string">&quot;name&quot;</span>).<span class="built_in">limit</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> results = db.<span class="built_in">query</span>(query);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>事务处理</strong>：ORMpp 支持事务操作，你可以使用 <code>ormpp::transaction</code> 对象来管理一系列数据库操作的原子性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="function">ormpp::transaction <span class="title">txn</span><span class="params">(db)</span></span>;</span><br><span class="line">    <span class="comment">// 执行一系列的数据库操作</span></span><br><span class="line">    txn.<span class="built_in">commit</span>(); <span class="comment">// 提交事务</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>错误处理</strong>：ORMpp 使用异常来处理错误情况。当出现错误时，它会抛出异常，你可以使用 try-catch 块来捕获并处理这些异常。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 执行数据库操作</span></span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>ORMpp 提供了清晰的文档和示例代码，以帮助你更详细地了解和使用它。你可以在 ORMpp 的 GitHub 页面上找到更多信息：<a target="_blank" rel="noopener" href="https://github.com/qicosmos/ormpp">https://github.com/qicosmos/ormpp</a></p>
+<p>需要注意的是，ORMpp 是一个轻量级的 C++ ORM 库，它在简化 SQLite3 数据库的使用过程中提供了便捷的接口和功能。但在使用之前，你仍然需要熟悉 SQL 查询语句和 SQLite3 数据库的概念。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 ORMpp！如果你有更多问题，请随时提问。</p>
+<h2 id="SQLite-Modern-C-详解"><a href="#SQLite-Modern-C-详解" class="headerlink" title="SQLite Modern C++ 详解"></a>SQLite Modern C++ 详解</h2><p>SQLite Modern C++ 是一个基于 C++11 的轻量级 SQLite3 封装库，提供了简单而直观的接口，使在 C++ 项目中使用 SQLite3 数据库更加便捷。以下是关于 SQLite Modern C++ 的一些详解：</p>
+<ol>
+<li><p><strong>面向对象接口</strong>：SQLite Modern C++ 提供了面向对象的接口，使用类和方法来操作数据库。你可以创建表格类来表示数据库表格，使用成员变量和方法来操作表格中的数据。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义表格类</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line">    std::string name;</span><br><span class="line">    <span class="type">int</span> age;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 插入数据</span></span><br><span class="line">Person person&#123;<span class="number">1</span>, <span class="string">&quot;John Doe&quot;</span>, <span class="number">25</span>&#125;;</span><br><span class="line">db.<span class="built_in">insert</span>(person);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查询数据</span></span><br><span class="line"><span class="keyword">auto</span> results = db.<span class="built_in">select</span>&lt;Person&gt;(<span class="string">&quot;SELECT * FROM people&quot;</span>);</span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; person : results) &#123;</span><br><span class="line">    <span class="comment">// 处理查询结果</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>类型安全</strong>：SQLite Modern C++ 在运行时执行类型检查，确保查询和绑定的类型正确。这可以避免在 SQL 查询中出现类型不匹配的错误。</p>
+</li>
+<li><p><strong>查询构建器</strong>：SQLite Modern C++ 提供了查询构建器，允许你以链式方式构建 SQL 查询，而不需要手动拼接 SQL 语句。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> query = db</span><br><span class="line">    .<span class="built_in">select</span>(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;name&quot;</span>)</span><br><span class="line">    .<span class="built_in">from</span>(<span class="string">&quot;people&quot;</span>)</span><br><span class="line">    .<span class="built_in">where</span>(<span class="string">&quot;age &gt; ?&quot;</span>, <span class="number">18</span>)</span><br><span class="line">    .<span class="built_in">order_by</span>(<span class="string">&quot;name&quot;</span>)</span><br><span class="line">    .<span class="built_in">limit</span>(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> results = query.<span class="built_in">execute</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>事务处理</strong>：SQLite Modern C++ 支持事务操作，你可以使用 <code>transaction</code> 对象来管理一系列数据库操作的原子性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="function">transaction <span class="title">txn</span><span class="params">(db)</span></span>;</span><br><span class="line">    <span class="comment">// 执行一系列的数据库操作</span></span><br><span class="line">    txn.<span class="built_in">commit</span>(); <span class="comment">// 提交事务</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>错误处理</strong>：SQLite Modern C++ 使用异常来处理错误情况。当出现错误时，它会抛出异常，你可以使用 try-catch 块来捕获并处理这些异常。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 执行数据库操作</span></span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>SQLite Modern C++ 提供了清晰的文档和示例代码，以帮助你更详细地了解和使用它。你可以在 SQLite Modern C++ 的 GitHub 页面上找到更多信息：<a target="_blank" rel="noopener" href="https://github.com/SqliteModernCpp/sqlite_modern_cpp">https://github.com/SqliteModernCpp/sqlite_modern_cpp</a></p>
+<p>需要注意的是，SQLite Modern C++ 是一个轻量级的封装库，它在简化 SQLite3 数据库的使用过程中提供了便捷的接口，但在使用之前，你仍然需要熟悉 SQL 查询语句和 SQLite3 数据库的概念。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 SQLite Modern C++！如果你有更多问题，请随时提问。</p>
+<h2 id="SQLite3-ORM-常用第三方库"><a href="#SQLite3-ORM-常用第三方库" class="headerlink" title="SQLite3 ORM 常用第三方库"></a>SQLite3 ORM 常用第三方库</h2><p>在 C++ 中，有几个常用的第三方库可用于提供 SQLite3 ORM（对象关系映射）功能。以下是一些常用的 C++ SQLite3 ORM 第三方库：</p>
+<ol>
+<li><p>**SQLite Modern C++**：SQLite Modern C++ 是一个轻量级的 C++ 封装库，提供了简单而直观的接口，使得在 C++ 项目中使用 SQLite3 数据库更加便捷。它支持对象关系映射和查询构建器，并提供了对数据库的增删改查操作的封装。</p>
+<p>GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/SqliteModernCpp/sqlite_modern_cpp">https://github.com/SqliteModernCpp/sqlite_modern_cpp</a></p>
+</li>
+<li><p><strong>SQLiteCpp</strong>：SQLiteCpp 是一个基于 C++11 的 SQLite3 封装库，提供了面向对象的接口，使得在 C++ 项目中使用 SQLite3 更加简单和方便。它支持对象关系映射和事务处理，并提供了简洁的 API 来进行数据库操作。</p>
+<p>GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/SRombauts/SQLiteCpp">https://github.com/SRombauts/SQLiteCpp</a></p>
+</li>
+<li><p><strong>ORMpp</strong>：ORMpp 是一个轻量级的 C++ ORM 库，专为 SQLite3 数据库设计。它提供了简单的接口和注解，用于定义数据模型和数据库关系。ORMpp 支持数据库迁移、查询构建器和事务处理等功能。</p>
+<p>GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/iansimon/ormpp">https://github.com/iansimon/ormpp</a></p>
+</li>
+<li><p><strong>Qt SQL</strong>：Qt 是一个功能强大的 C++ 框架，其中的 Qt SQL 模块提供了对各种数据库的访问功能，包括 SQLite3。使用 Qt SQL，你可以通过对象关系映射和查询构建器来操作 SQLite3 数据库。</p>
+<p>官方网站：<a target="_blank" rel="noopener" href="https://www.qt.io/">https://www.qt.io/</a></p>
+</li>
+</ol>
+<p>这些库都可以帮助你在 C++ 中使用 SQLite3 数据库，并提供了不同程度的 ORM 功能。你可以根据项目需求、库的易用性和适配性来选择最适合的库。</p>
+<p>需要注意的是，这些库都是第三方工具，你需要根据你的项目要求和预期的功能选择适合的库，并仔细阅读它们的文档和示例代码以了解如何使用它们。</p>
+<p>希望这些信息对你有帮助！如有更多问题，请随时提问。</p>
+<h2 id="C-REST-SDK-详解"><a href="#C-REST-SDK-详解" class="headerlink" title="C++ REST SDK 详解"></a>C++ REST SDK 详解</h2><p>C++ REST SDK（又称为 Casablanca）是一个功能强大的 C++ 库，用于构建基于 HTTP 的客户端和服务器应用程序。它提供了一组丰富的功能和工具，用于处理网络请求、JSON 解析、异步任务等。以下是关于 C++ REST SDK 的一些详解：</p>
+<ol>
+<li><p><strong>HTTP 客户端</strong>：C++ REST SDK 提供了一个强大的 HTTP 客户端库，用于发送和接收 HTTP 请求和响应。你可以通过创建 <code>http_client</code> 对象，指定请求的 URI、方法、头部、消息正文等来发起 HTTP 请求。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">web::http::<span class="function">client::http_client <span class="title">client</span><span class="params">(U(<span class="string">&quot;http://example.com&quot;</span>))</span></span>;</span><br><span class="line">web::http::http_response response = client.<span class="built_in">request</span>(web::http::methods::GET).<span class="built_in">get</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>HTTP 服务器</strong>：C++ REST SDK 允许你创建基于 HTTP 的服务器应用程序。你可以创建一个 <code>http_listener</code> 对象，并为特定的 URI 和方法注册处理程序来处理传入的请求。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">web::http::experimental::<span class="function">listener::http_listener <span class="title">listener</span><span class="params">(U(<span class="string">&quot;http://localhost:8080&quot;</span>))</span></span>;</span><br><span class="line">listener.<span class="built_in">support</span>(web::http::methods::GET, [](web::http::http_request request) &#123;</span><br><span class="line">    <span class="comment">// 处理 GET 请求</span></span><br><span class="line">&#125;);</span><br><span class="line">listener.<span class="built_in">open</span>().<span class="built_in">wait</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>异步任务和并发</strong>：C++ REST SDK 使用异步任务模型来处理并发操作。它提供了 <code>pplx::task</code> 类，用于处理异步操作和等待任务完成。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pplx::task&lt;std::string&gt; task = client.<span class="built_in">request</span>(web::http::methods::GET).<span class="built_in">then</span>([](web::http::http_response response) &#123;</span><br><span class="line">    <span class="keyword">return</span> response.<span class="built_in">extract_string</span>();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">task.<span class="built_in">then</span>([](<span class="type">const</span> std::string&amp; content) &#123;</span><br><span class="line">    <span class="comment">// 处理异步任务结果</span></span><br><span class="line">&#125;).<span class="built_in">wait</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>JSON 解析和序列化</strong>：C++ REST SDK 提供了用于解析和序列化 JSON 数据的工具。你可以使用 <code>web::json::value</code> 类来表示和操作 JSON 对象和数组。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">web::json::value json;</span><br><span class="line">json[<span class="built_in">U</span>(<span class="string">&quot;name&quot;</span>)] = web::json::value::<span class="built_in">string</span>(<span class="built_in">U</span>(<span class="string">&quot;John&quot;</span>));</span><br><span class="line">json[<span class="built_in">U</span>(<span class="string">&quot;age&quot;</span>)] = web::json::value::<span class="built_in">number</span>(<span class="number">25</span>);</span><br><span class="line"></span><br><span class="line">web::json::value::<span class="type">string_t</span> name = json[<span class="built_in">U</span>(<span class="string">&quot;name&quot;</span>)].<span class="built_in">as_string</span>();</span><br><span class="line"><span class="type">int</span> age = json[<span class="built_in">U</span>(<span class="string">&quot;age&quot;</span>)].<span class="built_in">as_integer</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>其他功能</strong>：C++ REST SDK 还提供了许多其他功能，如支持 HTTPS、网络代理、cookie 管理、身份验证等。</p>
+</li>
+</ol>
+<p>C++ REST SDK 的 GitHub 页面提供了详细的文档和示例代码，以帮助你更深入地了解和使用它：<a target="_blank" rel="noopener" href="https://github.com/microsoft/cpprestsdk">https://github.com/microsoft/cpprestsdk</a></p>
+<p>C++ REST SDK 是一个强大而全面的库，适用于构建基于 HTTP 的客户端和服务器应用程序。它可以帮助你轻松处理网络请求、JSON 数据和异步操作。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 C++ REST SDK！如果你有更多问题，请随时提问。</p>
+<h2 id="OTL-详解"><a href="#OTL-详解" class="headerlink" title="OTL 详解"></a>OTL 详解</h2><p>OTL（OCCI Template Library）是一个用于 C++ 的通用数据库访问库，它提供了高性能和灵活的接口，用于访问多种数据库。以下是关于 OTL 的一些详解：</p>
+<ol>
+<li><p><strong>支持多种数据库</strong>：OTL 支持多种常见的数据库系统，包括 Oracle、Microsoft SQL Server、IBM DB2、MySQL、PostgreSQL 等。你可以使用相同的接口和代码来访问不同类型的数据库，而不需要学习和使用特定数据库的 API。</p>
+</li>
+<li><p><strong>面向对象接口</strong>：OTL 提供了面向对象的接口，通过类和方法来操作数据库。它使用了现代 C++ 特性，如模板和 RAII（资源获取即初始化），使得代码更加清晰和易于维护。</p>
+</li>
+<li><p><strong>连接管理</strong>：使用 OTL，你可以通过提供连接字符串来建立和管理与数据库的连接。连接字符串包括数据库类型、主机名、端口号、用户名、密码等信息。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">otl_connect db;</span><br><span class="line">db.<span class="built_in">rlogon</span>(<span class="string">&quot;username/password@tnsname&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>查询执行</strong>：使用 OTL，你可以通过编写 SQL 查询语句来与数据库进行交互。你可以直接执行原始的 SQL 语句，也可以使用绑定变量和查询构建器来构建和执行查询。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">otl_stream stream;</span><br><span class="line">stream.<span class="built_in">open</span>(<span class="number">1</span>, <span class="string">&quot;SELECT name, age FROM users WHERE age &gt; :age&quot;</span>, db);</span><br><span class="line">stream &lt;&lt; <span class="number">18</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (!stream.<span class="built_in">eof</span>()) &#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    <span class="type">int</span> age;</span><br><span class="line">    stream &gt;&gt; name &gt;&gt; age;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 处理查询结果</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>事务处理</strong>：OTL 支持事务操作，你可以使用事务对象来管理一系列数据库操作的原子性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">otl_trans <span class="title">transaction</span><span class="params">(db)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行一系列的数据库操作</span></span><br><span class="line"></span><br><span class="line">transaction.<span class="built_in">commit</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>错误处理</strong>：OTL 使用异常来处理错误情况。当出现错误时，它会抛出相应的异常，你可以使用 try-catch 块来捕获并处理这些异常。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 执行数据库操作</span></span><br><span class="line">&#125; <span class="built_in">catch</span> (otl_exception&amp; ex) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>灵活性和可扩展性</strong>：OTL 具有灵活和可扩展的架构，你可以通过编写自定义的 OTL 数据库后端适配器来支持其他数据库系统。</p>
+</li>
+</ol>
+<p>OTL 提供了详细的文档和示例代码，以帮助你更深入地了解和使用它。你可以在 OTL 的官方网站上找到更多信息：<a target="_blank" rel="noopener" href="http://otl.sourceforge.net/">http://otl.sourceforge.net/</a></p>
+<p>需要注意的是，OTL 是一个相对底层的库，使用它需要对 SQL 查询语句和数据库概念有一定的了解。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 OTL！如果你有更多问题，请随时提问。</p>
+<h2 id="SOCI-详解"><a href="#SOCI-详解" class="headerlink" title="SOCI 详解"></a>SOCI 详解</h2><p>SOCI（The C++ Database Access Library）是一个通用的数据库访问库，它提供了简单和一致的接口，用于在 C++ 中访问多种不同类型的数据库。下面是关于 SOCI 的一些详解：</p>
+<ol>
+<li><p><strong>支持多种数据库</strong>：SOCI 支持多种常见的数据库系统，包括 SQLite、MySQL、PostgreSQL、Oracle、ODBC 等。你可以使用相同的接口和代码来访问不同类型的数据库，而不需要学习和使用特定数据库的 API。</p>
+</li>
+<li><p><strong>面向对象接口</strong>：SOCI 提供了面向对象的接口，通过类和方法来操作数据库。它使用了现代 C++ 特性，如模板和 RAII（资源获取即初始化），使得代码更加清晰和易于维护。</p>
+</li>
+<li><p><strong>连接管理</strong>：使用 SOCI，你可以通过提供连接字符串来建立和管理与数据库的连接。连接字符串包括数据库类型、主机名、端口号、用户名、密码等信息。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">soci::session <span class="title">sql</span><span class="params">(<span class="string">&quot;mysql://user:password@localhost/mydatabase&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>查询执行</strong>：使用 SOCI，你可以通过编写 SQL 查询语句来与数据库进行交互。你可以直接执行原始的 SQL 语句，也可以使用绑定变量和查询构建器来构建和执行查询。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">soci::rowset&lt;row&gt; rs = (sql.prepare &lt;&lt; <span class="string">&quot;SELECT name, age FROM users WHERE age &gt; :age&quot;</span>, soci::<span class="built_in">use</span>(<span class="number">18</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; r : rs) &#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    <span class="type">int</span> age;</span><br><span class="line">    r.<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;(name);</span><br><span class="line">    r.<span class="built_in">get</span>&lt;<span class="number">1</span>&gt;(age);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 处理查询结果</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>事务处理</strong>：SOCI 支持事务操作，你可以使用事务对象来管理一系列数据库操作的原子性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">soci::transaction <span class="title">tr</span><span class="params">(sql)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行一系列的数据库操作</span></span><br><span class="line"></span><br><span class="line">tr.<span class="built_in">commit</span>(); <span class="comment">// 提交事务</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>错误处理</strong>：SOCI 使用异常来处理错误情况。当出现错误时，它会抛出相应的异常，你可以使用 try-catch 块来捕获并处理这些异常。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 执行数据库操作</span></span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> soci::soci_error&amp; e) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>灵活性和可扩展性</strong>：SOCI 具有灵活和可扩展的架构，你可以通过编写自定义后端适配器来支持其他数据库系统。</p>
+</li>
+</ol>
+<p>SOCI 提供了丰富的文档和示例代码，以帮助你更详细地了解和使用它。你可以在 SOCI 的官方网站上找到更多信息：<a target="_blank" rel="noopener" href="http://soci.sourceforge.net/">http://soci.sourceforge.net/</a></p>
+<p>需要注意的是，SOCI 是一个相对底层的库，使用它需要对 SQL 查询语句和数据库概念有一定的了解。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 SOCI！如果你有更多问题，请随时提问。</p>
+<h2 id="sqlitecpp-详解"><a href="#sqlitecpp-详解" class="headerlink" title="sqlitecpp 详解"></a>sqlitecpp 详解</h2><p>SQLiteCpp 是一个在 C++ 中使用 SQLite 数据库的轻量级封装库。它提供了简单且直观的面向对象的接口，使得在 C++ 项目中使用 SQLite 数据库更加便捷。</p>
+<p>以下是 SQLiteCpp 的一些主要特点和用法的详解：</p>
+<ol>
+<li><p><strong>面向对象接口</strong>：SQLiteCpp 提供了一个面向对象的接口，通过类和方法来操作数据库。它使用了现代 C++ 特性，如 RAII（资源获取即初始化）和异常处理，使得代码更加清晰和易于维护。</p>
+</li>
+<li><p><strong>数据库连接</strong>：使用 SQLite::Database 类可以创建和管理与 SQLite 数据库的连接。你可以通过指定数据库文件的路径来打开数据库连接，也可以使用内存数据库。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SQLite::Database <span class="title">db</span><span class="params">(<span class="string">&quot;example.db&quot;</span>)</span></span>; <span class="comment">// 打开名为 &quot;example.db&quot; 的数据库文件连接</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>查询执行</strong>：你可以使用 SQLite::Statement 类执行 SQL 查询语句，并通过绑定参数和读取结果集来与数据库交互。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SQLite::Statement <span class="title">query</span><span class="params">(db, <span class="string">&quot;SELECT * FROM users WHERE age &gt; ?&quot;</span>)</span></span>;</span><br><span class="line">query.<span class="built_in">bind</span>(<span class="number">1</span>, <span class="number">18</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (query.<span class="built_in">executeStep</span>()) &#123;</span><br><span class="line">    std::string name = query.<span class="built_in">getColumn</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="type">int</span> age = query.<span class="built_in">getColumn</span>(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 处理查询结果</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>事务处理</strong>：SQLiteCpp 支持事务操作，通过 SQLite::Transaction 类可以实现简单的事务控制，保证一系列的数据库操作的原子性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SQLite::Transaction <span class="title">transaction</span><span class="params">(db)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行一系列的数据库操作</span></span><br><span class="line"></span><br><span class="line">transaction.<span class="built_in">commit</span>(); <span class="comment">// 提交事务</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>数据库操作</strong>：SQLiteCpp 提供了许多便捷的方法来执行数据库操作，包括插入、更新、删除等。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SQLite::Statement <span class="title">insert</span><span class="params">(db, <span class="string">&quot;INSERT INTO users (name, age) VALUES (?, ?)&quot;</span>)</span></span>;</span><br><span class="line">insert.<span class="built_in">bind</span>(<span class="number">1</span>, <span class="string">&quot;John Doe&quot;</span>);</span><br><span class="line">insert.<span class="built_in">bind</span>(<span class="number">2</span>, <span class="number">25</span>);</span><br><span class="line">insert.<span class="built_in">exec</span>(); <span class="comment">// 执行插入操作</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>错误处理</strong>：SQLiteCpp 在出现错误时会抛出异常，你可以使用 try-catch 块来捕获并处理这些异常。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 执行数据库操作</span></span><br><span class="line">&#125; <span class="built_in">catch</span> (std::exception&amp; e) &#123;</span><br><span class="line">    <span class="comment">// 处理异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>SQLiteCpp 提供了丰富的文档和示例代码，以帮助你更详细地了解和使用它。你可以在它的 GitHub 页面上找到更多信息：<a target="_blank" rel="noopener" href="https://github.com/SRombauts/SQLiteCpp">https://github.com/SRombauts/SQLiteCpp</a></p>
+<p>需要注意的是，尽管 SQLiteCpp 简化了在 C++ 中使用 SQLite 数据库的过程，你仍然需要熟悉 SQL 查询语句和 SQLite 数据库的概念。</p>
+<p>希望这些详解能够帮助你更好地理解和使用 SQLiteCpp！如果你有更多问题，请随时提问。</p>
+<h2 id="sqlite3-orm-第三方工具-推荐"><a href="#sqlite3-orm-第三方工具-推荐" class="headerlink" title="sqlite3 orm 第三方工具 推荐"></a>sqlite3 orm 第三方工具 推荐</h2><p>在 C++ 中，有几个流行的第三方工具可用于提供 SQLite3 ORM（对象关系映射）功能。以下是一些常用的 C++ SQLite3 ORM 第三方库：</p>
+<ol>
+<li><p>SQLiteCpp：SQLiteCpp 是一个轻量级的 C++ 封装库，提供了对 SQLite 数据库的面向对象访问接口。它使用现代 C++ 特性，简化了与 SQLite 数据库的交互，支持查询构建、事务处理等功能。</p>
+<p>GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/SRombauts/SQLiteCpp">https://github.com/SRombauts/SQLiteCpp</a></p>
+</li>
+<li><p>SOCI：SOCI 是一个通用的数据库访问库，支持多种数据库，包括 SQLite。它提供了面向对象的接口，可以简化数据库操作，包括查询、插入、更新等。</p>
+<p>GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/SOCI/soci">https://github.com/SOCI/soci</a></p>
+</li>
+<li><p>OTL：OTL（OCCI Template Library）是一个通用的数据库访问库，也支持 SQLite 数据库。它提供了面向对象的接口，支持事务处理、预编译语句等功能。</p>
+<p>官方网站：<a target="_blank" rel="noopener" href="http://otl.sourceforge.net/">http://otl.sourceforge.net/</a></p>
+</li>
+<li><p>C++ REST SDK：C++ REST SDK 是一个功能强大的 C++ 库，提供了丰富的功能，包括 HTTP 客户端&#x2F;服务器、JSON 解析、异步任务等。它也提供了对 SQLite 数据库的支持，可以用作 ORM。</p>
+<p>GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/microsoft/cpprestsdk">https://github.com/microsoft/cpprestsdk</a></p>
+</li>
+</ol>
+<p>这些库都可以帮助你在 C++ 中使用 SQLite3 数据库，并提供了不同程度的 ORM 功能。你可以根据项目的需求、库的易用性和适配性来选择最适合的库。</p>
+<p>需要注意的是，这些库都是第三方工具，你需要根据你的项目要求和预期的功能选择适合的库，并仔细阅读它们的文档和示例代码以了解如何使用它们。</p>
+<p>希望这些推荐对你有所帮助！如有更多问题，请随时提问。</p>
+<h2 id="sql语法和mysql-关系"><a href="#sql语法和mysql-关系" class="headerlink" title="sql语法和mysql 关系"></a>sql语法和mysql 关系</h2><p>SQL（Structured Query Language）是一种用于管理关系型数据库系统的编程语言。它提供了一套标准化的语法和操作，用于查询、操作和管理数据库中的数据。MySQL是一个开源的关系型数据库管理系统（RDBMS），它支持使用SQL语言进行数据库操作。</p>
+<p>SQL语法定义了一组规则和约定，用于编写查询和操作数据库的语句。它包括以下几个主要方面：</p>
+<ol>
+<li><p>数据定义语言（DDL）：DDL用于定义数据库的结构和模式。它包括创建数据库、创建表、定义表的列和约束等操作。例如，使用DDL语句可以创建一个名为”employees”的表，定义其列和数据类型：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> employees (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    age <span class="type">INT</span>,</span><br><span class="line">    salary <span class="type">DECIMAL</span>(<span class="number">10</span>, <span class="number">2</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>数据操作语言（DML）：DML用于插入、更新和删除数据库中的数据。它包括INSERT、UPDATE和DELETE语句，用于执行相应的操作。例如，使用DML语句可以向”employees”表中插入一条新记录：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT INTO</span> employees (id, name, age, salary)</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="string">&#x27;John Doe&#x27;</span>, <span class="number">30</span>, <span class="number">50000</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>数据查询语言（DQL）：DQL用于从数据库中检索数据。它包括SELECT语句，用于查询和过滤数据。例如，使用DQL语句可以查询”employees”表中年龄大于等于25岁的员工：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> employees <span class="keyword">WHERE</span> age <span class="operator">&gt;=</span> <span class="number">25</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>数据控制语言（DCL）：DCL用于控制数据库用户的访问权限和安全性。它包括GRANT和REVOKE语句，用于授予和撤销用户的权限。例如，使用DCL语句可以授予用户”john”对”employees”表的SELECT权限：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> employees <span class="keyword">TO</span> john;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>MySQL是一个流行的关系型数据库管理系统，它实现了SQL语言标准，并提供了额外的功能和扩展。MySQL支持大多数SQL语法的标准化操作，如DDL、DML、DQL和DCL。通过MySQL，你可以创建和管理数据库，创建表和索引，执行查询和数据操作，以及控制用户的权限。</p>
+<p>总而言之，SQL是一种用于管理关系型数据库的标准化语言，而MySQL是一个实现了SQL标准的关系型数据库管理系统。通过使用SQL语法，你可以在MySQL数据库中执行各种操作，包括创建和定义数据库结构、插入、更新和删除数据，以及查询和检索数据。</p>
+<h2 id="SQL"><a href="#SQL" class="headerlink" title="SQL"></a>SQL</h2><ul>
+<li>SQL 是用于访问和处理数据库的标准的计算机语言。</li>
+<li>在本教程中，您将学到如何使用 SQL 访问和处理数据系统中的数据，这类数据库包括：MySQL、SQL Server、Access、Oracle、Sybase、DB2 等等。</li>
+</ul>
+<h2 id="1-1-SQL-简介"><a href="#1-1-SQL-简介" class="headerlink" title="1.1 SQL 简介"></a>1.1 SQL 简介</h2><ul>
+<li>SQL (Structured Query Language:结构化查询语言) 是用于管理关系数据库管理系统（RDBMS）。 </li>
+<li>SQL 的范围包括数据插入、查询、更新和删除，数据库模式创建和修改，以及数据访问控制。</li>
+</ul>
+<h3 id="1-1-1-SQL-是什么"><a href="#1-1-1-SQL-是什么" class="headerlink" title="1.1.1 SQL 是什么"></a>1.1.1 SQL 是什么</h3><ul>
+<li>SQL 指结构化查询语言，全称是 Structured Query Language。</li>
+<li>SQL 让您可以访问和处理数据库，包括数据插入、查询、更新和删除。</li>
+<li>SQL 在1986年成为 ANSI（American National Standards Institute 美国国家标准化组织）的一项标准，在 1987 年成为国际标准化组织（ISO）标准。</li>
+</ul>
+<h3 id="1-1-2-SQL-能做什么"><a href="#1-1-2-SQL-能做什么" class="headerlink" title="1.1.2 SQL 能做什么"></a>1.1.2 SQL 能做什么</h3><ul>
+<li>SQL 面向数据库执行查询</li>
+<li>SQL 可从数据库取回数据</li>
+<li>SQL 可在数据库中插入新的记录</li>
+<li>SQL 可更新数据库中的数据</li>
+<li>SQL 可从数据库删除记录</li>
+<li>SQL 可创建新数据库</li>
+<li>SQL 可在数据库中创建新表</li>
+<li>SQL 可在数据库中创建存储过程</li>
+<li>SQL 可在数据库中创建视图</li>
+<li>SQL 可以设置表、存储过程和视图的权限</li>
+</ul>
+<h3 id="1-1-3-SQL-是一种标准-但是…"><a href="#1-1-3-SQL-是一种标准-但是…" class="headerlink" title="1.1.3 SQL 是一种标准 - 但是…"></a>1.1.3 SQL 是一种标准 - 但是…</h3><ul>
+<li><p>虽然 SQL 是一门 ANSI（American National Standards Institute 美国国家标准化组织）标准的计算机语言，但是仍然存在着多种不同版本的 SQL 语言。</p>
+</li>
+<li><p>然而，为了与 ANSI 标准相兼容，它们必须以相似的方式共同地来支持一些主要的命令（比如 SELECT、UPDATE、DELETE、INSERT、WHERE 等等）。</p>
+</li>
+<li><p>注释：除了 SQL 标准之外，大部分 SQL 数据库程序都拥有它们自己的专有扩展！</p>
+</li>
+</ul>
+<h3 id="1-1-4-RDBMS"><a href="#1-1-4-RDBMS" class="headerlink" title="1.1.4 RDBMS"></a>1.1.4 RDBMS</h3><ul>
+<li>RDBMS 指关系型数据库管理系统，全称 Relational Database Management System。</li>
+<li>RDBMS 是 SQL 的基础，同样也是所有现代数据库系统的基础，比如 MS SQL Server、IBM DB2、Oracle、MySQL 以及 Microsoft Access。</li>
+<li>RDBMS 中的数据存储在被称为表的数据库对象中。</li>
+<li>表是相关的数据项的集合，它由列和行组成。</li>
+</ul>
+<h2 id="1-2-SQL-语法"><a href="#1-2-SQL-语法" class="headerlink" title="1.2 SQL 语法"></a>1.2 SQL 语法</h2><h3 id="1-2-1-数据库表"><a href="#1-2-1-数据库表" class="headerlink" title="1.2.1 数据库表"></a>1.2.1 数据库表</h3><ul>
+<li>一个数据库通常包含一个或多个表。每个表有一个名字标识（例如:”Websites”）,表包含带有数据的记录（行）。</li>
+</ul>
+<h3 id="1-2-2-SQL-语句"><a href="#1-2-2-SQL-语句" class="headerlink" title="1.2.2 SQL 语句"></a>1.2.2 SQL 语句</h3><ul>
+<li><p>SQL 对大小写不敏感：SELECT 与 select 是相同的。</p>
+</li>
+<li><p>某些数据库系统要求在每条 SQL 语句的末端使用分号。</p>
+</li>
+<li><p>分号是在数据库系统中分隔每条 SQL 语句的标准方法，这样就可以在对服务器的相同请求中执行一条以上的 SQL 语句。</p>
+</li>
+</ul>
+<h3 id="1-2-3-一些最重要的-SQL-命令"><a href="#1-2-3-一些最重要的-SQL-命令" class="headerlink" title="1.2.3 一些最重要的 SQL 命令"></a>1.2.3 一些最重要的 SQL 命令</h3><ul>
+<li>SELECT - 从数据库中提取数据</li>
+<li>UPDATE - 更新数据库中的数据</li>
+<li>DELETE - 从数据库中删除数据</li>
+<li>INSERT INTO - 向数据库中插入新数据</li>
+<li>CREATE DATABASE - 创建新数据库</li>
+<li>ALTER DATABASE - 修改数据库</li>
+<li>CREATE TABLE - 创建新表</li>
+<li>ALTER TABLE - 变更（改变）数据库表</li>
+<li>DROP TABLE - 删除表</li>
+<li>CREATE INDEX - 创建索引（搜索键）</li>
+<li>DROP INDEX - 删除索引</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQL/" rel="tag"># SQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/SQL/2024-05-22-sqlpp11_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="sqlpp11_1_理论基础">
+      <i class="fa fa-chevron-left"></i> sqlpp11_1_理论基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/SQL/2024-05-22-sqlite3_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="sqlite3_1_理论基础">
+      sqlite3_1_理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ODB-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">ODB 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ORMpp-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">ORMpp 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQLite-Modern-C-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">SQLite Modern C++ 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQLite3-ORM-%E5%B8%B8%E7%94%A8%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93"><span class="nav-number">5.</span> <span class="nav-text">SQLite3 ORM 常用第三方库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-REST-SDK-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">C++ REST SDK 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OTL-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">OTL 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SOCI-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">SOCI 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlitecpp-%E8%AF%A6%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">sqlitecpp 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlite3-orm-%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B7%A5%E5%85%B7-%E6%8E%A8%E8%8D%90"><span class="nav-number">10.</span> <span class="nav-text">sqlite3 orm 第三方工具 推荐</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sql%E8%AF%AD%E6%B3%95%E5%92%8Cmysql-%E5%85%B3%E7%B3%BB"><span class="nav-number">11.</span> <span class="nav-text">sql语法和mysql 关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL"><span class="nav-number">12.</span> <span class="nav-text">SQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-SQL-%E7%AE%80%E4%BB%8B"><span class="nav-number">13.</span> <span class="nav-text">1.1 SQL 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-SQL-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">13.1.</span> <span class="nav-text">1.1.1 SQL 是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-SQL-%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88"><span class="nav-number">13.2.</span> <span class="nav-text">1.1.2 SQL 能做什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-SQL-%E6%98%AF%E4%B8%80%E7%A7%8D%E6%A0%87%E5%87%86-%E4%BD%86%E6%98%AF%E2%80%A6"><span class="nav-number">13.3.</span> <span class="nav-text">1.1.3 SQL 是一种标准 - 但是…</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-4-RDBMS"><span class="nav-number">13.4.</span> <span class="nav-text">1.1.4 RDBMS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-SQL-%E8%AF%AD%E6%B3%95"><span class="nav-number">14.</span> <span class="nav-text">1.2 SQL 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8"><span class="nav-number">14.1.</span> <span class="nav-text">1.2.1 数据库表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-SQL-%E8%AF%AD%E5%8F%A5"><span class="nav-number">14.2.</span> <span class="nav-text">1.2.2 SQL 语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3-%E4%B8%80%E4%BA%9B%E6%9C%80%E9%87%8D%E8%A6%81%E7%9A%84-SQL-%E5%91%BD%E4%BB%A4"><span class="nav-number">14.3.</span> <span class="nav-text">1.2.3 一些最重要的 SQL 命令</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

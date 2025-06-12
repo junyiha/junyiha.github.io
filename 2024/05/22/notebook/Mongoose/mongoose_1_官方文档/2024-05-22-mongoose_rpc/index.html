@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 RPC(Remote Procedure Call, 远程过程调用),是一种通信协议和编程模型，用于实现分布式系统中不同节点之间的远程调用。它允许在不同计算机或进程之间像调用本地函数一样调用远程函数，隐藏了底层网络通信的细节 Mongoose包含一组函数，通过RPC方法简化服务器端处理。  struct mg_rpc 简介：  RPC方法处理程序结构。每个方法在一个链表中都有一个入口，每个入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoose_rpc">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_rpc/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 RPC(Remote Procedure Call, 远程过程调用),是一种通信协议和编程模型，用于实现分布式系统中不同节点之间的远程调用。它允许在不同计算机或进程之间像调用本地函数一样调用远程函数，隐藏了底层网络通信的细节 Mongoose包含一组函数，通过RPC方法简化服务器端处理。  struct mg_rpc 简介：  RPC方法处理程序结构。每个方法在一个链表中都有一个入口，每个入">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.414Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Mongoose">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_rpc/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mongoose_rpc | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_rpc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mongoose_rpc
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>RPC(Remote Procedure Call, 远程过程调用),是一种通信协议和编程模型，用于实现分布式系统中不同节点之间的远程调用。它允许在不同计算机或进程之间像调用本地函数一样调用远程函数，隐藏了底层网络通信的细节</li>
+<li>Mongoose包含一组函数，通过RPC方法简化服务器端处理。</li>
+</ul>
+<h2 id="struct-mg-rpc"><a href="#struct-mg-rpc" class="headerlink" title="struct mg_rpc"></a>struct mg_rpc</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>RPC方法处理程序结构。每个方法在一个链表中都有一个入口，每个入口指向一个字符串，该字符串描述了将调用该方法的模式，以及为满足该方法调用而调用的函数，并带有一个适当的函数参数。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> &#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *next;              <span class="comment">// Next in list</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> method;             <span class="comment">// Method pattern</span></span><br><span class="line">  <span class="built_in">void</span> (*fn)(<span class="keyword">struct</span> mg_rpc_req *);  <span class="comment">// Handler function</span></span><br><span class="line">  <span class="type">void</span> *fn_data;                    <span class="comment">// Handler function argument</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="struct-mg-rpc-req"><a href="#struct-mg-rpc-req" class="headerlink" title="struct mg_rpc_req"></a>struct mg_rpc_req</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>RPC请求描述符。被调用的方法会收到一个包含请求的描述符，以及一个指向函数的指针，该函数将被调用来打印输出响应，并带有一个适当的函数参数；例如：mg_pfn_realloc() 或 mg_pfn_iobuf()</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc_req</span> &#123;</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_rpc</span> **head;  <span class="comment">// RPC handlers list head</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *rpc;    <span class="comment">// RPC handler being called</span></span><br><span class="line">  <span class="type">mg_pfn_t</span> pfn;          <span class="comment">// Response printing function</span></span><br><span class="line">  <span class="type">void</span> *pfn_data;        <span class="comment">// Response printing function data</span></span><br><span class="line">  <span class="type">void</span> *req_data;        <span class="comment">// Arbitrary request data</span></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">mg_str</span> frame;   <span class="comment">// Request, e.g. &#123;&quot;id&quot;:1,&quot;method&quot;:&quot;add&quot;,&quot;params&quot;:[1,2]&#125;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-add"><a href="#mg-rpc-add" class="headerlink" title="mg_rpc_add"></a>mg_rpc_add</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>将方法method_pattern添加到RPC方法列表的头部。调用该方法将调用handler，并将handler_data与请求一起传递给它(如下使用示例中的r-&gt;fn_data)。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_add</span><span class="params">(<span class="keyword">struct</span> mg_rpc **head, <span class="keyword">struct</span> mg_str method_pattern,</span></span></span><br><span class="line"><span class="params"><span class="function">                <span class="type">void</span> (*handler)(<span class="keyword">struct</span> mg_rpc_req *), <span class="type">void</span> *handler_data)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>head – 链表指针</li>
+<li>method_pattern – 方法的名称</li>
+<li>handler – 执行该方法操作的RPC函数</li>
+<li>handler_data – 任意函数数据</li>
+</ul>
+</li>
+<li><p>注：</p>
+<ul>
+<li>如果method_pattern为空字符串，该处理程序将被调用来处理JSON-RPC响应。如果JSON请求是由双方发起的，那么处理响应可能是必要的。</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *s_rpc_head = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_sum</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;</span><br><span class="line">  <span class="type">double</span> a = <span class="number">0.0</span>, b = <span class="number">0.0</span>;</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[0]&quot;</span>, &amp;a);</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[1]&quot;</span>, &amp;b);</span><br><span class="line">  <span class="built_in">mg_rpc_ok</span>(r, <span class="string">&quot;%g&quot;</span>, a + b);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_mul</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;<span class="comment">//...&#125;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">mg_rpc_add</span>(&amp;s_rpc_head, <span class="built_in">mg_str</span>(<span class="string">&quot;sum&quot;</span>), rpc_sum, <span class="literal">NULL</span>);</span><br><span class="line">  <span class="built_in">mg_rpc_add</span>(&amp;s_rpc_head, <span class="built_in">mg_str</span>(<span class="string">&quot;mul&quot;</span>), rpc_mul, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-del"><a href="#mg-rpc-del" class="headerlink" title="mg_rpc_del"></a>mg_rpc_del</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>从RPC方法列表中删除带有RPC函数处理程序的方法</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_del</span><span class="params">(<span class="keyword">struct</span> mg_rpc **head, <span class="type">void</span> (*handler)(<span class="keyword">struct</span> mg_rpc_req *))</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>head – 链表指针</li>
+<li>handler – RPC函数处理程序的方法，使用NULL删除全部</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *s_rpc_head = <span class="literal">NULL</span>;</span><br><span class="line"><span class="comment">// add methods</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Time to cleanup</span></span><br><span class="line"><span class="built_in">mg_rpc_del</span>(&amp;s_rpc_head, rpc_mul);    <span class="comment">// Deallocate specific handler</span></span><br><span class="line"><span class="built_in">mg_rpc_del</span>(&amp;s_rpc_head, <span class="literal">NULL</span>);       <span class="comment">// Deallocate all RPC handlers</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-process"><a href="#mg-rpc-process" class="headerlink" title="mg_rpc_process"></a>mg_rpc_process</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>为这个请求调用合适的方法。如果请求的方法不存在，将调用mg_rpc_err()并打印错误提示。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_process</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *req)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>req – 一个请求</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc</span> *s_rpcs = <span class="literal">NULL</span>;                               <span class="comment">// Empty RPC list head</span></span><br><span class="line"><span class="built_in">mg_rpc_add</span>(&amp;s_rpcs, <span class="built_in">mg_str</span>(<span class="string">&quot;rpc.list&quot;</span>), mg_rpc_list, <span class="literal">NULL</span>); <span class="comment">// Add rpc.list</span></span><br><span class="line"><span class="comment">// ... add more RPC methods</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// On request, process the incoming frame</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_str</span> req = <span class="built_in">mg_str</span>(<span class="string">&quot;&#123;\&quot;id\&quot;:1,\&quot;method\&quot;:\&quot;sum\&quot;,\&quot;params\&quot;:[1,2]&#125;&quot;</span>);</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_iobuf</span> io = &#123;<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">512</span>&#125;;  <span class="comment">// Empty IO buf, with 512 realloc granularity</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">mg_rpc_req</span> r = &#123;</span><br><span class="line">  .head = &amp;s_rpcs,        <span class="comment">// RPC list head</span></span><br><span class="line">  .rpc = <span class="literal">NULL</span>,            <span class="comment">// This will be set by mg_rpc_process()</span></span><br><span class="line">  .pfn = mg_pfn_iobuf,    <span class="comment">// Printing function: print into the io buffer</span></span><br><span class="line">  .pfn_data = &amp;io,        <span class="comment">// Pass our io buffer as a parameter</span></span><br><span class="line">  .req_data = <span class="literal">NULL</span>,       <span class="comment">// No specific request data</span></span><br><span class="line">  .frame = req,           <span class="comment">// Specify incoming frame</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">mg_rpc_process</span>(&amp;r);</span><br><span class="line"><span class="keyword">if</span> (io.buf != <span class="literal">NULL</span>) <span class="built_in">printf</span>(<span class="string">&quot;Response: %s\n&quot;</span>, (<span class="type">char</span> *) io.buf);</span><br><span class="line"><span class="built_in">mg_iobuf_free</span>(&amp;io);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-ok-mg-rpc-vok"><a href="#mg-rpc-ok-mg-rpc-vok" class="headerlink" title="mg_rpc_ok, mg_rpc_vok"></a>mg_rpc_ok, mg_rpc_vok</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>打印结果帧的辅助函数</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_ok</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_vok</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">const</span> <span class="type">char</span> *fmt, va_list *ap)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>req – 一个请求</li>
+<li>fmt – 使用printf语义格式化的字符串</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_sum</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;</span><br><span class="line">  <span class="type">double</span> a = <span class="number">0.0</span>, b = <span class="number">0.0</span>;</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[0]&quot;</span>, &amp;a);</span><br><span class="line">  <span class="built_in">mg_json_get_num</span>(r-&gt;frame, <span class="string">&quot;$.params[1]&quot;</span>, &amp;b);</span><br><span class="line">  <span class="built_in">mg_rpc_ok</span>(r, <span class="string">&quot;%g&quot;</span>, a + b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-err-mg-rpc-verr"><a href="#mg-rpc-err-mg-rpc-verr" class="headerlink" title="mg_rpc_err, mg_rpc_verr"></a>mg_rpc_err, mg_rpc_verr</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>打印错误帧的辅助函数</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_err</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">int</span> code, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_verr</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *, <span class="type">int</span> code, <span class="type">const</span> <span class="type">char</span> *fmt, va_list *)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>req – 一个请求</li>
+<li>fmt – 使用printf语义格式化的字符串</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">rpc_dosome</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="built_in">mg_rpc_err</span>(r, <span class="number">-32109</span>, <span class="string">&quot;\&quot;%.*s not found\&quot;&quot;</span>, len, &amp;r-&gt;frame.ptr[offset]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="mg-rpc-list"><a href="#mg-rpc-list" class="headerlink" title="mg_rpc_list"></a>mg_rpc_list</h2><ul>
+<li><p>简介：</p>
+<ul>
+<li>内置RPC方法，用于列出所有已注册的RPC方法。该函数通常不直接调用，而是作为方法注册。</li>
+</ul>
+</li>
+<li><p>原型：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mg_rpc_list</span><span class="params">(<span class="keyword">struct</span> mg_rpc_req *r)</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>req – 一个请求</li>
+</ul>
+</li>
+<li><p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mg_rpc_add</span>(&amp;s_rpc_head, <span class="built_in">mg_str</span>(<span class="string">&quot;rpc.list&quot;</span>), mg_rpc_list, &amp;s_rpc_head);</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mongoose/" rel="tag"># Mongoose</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_timer/" rel="prev" title="mongoose_timer">
+      <i class="fa fa-chevron-left"></i> mongoose_timer
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_utility/" rel="next" title="mongoose_utility">
+      mongoose_utility <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-rpc"><span class="nav-number">2.</span> <span class="nav-text">struct mg_rpc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-mg-rpc-req"><span class="nav-number">3.</span> <span class="nav-text">struct mg_rpc_req</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-rpc-add"><span class="nav-number">4.</span> <span class="nav-text">mg_rpc_add</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-rpc-del"><span class="nav-number">5.</span> <span class="nav-text">mg_rpc_del</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-rpc-process"><span class="nav-number">6.</span> <span class="nav-text">mg_rpc_process</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-rpc-ok-mg-rpc-vok"><span class="nav-number">7.</span> <span class="nav-text">mg_rpc_ok, mg_rpc_vok</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-rpc-err-mg-rpc-verr"><span class="nav-number">8.</span> <span class="nav-text">mg_rpc_err, mg_rpc_verr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mg-rpc-list"><span class="nav-number">9.</span> <span class="nav-text">mg_rpc_list</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

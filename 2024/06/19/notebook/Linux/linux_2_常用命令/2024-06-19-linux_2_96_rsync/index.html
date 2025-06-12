@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="linux rsync命令是什么rsync 是一个用于在本地或远程同步文件和目录的开源实用工具。它非常强大和灵活，支持递归传输、保持文件权限、压缩传输等功能，使其成为文件同步和备份的首选工具之一。 以下是 rsync 的一些常用选项和示例： 常用选项 -a, --archive：归档模式，等同于 -rlptgoD，保留文件的权限、时间戳、符号链接等。 -v, --verbose：详细模式，显示传输">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_96_rsync">
+<meta property="og:url" content="https://junyiha.github.io/2024/06/19/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-06-19-linux_2_96_rsync/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="linux rsync命令是什么rsync 是一个用于在本地或远程同步文件和目录的开源实用工具。它非常强大和灵活，支持递归传输、保持文件权限、压缩传输等功能，使其成为文件同步和备份的首选工具之一。 以下是 rsync 的一些常用选项和示例： 常用选项 -a, --archive：归档模式，等同于 -rlptgoD，保留文件的权限、时间戳、符号链接等。 -v, --verbose：详细模式，显示传输">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-06-19T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.381Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/06/19/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-06-19-linux_2_96_rsync/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_96_rsync | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/06/19/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-06-19-linux_2_96_rsync/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_96_rsync
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-06-19 09:00:00" itemprop="dateCreated datePublished" datetime="2024-06-19T09:00:00+08:00">2024-06-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="linux-rsync命令是什么"><a href="#linux-rsync命令是什么" class="headerlink" title="linux rsync命令是什么"></a>linux rsync命令是什么</h2><p><code>rsync</code> 是一个用于在本地或远程同步文件和目录的开源实用工具。它非常强大和灵活，支持递归传输、保持文件权限、压缩传输等功能，使其成为文件同步和备份的首选工具之一。</p>
+<p>以下是 <code>rsync</code> 的一些常用选项和示例：</p>
+<h3 id="常用选项"><a href="#常用选项" class="headerlink" title="常用选项"></a>常用选项</h3><ul>
+<li><code>-a, --archive</code>：归档模式，等同于 <code>-rlptgoD</code>，保留文件的权限、时间戳、符号链接等。</li>
+<li><code>-v, --verbose</code>：详细模式，显示传输过程中的详细信息。</li>
+<li><code>-z, --compress</code>：在传输过程中压缩文件以节省带宽。</li>
+<li><code>-P</code>：显示传输进度并部分保留已传输的文件（等同于 <code>--partial --progress</code>）。</li>
+<li><code>--exclude</code>：排除指定的文件或目录。</li>
+<li><code>--delete</code>：删除目标目录中在源目录中不存在的文件。</li>
+</ul>
+<h3 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h3><h4 id="本地复制"><a href="#本地复制" class="headerlink" title="本地复制"></a>本地复制</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /source/directory /destination/directory</span><br></pre></td></tr></table></figure>
+<p>将 <code>/source/directory</code> 复制到 <code>/destination/directory</code>。</p>
+<h4 id="远程复制"><a href="#远程复制" class="headerlink" title="远程复制"></a>远程复制</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /local/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+<p>将本地目录 <code>/local/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av user@remote_host:/remote/directory /local/directory</span><br></pre></td></tr></table></figure>
+<p>将远程主机 <code>remote_host</code> 的 <code>/remote/directory</code> 复制到本地目录 <code>/local/directory</code>。</p>
+<h4 id="使用-exclude-排除特定目录"><a href="#使用-exclude-排除特定目录" class="headerlink" title="使用 --exclude 排除特定目录"></a>使用 <code>--exclude</code> 排除特定目录</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;exclude_directory&#x27;</span> /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+<p>将本地目录 <code>/source/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，但排除 <code>exclude_directory</code> 目录。</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><ol>
+<li><p><strong>同步本地目录</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /home/user/data /backup</span><br></pre></td></tr></table></figure>
+<p>将 <code>/home/user/data</code> 目录同步到 <code>/backup</code> 目录。</p>
+</li>
+<li><p><strong>排除特定目录</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;tmp&#x27;</span> /home/user/data /backup</span><br></pre></td></tr></table></figure>
+<p>将 <code>/home/user/data</code> 目录同步到 <code>/backup</code> 目录，但排除 <code>tmp</code> 目录。</p>
+</li>
+<li><p><strong>同步到远程主机</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz /home/user/data user@remote_host:/backup</span><br></pre></td></tr></table></figure>
+<p>将本地 <code>/home/user/data</code> 目录同步到远程主机 <code>remote_host</code> 的 <code>/backup</code> 目录，并在传输过程中进行压缩。</p>
+</li>
+<li><p><strong>从远程主机同步到本地</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz user@remote_host:/backup /home/user/data</span><br></pre></td></tr></table></figure>
+<p>将远程主机 <code>remote_host</code> 的 <code>/backup</code> 目录同步到本地的 <code>/home/user/data</code> 目录，并在传输过程中进行压缩。</p>
+</li>
+<li><p><strong>显示进度</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avP /home/user/data user@remote_host:/backup</span><br></pre></td></tr></table></figure>
+<p>将本地 <code>/home/user/data</code> 目录同步到远程主机 <code>remote_host</code> 的 <code>/backup</code> 目录，并显示传输进度。</p>
+</li>
+</ol>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p><code>rsync</code> 是一个非常强大且灵活的工具，适用于各种文件同步和备份需求。通过熟练使用 <code>rsync</code> 的各种选项，你可以高效地完成复杂的文件传输和同步任务。</p>
+<h2 id="linux-rsync命令-详解"><a href="#linux-rsync命令-详解" class="headerlink" title="linux rsync命令 详解"></a>linux rsync命令 详解</h2><p><code>rsync</code> 是一个强大的文件同步工具，常用于在本地或远程主机之间复制和同步文件和目录。它支持增量传输、保持文件权限、压缩传输等功能。以下是 <code>rsync</code> 的详细说明和一些示例。</p>
+<h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync [OPTION]... SRC [SRC]... DEST</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>SRC</code>：源文件或目录</li>
+<li><code>DEST</code>：目标文件或目录</li>
+</ul>
+<h3 id="常用选项-1"><a href="#常用选项-1" class="headerlink" title="常用选项"></a>常用选项</h3><ul>
+<li><code>-a, --archive</code>：归档模式，相当于 <code>-rlptgoD</code>，保留文件属性。<ul>
+<li><code>-r, --recursive</code>：递归处理目录。</li>
+<li><code>-l, --links</code>：保留符号链接。</li>
+<li><code>-p, --perms</code>：保留文件权限。</li>
+<li><code>-t, --times</code>：保持文件修改时间。</li>
+<li><code>-g, --group</code>：保留文件组信息。</li>
+<li><code>-o, --owner</code>：保留文件所有者信息。</li>
+<li><code>-D</code>：保留设备文件和特殊文件。</li>
+</ul>
+</li>
+<li><code>-v, --verbose</code>：详细输出。</li>
+<li><code>-z, --compress</code>：在传输过程中压缩文件。</li>
+<li><code>-P</code>：显示传输进度和部分传输的文件（等同于 <code>--partial --progress</code>）。<ul>
+<li><code>--partial</code>：保留部分传输的文件，以便恢复。</li>
+<li><code>--progress</code>：显示传输进度。</li>
+</ul>
+</li>
+<li><code>--exclude</code>：指定排除的文件或目录模式。</li>
+<li><code>--delete</code>：删除目标目录中在源目录中不存在的文件。</li>
+<li><code>--bwlimit=RATE</code>：限制 I&#x2F;O 带宽，单位为 KB&#x2F;s。</li>
+<li><code>-e, --rsh=COMMAND</code>：指定远程 shell 程序。</li>
+<li><code>--checksum</code>：基于文件校验和进行比较，而不是文件大小和修改时间。</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><h4 id="本地复制-1"><a href="#本地复制-1" class="headerlink" title="本地复制"></a>本地复制</h4><p>将本地目录 <code>/source/directory</code> 复制到 <code>/destination/directory</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /source/directory /destination/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="远程复制-1"><a href="#远程复制-1" class="headerlink" title="远程复制"></a>远程复制</h4><p>将本地目录 <code>/local/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /local/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<p>将远程主机 <code>remote_host</code> 的 <code>/remote/directory</code> 复制到本地目录 <code>/local/directory</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av user@remote_host:/remote/directory /local/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="排除特定目录"><a href="#排除特定目录" class="headerlink" title="排除特定目录"></a>排除特定目录</h4><p>将本地目录 <code>/source/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，但排除 <code>exclude_directory</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;exclude_directory&#x27;</span> /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="显示进度"><a href="#显示进度" class="headerlink" title="显示进度"></a>显示进度</h4><p>在传输过程中显示进度：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avP /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="同步文件并删除目标目录中多余的文件"><a href="#同步文件并删除目标目录中多余的文件" class="headerlink" title="同步文件并删除目标目录中多余的文件"></a>同步文件并删除目标目录中多余的文件</h4><p>将本地目录 <code>/source/directory</code> 同步到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，并删除目标目录中多余的文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --delete /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="限制传输带宽"><a href="#限制传输带宽" class="headerlink" title="限制传输带宽"></a>限制传输带宽</h4><p>将本地目录 <code>/source/directory</code> 复制到远程主机 <code>remote_host</code> 的 <code>/remote/directory</code>，并限制传输带宽为 500 KB&#x2F;s：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz --bwlimit=500 /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用-SSH-进行传输"><a href="#使用-SSH-进行传输" class="headerlink" title="使用 SSH 进行传输"></a>使用 SSH 进行传输</h4><p>通过 SSH 进行文件传输：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz -e ssh /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<h4 id="基于校验和进行比较"><a href="#基于校验和进行比较" class="headerlink" title="基于校验和进行比较"></a>基于校验和进行比较</h4><p>基于文件校验和进行比较，而不是文件大小和修改时间：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -avz --checksum /source/directory user@remote_host:/remote/directory</span><br></pre></td></tr></table></figure>
+
+<h3 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h3><p><code>rsync</code> 是一个非常强大且灵活的工具，可以满足各种文件同步和备份需求。通过掌握 <code>rsync</code> 的各种选项和用法，你可以高效地完成复杂的文件传输和同步任务。</p>
+<h2 id="linux-rsync命令-拷贝目录并且忽略指定目录"><a href="#linux-rsync命令-拷贝目录并且忽略指定目录" class="headerlink" title="linux rsync命令 拷贝目录并且忽略指定目录"></a>linux rsync命令 拷贝目录并且忽略指定目录</h2><p>在 Linux 上使用 <code>rsync</code> 拷贝目录并且忽略指定目录的具体步骤如下。假设你要拷贝 <code>/source/directory</code> 到目标目录 <code>/destination/directory</code>，但要忽略 <code>ignore_directory</code> 目录。</p>
+<h3 id="示例命令"><a href="#示例命令" class="headerlink" title="示例命令"></a>示例命令</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
+
+<h3 id="详细说明"><a href="#详细说明" class="headerlink" title="详细说明"></a>详细说明</h3><ul>
+<li><code>-a, --archive</code>：归档模式，表示递归复制目录，并保持文件属性。</li>
+<li><code>-v, --verbose</code>：详细模式，显示传输过程中的信息。</li>
+<li><code>--exclude &#39;ignore_directory&#39;</code>：指定要排除的目录 <code>ignore_directory</code>。</li>
+<li><code>/source/directory/</code>：源目录路径，末尾的 <code>/</code> 表示拷贝目录内的内容。</li>
+<li><code>/destination/directory/</code>：目标目录路径，末尾的 <code>/</code> 表示将内容复制到该目录中。</li>
+</ul>
+<h3 id="更详细的例子"><a href="#更详细的例子" class="headerlink" title="更详细的例子"></a>更详细的例子</h3><p>假设有如下目录结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/source/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">├── file2.txt</span><br><span class="line">└── ignore_directory/</span><br><span class="line">    ├── file3.txt</span><br><span class="line">    └── file4.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用上述 <code>rsync</code> 命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
+
+<p>结果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/destination/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">└── file2.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="其他选项"><a href="#其他选项" class="headerlink" title="其他选项"></a>其他选项</h3><ul>
+<li>如果你有多个目录或文件需要排除，可以使用多个 <code>--exclude</code> 选项：</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory1&#x27;</span> --exclude <span class="string">&#x27;ignore_directory2&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>你也可以使用 <code>--exclude-from</code> 选项从文件中读取排除的目录和文件列表。假设排除列表文件 <code>exclude-list.txt</code> 内容如下：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ignore_directory1</span><br><span class="line">ignore_directory2</span><br><span class="line">ignore_file.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude-from=<span class="string">&#x27;exclude-list.txt&#x27;</span> /source/directory/ /destination/directory/</span><br></pre></td></tr></table></figure>
+
+<h3 id="结论-2"><a href="#结论-2" class="headerlink" title="结论"></a>结论</h3><p>通过以上方法，你可以使用 <code>rsync</code> 高效地复制目录，同时忽略指定的目录或文件。这些选项提供了灵活的排除机制，使 <code>rsync</code> 成为处理文件同步和备份任务的强大工具。</p>
+<h2 id="linux-rsync命令-远程拷贝目录并且忽略指定目录"><a href="#linux-rsync命令-远程拷贝目录并且忽略指定目录" class="headerlink" title="linux rsync命令 远程拷贝目录并且忽略指定目录"></a>linux rsync命令 远程拷贝目录并且忽略指定目录</h2><p>使用 <code>rsync</code> 命令可以实现远程拷贝目录并且忽略指定目录。以下是详细步骤和示例。</p>
+<h3 id="示例命令-1"><a href="#示例命令-1" class="headerlink" title="示例命令"></a>示例命令</h3><p>假设你要将本地的 <code>/source/directory</code> 目录拷贝到远程主机 <code>remote_host</code> 的 <code>/destination/directory</code>，但要忽略 <code>ignore_directory</code> 目录。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
+
+<h3 id="详细说明-1"><a href="#详细说明-1" class="headerlink" title="详细说明"></a>详细说明</h3><ul>
+<li><code>-a, --archive</code>：归档模式，表示递归复制目录，并保持文件属性。</li>
+<li><code>-v, --verbose</code>：详细模式，显示传输过程中的信息。</li>
+<li><code>--exclude &#39;ignore_directory&#39;</code>：指定要排除的目录 <code>ignore_directory</code>。</li>
+<li><code>/source/directory/</code>：源目录路径，末尾的 <code>/</code> 表示拷贝目录内的内容。</li>
+<li><code>user@remote_host:/destination/directory/</code>：目标目录路径，格式为 <code>user@host:/path</code>。</li>
+</ul>
+<h3 id="更详细的例子-1"><a href="#更详细的例子-1" class="headerlink" title="更详细的例子"></a>更详细的例子</h3><p>假设有如下本地目录结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/source/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">├── file2.txt</span><br><span class="line">└── ignore_directory/</span><br><span class="line">    ├── file3.txt</span><br><span class="line">    └── file4.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用上述 <code>rsync</code> 命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
+
+<p>结果是远程主机 <code>remote_host</code> 上的 <code>/destination/directory/</code> 目录结构为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/destination/directory/</span><br><span class="line">├── file1.txt</span><br><span class="line">└── file2.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用多个排除选项"><a href="#使用多个排除选项" class="headerlink" title="使用多个排除选项"></a>使用多个排除选项</h3><p>如果你有多个目录或文件需要排除，可以使用多个 <code>--exclude</code> 选项：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude <span class="string">&#x27;ignore_directory1&#x27;</span> --exclude <span class="string">&#x27;ignore_directory2&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用排除列表文件"><a href="#使用排除列表文件" class="headerlink" title="使用排除列表文件"></a>使用排除列表文件</h3><p>你也可以使用 <code>--exclude-from</code> 选项从文件中读取排除的目录和文件列表。假设排除列表文件 <code>exclude-list.txt</code> 内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ignore_directory1</span><br><span class="line">ignore_directory2</span><br><span class="line">ignore_file.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av --exclude-from=<span class="string">&#x27;exclude-list.txt&#x27;</span> /source/directory/ user@remote_host:/destination/directory/</span><br></pre></td></tr></table></figure>
+
+<h3 id="结论-3"><a href="#结论-3" class="headerlink" title="结论"></a>结论</h3><p>通过以上方法，你可以使用 <code>rsync</code> 高效地实现远程目录拷贝，同时忽略指定的目录或文件。这些选项提供了灵活的排除机制，使 <code>rsync</code> 成为处理远程文件同步和备份任务的强大工具。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/27/notebook/Tools/2024-05-27-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="prev" title="数据结构">
+      <i class="fa fa-chevron-left"></i> 数据结构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/06/19/notebook/C++/C++_05_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/2024-06-19-C++%E4%B8%AD%E7%9A%84NaN/" rel="next" title="C++中的NaN 产生原因，特性及处理方法">
+      C++中的NaN 产生原因，特性及处理方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-rsync%E5%91%BD%E4%BB%A4%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">linux rsync命令是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9"><span class="nav-number">1.1.</span> <span class="nav-text">常用选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">基本用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%A4%8D%E5%88%B6"><span class="nav-number">1.2.1.</span> <span class="nav-text">本地复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E5%A4%8D%E5%88%B6"><span class="nav-number">1.2.2.</span> <span class="nav-text">远程复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-exclude-%E6%8E%92%E9%99%A4%E7%89%B9%E5%AE%9A%E7%9B%AE%E5%BD%95"><span class="nav-number">1.2.3.</span> <span class="nav-text">使用 --exclude 排除特定目录</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">1.4.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-rsync%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux rsync命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">基本语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9-1"><span class="nav-number">2.2.</span> <span class="nav-text">常用选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">2.3.</span> <span class="nav-text">示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%A4%8D%E5%88%B6-1"><span class="nav-number">2.3.1.</span> <span class="nav-text">本地复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E5%A4%8D%E5%88%B6-1"><span class="nav-number">2.3.2.</span> <span class="nav-text">远程复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%92%E9%99%A4%E7%89%B9%E5%AE%9A%E7%9B%AE%E5%BD%95"><span class="nav-number">2.3.3.</span> <span class="nav-text">排除特定目录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%98%BE%E7%A4%BA%E8%BF%9B%E5%BA%A6"><span class="nav-number">2.3.4.</span> <span class="nav-text">显示进度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E6%96%87%E4%BB%B6%E5%B9%B6%E5%88%A0%E9%99%A4%E7%9B%AE%E6%A0%87%E7%9B%AE%E5%BD%95%E4%B8%AD%E5%A4%9A%E4%BD%99%E7%9A%84%E6%96%87%E4%BB%B6"><span class="nav-number">2.3.5.</span> <span class="nav-text">同步文件并删除目标目录中多余的文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E4%BC%A0%E8%BE%93%E5%B8%A6%E5%AE%BD"><span class="nav-number">2.3.6.</span> <span class="nav-text">限制传输带宽</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-SSH-%E8%BF%9B%E8%A1%8C%E4%BC%A0%E8%BE%93"><span class="nav-number">2.3.7.</span> <span class="nav-text">使用 SSH 进行传输</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%A0%A1%E9%AA%8C%E5%92%8C%E8%BF%9B%E8%A1%8C%E6%AF%94%E8%BE%83"><span class="nav-number">2.3.8.</span> <span class="nav-text">基于校验和进行比较</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA-1"><span class="nav-number">2.4.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-rsync%E5%91%BD%E4%BB%A4-%E6%8B%B7%E8%B4%9D%E7%9B%AE%E5%BD%95%E5%B9%B6%E4%B8%94%E5%BF%BD%E7%95%A5%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95"><span class="nav-number">3.</span> <span class="nav-text">linux rsync命令 拷贝目录并且忽略指定目录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%91%BD%E4%BB%A4"><span class="nav-number">3.1.</span> <span class="nav-text">示例命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E"><span class="nav-number">3.2.</span> <span class="nav-text">详细说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E8%AF%A6%E7%BB%86%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">3.3.</span> <span class="nav-text">更详细的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%80%89%E9%A1%B9"><span class="nav-number">3.4.</span> <span class="nav-text">其他选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA-2"><span class="nav-number">3.5.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-rsync%E5%91%BD%E4%BB%A4-%E8%BF%9C%E7%A8%8B%E6%8B%B7%E8%B4%9D%E7%9B%AE%E5%BD%95%E5%B9%B6%E4%B8%94%E5%BF%BD%E7%95%A5%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95"><span class="nav-number">4.</span> <span class="nav-text">linux rsync命令 远程拷贝目录并且忽略指定目录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%91%BD%E4%BB%A4-1"><span class="nav-number">4.1.</span> <span class="nav-text">示例命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E-1"><span class="nav-number">4.2.</span> <span class="nav-text">详细说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E8%AF%A6%E7%BB%86%E7%9A%84%E4%BE%8B%E5%AD%90-1"><span class="nav-number">4.3.</span> <span class="nav-text">更详细的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA%E6%8E%92%E9%99%A4%E9%80%89%E9%A1%B9"><span class="nav-number">4.4.</span> <span class="nav-text">使用多个排除选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%8E%92%E9%99%A4%E5%88%97%E8%A1%A8%E6%96%87%E4%BB%B6"><span class="nav-number">4.5.</span> <span class="nav-text">使用排除列表文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA-3"><span class="nav-number">4.6.</span> <span class="nav-text">结论</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

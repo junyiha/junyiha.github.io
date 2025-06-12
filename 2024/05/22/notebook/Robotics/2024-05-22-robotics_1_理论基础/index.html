@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 机器人学相关理论基础  手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？是的，在移动相机（Eye-in-Hand）的手眼标定中，标定的是相机坐标系相对于末端坐标系的变换矩阵。    1. 变换矩阵的定义在Eye-in-Hand（移动相机）手眼标定中，通常涉及以下坐标系：  基地坐标系 ( B )（Base Frame）：固定在机械臂的底座上。 末端坐标系 ( E )（End-Effect">
+<meta property="og:type" content="article">
+<meta property="og:title" content="robotics_1_理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Robotics/2024-05-22-robotics_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 机器人学相关理论基础  手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？是的，在移动相机（Eye-in-Hand）的手眼标定中，标定的是相机坐标系相对于末端坐标系的变换矩阵。    1. 变换矩阵的定义在Eye-in-Hand（移动相机）手眼标定中，通常涉及以下坐标系：  基地坐标系 ( B )（Base Frame）：固定在机械臂的底座上。 末端坐标系 ( E )（End-Effect">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.506Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Robot">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Robotics/2024-05-22-robotics_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>robotics_1_理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Robotics/2024-05-22-robotics_1_%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          robotics_1_理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Robotics/" itemprop="url" rel="index"><span itemprop="name">Robotics</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>机器人学相关理论基础</li>
+</ul>
+<h2 id="手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？"><a href="#手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？" class="headerlink" title="手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？"></a>手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？</h2><p>是的，在<strong>移动相机（Eye-in-Hand）</strong>的手眼标定中，<strong>标定的是相机坐标系相对于末端坐标系的变换矩阵</strong>。  </p>
+<hr>
+<h2 id="1-变换矩阵的定义"><a href="#1-变换矩阵的定义" class="headerlink" title="1. 变换矩阵的定义"></a><strong>1. 变换矩阵的定义</strong></h2><p>在<strong>Eye-in-Hand</strong>（移动相机）手眼标定中，通常涉及以下坐标系：</p>
+<ul>
+<li><strong>基地坐标系 ( B )</strong>（Base Frame）：固定在机械臂的底座上。</li>
+<li><strong>末端坐标系 ( E )</strong>（End-Effector Frame）：固定在机械臂末端（即法兰盘或工具的坐标系）。</li>
+<li><strong>相机坐标系 ( C )</strong>（Camera Frame）：相机安装在机械臂末端，与机械臂一起运动。</li>
+<li><strong>标定板坐标系 ( W )</strong>（World Frame）：标定板的坐标系，通常固定在环境中的某个已知位置。</li>
+</ul>
+<p>在手眼标定中，我们要求解：<br>[<br>{}^E T_C<br>]<br>其中：</p>
+<ul>
+<li><strong>( {}^E T_C )</strong>：<strong>相机坐标系相对于末端坐标系的变换矩阵</strong>，用于描述相机相对于机械臂末端的固定安装位置。</li>
+</ul>
+<hr>
+<h2 id="2-变换关系推导"><a href="#2-变换关系推导" class="headerlink" title="2. 变换关系推导"></a><strong>2. 变换关系推导</strong></h2><p>在<strong>Eye-in-Hand</strong>系统中，物体坐标 ( P_W ) 在不同坐标系中的变换关系如下：<br>[<br>P_B &#x3D; {}^B T_E \cdot {}^E T_C \cdot {}^C T_W \cdot P_W<br>]<br>其中：</p>
+<ul>
+<li><strong>( {}^B T_E )</strong>：基地坐标系到末端坐标系的变换（已知，来自机械臂的运动学计算）。</li>
+<li><strong>( {}^E T_C )</strong>：末端坐标系到相机坐标系的变换（<strong>未知，需要标定</strong>）。</li>
+<li><strong>( {}^C T_W )</strong>：相机坐标系到标定板坐标系的变换（可通过相机拍摄标定板计算得出）。</li>
+<li><strong>( {}^B T_W )</strong>：基地坐标系到标定板坐标系的变换（已知，通过标定板的固定位置确定）。</li>
+</ul>
+<p>为了求解<strong>相机相对于末端的安装位姿</strong> ( {}^E T_C )，可以通过以下公式：<br>[<br>{}^E T_C &#x3D; ({}^B T_E)^{-1} \cdot {}^B T_W \cdot ({}^C T_W)^{-1}<br>]</p>
+<ul>
+<li>机械臂运动提供 ( {}^B T_E )（来自机械臂的位姿反馈）。</li>
+<li>视觉检测提供 ( {}^C T_W )（通过相机检测标定板获取）。</li>
+<li>物理测量提供 ( {}^B T_W )（标定板位置相对于机械臂基地）。</li>
+</ul>
+<hr>
+<h2 id="3-手眼标定的实现流程"><a href="#3-手眼标定的实现流程" class="headerlink" title="3. 手眼标定的实现流程"></a><strong>3. 手眼标定的实现流程</strong></h2><h3 id="步骤-1：数据采集"><a href="#步骤-1：数据采集" class="headerlink" title="步骤 1：数据采集"></a><strong>步骤 1：数据采集</strong></h3><ul>
+<li>让机械臂的末端移动到多个不同的已知姿态 ( {}^B T_E )。</li>
+<li>每个姿态下，相机拍摄标定板，获取标定板在相机坐标系下的位姿 ( {}^C T_W )。</li>
+</ul>
+<h3 id="步骤-2：计算变换矩阵"><a href="#步骤-2：计算变换矩阵" class="headerlink" title="步骤 2：计算变换矩阵"></a><strong>步骤 2：计算变换矩阵</strong></h3><ul>
+<li>通过 Tsai-Lenz 方法或最小二乘优化方法，解算 ( {}^E T_C )。</li>
+</ul>
+<h3 id="步骤-3：验证精度"><a href="#步骤-3：验证精度" class="headerlink" title="步骤 3：验证精度"></a><strong>步骤 3：验证精度</strong></h3><ul>
+<li>使用已知的物体位置，验证手眼标定结果是否准确。</li>
+</ul>
+<hr>
+<h2 id="4-结论"><a href="#4-结论" class="headerlink" title="4. 结论"></a><strong>4. 结论</strong></h2><p>在<strong>移动相机（Eye-in-Hand）</strong>的手眼标定中，最终求解的是<strong>相机坐标系相对于末端坐标系的变换矩阵 ( {}^E T_C )</strong>，它用于描述相机相对于机械臂末端的固定位置，并用于视觉引导、抓取等任务。</p>
+<h2 id="机械臂种的世界坐标系的作用"><a href="#机械臂种的世界坐标系的作用" class="headerlink" title="机械臂种的世界坐标系的作用"></a>机械臂种的世界坐标系的作用</h2><h3 id="机械臂中的世界坐标系的作用"><a href="#机械臂中的世界坐标系的作用" class="headerlink" title="机械臂中的世界坐标系的作用"></a><strong>机械臂中的世界坐标系的作用</strong></h3><p>在机器人学中，<strong>世界坐标系（World Coordinate System, W）</strong>是一个全局参考坐标系，它在机械臂的应用中起着至关重要的作用，主要用于<strong>统一不同坐标系、任务规划、视觉定位</strong>等。  </p>
+<hr>
+<h2 id="1-世界坐标系的定义"><a href="#1-世界坐标系的定义" class="headerlink" title="1. 世界坐标系的定义"></a><strong>1. 世界坐标系的定义</strong></h2><ul>
+<li>世界坐标系 ( W ) 是整个机械臂工作环境中的一个<strong>固定</strong>的全局参考坐标系。</li>
+<li>其原点、方向通常根据任务需求确定，例如：<ul>
+<li>设定在<strong>机械臂基地坐标系 ( B )</strong> 处，方便对齐机器人本体。</li>
+<li>设定在<strong>生产线的某个固定点</strong>，便于多个机器人协作。</li>
+<li>设定在<strong>视觉系统的标定板</strong>，以便对接视觉坐标信息。</li>
+</ul>
+</li>
+</ul>
+<p>世界坐标系可以通过<strong>齐次变换矩阵</strong> ( {}^W T_X ) 来表示<strong>任何其他坐标系</strong>（如基地坐标系、末端坐标系等）相对于世界坐标系的变换关系。</p>
+<hr>
+<h2 id="2-世界坐标系的主要作用"><a href="#2-世界坐标系的主要作用" class="headerlink" title="2. 世界坐标系的主要作用"></a><strong>2. 世界坐标系的主要作用</strong></h2><h3 id="2-1-统一不同坐标系"><a href="#2-1-统一不同坐标系" class="headerlink" title="2.1 统一不同坐标系"></a><strong>2.1 统一不同坐标系</strong></h3><p>机械臂系统涉及多个坐标系，如：</p>
+<ul>
+<li><strong>基地坐标系（Base Frame, B）</strong></li>
+<li><strong>末端坐标系（End-Effector Frame, E）</strong></li>
+<li><strong>工具坐标系（Tool Frame, T）</strong></li>
+<li><strong>相机坐标系（Camera Frame, C）</strong></li>
+<li><strong>物体坐标系（Object Frame, O）</strong></li>
+</ul>
+<p>世界坐标系作为一个全局基准，可以将所有坐标系转换到同一基准下，使它们相互配合。例如：<br>[<br>P_W &#x3D; {}^W T_B \cdot {}^B T_E \cdot {}^E T_T \cdot P_T<br>]<br>这个公式表示：工具坐标系中的某个点 ( P_T ) 经过多次变换后，最终转换到世界坐标系下的点 ( P_W )。</p>
+<hr>
+<h3 id="2-2-机器人任务规划"><a href="#2-2-机器人任务规划" class="headerlink" title="2.2 机器人任务规划"></a><strong>2.2 机器人任务规划</strong></h3><ul>
+<li>在工业应用中，任务点通常在世界坐标系下定义，比如：<ul>
+<li>机械臂要在<strong>流水线上某个固定点抓取物体</strong>，该点通常用世界坐标系表示。</li>
+<li>焊接任务中的焊点坐标、喷涂任务中的轨迹，都是基于世界坐标系设定的。</li>
+</ul>
+</li>
+<li>通过设定目标点在世界坐标系下的位置 ( P_W )，机械臂可以通过逆运动学计算合适的关节角度去执行任务。</li>
+</ul>
+<hr>
+<h3 id="2-3-视觉引导（手眼协调）"><a href="#2-3-视觉引导（手眼协调）" class="headerlink" title="2.3 视觉引导（手眼协调）"></a><strong>2.3 视觉引导（手眼协调）</strong></h3><ul>
+<li><strong>固定相机（Eye-to-Hand）</strong>：相机通常固定在环境中（例如装在一个架子上），它的坐标系需要转换到世界坐标系，以便机械臂理解物体位置。</li>
+<li><strong>运动相机（Eye-in-Hand）</strong>：相机安装在机械臂末端，检测到的物体坐标首先是相机坐标系下的，必须转换到世界坐标系，才能进行全局路径规划。</li>
+<li>例如，物体在相机坐标系下的位置 ( P_C ) 需要转换到世界坐标系：<br>[<br>P_W &#x3D; {}^W T_C \cdot P_C<br>]<br>这样机械臂就能在世界坐标系中理解目标物体的位置，并进行抓取。</li>
+</ul>
+<hr>
+<h3 id="2-4-多机器人协作"><a href="#2-4-多机器人协作" class="headerlink" title="2.4 多机器人协作"></a><strong>2.4 多机器人协作</strong></h3><ul>
+<li>在多机器人协作场景中，每个机械臂通常有自己的<strong>基地坐标系</strong>，但为了让它们协作，需要有一个公共的<strong>世界坐标系</strong>。</li>
+<li>例如，两个机械臂协作搬运物体：<ul>
+<li>机械臂 A 需要将物体放置到某个世界坐标点 ( P_W )。</li>
+<li>机械臂 B 需要从 ( P_W ) 处接住物体。</li>
+</ul>
+</li>
+<li>这种情况下，世界坐标系可以作为统一参考，使两个机械臂的操作无缝对接。</li>
+</ul>
+<hr>
+<h3 id="2-5-机器人路径规划"><a href="#2-5-机器人路径规划" class="headerlink" title="2.5 机器人路径规划"></a><strong>2.5 机器人路径规划</strong></h3><ul>
+<li>机器人路径通常是在世界坐标系下定义的，比如：<ul>
+<li>让机械臂按照某条轨迹（如直线、圆弧）移动。</li>
+<li>进行避障计算，确保路径不会与环境发生碰撞。</li>
+</ul>
+</li>
+<li>通过世界坐标系，机械臂可以从当前姿态 ( {}^W T_E ) 规划一条到达目标位姿 ( {}^W T_{E,goal} ) 的路径。</li>
+</ul>
+<hr>
+<h2 id="3-世界坐标系与其他坐标系的关系"><a href="#3-世界坐标系与其他坐标系的关系" class="headerlink" title="3. 世界坐标系与其他坐标系的关系"></a><strong>3. 世界坐标系与其他坐标系的关系</strong></h2><table>
+<thead>
+<tr>
+<th>坐标系</th>
+<th>作用</th>
+<th>典型变换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>世界坐标系（W）</strong></td>
+<td>统一多个坐标系，定义全局任务</td>
+<td>( {}^W T_B ), ( {}^W T_O )</td>
+</tr>
+<tr>
+<td><strong>基地坐标系（B）</strong></td>
+<td>机械臂的固定参考点</td>
+<td>( {}^B T_E )</td>
+</tr>
+<tr>
+<td><strong>末端坐标系（E）</strong></td>
+<td>机械臂末端工具的姿态</td>
+<td>( {}^E T_T )</td>
+</tr>
+<tr>
+<td><strong>工具坐标系（T）</strong></td>
+<td>机械臂安装的工具（如夹爪）</td>
+<td>( {}^T T_O )</td>
+</tr>
+<tr>
+<td><strong>相机坐标系（C）</strong></td>
+<td>视觉检测目标的坐标系</td>
+<td>( {}^C T_O )</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a><strong>4. 总结</strong></h2><ul>
+<li><strong>世界坐标系是整个机械臂系统的全局参考坐标系</strong>，用于统一不同的局部坐标系。</li>
+<li>在<strong>任务规划、视觉定位、多机器人协作、路径规划</strong>等场景中，世界坐标系起到了核心作用。</li>
+<li><strong>所有坐标系之间的转换</strong>（如基地、末端、工具、相机）最终都可以统一到世界坐标系，以实现复杂的机器人任务。</li>
+</ul>
+<p>如果你有具体的应用场景（如视觉引导、机器人抓取等），可以提供更多细节，我可以帮助你进一步优化计算和实现方案！ 🚀</p>
+<h2 id="详细解释关节空间和笛卡尔空间"><a href="#详细解释关节空间和笛卡尔空间" class="headerlink" title="详细解释关节空间和笛卡尔空间"></a>详细解释关节空间和笛卡尔空间</h2><h3 id="关节空间（Joint-Space）与笛卡尔空间（Cartesian-Space）详解"><a href="#关节空间（Joint-Space）与笛卡尔空间（Cartesian-Space）详解" class="headerlink" title="关节空间（Joint Space）与笛卡尔空间（Cartesian Space）详解"></a><strong>关节空间（Joint Space）与笛卡尔空间（Cartesian Space）详解</strong></h3><p>在机器人运动学中，机械臂的运动可以用两种不同的方式来描述：<strong>关节空间（Joint Space）</strong>和<strong>笛卡尔空间（Cartesian Space）</strong>。这两种表示方式各有优缺点，适用于不同的运动控制方法。</p>
+<hr>
+<h2 id="1-关节空间（Joint-Space）"><a href="#1-关节空间（Joint-Space）" class="headerlink" title="1. 关节空间（Joint Space）"></a><strong>1. 关节空间（Joint Space）</strong></h2><p>关节空间是用<strong>机械臂各个关节的角度或位移</strong>来表示机械臂的姿态和位置的方式。</p>
+<h3 id="1-1-关节空间的定义"><a href="#1-1-关节空间的定义" class="headerlink" title="1.1 关节空间的定义"></a><strong>1.1 关节空间的定义</strong></h3><p>对于一个具有 ( n ) 个自由度（DOF, Degrees of Freedom）的机械臂，关节空间的状态可以表示为一个 ( n ) 维向量：<br>[<br>\mathbf{q} &#x3D; [q_1, q_2, …, q_n]^T<br>]<br>其中：</p>
+<ul>
+<li>( q_i ) 是第 ( i ) 个关节的角度（如果是旋转关节）或线性位移（如果是滑动关节）。</li>
+<li>这个向量完全描述了机械臂当前的配置。</li>
+</ul>
+<h3 id="1-2-关节空间的特点"><a href="#1-2-关节空间的特点" class="headerlink" title="1.2 关节空间的特点"></a><strong>1.2 关节空间的特点</strong></h3><ul>
+<li>关节空间中的点表示<strong>每个关节的角度或位移</strong>，而不是机械臂末端的物理位置。</li>
+<li>机械臂的运动通常由<strong>关节角度插值</strong>控制，而不是直接在三维空间内进行规划。</li>
+<li>机械臂的运动受<strong>关节约束</strong>，如角度范围、速度限制、加速度限制等。</li>
+</ul>
+<h3 id="1-3-关节空间的优缺点"><a href="#1-3-关节空间的优缺点" class="headerlink" title="1.3 关节空间的优缺点"></a><strong>1.3 关节空间的优缺点</strong></h3><p>✅ <strong>优点：</strong></p>
+<ul>
+<li>直接对应于<strong>机器人驱动系统</strong>，可以更直接地控制关节电机。</li>
+<li>运动规划计算简单，关节插值可以平稳执行。</li>
+<li>易于避免关节角度限制、奇异点等问题。</li>
+</ul>
+<p>❌ <strong>缺点：</strong></p>
+<ul>
+<li>不直观，无法直接确定末端在三维空间中的位置。</li>
+<li>可能会导致非直线运动，路径不一定最优。</li>
+</ul>
+<h3 id="1-4-关节空间的应用"><a href="#1-4-关节空间的应用" class="headerlink" title="1.4 关节空间的应用"></a><strong>1.4 关节空间的应用</strong></h3><ul>
+<li><strong>逆运动学（Inverse Kinematics, IK）计算</strong>：给定末端位置，求解对应的关节角度。</li>
+<li><strong>关节空间路径规划</strong>：如关节插值运动（Joint Interpolation）。</li>
+<li><strong>关节级控制</strong>：如PID控制、力控制等。</li>
+</ul>
+<hr>
+<h2 id="2-笛卡尔空间（Cartesian-Space）"><a href="#2-笛卡尔空间（Cartesian-Space）" class="headerlink" title="2. 笛卡尔空间（Cartesian Space）"></a><strong>2. 笛卡尔空间（Cartesian Space）</strong></h2><p>笛卡尔空间是用<strong>末端执行器的位姿（位置 + 方向）</strong>来描述机械臂的状态的方式。</p>
+<h3 id="2-1-笛卡尔空间的定义"><a href="#2-1-笛卡尔空间的定义" class="headerlink" title="2.1 笛卡尔空间的定义"></a><strong>2.1 笛卡尔空间的定义</strong></h3><p>机械臂的末端位姿通常由<strong>位置（Position）</strong>和<strong>方向（Orientation）</strong>两部分组成：<br>[<br>\mathbf{X} &#x3D; [x, y, z, \alpha, \beta, \gamma]^T<br>]<br>其中：</p>
+<ul>
+<li>( (x, y, z) ) 是末端执行器在世界坐标系或基地坐标系中的三维位置。</li>
+<li>( (\alpha, \beta, \gamma) ) 是末端的<strong>欧拉角</strong>（或四元数表示的旋转方向）。</li>
+<li>也可以用<strong>齐次变换矩阵（Homogeneous Transformation Matrix）</strong>表示：<br>[<br>T &#x3D;<br>\begin{bmatrix}<br>R &amp; t \<br>0 &amp; 1<br>\end{bmatrix}<br>]<br>其中：<ul>
+<li>( R ) 是 ( 3 \times 3 ) 旋转矩阵</li>
+<li>( t ) 是 ( 3 \times 1 ) 位置向量</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-2-笛卡尔空间的特点"><a href="#2-2-笛卡尔空间的特点" class="headerlink" title="2.2 笛卡尔空间的特点"></a><strong>2.2 笛卡尔空间的特点</strong></h3><ul>
+<li><strong>直观</strong>，描述的是机械臂<strong>末端</strong>在三维空间中的实际位置。</li>
+<li>机械臂的运动规划可以直接在工作空间中进行。</li>
+<li>需要通过<strong>逆运动学（IK）</strong>求解关节角度。</li>
+</ul>
+<h3 id="2-3-笛卡尔空间的优缺点"><a href="#2-3-笛卡尔空间的优缺点" class="headerlink" title="2.3 笛卡尔空间的优缺点"></a><strong>2.3 笛卡尔空间的优缺点</strong></h3><p>✅ <strong>优点：</strong></p>
+<ul>
+<li>直观，易于规划路径，例如直线运动、圆弧运动等。</li>
+<li>适用于<strong>末端伺服控制</strong>（如视觉伺服）。</li>
+<li>可以直接与<strong>外部坐标系（如世界坐标系）</strong>关联，适用于机器人协作。</li>
+</ul>
+<p>❌ <strong>缺点：</strong></p>
+<ul>
+<li>机械臂的运动需要求解<strong>逆运动学</strong>（IK），可能导致计算复杂或无解（如奇异点问题）。</li>
+<li>可能无法保证运动的可行性（如超出关节运动范围）。</li>
+<li>计算复杂度较高，控制上不如关节空间直接。</li>
+</ul>
+<h3 id="2-4-笛卡尔空间的应用"><a href="#2-4-笛卡尔空间的应用" class="headerlink" title="2.4 笛卡尔空间的应用"></a><strong>2.4 笛卡尔空间的应用</strong></h3><ul>
+<li><strong>机器人视觉伺服</strong>（Vision-Based Servoing）</li>
+<li><strong>笛卡尔路径规划</strong>（直线运动、插值）</li>
+<li><strong>手眼标定</strong>（Hand-Eye Calibration）</li>
+<li><strong>力控制任务</strong>（例如焊接、打磨、装配等）</li>
+</ul>
+<hr>
+<h2 id="3-关节空间-vs-笛卡尔空间的对比"><a href="#3-关节空间-vs-笛卡尔空间的对比" class="headerlink" title="3. 关节空间 vs 笛卡尔空间的对比"></a><strong>3. 关节空间 vs 笛卡尔空间的对比</strong></h2><table>
+<thead>
+<tr>
+<th><strong>比较项</strong></th>
+<th><strong>关节空间（Joint Space）</strong></th>
+<th><strong>笛卡尔空间（Cartesian Space）</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>定义</strong></td>
+<td>关节角度&#x2F;位移</td>
+<td>末端执行器的位置和方向</td>
+</tr>
+<tr>
+<td><strong>描述方式</strong></td>
+<td>( q &#x3D; [q_1, q_2, …, q_n]^T )</td>
+<td>( X &#x3D; [x, y, z, \alpha, \beta, \gamma]^T )</td>
+</tr>
+<tr>
+<td><strong>计算难度</strong></td>
+<td>低（直接控制关节）</td>
+<td>高（需要逆运动学求解）</td>
+</tr>
+<tr>
+<td><strong>直观性</strong></td>
+<td>低（需要关节角度计算）</td>
+<td>高（直接表示末端位置）</td>
+</tr>
+<tr>
+<td><strong>路径控制</strong></td>
+<td>关节插值（可能产生曲线）</td>
+<td>笛卡尔插值（可以精确控制直线、圆弧）</td>
+</tr>
+<tr>
+<td><strong>控制方式</strong></td>
+<td>关节级控制</td>
+<td>末端级控制</td>
+</tr>
+<tr>
+<td><strong>应用场景</strong></td>
+<td>机器人关节运动控制</td>
+<td>视觉伺服、直线插值运动</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="4-关节空间到笛卡尔空间的转换"><a href="#4-关节空间到笛卡尔空间的转换" class="headerlink" title="4. 关节空间到笛卡尔空间的转换"></a><strong>4. 关节空间到笛卡尔空间的转换</strong></h2><p>由于机器人通常接受<strong>关节空间指令</strong>，但任务多在<strong>笛卡尔空间</strong>定义，因此两者之间的转换十分重要。</p>
+<h3 id="4-1-关节空间-→-笛卡尔空间（正运动学，FK）"><a href="#4-1-关节空间-→-笛卡尔空间（正运动学，FK）" class="headerlink" title="4.1 关节空间 → 笛卡尔空间（正运动学，FK）"></a><strong>4.1 关节空间 → 笛卡尔空间（正运动学，FK）</strong></h3><p>已知关节角度 ( \mathbf{q} )，求出末端位姿 ( \mathbf{X} )：<br>[<br>\mathbf{X} &#x3D; FK(\mathbf{q})<br>]<br>使用 <strong>Denavit-Hartenberg（DH）参数</strong> 或 <strong>数值计算</strong>方法求解。</p>
+<h3 id="4-2-笛卡尔空间-→-关节空间（逆运动学，IK）"><a href="#4-2-笛卡尔空间-→-关节空间（逆运动学，IK）" class="headerlink" title="4.2 笛卡尔空间 → 关节空间（逆运动学，IK）"></a><strong>4.2 笛卡尔空间 → 关节空间（逆运动学，IK）</strong></h3><p>已知末端位姿 ( \mathbf{X} )，求出关节角度 ( \mathbf{q} )：<br>[<br>\mathbf{q} &#x3D; IK(\mathbf{X})<br>]<br>需要求解 <strong>逆运动学（IK）</strong>，可能存在多解、无解或奇异点。</p>
+<hr>
+<h2 id="5-典型应用案例"><a href="#5-典型应用案例" class="headerlink" title="5. 典型应用案例"></a><strong>5. 典型应用案例</strong></h2><h3 id="案例-1：机器人抓取"><a href="#案例-1：机器人抓取" class="headerlink" title="案例 1：机器人抓取"></a><strong>案例 1：机器人抓取</strong></h3><ul>
+<li>目标点通常在<strong>笛卡尔空间</strong>（如相机检测的物体位置）。</li>
+<li>需要转换到<strong>关节空间</strong>执行运动。</li>
+</ul>
+<h3 id="案例-2：机器人焊接"><a href="#案例-2：机器人焊接" class="headerlink" title="案例 2：机器人焊接"></a><strong>案例 2：机器人焊接</strong></h3><ul>
+<li>需要沿着直线或曲线焊接（笛卡尔空间路径）。</li>
+<li>需要求解逆运动学，将路径转换为关节角度。</li>
+</ul>
+<hr>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a><strong>6. 总结</strong></h2><ul>
+<li><strong>关节空间（Joint Space）</strong>：直接控制关节角度，计算简单但路径不直观。</li>
+<li><strong>笛卡尔空间（Cartesian Space）</strong>：描述末端位置，直观但需要逆运动学计算。</li>
+<li><strong>路径规划通常在笛卡尔空间进行</strong>，但最终需要转换到关节空间执行。</li>
+<li><strong>两者相互转换是机器人控制的核心技术</strong>。</li>
+</ul>
+<p>如果你有具体的应用场景（如机器人抓取、焊接等），可以提供更详细的规划和代码示例！ 🚀</p>
+<h2 id="详细解释-机械臂末端坐标系与基地坐标系"><a href="#详细解释-机械臂末端坐标系与基地坐标系" class="headerlink" title="详细解释 机械臂末端坐标系与基地坐标系"></a>详细解释 机械臂末端坐标系与基地坐标系</h2><h3 id="机械臂末端坐标系与基地坐标系的详细解释"><a href="#机械臂末端坐标系与基地坐标系的详细解释" class="headerlink" title="机械臂末端坐标系与基地坐标系的详细解释"></a><strong>机械臂末端坐标系与基地坐标系的详细解释</strong></h3><p>在机器人学中，坐标系的定义对于精确控制机械臂的运动至关重要。通常，机械臂涉及多个坐标系，其中<strong>基地坐标系（Base Frame）</strong>和<strong>末端坐标系（End-Effector Frame）</strong>是最重要的两个坐标系，它们用于描述机械臂在空间中的姿态和位置。</p>
+<hr>
+<h2 id="1-机械臂坐标系的定义"><a href="#1-机械臂坐标系的定义" class="headerlink" title="1. 机械臂坐标系的定义"></a><strong>1. 机械臂坐标系的定义</strong></h2><p>在工业机器人或机械臂系统中，常见的坐标系有：</p>
+<ul>
+<li><strong>基地坐标系（Base Frame）</strong>：固定在机械臂的底座上，用于定义整个机械臂的参考坐标系。</li>
+<li><strong>关节坐标系（Joint Frames）</strong>：每个关节都有一个局部坐标系，跟随关节运动。</li>
+<li><strong>末端执行器坐标系（End-Effector Frame）</strong>：固定在机械臂末端（如机械爪、焊枪、相机等）上，描述末端执行器的位置和方向。</li>
+<li><strong>世界坐标系（World Frame）</strong>（可选）：如果多个机器人或传送带协作，可能还会定义一个全局的世界坐标系。</li>
+</ul>
+<p>本次主要讨论 <strong>基地坐标系与末端坐标系</strong>。</p>
+<hr>
+<h2 id="2-机械臂基地坐标系（Base-Frame）"><a href="#2-机械臂基地坐标系（Base-Frame）" class="headerlink" title="2. 机械臂基地坐标系（Base Frame）"></a><strong>2. 机械臂基地坐标系（Base Frame）</strong></h2><p><strong>基地坐标系（Base Frame）</strong>是整个机械臂的全局参考坐标系，它通常<strong>固定在机械臂的底座上</strong>，不会随关节或末端运动而改变。</p>
+<h3 id="基地坐标系的特点："><a href="#基地坐标系的特点：" class="headerlink" title="基地坐标系的特点："></a><strong>基地坐标系的特点：</strong></h3><ul>
+<li>是整个机械臂的参考坐标系，所有关节、末端坐标系都基于它进行计算。</li>
+<li><strong>固定不动</strong>，不会随机械臂的运动而改变。</li>
+<li>通常定义在机械臂的底部，以便有一个稳定的参考点。</li>
+<li>用于计算机械臂的正运动学（Forward Kinematics, FK）和逆运动学（Inverse Kinematics, IK）。</li>
+</ul>
+<h3 id="基地坐标系的定义方式"><a href="#基地坐标系的定义方式" class="headerlink" title="基地坐标系的定义方式"></a><strong>基地坐标系的定义方式</strong></h3><p>通常，基地坐标系的原点设定在机械臂底座的中心，Z 轴朝上或垂直于地面，X 轴和 Y 轴平行于地面，如下所示：</p>
+<h4 id="常见的基地坐标系定义（右手坐标系）："><a href="#常见的基地坐标系定义（右手坐标系）：" class="headerlink" title="常见的基地坐标系定义（右手坐标系）："></a><strong>常见的基地坐标系定义（右手坐标系）：</strong></h4><p>[<br>O_b &#x3D; (x_b, y_b, z_b)<br>]</p>
+<ul>
+<li><strong>X 轴</strong>：向前或沿传送带方向。</li>
+<li><strong>Y 轴</strong>：向左或侧向。</li>
+<li><strong>Z 轴</strong>：垂直向上，与重力方向相反。</li>
+</ul>
+<hr>
+<h2 id="3-机械臂末端执行器坐标系（End-Effector-Frame）"><a href="#3-机械臂末端执行器坐标系（End-Effector-Frame）" class="headerlink" title="3. 机械臂末端执行器坐标系（End-Effector Frame）"></a><strong>3. 机械臂末端执行器坐标系（End-Effector Frame）</strong></h2><p><strong>末端坐标系（End-Effector Frame）</strong>定义在<strong>机械臂末端（End-Effector）上</strong>，并随机械臂的运动而改变位置和方向。</p>
+<h3 id="末端坐标系的特点："><a href="#末端坐标系的特点：" class="headerlink" title="末端坐标系的特点："></a><strong>末端坐标系的特点：</strong></h3><ul>
+<li><strong>随机械臂末端运动而变化</strong>，在不同关节角度时，末端坐标系的相对位置和方向也不同。</li>
+<li><strong>用于描述机械臂末端工具的位置和姿态</strong>，通常用于编写路径规划、抓取任务等。</li>
+<li><strong>需要标定</strong>，特别是安装了焊枪、吸盘、摄像头等工具时，需要知道工具相对于末端坐标系的位置偏移（TCP：Tool Center Point，工具中心点）。</li>
+</ul>
+<h3 id="末端坐标系的定义方式"><a href="#末端坐标系的定义方式" class="headerlink" title="末端坐标系的定义方式"></a><strong>末端坐标系的定义方式</strong></h3><p>一般情况下，末端坐标系的原点可以放置在：</p>
+<ul>
+<li>机械爪的中心点（抓取任务）</li>
+<li>焊枪的喷嘴位置（焊接任务）</li>
+<li>吸盘的中心（搬运任务）</li>
+<li>相机的光轴中心（视觉任务）</li>
+</ul>
+<h4 id="常见的末端坐标系定义："><a href="#常见的末端坐标系定义：" class="headerlink" title="常见的末端坐标系定义："></a><strong>常见的末端坐标系定义：</strong></h4><p>[<br>O_e &#x3D; (x_e, y_e, z_e)<br>]</p>
+<ul>
+<li><strong>X 轴</strong>：通常指向工具的前方（沿机械爪闭合方向）。</li>
+<li><strong>Y 轴</strong>：垂直于X轴，指向左侧或右侧。</li>
+<li><strong>Z 轴</strong>：沿着工具的操作方向（通常是指向工具伸出的方向）。</li>
+</ul>
+<h3 id="举例："><a href="#举例：" class="headerlink" title="举例："></a><strong>举例：</strong></h3><p>如果是 <strong>Eye-in-Hand（相机安装在机械臂末端）</strong>：</p>
+<ul>
+<li>末端坐标系的原点可以放在相机光学中心，Z 轴指向相机拍摄方向。</li>
+</ul>
+<p>如果是 <strong>机械爪（Gripper）</strong>：</p>
+<ul>
+<li>末端坐标系的原点通常设在两指机械爪的中心，Z 轴指向机械爪开合方向。</li>
+</ul>
+<hr>
+<h2 id="4-末端坐标系与基地坐标系的关系"><a href="#4-末端坐标系与基地坐标系的关系" class="headerlink" title="4. 末端坐标系与基地坐标系的关系"></a><strong>4. 末端坐标系与基地坐标系的关系</strong></h2><p>要描述末端执行器在空间中的位置，我们需要一个从基地坐标系到末端坐标系的变换矩阵，通常表示为：</p>
+<p>[<br>{}^B T_E &#x3D;<br>\begin{bmatrix}<br>R &amp; t \<br>0 &amp; 1<br>\end{bmatrix}<br>]</p>
+<p>其中：</p>
+<ul>
+<li><strong>( {}^B T_E )</strong>：基地坐标系到末端坐标系的齐次变换矩阵</li>
+<li><strong>( R )</strong>：( 3 \times 3 ) 的旋转矩阵，描述末端相对于基地的旋转</li>
+<li><strong>( t )</strong>：( 3 \times 1 ) 的平移向量，描述末端在基地坐标系下的位置</li>
+</ul>
+<p>[<br>t &#x3D;<br>\begin{bmatrix}<br>x \<br>y \<br>z<br>\end{bmatrix}<br>]</p>
+<p>其中：</p>
+<ul>
+<li>( x, y, z ) 是末端坐标系相对于基地坐标系的平移量（位置）。</li>
+<li>( R ) 是描述末端相对于基地的旋转（通常以欧拉角、四元数或旋转矩阵表示）。</li>
+</ul>
+<hr>
+<h2 id="5-如何计算末端坐标系在基地坐标系下的位置？"><a href="#5-如何计算末端坐标系在基地坐标系下的位置？" class="headerlink" title="5. 如何计算末端坐标系在基地坐标系下的位置？"></a><strong>5. 如何计算末端坐标系在基地坐标系下的位置？</strong></h2><p>通常，我们通过<strong>正运动学（Forward Kinematics, FK）</strong>计算末端坐标系在基地坐标系下的位姿：</p>
+<h3 id="计算步骤："><a href="#计算步骤：" class="headerlink" title="计算步骤："></a><strong>计算步骤：</strong></h3><ol>
+<li>获取<strong>机械臂的DH参数</strong>（Denavit-Hartenberg参数），用于描述各个关节的旋转和平移。</li>
+<li>计算每个关节的<strong>变换矩阵 ( T_i )</strong>，从基座到第 ( i ) 号关节。</li>
+<li>通过连乘所有变换矩阵，得到末端相对于基座的最终变换：</li>
+</ol>
+<p>[<br>{}^B T_E &#x3D; T_1 T_2 T_3 … T_n<br>]</p>
+<p>其中：</p>
+<ul>
+<li>( T_1, T_2, …, T_n ) 是各个关节的变换矩阵。</li>
+<li>( {}^B T_E ) 是末端执行器在基地坐标系下的位置和姿态。</li>
+</ul>
+<hr>
+<h2 id="6-末端坐标系与基地坐标系的应用"><a href="#6-末端坐标系与基地坐标系的应用" class="headerlink" title="6. 末端坐标系与基地坐标系的应用"></a><strong>6. 末端坐标系与基地坐标系的应用</strong></h2><ul>
+<li><strong>机器人路径规划</strong>：在基地坐标系下规划轨迹，再转换到末端坐标系执行。</li>
+<li><strong>手眼标定（Hand-Eye Calibration）</strong>：确定相机坐标系与末端坐标系的关系。</li>
+<li><strong>机器人视觉伺服</strong>：相机获取目标物体坐标，并转换到基地坐标系指导机械臂运动。</li>
+<li><strong>离线编程</strong>：用CAD软件编写路径，在基地坐标系下转换成末端坐标系的指令。</li>
+</ul>
+<hr>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a><strong>7. 总结</strong></h2><ul>
+<li><strong>基地坐标系（Base Frame）</strong>：固定在机械臂底座上，是所有关节和末端的参考系。</li>
+<li><strong>末端坐标系（End-Effector Frame）</strong>：固定在机械臂的末端执行器上，随机械臂运动而变化。</li>
+<li><strong>两者之间的关系</strong>可以通过<strong>正运动学</strong>计算，从而确定末端在基地坐标系下的位姿。</li>
+</ul>
+<p>如果你有具体的应用场景（如抓取、视觉对位等），可以进一步优化末端坐标系的设置！🚀</p>
+<h2 id="机械臂行业"><a href="#机械臂行业" class="headerlink" title="机械臂行业"></a>机械臂行业</h2><ul>
+<li><p>机械手臂是一种固定或移动式的机器，其构造通常由一系列互相链接或相对滑动的零件组成，工作方式主要通过沿着X，Y，Z轴上做线性运动以到达目标位置，从而实现物体的抓取或者移动，能够实现自动控制，可重复程序设计，多自由度(轴)</p>
+</li>
+<li><p>国际企业</p>
+<ul>
+<li>ABB</li>
+<li>发那科</li>
+<li>安川电机</li>
+<li>ADEPT Technology</li>
+<li>UR</li>
+</ul>
+</li>
+<li><p>本土企业</p>
+<ul>
+<li>新松机器人</li>
+<li>埃斯顿</li>
+<li>大族激光</li>
+<li>越疆科技</li>
+<li>埃夫特</li>
+<li>汇川技术</li>
+<li>新时达</li>
+</ul>
+</li>
+<li><p>机械臂的应用领域</p>
+<ul>
+<li>工业制造</li>
+<li>医疗保健</li>
+<li>军事</li>
+<li>物流仓储</li>
+<li>农业</li>
+<li>家庭服务</li>
+</ul>
+</li>
+</ul>
+<h2 id="机器人领域-推荐著作"><a href="#机器人领域-推荐著作" class="headerlink" title="机器人领域 推荐著作"></a>机器人领域 推荐著作</h2><ul>
+<li><p>机器人学导论</p>
+<ul>
+<li>综合性入门教材，内容涉及正&#x2F;逆运动学、静力变换、操作臂动力学、轨迹规划、机械设计、控制等。</li>
+</ul>
+</li>
+<li><p>机器人学，机器视觉与控制-MATLAB算法基础</p>
+<ul>
+<li>Peter Corke编写的机器人入门教材，书中的实例很多，都使用机器人工具箱编写，配合Matlab可以边看边试！</li>
+</ul>
+</li>
+<li><p>Principles of Robot Motion：Theory, Algorithms, and Implementations</p>
+<ul>
+<li>主要讲解基于传感器的规划、概率规划、定位与映射、动态与非完整系统的运动规划。</li>
+</ul>
+</li>
+<li><p>Planning Algorithms</p>
+<ul>
+<li>这本书提出了多种不同规划算法的统一处理。运动规划、离散规划、不确定性规划、基于传感器的规划、可见性、决策理论规划、博弈论、信息空间、强化学习、非线性系统、轨迹规划、非完整规划和动态规划</li>
+</ul>
+</li>
+<li><p>Rigid Body Dynamics Algorithms</p>
+<ul>
+<li>最佳刚体动力学算法的综合集合，Github上也拥有很多不错的资源。</li>
+</ul>
+</li>
+<li><p>机器人操作的数学导论</p>
+<ul>
+<li>从数学的角度系统地介绍了机器人操作的运动学、动力学、控制及运动规划内容，主要包含旋量理论、指数积建模，机器人动力学等内容</li>
+</ul>
+</li>
+<li><p>机器人学-建模、规划与控制</p>
+<ul>
+<li>深入讲解机器人的建模、轨迹运动、运动控制等内容。基础入门强烈推荐！</li>
+</ul>
+</li>
+<li><p>机器人技术手册</p>
+<ul>
+<li>日本机器人学会出品，一本超全的百科全书类型。特别适合作为工具查漏翻查</li>
+</ul>
+</li>
+<li><p>Springer Handbook of Roboticsd</p>
+<ul>
+<li>机器人研究人员、该领域新人和相关学科学者的权威参考</li>
+</ul>
+</li>
+</ul>
+<h2 id="机械臂中的正解FK和逆解IK是什么"><a href="#机械臂中的正解FK和逆解IK是什么" class="headerlink" title="机械臂中的正解FK和逆解IK是什么"></a>机械臂中的正解FK和逆解IK是什么</h2><p>在机械臂控制中，正解（Forward Kinematics，FK）和逆解（Inverse Kinematics，IK）是两个重要的概念。</p>
+<ol>
+<li><p>正解（Forward Kinematics，FK）：<br>正解是指根据机械臂的关节角度或长度等参数，推导出末端执行器（例如机械臂末端的位置和姿态）的运动学表达式或方程式的过程。FK描述了输入到机械臂关节的位置、速度或加速度等参数，从而计算出末端执行器的位置和姿态。FK用于确定机械臂末端在给定关节参数下的运动轨迹，通常是一个从关节空间到工作空间的映射。</p>
+</li>
+<li><p>逆解（Inverse Kinematics，IK）：<br>逆解是指根据已知末端执行器的位置和姿态，确定使机械臂末端达到这个位置和姿态所需的关节角度或长度等参数的过程。IK可以被用来解决给定目标位置和姿态时，计算出机械臂关节参数的问题。在实际应用中，逆解通常是更为复杂和困难的问题，因为一个末端位置和姿态通常对应着多个可能的解。</p>
+</li>
+</ol>
+<p>FK和IK在机器人学和机械臂控制中扮演着重要的角色，FK用于描述机械臂的运动学特性，而IK则允许机械臂在空间中实现特定的末端目标。这些概念对于控制和规划机械臂的运动非常重要，特别是在自动化生产线、工业机器人和虚拟仿真等领域中。</p>
+<h2 id="机器人-目标坐标系-末端坐标系-基底坐标系"><a href="#机器人-目标坐标系-末端坐标系-基底坐标系" class="headerlink" title="机器人 目标坐标系 末端坐标系 基底坐标系"></a>机器人 目标坐标系 末端坐标系 基底坐标系</h2><p>在机器人学中，通常使用三种坐标系来描述机器人的运动和位置：目标坐标系、末端坐标系和基底坐标系。</p>
+<ol>
+<li><p><strong>目标坐标系（Target Coordinate System）：</strong> 这是机器人执行任务时所需达到的目标位置的坐标系。在目标坐标系中定义了机器人需要完成的具体任务的坐标和方向信息。机器人的动作控制通常是根据目标坐标系来规划和执行的。</p>
+</li>
+<li><p><strong>末端坐标系（End-Effector Coordinate System）：</strong> 这是机器人末端执行器（通常是机械手、夹爪等）的坐标系。末端坐标系描述了末端执行器的位置和方向，是机器人进行具体操作时的参考坐标系。机器人执行任务时，末端坐标系的变化反映了机器人末端执行器的运动和姿态。</p>
+</li>
+<li><p><strong>基底坐标系（Base Coordinate System）：</strong> 这是机器人整体结构的参考坐标系。基底坐标系通常与机器人的固定部分（例如机器人底座）相关联，用于描述机器人整体的位置和方向。基底坐标系的选择对机器人运动的规划和控制起着重要的作用。</p>
+</li>
+</ol>
+<p>这三个坐标系之间的关系和转换是机器人控制和规划中的关键问题。通过准确描述这些坐标系之间的变换关系，可以更有效地控制机器人的运动，使其在工作空间内完成任务。</p>
+<h2 id="机器人-世界坐标系-基底坐标系"><a href="#机器人-世界坐标系-基底坐标系" class="headerlink" title="机器人 世界坐标系 基底坐标系"></a>机器人 世界坐标系 基底坐标系</h2><p>在机器人学中，世界坐标系和基底坐标系是两个相关但不同的概念。</p>
+<ol>
+<li><p><strong>世界坐标系（World Coordinate System）：</strong> 世界坐标系是一个全局坐标系，通常被用作机器人工作空间中的参考坐标系。它是一个固定的坐标系，用于描述整个机器人系统在其运动范围内的位置和方向。世界坐标系的选择通常取决于特定应用的需要，以提供方便的参考点。</p>
+</li>
+<li><p><strong>基底坐标系（Base Coordinate System）：</strong> 基底坐标系是机器人本身固有的坐标系，通常与机器人底座或底部连接的结构相关联。这是机器人运动的起点和参考点。机器人的关节和执行器运动通常是相对于基底坐标系进行描述的。基底坐标系的选择对机器人的运动规划和控制非常重要。</p>
+</li>
+</ol>
+<p>在一般情况下，机器人控制和规划涉及到将基底坐标系中的运动转换到世界坐标系中，或者反之。这涉及到位姿变换，包括平移和旋转。</p>
+<p>例如，如果你想让机器人执行一个在世界坐标系中指定的任务，你可能需要将任务的坐标转换为机器人基底坐标系中的坐标，以便机器人能够正确执行任务。反之，如果你想获取机器人当前的位置和方向，你可能需要将机器人基底坐标系中的信息转换为世界坐标系中的信息，以便提供一个全局的参考框架。</p>
+<p>这种坐标系的变换在机器人学和自动化控制中是非常常见的，因为它允许机器人在不同坐标系中进行运动和交互。</p>
+<h2 id="机器人-轨迹规划是什么"><a href="#机器人-轨迹规划是什么" class="headerlink" title="机器人 轨迹规划是什么"></a>机器人 轨迹规划是什么</h2><p>在机器人学和自动化领域，轨迹规划是指通过一系列的动作，规划出机器人从一个起始点到达目标点或完成任务的路径。这个路径通常被称为轨迹，而规划这样的轨迹则需要考虑一系列的因素，如避障、动力学、工作空间限制等。</p>
+<p>轨迹规划的目标是使机器人能够在给定的环境中，以安全、有效、并且可能最优的方式达到目标。以下是轨迹规划的一些关键概念：</p>
+<ol>
+<li><p><strong>起始点和目标点：</strong> 轨迹规划通常始于机器人当前的位置（起始点）并以某个目标位置为终点。</p>
+</li>
+<li><p><strong>运动约束：</strong> 考虑到机器人的动力学、速度、加速度等方面的限制，确保规划出的轨迹是机器人能够执行的。</p>
+</li>
+<li><p><strong>避障：</strong> 考虑到环境中的障碍物，确保规划的轨迹不会碰撞到障碍物。这可能涉及到路径规划算法，例如 A*、Dijkstra、RRT（Rapidly Exploring Random Trees）等。</p>
+</li>
+<li><p><strong>工作空间：</strong> 考虑到机器人工作的空间限制，确保规划的轨迹在工作空间内。</p>
+</li>
+<li><p><strong>优化：</strong> 有时候，除了满足上述条件，还希望规划出的轨迹是最优的，例如最短路径或最短时间。</p>
+</li>
+<li><p><strong>实时性：</strong> 在某些情况下，轨迹规划需要在实时性要求下执行，以适应不断变化的环境。</p>
+</li>
+</ol>
+<p>轨迹规划可以应用于各种类型的机器人，包括工业机械臂、移动机器人、飞行器等。不同类型的机器人可能需要不同的轨迹规划方法，因为它们的动力学和环境条件可能有很大的差异。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Robot/" rel="tag"># Robot</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Robotics/2024-05-22-robotics_2_%E4%BB%BF%E7%9C%9F%E5%B7%A5%E5%85%B7/" rel="prev" title="robotics_2_仿真工具">
+      <i class="fa fa-chevron-left"></i> robotics_2_仿真工具
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Qt/2024-09-05-qt_5_quick_designer/" rel="next" title="quick designer">
+      quick designer <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%E4%B8%AD%E7%A7%BB%E5%8A%A8%E7%9B%B8%E6%9C%BA%E7%9A%84%E6%A0%87%E5%AE%9A%E6%98%AF%E7%9B%B8%E6%9C%BA%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8E%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E5%90%97%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">手眼标定中移动相机的标定是相机坐标系与末端坐标系吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%8F%98%E6%8D%A2%E7%9F%A9%E9%98%B5%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">3.</span> <span class="nav-text">1. 变换矩阵的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8F%98%E6%8D%A2%E5%85%B3%E7%B3%BB%E6%8E%A8%E5%AF%BC"><span class="nav-number">4.</span> <span class="nav-text">2. 变换关系推导</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%B5%81%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">3. 手眼标定的实现流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86"><span class="nav-number">5.1.</span> <span class="nav-text">步骤 1：数据采集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E8%AE%A1%E7%AE%97%E5%8F%98%E6%8D%A2%E7%9F%A9%E9%98%B5"><span class="nav-number">5.2.</span> <span class="nav-text">步骤 2：计算变换矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E9%AA%8C%E8%AF%81%E7%B2%BE%E5%BA%A6"><span class="nav-number">5.3.</span> <span class="nav-text">步骤 3：验证精度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%93%E8%AE%BA"><span class="nav-number">6.</span> <span class="nav-text">4. 结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E7%A7%8D%E7%9A%84%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">机械臂种的世界坐标系的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E4%B8%AD%E7%9A%84%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">7.1.</span> <span class="nav-text">机械臂中的世界坐标系的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">8.</span> <span class="nav-text">1. 世界坐标系的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8"><span class="nav-number">9.</span> <span class="nav-text">2. 世界坐标系的主要作用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%BB%9F%E4%B8%80%E4%B8%8D%E5%90%8C%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">9.1.</span> <span class="nav-text">2.1 统一不同坐标系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BB%BB%E5%8A%A1%E8%A7%84%E5%88%92"><span class="nav-number">9.2.</span> <span class="nav-text">2.2 机器人任务规划</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%A7%86%E8%A7%89%E5%BC%95%E5%AF%BC%EF%BC%88%E6%89%8B%E7%9C%BC%E5%8D%8F%E8%B0%83%EF%BC%89"><span class="nav-number">9.3.</span> <span class="nav-text">2.3 视觉引导（手眼协调）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%A4%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%8D%8F%E4%BD%9C"><span class="nav-number">9.4.</span> <span class="nav-text">2.4 多机器人协作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E6%9C%BA%E5%99%A8%E4%BA%BA%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92"><span class="nav-number">9.5.</span> <span class="nav-text">2.5 机器人路径规划</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8E%E5%85%B6%E4%BB%96%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">10.</span> <span class="nav-text">3. 世界坐标系与其他坐标系的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">4. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%E5%92%8C%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4"><span class="nav-number">12.</span> <span class="nav-text">详细解释关节空间和笛卡尔空间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%EF%BC%88Joint-Space%EF%BC%89%E4%B8%8E%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%EF%BC%88Cartesian-Space%EF%BC%89%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.1.</span> <span class="nav-text">关节空间（Joint Space）与笛卡尔空间（Cartesian Space）详解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%EF%BC%88Joint-Space%EF%BC%89"><span class="nav-number">13.</span> <span class="nav-text">1. 关节空间（Joint Space）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">13.1.</span> <span class="nav-text">1.1 关节空间的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">13.2.</span> <span class="nav-text">1.2 关节空间的特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">13.3.</span> <span class="nav-text">1.3 关节空间的优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">13.4.</span> <span class="nav-text">1.4 关节空间的应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%EF%BC%88Cartesian-Space%EF%BC%89"><span class="nav-number">14.</span> <span class="nav-text">2. 笛卡尔空间（Cartesian Space）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">14.1.</span> <span class="nav-text">2.1 笛卡尔空间的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">14.2.</span> <span class="nav-text">2.2 笛卡尔空间的特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">14.3.</span> <span class="nav-text">2.3 笛卡尔空间的优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">14.4.</span> <span class="nav-text">2.4 笛卡尔空间的应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4-vs-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-number">15.</span> <span class="nav-text">3. 关节空间 vs 笛卡尔空间的对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%E5%88%B0%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">16.</span> <span class="nav-text">4. 关节空间到笛卡尔空间的转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4-%E2%86%92-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%EF%BC%88%E6%AD%A3%E8%BF%90%E5%8A%A8%E5%AD%A6%EF%BC%8CFK%EF%BC%89"><span class="nav-number">16.1.</span> <span class="nav-text">4.1 关节空间 → 笛卡尔空间（正运动学，FK）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4-%E2%86%92-%E5%85%B3%E8%8A%82%E7%A9%BA%E9%97%B4%EF%BC%88%E9%80%86%E8%BF%90%E5%8A%A8%E5%AD%A6%EF%BC%8CIK%EF%BC%89"><span class="nav-number">16.2.</span> <span class="nav-text">4.2 笛卡尔空间 → 关节空间（逆运动学，IK）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E6%A1%88%E4%BE%8B"><span class="nav-number">17.</span> <span class="nav-text">5. 典型应用案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B-1%EF%BC%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%8A%93%E5%8F%96"><span class="nav-number">17.1.</span> <span class="nav-text">案例 1：机器人抓取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B-2%EF%BC%9A%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%84%8A%E6%8E%A5"><span class="nav-number">17.2.</span> <span class="nav-text">案例 2：机器人焊接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-number">18.</span> <span class="nav-text">6. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A-%E6%9C%BA%E6%A2%B0%E8%87%82%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8E%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">19.</span> <span class="nav-text">详细解释 机械臂末端坐标系与基地坐标系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8E%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E8%AF%A6%E7%BB%86%E8%A7%A3%E9%87%8A"><span class="nav-number">19.1.</span> <span class="nav-text">机械臂末端坐标系与基地坐标系的详细解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%9C%BA%E6%A2%B0%E8%87%82%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">20.</span> <span class="nav-text">1. 机械臂坐标系的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9C%BA%E6%A2%B0%E8%87%82%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%EF%BC%88Base-Frame%EF%BC%89"><span class="nav-number">21.</span> <span class="nav-text">2. 机械臂基地坐标系（Base Frame）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E7%89%B9%E7%82%B9%EF%BC%9A"><span class="nav-number">21.1.</span> <span class="nav-text">基地坐标系的特点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%AE%9A%E4%B9%89%E6%96%B9%E5%BC%8F"><span class="nav-number">21.2.</span> <span class="nav-text">基地坐标系的定义方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E5%AE%9A%E4%B9%89%EF%BC%88%E5%8F%B3%E6%89%8B%E5%9D%90%E6%A0%87%E7%B3%BB%EF%BC%89%EF%BC%9A"><span class="nav-number">21.2.1.</span> <span class="nav-text">常见的基地坐标系定义（右手坐标系）：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%9C%BA%E6%A2%B0%E8%87%82%E6%9C%AB%E7%AB%AF%E6%89%A7%E8%A1%8C%E5%99%A8%E5%9D%90%E6%A0%87%E7%B3%BB%EF%BC%88End-Effector-Frame%EF%BC%89"><span class="nav-number">22.</span> <span class="nav-text">3. 机械臂末端执行器坐标系（End-Effector Frame）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E7%89%B9%E7%82%B9%EF%BC%9A"><span class="nav-number">22.1.</span> <span class="nav-text">末端坐标系的特点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%AE%9A%E4%B9%89%E6%96%B9%E5%BC%8F"><span class="nav-number">22.2.</span> <span class="nav-text">末端坐标系的定义方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="nav-number">22.2.1.</span> <span class="nav-text">常见的末端坐标系定义：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%BE%8B%EF%BC%9A"><span class="nav-number">22.3.</span> <span class="nav-text">举例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8E%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">23.</span> <span class="nav-text">4. 末端坐标系与基地坐标系的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E5%9C%A8%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8B%E7%9A%84%E4%BD%8D%E7%BD%AE%EF%BC%9F"><span class="nav-number">24.</span> <span class="nav-text">5. 如何计算末端坐标系在基地坐标系下的位置？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%AD%A5%E9%AA%A4%EF%BC%9A"><span class="nav-number">24.1.</span> <span class="nav-text">计算步骤：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB%E4%B8%8E%E5%9F%BA%E5%9C%B0%E5%9D%90%E6%A0%87%E7%B3%BB%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">25.</span> <span class="nav-text">6. 末端坐标系与基地坐标系的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%80%BB%E7%BB%93"><span class="nav-number">26.</span> <span class="nav-text">7. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E8%A1%8C%E4%B8%9A"><span class="nav-number">27.</span> <span class="nav-text">机械臂行业</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E4%BA%BA%E9%A2%86%E5%9F%9F-%E6%8E%A8%E8%8D%90%E8%91%97%E4%BD%9C"><span class="nav-number">28.</span> <span class="nav-text">机器人领域 推荐著作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E6%A2%B0%E8%87%82%E4%B8%AD%E7%9A%84%E6%AD%A3%E8%A7%A3FK%E5%92%8C%E9%80%86%E8%A7%A3IK%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">29.</span> <span class="nav-text">机械臂中的正解FK和逆解IK是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E4%BA%BA-%E7%9B%AE%E6%A0%87%E5%9D%90%E6%A0%87%E7%B3%BB-%E6%9C%AB%E7%AB%AF%E5%9D%90%E6%A0%87%E7%B3%BB-%E5%9F%BA%E5%BA%95%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">30.</span> <span class="nav-text">机器人 目标坐标系 末端坐标系 基底坐标系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E4%BA%BA-%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB-%E5%9F%BA%E5%BA%95%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">31.</span> <span class="nav-text">机器人 世界坐标系 基底坐标系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E4%BA%BA-%E8%BD%A8%E8%BF%B9%E8%A7%84%E5%88%92%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">32.</span> <span class="nav-text">机器人 轨迹规划是什么</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

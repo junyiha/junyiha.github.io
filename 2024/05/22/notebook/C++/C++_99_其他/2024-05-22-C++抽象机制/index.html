@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 C++类是创建新类型的工具，创建出的新类型可以像内置类型一样方便地使用。而且派生类和模板允许程序员表达类之间的（层次和参数化）关系并且利用这种关系。  一个类型就是一个概念（一个思想，一个观念等）的具体表示。  类是用户自定义类型。如果一个概念没有与之直接对应的内置类型，我们就定义一个新类型来表示它。  定义新类型的基本思想是将实现的细节（例如，某种类型对象的数据存储布局）与正确使用它的必要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++抽象机制">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++%E6%8A%BD%E8%B1%A1%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 C++类是创建新类型的工具，创建出的新类型可以像内置类型一样方便地使用。而且派生类和模板允许程序员表达类之间的（层次和参数化）关系并且利用这种关系。  一个类型就是一个概念（一个思想，一个观念等）的具体表示。  类是用户自定义类型。如果一个概念没有与之直接对应的内置类型，我们就定义一个新类型来表示它。  定义新类型的基本思想是将实现的细节（例如，某种类型对象的数据存储布局）与正确使用它的必要">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.214Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppOthers">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++%E6%8A%BD%E8%B1%A1%E6%9C%BA%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C++抽象机制 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++%E6%8A%BD%E8%B1%A1%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++抽象机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><p>C++类是创建新类型的工具，创建出的新类型可以像内置类型一样方便地使用。而且派生类和模板允许程序员表达类之间的（层次和参数化）关系并且利用这种关系。</p>
+</li>
+<li><p>一个类型就是一个概念（一个思想，一个观念等）的具体表示。</p>
+</li>
+<li><p><strong>类是用户自定义类型。如果一个概念没有与之直接对应的内置类型，我们就定义一个新类型来表示它。</strong></p>
+</li>
+<li><p>定义新类型的基本思想是将实现的细节（例如，某种类型对象的数据存储布局）与正确使用它的必要属性（例如，可访问数据的函数的完整列表）分离。这种分离的最佳表达方式是：通过一个专用接口引导数据结构及其内部辅助例程的使用</p>
+</li>
+</ul>
+<h3 id="类基础"><a href="#类基础" class="headerlink" title="类基础"></a>类基础</h3><ul>
+<li><p>类的简要概括：</p>
+<ul>
+<li>一个类就是一个用户自定义类型</li>
+<li>一个类由一组成员构成。最常见的成员类别是数据成员和成员函数</li>
+<li>成员函数可定义初始化（创建），拷贝，移动和清理（析构）等语义</li>
+<li>可以为类定义运算符，如+， ！和[]</li>
+<li>一个类就是一个包含其成员的名字空间</li>
+<li>对对象使用<code>.（点）</code>访问成员，对指针使用<code>-&gt;（箭头）</code>访问成员</li>
+<li><strong>public成员提供类的接口，private成员提供实现细节。</strong></li>
+<li>struct是成员默认为public的class</li>
+</ul>
+</li>
+<li><p>声明于类定义内的函数称为成员函数(member function)，对恰当类型的特定变量使用结构成员访问语法才能调用这种函数。</p>
+</li>
+<li><p>由于不同结构可能有同名成员函数，在定义成员函数时必须指定结构名。</p>
+</li>
+</ul>
+<h3 id="类内函数定义"><a href="#类内函数定义" class="headerlink" title="类内函数定义"></a>类内函数定义</h3><ul>
+<li>如果一个函数不仅在类中声明，还在类中定义，那么它就被当作内联函数处理，即很少修改且频繁使用的小函数适合类内定义。</li>
+</ul>
+<h3 id="自引用"><a href="#自引用" class="headerlink" title="自引用"></a>自引用</h3><ul>
+<li>在非static成员函数中，关键字this是指向调用它的对象的指针</li>
+</ul>
+<h3 id="成员和基类初始化"><a href="#成员和基类初始化" class="headerlink" title="成员和基类初始化"></a>成员和基类初始化</h3><ul>
+<li>类自身的构造函数在其函数体执行之前会先调用成员的构造函数</li>
+<li>成员的构造函数按成员在类中声明的顺序调用，而不是按成员在初始化器列表中出现的顺序。</li>
+</ul>
+<h3 id="不变式"><a href="#不变式" class="headerlink" title="不变式"></a>不变式</h3><ul>
+<li><p>一个类通常都会有一个不变式。如果是这样，我们希望拷贝和移动操作能够保持此不变式，而析构函数能释放任何用到的资源。</p>
+</li>
+<li><p>不幸的是，编译器不可能在任何情况下都能了解程序员所考虑的不变式是什么。只要可能，我们就应该：</p>
+<ul>
+<li>在构造函数中建立不变式（包括可能的资源获取）</li>
+<li>在拷贝和移动操作中保持不变式（利用常用名字和类型）</li>
+<li>在析构函数中做任何需要的清理工作（包括可能的资源释放）</li>
+</ul>
+</li>
+<li><p>不变式很多最关键，最明显的应用都与资源管理相关。</p>
+</li>
+<li><p>简单的句柄Handle，其思想是，给定一个用new分配的对象的指针，创建一个Handle。这个Handle提供对象访问功能，并负责最终delete对象</p>
+</li>
+</ul>
+<h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h3><ul>
+<li>应该将构造函数，赋值操作以及析构函数设计为一组匹配的操作</li>
+<li>使用构造函数为类建立不变式</li>
+<li>如果一个构造函数获取了资源，那么这个类就需要一个析构函数释放该资源</li>
+<li><strong>如果一个类有虚函数，它就需要一个虚析构函数。</strong></li>
+<li>如果一个类没有构造函数，它可以进行逐成员初始化</li>
+<li>优先选择使用<code>&#123;&#125;</code>初始化而不是<code>=</code>和<code>()</code>初始化</li>
+<li>如果一个类是一个容器，为它定义一个初始化器列表构造函数</li>
+<li>按声明顺序初始化成员和基类</li>
+<li>在构造函数中优先选择成员初始化而不是赋值操作</li>
+<li>使用类内初始化器来提供默认值</li>
+<li>如果一个类是一个资源句柄，它可能需要拷贝和移动操作</li>
+<li>一个拷贝操作应该提供等价性和独立性</li>
+<li>如果一个类被用作基类，防止切片现象</li>
+<li>如果一个类需要一个拷贝操作或者一个析构函数，它可能需要一个构造函数，一个析构函数，一个拷贝赋值操作以及一个拷贝构造函数。</li>
+<li>如果一个类是一个资源句柄，它需要一个构造函数，一个析构函数和非默认拷贝操作</li>
+<li>显式说明你的不变式；用构造函数建立不变式，用赋值操作保持不变式</li>
+</ul>
+<h2 id="派生类"><a href="#派生类" class="headerlink" title="派生类"></a>派生类</h2><ul>
+<li><p>C++从Simula借鉴了类和类层次的思想。而且，C++还借鉴了一个重要的设计思想：<strong>类应该用来建模程序员和应用程序世界中的思想</strong></p>
+</li>
+<li><p>任何一个概念都不是孤立存在的，都有与之共存的相关概念，而且其强大能力中的大部分都源于与其它概念的关联。</p>
+</li>
+<li><p>C++提供了派生类的概念及相关的语言机制来表达层次关系，即，<strong>表达类之间的共性</strong></p>
+</li>
+<li><p>C++语言特性支持从已有类构建新的类：</p>
+<ul>
+<li>实现继承(implementation inheritance):通过共享基类所提供的特性来减少实现工作量</li>
+<li>接口继承(interface inheritance):通过一个公共基类提供的接口允许不同派生类互换使用。</li>
+</ul>
+</li>
+<li><p>接口继承常被称为<strong>运行时多态(run-time polymorphism, 或动态多态, dynamic polymorphism)</strong></p>
+</li>
+<li><p>相反，模板所提供的类的通用性与继承无关，常被称为<strong>编译时多态(compile-time polymorphism， 或静态多态, static polymorphism)</strong></p>
+</li>
+<li><p>我们常常称一个派生类继承了来自基类的属性，因此这种关系也称为继承(inheritance)</p>
+</li>
+<li><p>派生类的成员可以使用基类的公有和保护成员，就好像它们声明在派生类中一样，但是派生类不能访问基类的私有成员</p>
+</li>
+</ul>
+<h2 id="类层次"><a href="#类层次" class="headerlink" title="类层次"></a>类层次</h2><ul>
+<li>一个派生类自身也可以作为其他类的基类，我们习惯称这样的一组相关的类为类层次(class hierarchy)。</li>
+<li>这种层次结构大多数情况下是一棵树，但也可能是更一般的图结构</li>
+</ul>
+<h3 id="类型域"><a href="#类型域" class="headerlink" title="类型域"></a>类型域</h3><ul>
+<li>为了使派生类不至于成为仅仅是一种方便的声明简写方式，我们必须解决一个问题：给定一个Base* 类型的指针，它指向的对象的真正派生类型是什么?</li>
+<li>C++提供了四种基本解决方法：<ol>
+<li>保证指针只能指向单一类型的对象</li>
+<li>在基类中放置一个类型域，供函数查看</li>
+<li>使用dynamic_cast</li>
+<li>使用虚函数</li>
+</ol>
+</li>
+<li>除非使用final，否则方法1依赖于所使用类型的很多值是，比编译器所能掌握的更多。一般而言，不要试图比类型系统更聪明。但是方法1可用来（特别是与模板组合使用）实现同构容器（如标准库vector和map），以获得非常好的性能</li>
+<li>方法2，3和4可用来实现异构列表，即，多种不同类型对象（指针）的列表。</li>
+<li>方法3是方法2的一种语言支持的变体，</li>
+<li>方法4是方法2的一种特殊的类型安全的变体</li>
+</ul>
+<h2 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h2><ul>
+<li><p><strong>虚函数机制允许程序员在基类中声明函数，然后在每个派生类中重新的定义这些函数，从而解决了类型域方法的固有问题</strong>。编译器和链接器会保证对象和施用于对象之上的函数之间的正确关联。</p>
+</li>
+<li><p>为了允许一个虚函数声明能作为派生类中定义的函数的接口，派生类中函数的参数类型必须与基类中声明的参数类型完全一致，返回类型也只允许细微改变。虚成员函数有时也称为方法(method)</p>
+</li>
+<li><p>如果派生类中的一个函数的<strong>名字</strong>和<strong>参数类型</strong>与基类中的一个虚函数完全相同，则称它**覆盖(override)**了虚函数的基类版本。此外，我们也可以用一个派生层次更深的返回类型覆盖基类中的虚函数</p>
+</li>
+<li><p>除了我们显式说明调用虚函数的哪个版本之外，覆盖版本会作为最恰当的选择应用于调用它的对象。无论用哪个基类（接口）访问对象，虚函数调用机制都会保证我们总是得到相同的函数</p>
+</li>
+<li><p>无论真正使用的确切<code>Employee</code>类型是什么，都能令<code>Employee</code>的函数表现出“正确的”行为，这称为<strong>多态性(polymorphism)<strong>。具有虚函数的类型称为</strong>多态类型(polymorphic type)<strong>或（更精确的）</strong>运行时多态类型(run-time polymorphic type)</strong></p>
+</li>
+<li><p><strong>在C++中为了获得运行时多态行为，必须调用virtual成员函数，对象必须通过指针或引用进行访问</strong>。当直接操作一个对象时（而不是通过指针或引用）编译器了解其确切类型，从而就不需要运行时多肽了。</p>
+</li>
+<li><p>默认情况下，覆盖虚函数的函数自身也变为virtual的。我们在派生类宗可以重复关键字virtual，但是这不是必需的。建议不重复virtual。如果希望明确标记覆盖版本，可以使用<code>override</code>。</p>
+</li>
+<li><p>显然，为了实现多态性，编译器必须在每个Employee类的对象中保存某种类型信息，并利用它选择虚函数的正确版本。在一个典型的C++实现中，这只会占用一个指针大小的空间：常用的编译器实现技术是将虚函数名转换为函数指针表中的一个索引。这个表通常称为**虚函数表(the virtual function table)**或者简称为vbtl。每个具有虚函数的类都有自己的vbtl,用来标识它的虚函数。</p>
+</li>
+<li><p><strong>显式限定</strong>，使用作用域解析运算符<code>::</code>调用函数<code>(Manager::print())</code>能够保证不是用virtual机制</p>
+</li>
+<li><p>如果一个虚函数也是一个inline，对于使用<code>::</code>限定的调用就可以进行内联替换。这给程序员提供了一种方法高效处理某些重要的特殊情形：一个虚函数对相同对象调用另一个虚函数。</p>
+</li>
+</ul>
+<h2 id="override"><a href="#override" class="headerlink" title="override"></a>override</h2><ul>
+<li>override不是一个关键字，它是所谓的上下文关键字(contextual keyword)。即，override在某些上下文中有特殊含义，但是在其他地方可用作标识符</li>
+</ul>
+<h2 id="抽象类"><a href="#抽象类" class="headerlink" title="抽象类"></a>抽象类</h2><ul>
+<li><p>具有一个或者多个纯虚函数的类称为抽象类(abstract class)，我们无法创建抽象类的对象</p>
+</li>
+<li><p>抽象类就是要作为<strong>通用指针</strong>和<strong>引用访问</strong>的对象的接口（为了保持多态行为）</p>
+</li>
+<li><p>因此，对于一个抽象类来说，定义一个虚析构函数通常很重要。由于抽象类提供的接口不能用来创建对象，因此抽象类通常没有构造函数。</p>
+</li>
+<li><p>如果纯虚函数在派生类中未被定义，那么它仍保持是纯虚函数，因此派生类也是一个抽象类。这令我们可以阶段性地构建具体实现</p>
+</li>
+<li><p>抽象类提供接口，但是不暴露实现细节。</p>
+</li>
+<li><p>抽象类所支持的设计风格称为接口继承(interface inheritance)，它与实现继承(implementation inheritance)相对，后者是由带状态或定义了成员函数的基类所支撑的。两种风格组合使用是有可能的。即，我们可以定义并使用即带状态又有纯虚函数的基类。但是，这种混合风格会令人迷惑，也需要特别小心。</p>
+</li>
+</ul>
+<h2 id="基类和派生类成员"><a href="#基类和派生类成员" class="headerlink" title="基类和派生类成员"></a>基类和派生类成员</h2><ul>
+<li>一个派生类至少包含从基类那里继承来的成员，通常还包含其他成员。这意味着我们可以安全地将一个基类成员指针赋予一个派生类成员指针，但是反方向赋值则不行，这一特性常被称为逆变性(contravariance)</li>
+<li>这一逆变规则看起来与另一规则是相反的：我们可以将一个派生类指针赋予其基类的指针。</li>
+<li>实际上，两个规则都是为了提供基本保障：<strong>一个指针永远不应该指向这样的对象–不能提供指针所承诺的最基本的属性。</strong></li>
+</ul>
+<h2 id="类层次-1"><a href="#类层次-1" class="headerlink" title="类层次"></a>类层次</h2><ul>
+<li>一个系统应该用抽象类层次表示，而用传统的层次体系实现。换句话说：<ul>
+<li>用抽象类支持接口继承</li>
+<li>用带有虚函数实现的基类支持实现继承</li>
+</ul>
+</li>
+</ul>
+<h3 id="多重继承-multiple-inheritance"><a href="#多重继承-multiple-inheritance" class="headerlink" title="多重继承(multiple inheritance)"></a>多重继承(multiple inheritance)</h3><ul>
+<li><p>直接从多个类中派生称为多重继承</p>
+</li>
+<li><p>用一个基类表示实现细节，用另一个基类表示接口（抽象类）的做法对于所有支持继承和编译时接口检查的编程语言来说都是非常常见的。</p>
+</li>
+<li><p>“我个人习惯于使用一个实现层次体系，再（在必要时）辅以几个提供接口的抽象类。这种方式比较灵活，也易于系统的演化。但是我们未必总能如愿，尤其是当需要使用现有的类，有不想对它作出任何修改时更时如此（比如，这些类属于别人的库）”</p>
+</li>
+</ul>
+<h3 id="二义性"><a href="#二义性" class="headerlink" title="二义性"></a>二义性</h3><ul>
+<li>两个基类的成员函数可能具有相同的名字，产生歧义。具体做法是为成员名字加一个类限定符。</li>
+<li>然而，显式消除二义性比较繁琐，解决此类问题的最佳方式是在派生类中定义一个新函数。在派生类中声明的函数会覆盖基类中所有同名及同类型的函数。通常情况下，这种效果就是我们需要的，因为在同一个类中的同一个名字不宜有多重含义。<strong>virtual的目标是对于一个调用来说，不管我们是通过哪个接口找到函数的，它的执行效果都应该保持一致。</strong></li>
+</ul>
+<h2 id="虚基类"><a href="#虚基类" class="headerlink" title="虚基类"></a>虚基类</h2><ul>
+<li><p>如果每个类只有一个直接基类，则类层次表现为一棵树，并且每个类在树中只能出现一次。如果每个类可以有多个基类，则在层次体系中每个类可能出现多次。</p>
+</li>
+<li><p>重复基类的虚函数可以在派生类中被一个（单独的）函数覆盖。通常情况下，这个覆盖的函数先调用其基类的版本，然后执行派生类自己的操作。</p>
+</li>
+<li><p>每个被指定为virtual的基类只用该类的一个单独的对象表示。另一个方面，非virtual基类由其子对象表示。</p>
+</li>
+<li><p><strong>派生类可以覆盖其直接或者间接虚基类的虚函数。尤其是，两个不同的类可能会覆盖虚基类的不同的虚函数。通过这种方式，几个派生类就能共同为一个虚基类表示的接口提供实现了。</strong></p>
+</li>
+</ul>
+<h3 id="建议-1"><a href="#建议-1" class="headerlink" title="建议"></a>建议</h3><ul>
+<li>不要在作为接口的基类中放置数据成员</li>
+<li>用抽象类表示接口</li>
+<li>为抽象基类定义一个虚析构函数确保其正确地清理资源</li>
+<li>用抽象类支持接口继承</li>
+<li>用含有数据成员的基类支持实现继承</li>
+<li>用普通的多重继承表示特征的组合</li>
+<li>用多重继承把实现的接口分离开来</li>
+<li>用虚基类表示层次中一部分（而非全部）类公有的内容</li>
+</ul>
+<h2 id="运行时类型信息"><a href="#运行时类型信息" class="headerlink" title="运行时类型信息"></a>运行时类型信息</h2><ul>
+<li>一般来说，类是从基类的框架中构造出来的。这种类框架(class lattice)通常被称为类层次(class hierarchy)</li>
+<li>在运行时使用类型信息通常被称为“运行时类型信息”，简写为RTTI(Run-Time Type Information)</li>
+<li>从基类到派生类的转换通常称为向下转换(downcast),从派生类到基类的转换称为向上转换(upcast),从基类到兄弟类的转换，称为交叉转换(crosscast)</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppOthers/" rel="tag"># CppOthers</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF/" rel="prev" title="C++常见错误">
+      <i class="fa fa-chevron-left"></i> C++常见错误
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C++/C++_99_%E5%85%B6%E4%BB%96/2024-05-22-C++%E6%9C%AA%E6%95%B4%E7%90%86%E7%AC%94%E8%AE%B0/" rel="next" title="C++未整理笔记">
+      C++未整理笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9F%BA%E7%A1%80"><span class="nav-number">1.1.</span> <span class="nav-text">类基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%86%85%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">1.2.</span> <span class="nav-text">类内函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%BC%95%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">自引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%90%E5%91%98%E5%92%8C%E5%9F%BA%E7%B1%BB%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.4.</span> <span class="nav-text">成员和基类初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%8F%98%E5%BC%8F"><span class="nav-number">1.5.</span> <span class="nav-text">不变式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.6.</span> <span class="nav-text">建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B4%BE%E7%94%9F%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">派生类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%B1%82%E6%AC%A1"><span class="nav-number">3.</span> <span class="nav-text">类层次</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E5%9F%9F"><span class="nav-number">3.1.</span> <span class="nav-text">类型域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">虚函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#override"><span class="nav-number">5.</span> <span class="nav-text">override</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB"><span class="nav-number">6.</span> <span class="nav-text">抽象类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%B1%BB%E5%92%8C%E6%B4%BE%E7%94%9F%E7%B1%BB%E6%88%90%E5%91%98"><span class="nav-number">7.</span> <span class="nav-text">基类和派生类成员</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%B1%82%E6%AC%A1-1"><span class="nav-number">8.</span> <span class="nav-text">类层次</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF-multiple-inheritance"><span class="nav-number">8.1.</span> <span class="nav-text">多重继承(multiple inheritance)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E4%B9%89%E6%80%A7"><span class="nav-number">8.2.</span> <span class="nav-text">二义性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E5%9F%BA%E7%B1%BB"><span class="nav-number">9.</span> <span class="nav-text">虚基类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE-1"><span class="nav-number">9.1.</span> <span class="nav-text">建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E7%B1%BB%E5%9E%8B%E4%BF%A1%E6%81%AF"><span class="nav-number">10.</span> <span class="nav-text">运行时类型信息</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

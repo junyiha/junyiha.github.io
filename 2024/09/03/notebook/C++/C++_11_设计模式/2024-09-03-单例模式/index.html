@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 单例模式相关学习笔记  单例模式 单例模式，这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。  这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。  单例模式是一种创建型设计模式，它确保一个类只有一个实例，并提供了一个全局访问点来访问该实例。  注意：  单例类只能有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单例模式">
+<meta property="og:url" content="https://junyiha.github.io/2024/09/03/notebook/C++/C++_11_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/2024-09-03-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 单例模式相关学习笔记  单例模式 单例模式，这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。  这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。  单例模式是一种创建型设计模式，它确保一个类只有一个实例，并提供了一个全局访问点来访问该实例。  注意：  单例类只能有">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-03T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.214Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CppDesignMode">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/09/03/notebook/C++/C++_11_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/2024-09-03-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>单例模式 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/09/03/notebook/C++/C++_11_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/2024-09-03-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          单例模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-09-03 09:00:00" itemprop="dateCreated datePublished" datetime="2024-09-03T09:00:00+08:00">2024-09-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>单例模式相关学习笔记</li>
+</ul>
+<h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><ul>
+<li><p>单例模式，这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。</p>
+</li>
+<li><p>这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。</p>
+</li>
+<li><p>单例模式是一种创建型设计模式，它确保一个类只有一个实例，并提供了一个全局访问点来访问该实例。</p>
+</li>
+<li><p>注意：</p>
+<ul>
+<li>单例类只能有一个实例</li>
+<li>单例类必须自己创建自己的唯一实例</li>
+<li>单例类必须给所有其他对象提供这一实例</li>
+</ul>
+</li>
+<li><p>单例模式是设计模式中最简单，最常见的一种。其主要目的是确保整个进程中，只有一个类的实例，并且提供一个统一的访问接口。常用于Logger类，通信接口类，线程池等。</p>
+</li>
+</ul>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><ul>
+<li>限制用户直接访问类的构造函数，提供一个统一的public接口获取单例对象</li>
+<li>这里有一个先有鸡还是先有蛋的问题<ul>
+<li>因为用户无法访问构造函数，所以无法创建对象</li>
+<li>因为无法创建对象，所以不能调用普通的getInstance()方法来获取单例对象</li>
+</ul>
+</li>
+<li>解决这个问题的方法很简单，将 getInstance() 定义为static即可(这也会限制getInstance()内只能访问类的静态成员)</li>
+</ul>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
+<li>所有的构造函数是private</li>
+<li>拷贝构造，拷贝赋值运算符需要显示删除 &#x3D;delete，防止编译器自动合成</li>
+</ul>
+<h2 id="C-单例模式的几种实现方式"><a href="#C-单例模式的几种实现方式" class="headerlink" title="C++单例模式的几种实现方式"></a>C++单例模式的几种实现方式</h2><h3 id="版本一-饿汉式"><a href="#版本一-饿汉式" class="headerlink" title="版本一 饿汉式"></a>版本一 饿汉式</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton1</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton1* <span class="title">getInstance</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> &amp;inst; &#125;</span><br><span class="line">    <span class="built_in">Singleton1</span>(<span class="type">const</span> Singleton1&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton1&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton1&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton1</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton1 inst;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton1 Singleton1::inst;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这个版本在程序启动时创建单例对象，即使没有使用也会创建，浪费资源。</li>
+</ul>
+<h3 id="版本二-懒汉式"><a href="#版本二-懒汉式" class="headerlink" title="版本二 懒汉式"></a>版本二 懒汉式</h3><ul>
+<li>通过将单例对象的实例化会推迟到首次调用getInstance()，解决版本一的问题<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton2</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton2* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">            pSingleton = <span class="keyword">new</span> <span class="built_in">Singleton2</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Singleton2</span>(<span class="type">const</span> Singleton2&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton2&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton2&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton2</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton2* pSingleton;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton2* Singleton2::pSingleton = <span class="literal">nullptr</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="版本三-线程安全"><a href="#版本三-线程安全" class="headerlink" title="版本三 线程安全"></a>版本三 线程安全</h3><ul>
+<li>在版本二中，如果多个线程同时调用getInstance()则有可能创建多个实例<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton3</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton3* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="function">lock_guard&lt;mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">            pSingleton = <span class="keyword">new</span> <span class="built_in">Singleton3</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Singleton3</span>(<span class="type">const</span> Singleton3&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton3&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton3&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton3</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton3* pSingleton;</span><br><span class="line">    <span class="type">static</span> mutex mtx;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton3* Singleton3::pSingleton = <span class="literal">nullptr</span>;</span><br><span class="line">mutex Singleton3::mtx;</span><br></pre></td></tr></table></figure></li>
+<li>加锁可以解决线程安全的问题，但是版本三的问题在于效率太低，每次调用getInstance()都需要加锁，而加锁的开销又是相当高昂的</li>
+</ul>
+<h3 id="版本四-DCL-Double-Checked-Locking"><a href="#版本四-DCL-Double-Checked-Locking" class="headerlink" title="版本四 DCL(Double-Checked Locking)"></a>版本四 DCL(Double-Checked Locking)</h3><ul>
+<li>版本四是版本三的改进版本，只有在指针为空的时候才会进行加锁，然后再次判断指针是否为空。而一旦首次初始化完成之后，指针不为空，则不再进行加锁。既保证了线程安全，又不会导致后续每次调用都产生锁的开销<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton4</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton4* <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">            <span class="function">lock_guard&lt;mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">            <span class="keyword">if</span> (!pSingleton) &#123;</span><br><span class="line">                pSingleton = <span class="keyword">new</span> <span class="built_in">Singleton4</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Singleton4</span>(<span class="type">const</span> Singleton4&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton4&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton4&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton4</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="type">static</span> Singleton4* pSingleton;</span><br><span class="line">    <span class="type">static</span> mutex mtx;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Singleton4* Singleton4::pSingleton = <span class="literal">nullptr</span>;</span><br><span class="line">mutex Singleton4::mtx;</span><br></pre></td></tr></table></figure></li>
+<li>DCL在很长一段时间内被认为是C++单例模式的最佳实践。但是也有文章表示DCL的正确性取决于内存模型。关于这部分的深入讨论可以参考以下两篇文章<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html">https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/">https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="版本五-Meyer’s-Singleton"><a href="#版本五-Meyer’s-Singleton" class="headerlink" title="版本五 Meyer’s Singleton"></a>版本五 Meyer’s Singleton</h3><ul>
+<li>这个版本利用局部静态变量来实现单例模式。最早由C++大佬，Effective C++系列的作者Scott Meyers提出，因此也被称为Meyers’ Singleton</li>
+<li>TLDR: 这就是C++11之后的单例模式最佳实践，没有之一<ul>
+<li>最简洁： 不需要额外定义类的静态成员</li>
+<li>线程安全：不需要额外加锁</li>
+<li>没有烦人的指针</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton5</span> &#123;</span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton5&amp; <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> Singleton5 inst;</span><br><span class="line">        <span class="keyword">return</span> inst;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Singleton5</span>(<span class="type">const</span> Singleton5&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton5&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Singleton5&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Singleton5</span>() = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CppDesignMode/" rel="tag"># CppDesignMode</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/08/31/notebook/Python/python_3_%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/2024-08-31-python_3_bs4%E6%A8%A1%E5%9D%97/" rel="prev" title="python_3_bs4模块">
+      <i class="fa fa-chevron-left"></i> python_3_bs4模块
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/09/03/notebook/Books/2024-09-03-Effective_Modern_C++/" rel="next" title="Effective Modern C++">
+      Effective Modern C++ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">单例模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">基本原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">4.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%87%A0%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">C++单例模式的几种实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E4%B8%80-%E9%A5%BF%E6%B1%89%E5%BC%8F"><span class="nav-number">5.1.</span> <span class="nav-text">版本一 饿汉式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E4%BA%8C-%E6%87%92%E6%B1%89%E5%BC%8F"><span class="nav-number">5.2.</span> <span class="nav-text">版本二 懒汉式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E4%B8%89-%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">5.3.</span> <span class="nav-text">版本三 线程安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E5%9B%9B-DCL-Double-Checked-Locking"><span class="nav-number">5.4.</span> <span class="nav-text">版本四 DCL(Double-Checked Locking)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E4%BA%94-Meyer%E2%80%99s-Singleton"><span class="nav-number">5.5.</span> <span class="nav-text">版本五 Meyer’s Singleton</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

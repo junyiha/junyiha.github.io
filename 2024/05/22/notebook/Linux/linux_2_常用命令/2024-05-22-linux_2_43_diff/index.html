@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 diff命令  linux diff命令 详解diff 命令在 Linux 和类 Unix 系统上用于比较文件之间的差异。它能够逐行比较文本文件，并以可读的方式显示文件之间的不同之处。以下是关于 diff 命令的详细解释： 语法：1diff [选项] 文件1 文件2  常用选项： -u 或 --unified：以统一格式显示差异。 -c 或 --context：以上下文格式显示差异。 -r">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_43_diff">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_43_diff/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 diff命令  linux diff命令 详解diff 命令在 Linux 和类 Unix 系统上用于比较文件之间的差异。它能够逐行比较文本文件，并以可读的方式显示文件之间的不同之处。以下是关于 diff 命令的详细解释： 语法：1diff [选项] 文件1 文件2  常用选项： -u 或 --unified：以统一格式显示差异。 -c 或 --context：以上下文格式显示差异。 -r">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_43_diff/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_43_diff | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_43_diff/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_43_diff
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>diff命令</li>
+</ul>
+<h2 id="linux-diff命令-详解"><a href="#linux-diff命令-详解" class="headerlink" title="linux diff命令 详解"></a>linux diff命令 详解</h2><p><code>diff</code> 命令在 Linux 和类 Unix 系统上用于比较文件之间的差异。它能够逐行比较文本文件，并以可读的方式显示文件之间的不同之处。以下是关于 <code>diff</code> 命令的详细解释：</p>
+<h3 id="语法："><a href="#语法：" class="headerlink" title="语法："></a>语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff [选项] 文件1 文件2</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用选项："><a href="#常用选项：" class="headerlink" title="常用选项："></a>常用选项：</h3><ul>
+<li><code>-u</code> 或 <code>--unified</code>：以统一格式显示差异。</li>
+<li><code>-c</code> 或 <code>--context</code>：以上下文格式显示差异。</li>
+<li><code>-r</code> 或 <code>--recursive</code>：递归比较目录中的文件。</li>
+<li><code>-q</code> 或 <code>--brief</code>：仅显示文件是否不同，不显示详细差异。</li>
+<li><code>-i</code> 或 <code>--ignore-case</code>：忽略大小写差异。</li>
+</ul>
+<h3 id="示例用法："><a href="#示例用法：" class="headerlink" title="示例用法："></a>示例用法：</h3><ol>
+<li><p><strong>显示两个文件的差异：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>这将比较两个文件，并显示它们之间的差异。</p>
+</li>
+<li><p><strong>以统一格式显示差异：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -u file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-u</code> 选项，以统一格式显示文件差异。</p>
+</li>
+<li><p><strong>递归比较目录中的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -r directory1 directory2</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-r</code> 选项，递归比较两个目录中的文件。</p>
+</li>
+<li><p><strong>仅显示文件是否不同：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -q file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-q</code> 选项，仅显示文件是否不同，不显示详细差异。</p>
+</li>
+<li><p><strong>忽略大小写差异：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -i file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-i</code> 选项，忽略大小写进行文件比较。</p>
+</li>
+</ol>
+<h3 id="示例输出："><a href="#示例输出：" class="headerlink" title="示例输出："></a>示例输出：</h3><ul>
+<li><p>统一格式 (<code>-u</code> 选项) 的输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">--- file1.txt	2022-01-01 12:34:56.789012345 +0000</span><br><span class="line">+++ file2.txt	2022-01-01 12:34:56.789012345 +0000</span><br><span class="line">@@ -1,4 +1,4 @@</span><br><span class="line"> Line 1</span><br><span class="line"> Line 2</span><br><span class="line">-Line 3</span><br><span class="line">+Modified Line 3</span><br><span class="line"> Line 4</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>上下文格式 (<code>-c</code> 选项) 的输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">***************</span><br><span class="line">*** 1,4 ****</span><br><span class="line"> Line 1</span><br><span class="line"> Line 2</span><br><span class="line"> Line 3</span><br><span class="line">! Line 4</span><br><span class="line">--- 1,4 ----</span><br><span class="line"> Line 1</span><br><span class="line"> Line 2</span><br><span class="line"> Modified Line 3</span><br><span class="line"> Line 4</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="工作原理："><a href="#工作原理：" class="headerlink" title="工作原理："></a>工作原理：</h3><p><code>diff</code> 命令逐行比较两个文本文件，并生成描述差异的文本输出。输出中以 <code>+</code> 表示新增的行，以 <code>-</code> 表示被删除的行。行前面的 <code>!</code> 标记表示差异的行。</p>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>diff</code> 命令通常用于比较文本文件，对于二进制文件可能不太适用。</li>
+<li>输出的格式可以通过选项进行定制，以满足用户的需求。</li>
+</ul>
+<p><code>diff</code> 是一个强大的比较工具，常用于查找文件或目录之间的变化，是开发人员和系统管理员的常用工具之一。</p>
+<h2 id="linux-diff命令-常用技巧"><a href="#linux-diff命令-常用技巧" class="headerlink" title="linux diff命令 常用技巧"></a>linux diff命令 常用技巧</h2><p>以下是一些在使用 <code>diff</code> 命令时常用的技巧：</p>
+<ol>
+<li><p><strong>使用统一格式 (<code>-u</code> 选项) 显示差异：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -u file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>统一格式更易读，通常是首选的差异显示方式。</p>
+</li>
+<li><p><strong>递归比较目录中的文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -r directory1 directory2</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-r</code> 选项，可以递归比较两个目录中的文件。</p>
+</li>
+<li><p><strong>使用上下文格式 (<code>-c</code> 选项) 显示差异：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -c file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>上下文格式对于显示更多上下文信息可能更有用。</p>
+</li>
+<li><p><strong>仅显示文件是否不同 (<code>-q</code> 选项)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -q file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-q</code> 选项，仅显示文件是否不同，不显示详细差异。</p>
+</li>
+<li><p><strong>忽略空白字符：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -b file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-b</code> 选项，忽略空白字符的差异。</p>
+</li>
+<li><p><strong>忽略大小写 (<code>-i</code> 选项)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -i file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-i</code> 选项，忽略大小写进行文件比较。</p>
+</li>
+<li><p><strong>将差异输出到文件：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff file1.txt file2.txt &gt; diff_output.txt</span><br></pre></td></tr></table></figure>
+<p>将 <code>diff</code> 命令的输出保存到文件，以便后续查看或分析。</p>
+</li>
+<li><p><strong>使用颜色高亮显示差异：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff --color file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>通过 <code>--color</code> 选项，可以启用差异的颜色高亮显示，提高可读性。</p>
+</li>
+<li><p><strong>显示行号 (<code>-n</code> 选项)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -n file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-n</code> 选项，显示差异的行号。</p>
+</li>
+<li><p><strong>比较两个命令的输出：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">command1 | diff - file.txt</span><br></pre></td></tr></table></figure>
+<p>通过管道将命令的输出与文件进行比较，用于检查命令是否按预期工作。</p>
+</li>
+</ol>
+<p>这些技巧有助于更灵活地使用 <code>diff</code> 命令，满足不同场景下的需求。</p>
+<h2 id="diff"><a href="#diff" class="headerlink" title="diff"></a>diff</h2><ul>
+<li>diff, 用于比较文件的差异</li>
+<li>diff以逐行的方式,比较文本文件的异同处.如果指定要比较目录,则diff会比较目录中相同文件名的文件,但是不会比较其中子目录</li>
+<li>递归比较两个文件夹之间的差异:<code>diff -r -q folder1 folder2</code><ul>
+<li><code>-r</code> : 递归的比较</li>
+<li><code>-q</code> : 只有在文件有差异的情况下报告</li>
+</ul>
+</li>
+<li><code>diff</code>,常常与<code>grep</code>一起使用,筛选出想要的结果</li>
+</ul>
+<p>在Linux中，<code>diff</code>命令用于比较两个文件的内容并显示它们之间的差异。它可以用于比较文本文件、目录以及其他类型的文件。</p>
+<p>以下是<code>diff</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff [options] file1 file2</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>file1</code>和<code>file2</code>是要比较的两个文件。</p>
+<p>以下是一些常见的<code>diff</code>命令选项和用法：</p>
+<ol>
+<li><p>比较文本文件的差异：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff file1.txt file2.txt</span><br></pre></td></tr></table></figure>
+
+<p>此命令将比较<code>file1.txt</code>和<code>file2.txt</code>两个文本文件的内容，并显示它们之间的差异。</p>
+</li>
+<li><p>递归比较目录的差异：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -r dir1 dir2</span><br></pre></td></tr></table></figure>
+
+<p>此命令将递归比较<code>dir1</code>和<code>dir2</code>两个目录及其子目录中的文件，并显示它们之间的差异。</p>
+</li>
+<li><p>生成可应用的补丁文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff -u file1.txt file2.txt &gt; patch.diff</span><br></pre></td></tr></table></figure>
+
+<p>此命令将比较<code>file1.txt</code>和<code>file2.txt</code>两个文件的内容，并生成一个可应用的补丁文件<code>patch.diff</code>，以便在其他系统上应用差异。</p>
+</li>
+</ol>
+<p><code>diff</code>命令提供了多种选项，用于控制输出格式、忽略空格或空行、显示上下文等。</p>
+<p><code>diff</code>命令在版本控制系统和文件比较方面非常有用，可以帮助您查找文件之间的更改和差异。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_44_patch/" rel="prev" title="linux_2_44_patch">
+      <i class="fa fa-chevron-left"></i> linux_2_44_patch
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_45_expr/" rel="next" title="linux_2_45_expr">
+      linux_2_45_expr <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-diff%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux diff命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常用选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E7%94%A8%E6%B3%95%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例用法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E8%BE%93%E5%87%BA%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">示例输出：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">工作原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.6.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-diff%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux diff命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#diff"><span class="nav-number">4.</span> <span class="nav-text">diff</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 tcpdump命令  Linux tcpdump是什么tcpdump 是一个在 Linux 和其他类 Unix 操作系统上运行的网络抓包工具。它允许用户捕获和分析网络数据包，并可以用于监视、诊断和分析计算机网络的活动。 通过 tcpdump，用户可以指定网络接口，捕获经过该接口的数据包，并将其以可读的格式显示出来。它提供了丰富的选项和过滤器，允许用户根据需要对捕获的数据包进行过滤，以便查看特">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_81_tcpdump">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_81_tcpdump/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 tcpdump命令  Linux tcpdump是什么tcpdump 是一个在 Linux 和其他类 Unix 操作系统上运行的网络抓包工具。它允许用户捕获和分析网络数据包，并可以用于监视、诊断和分析计算机网络的活动。 通过 tcpdump，用户可以指定网络接口，捕获经过该接口的数据包，并将其以可读的格式显示出来。它提供了丰富的选项和过滤器，允许用户根据需要对捕获的数据包进行过滤，以便查看特">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.376Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_81_tcpdump/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_81_tcpdump | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_81_tcpdump/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_81_tcpdump
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>tcpdump命令</li>
+</ul>
+<h2 id="Linux-tcpdump是什么"><a href="#Linux-tcpdump是什么" class="headerlink" title="Linux tcpdump是什么"></a>Linux tcpdump是什么</h2><p>tcpdump 是一个在 Linux 和其他类 Unix 操作系统上运行的网络抓包工具。它允许用户捕获和分析网络数据包，并可以用于监视、诊断和分析计算机网络的活动。</p>
+<p>通过 tcpdump，用户可以指定网络接口，捕获经过该接口的数据包，并将其以可读的格式显示出来。它提供了丰富的选项和过滤器，允许用户根据需要对捕获的数据包进行过滤，以便查看特定类型、源或目标地址、协议类型等的数据包。</p>
+<p>tcpdump 可以用于各种网络调试和分析场景，比如排查网络问题、监控流量、检查特定协议的数据包、查找异常行为等。它是一个强大的命令行工具，通常被网络管理员、系统管理员和网络安全专家用于网络故障排除和安全审计。</p>
+<h2 id="Linux-tcpdump详解"><a href="#Linux-tcpdump详解" class="headerlink" title="Linux tcpdump详解"></a>Linux tcpdump详解</h2><p>tcpdump 是一个在 Linux 和其他类 Unix 操作系统上常用的网络抓包工具，用于捕获网络数据包以及对其进行分析。它可以捕获经过指定网络接口的数据包，并将其以可读的格式显示出来。以下是一些 tcpdump 的详细信息：</p>
+<ol>
+<li><p><strong>捕获网络数据包：</strong> tcpdump 可以通过指定网络接口，如eth0或者其他网络接口名字，捕获经过该接口的数据包。</p>
+</li>
+<li><p><strong>抓取特定条件的数据包：</strong> 它支持各种过滤器，允许用户根据需要对捕获的数据包进行过滤，比如可以根据源地址、目标地址、端口号、协议类型等来过滤数据包。</p>
+</li>
+<li><p><strong>灵活的输出格式：</strong> tcpdump 可以输出捕获到的数据包的详细信息，如源 IP 地址、目标 IP 地址、端口号、时间戳、协议类型、数据包内容等，并以不同的格式进行展示。</p>
+</li>
+<li><p><strong>输出到文件或其他设备：</strong> 捕获到的数据包可以直接输出到标准输出，也可以重定向到文件中以便后续分析。此外，它还支持将数据包输出到其他设备上。</p>
+</li>
+<li><p><strong>灵活的选项和参数：</strong> tcpdump 提供了多种选项和参数，可以控制捕获数据包的行为，如捕获数量、持续时间、打印方式等。</p>
+</li>
+<li><p><strong>网络故障排除与安全审计：</strong> 作为网络故障排查的强大工具，tcpdump 可用于监控网络流量、检查特定协议的数据包、分析网络连接问题，并对网络安全进行审计，检查异常行为或潜在的攻击。</p>
+</li>
+</ol>
+<p>示例用法：</p>
+<ul>
+<li><code>sudo tcpdump -i eth0</code>: 在接口 eth0 上捕获所有流经的数据包。</li>
+<li><code>sudo tcpdump -i eth0 -n host 192.168.1.100</code>: 仅捕获源或目标地址为 192.168.1.100 的数据包。</li>
+<li><code>sudo tcpdump -i eth0 port 80</code>: 捕获所有通过端口 80 的流量。</li>
+<li><code>sudo tcpdump -i eth0 -w output.pcap</code>: 将捕获的数据包保存到 output.pcap 文件中供后续分析使用。</li>
+</ul>
+<p>在使用 tcpdump 时，需要以 root 或具有特殊权限的用户来执行，因为捕获数据包需要访问网络设备的权限。此外，需要谨慎使用，避免在生产环境中对网络产生不必要的影响，并遵循适当的法律法规和网络政策。</p>
+<h2 id="Linux-tcpdump-常用选项-详解"><a href="#Linux-tcpdump-常用选项-详解" class="headerlink" title="Linux tcpdump 常用选项 详解"></a>Linux tcpdump 常用选项 详解</h2><p>tcpdump 是一个功能强大的网络抓包工具，在使用时可以结合多种选项来满足各种需求。以下是一些常用的 tcpdump 选项和其详细解释：</p>
+<ol>
+<li><p><strong>-i：</strong> 指定要监听的网络接口。例如 <code>-i eth0</code> 表示监听 eth0 接口的数据包。</p>
+</li>
+<li><p><strong>-n：</strong> 禁用主机名解析，使用 IP 地址代替主机名，加快解析速度。</p>
+</li>
+<li><p><strong>-nn：</strong> 禁用主机名和端口号解析，只显示 IP 地址和端口号。</p>
+</li>
+<li><p><strong>-c：</strong> 指定捕获数据包的数量，达到指定数量后会自动停止抓包。例如 <code>-c 100</code> 表示捕获100个数据包后停止。</p>
+</li>
+<li><p><strong>-w：</strong> 将捕获的数据包保存到指定文件中。例如 <code>-w capture.pcap</code> 会将捕获的数据包保存到名为 capture.pcap 的文件中。</p>
+</li>
+<li><p><strong>-s：</strong> 设置捕获数据包时的快照长度（即捕获数据包的最大长度）。例如 <code>-s 1500</code> 设置捕获数据包的最大长度为1500字节。</p>
+</li>
+<li><p><strong>-X：</strong> 以十六进制和 ASCII 字符的形式显示数据包的内容。</p>
+</li>
+<li><p><strong>-q：</strong> 减少输出信息，以精简模式显示捕获的数据包。</p>
+</li>
+<li><p><strong>-A：</strong> 以 ASCII 文本格式显示数据包内容。</p>
+</li>
+<li><p><strong>-v：</strong> 增加输出详细程度，显示更多关于捕获数据包的信息。</p>
+</li>
+<li><p><strong>-vvv：</strong> 增加输出的详细程度，显示更多详细信息。</p>
+</li>
+<li><p><strong>-X：</strong> 以十六进制和 ASCII 字符的形式显示捕获的数据包内容。</p>
+</li>
+</ol>
+<p>这些选项可以单独使用，也可以组合使用以满足具体的需求。例如，可以使用 <code>-i</code> 选项指定接口并结合 <code>-nn</code> 选项禁用名称解析，使用 <code>-w</code> 选项将捕获的数据包保存到文件中。</p>
+<p>总体而言，这些选项允许用户对捕获的数据包进行精确控制和分析，有助于进行网络故障排除、安全审计以及对网络流量的监控和分析。在使用时，务必了解和熟悉这些选项的用法，并根据具体的需求来灵活运用。</p>
+<h2 id="Linux-tcpdump-常用技巧-详解"><a href="#Linux-tcpdump-常用技巧-详解" class="headerlink" title="Linux tcpdump 常用技巧 详解"></a>Linux tcpdump 常用技巧 详解</h2><p>在使用 tcpdump 进行网络数据包分析时，以下是一些常用的技巧和最佳实践：</p>
+<ol>
+<li><p><strong>过滤特定接口：</strong> 使用 <code>-i</code> 选项过滤特定网络接口，以便只捕获该接口上的数据包。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -i eth0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>过滤特定主机或网络：</strong> 使用过滤器过滤特定源或目标 IP 地址。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump host 192.168.1.100</span><br><span class="line">sudo tcpdump net 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>过滤特定端口：</strong> 使用过滤器来捕获特定端口的数据包。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump port 80</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>同时显示十六进制和 ASCII 数据：</strong> 使用 <code>-X</code> 选项可以同时显示十六进制和 ASCII 数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -X</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>将捕获的数据包保存到文件：</strong> 使用 <code>-w</code> 选项将捕获的数据包保存到文件中以供后续分析。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -w capture.pcap</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>限制捕获数据包的数量：</strong> 使用 <code>-c</code> 选项限制捕获的数据包数量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -c 100</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>显示更详细的信息：</strong> 使用 <code>-v</code> 或 <code>-vvv</code> 选项来显示更详细的捕获信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -v</span><br><span class="line">sudo tcpdump -vvv</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>禁用 DNS 解析：</strong> 使用 <code>-n</code> 选项禁用 DNS 解析，以加快抓包速度。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -n</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>显示捕获数据包的 ASCII 文本内容：</strong> 使用 <code>-A</code> 选项显示捕获数据包的 ASCII 文本内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -A</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>结合过滤条件：</strong> 可以结合多个过滤条件，以便更精确地捕获所需的数据包。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -i eth0 host 192.168.1.100 and port 80</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>这些技巧和命令可以帮助你更有效地使用 tcpdump 进行网络数据包的捕获和分析。根据具体的需求和场景，结合不同的选项和过滤器可以更精确地捕获和分析所需的数据包，有助于网络故障排查、安全审计以及对网络流量的监控。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_85_autoconf/" rel="prev" title="linux_2_85_autoconf">
+      <i class="fa fa-chevron-left"></i> linux_2_85_autoconf
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_84_blkid/" rel="next" title="linux_2_84_blkid">
+      linux_2_84_blkid <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-tcpdump%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">Linux tcpdump是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-tcpdump%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Linux tcpdump详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-tcpdump-%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">Linux tcpdump 常用选项 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-tcpdump-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">Linux tcpdump 常用技巧 详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

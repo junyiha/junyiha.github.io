@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 systemctl命令  linux systemctl命令 详解systemctl 是 Linux 系统中用于管理系统服务（system services）和套接字（sockets）的命令。它是 systemd 系统管理守护进程的一部分，负责启动、停止、重启和管理系统服务。以下是一些常用的 systemctl 命令以及它们的详解：  启动一个服务： 1systemctl start &amp;lt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_49_systemctl">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_49_systemctl/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 systemctl命令  linux systemctl命令 详解systemctl 是 Linux 系统中用于管理系统服务（system services）和套接字（sockets）的命令。它是 systemd 系统管理守护进程的一部分，负责启动、停止、重启和管理系统服务。以下是一些常用的 systemctl 命令以及它们的详解：  启动一个服务： 1systemctl start &amp;lt">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.351Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_49_systemctl/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_49_systemctl | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_49_systemctl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_49_systemctl
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>systemctl命令</li>
+</ul>
+<h2 id="linux-systemctl命令-详解"><a href="#linux-systemctl命令-详解" class="headerlink" title="linux systemctl命令 详解"></a>linux systemctl命令 详解</h2><p><code>systemctl</code> 是 Linux 系统中用于管理系统服务（system services）和套接字（sockets）的命令。它是 systemd 系统管理守护进程的一部分，负责启动、停止、重启和管理系统服务。以下是一些常用的 <code>systemctl</code> 命令以及它们的详解：</p>
+<ol>
+<li><p><strong>启动一个服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>启动指定名称的服务。</p>
+</li>
+<li><p><strong>停止一个服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>停止指定名称的服务。</p>
+</li>
+<li><p><strong>重启一个服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>重启指定名称的服务。</p>
+</li>
+<li><p><strong>查看服务状态：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl status &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定名称的服务的当前状态，包括是否正在运行以及相关的信息。</p>
+</li>
+<li><p><strong>启用服务开机自启：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>设置指定名称的服务在系统启动时自动启动。</p>
+</li>
+<li><p><strong>禁用服务开机自启：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">disable</span> &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>取消指定名称的服务在系统启动时自动启动。</p>
+</li>
+<li><p><strong>显示所有已加载的服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-units --<span class="built_in">type</span>=service</span><br></pre></td></tr></table></figure>
+<p>列出所有已加载的服务及其状态。</p>
+</li>
+<li><p><strong>显示所有已启用的服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-unit-files --<span class="built_in">type</span>=service | grep enabled</span><br></pre></td></tr></table></figure>
+<p>列出所有已启用的服务。</p>
+</li>
+<li><p><strong>显示服务的依赖关系：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-dependencies &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定服务的依赖关系。</p>
+</li>
+<li><p><strong>重新加载服务配置：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl reload &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>重新加载指定服务的配置文件，不会停止服务。</p>
+</li>
+<li><p><strong>显示系统的引导目标（target）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl get-default</span><br></pre></td></tr></table></figure>
+<p>显示系统当前的引导目标。</p>
+</li>
+<li><p><strong>更改系统的引导目标：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl set-default &lt;target_name&gt;</span><br></pre></td></tr></table></figure>
+<p>设置系统的引导目标。</p>
+</li>
+</ol>
+<p>这些是一些常见的 <code>systemctl</code> 命令，可以帮助你管理和维护系统服务。通过结合这些命令，你可以轻松地启动、停止、重启服务，管理它们的开机自启设置，并查看相关的状态和依赖关系。</p>
+<h2 id="linux-systemctl命令-常用技巧"><a href="#linux-systemctl命令-常用技巧" class="headerlink" title="linux systemctl命令 常用技巧"></a>linux systemctl命令 常用技巧</h2><p>除了基本的 <code>systemctl</code> 命令之外，以下是一些常用的技巧和进阶用法：</p>
+<ol>
+<li><p><strong>模糊搜索服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-units --<span class="built_in">type</span>=service | grep &lt;keyword&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>grep</code> 命令结合 <code>list-units</code> 来进行模糊搜索服务，替换 <code>&lt;keyword&gt;</code> 为你感兴趣的关键字。</p>
+</li>
+<li><p><strong>显示服务的详细信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl show &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>显示指定服务的详细信息，包括配置文件路径、依赖关系等。</p>
+</li>
+<li><p><strong>查看引导目标的详细信息：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl show default.target</span><br></pre></td></tr></table></figure>
+<p>显示当前引导目标的详细信息。</p>
+</li>
+<li><p><strong>过滤显示服务状态：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --state=active</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--state</code> 选项过滤显示服务的状态，例如，只显示正在运行的服务。</p>
+</li>
+<li><p><strong>查看服务的日志：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -u &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>journalctl</code> 命令查看指定服务的日志，替换 <code>&lt;service_name&gt;</code> 为你感兴趣的服务。</p>
+</li>
+<li><p><strong>查看最近的引导日志：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -xe</span><br></pre></td></tr></table></figure>
+<p>查看最近的引导日志，用于排查系统启动时可能遇到的问题。</p>
+</li>
+<li><p><strong>查看引导目标的依赖关系：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-dependencies multi-user.target</span><br></pre></td></tr></table></figure>
+<p>显示指定引导目标的依赖关系。</p>
+</li>
+<li><p><strong>使用通配符进行操作：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart <span class="string">&#x27;nginx*&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>使用通配符 <code>*</code> 来一次性操作符合条件的多个服务。</p>
+</li>
+<li><p><strong>查看系统启动时间：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemd-analyze</span><br></pre></td></tr></table></figure>
+<p>查看系统的启动时间及关键步骤，可以使用 <code>systemd-analyze blame</code> 查看各个服务的启动耗时。</p>
+</li>
+<li><p><strong>启动失败服务的故障排查：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl status &lt;service_name&gt; -l</span><br></pre></td></tr></table></figure>
+<p>使用 <code>-l</code> 选项显示更多详细的日志信息，有助于排查启动失败的服务问题。</p>
+</li>
+<li><p><strong>使用用户级服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user start &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>对于用户级服务，可以使用 <code>--user</code> 选项来管理。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更高效地使用 <code>systemctl</code> 命令，进行服务管理和故障排查。记住在使用系统管理命令时要小心，确保了解命令的影响和安全性。</p>
+<h2 id="linux-systemctl命令-高级技巧"><a href="#linux-systemctl命令-高级技巧" class="headerlink" title="linux systemctl命令 高级技巧"></a>linux systemctl命令 高级技巧</h2><p>以下是一些 <code>systemctl</code> 命令的高级技巧，适用于更深入的系统管理和故障排查：</p>
+<ol>
+<li><p><strong>使用 <code>--quiet</code> 选项：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --quiet start &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--quiet</code> 选项可以使 <code>systemctl</code> 命令输出更加简洁，只显示关键信息。</p>
+</li>
+<li><p><strong>使用 <code>--failed</code> 选项查看失败的服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --failed</span><br></pre></td></tr></table></figure>
+<p>列出所有启动失败的服务，方便快速定位问题。</p>
+</li>
+<li><p><strong>查看服务的所有相关日志：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl -u &lt;service_name&gt; --no-pager</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--no-pager</code> 选项可以直接在终端中显示所有相关日志，而不是通过分页器。</p>
+</li>
+<li><p><strong>手动启动服务：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --no-pager --quiet start &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--no-pager</code> 选项可以避免 <code>systemctl</code> 命令使用分页器，而 <code>--quiet</code> 则可以减少输出。</p>
+</li>
+<li><p><strong>显示服务的详细依赖树：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl list-dependencies --all &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>显示服务的详细依赖树，包括所有被依赖的服务。</p>
+</li>
+<li><p><strong>使用 <code>--force</code> 选项强制操作：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --force restart &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>--force</code> 选项可以强制执行某些操作，如强制重启服务。</p>
+</li>
+<li><p><strong>查看系统引导的时间线：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemd-analyze plot &gt; timeline.svg</span><br></pre></td></tr></table></figure>
+<p>生成引导时间线图，以 SVG 格式保存在文件中，用于可视化系统引导的整个过程。</p>
+</li>
+<li><p><strong>查看服务启动的时间线：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemd-analyze critical-chain &lt;service_name&gt;</span><br></pre></td></tr></table></figure>
+<p>查看指定服务启动所花费的时间和关键步骤。</p>
+</li>
+<li><p><strong>查看用户单元的状态：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user status</span><br></pre></td></tr></table></figure>
+<p>查看用户级服务单元的状态，包括用户自定义的服务。</p>
+</li>
+<li><p><strong>查看服务单元的所有属性：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl show &lt;service_name&gt; --all</span><br></pre></td></tr></table></figure>
+<p>显示指定服务单元的所有属性，包括默认值和用户自定义值。</p>
+</li>
+<li><p><strong>使用 <code>systemd-cgtop</code> 监控进程和资源：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemd-cgtop</span><br></pre></td></tr></table></figure>
+<p>以实时方式监控系统中的控制组（cgroup）信息，包括进程数、CPU 使用情况等。</p>
+</li>
+</ol>
+<p>这些高级技巧可以帮助你更深入地理解和利用 <code>systemctl</code> 命令，用于更复杂的系统管理任务和故障排查。请确保在使用这些命令时理解其影响，并根据需要适度使用。</p>
+<h2 id="systemctl"><a href="#systemctl" class="headerlink" title="systemctl"></a>systemctl</h2><p>Systemd 是 Linux 系统中广泛使用的 init 系统和服务管理器。<code>systemctl</code> 是 Systemd 的主要命令，用于管理系统服务。下面是一些常用的 <code>systemctl</code> 命令及其功能：</p>
+<ol>
+<li><p>启动和停止服务：</p>
+<ul>
+<li>启动一个服务：<code>sudo systemctl start servicename</code></li>
+<li>停止一个服务：<code>sudo systemctl stop servicename</code></li>
+<li>重启一个服务：<code>sudo systemctl restart servicename</code></li>
+<li>查看服务的状态：<code>sudo systemctl status servicename</code></li>
+</ul>
+</li>
+<li><p>禁用和启用服务的自启动：</p>
+<ul>
+<li>禁用一个服务的自启动：<code>sudo systemctl disable servicename</code></li>
+<li>启用一个服务的自启动：<code>sudo systemctl enable servicename</code></li>
+</ul>
+</li>
+<li><p>查看服务列表：</p>
+<ul>
+<li>列出所有运行中的服务：<code>sudo systemctl list-units --type=service --state=running</code></li>
+<li>列出所有已启用的服务：<code>sudo systemctl list-unit-files --type=service --state=enabled</code></li>
+</ul>
+</li>
+<li><p>查看日志：</p>
+<ul>
+<li>查看一个服务的日志：<code>sudo journalctl -u servicename</code></li>
+<li>查看系统日志：<code>sudo journalctl</code></li>
+</ul>
+</li>
+<li><p>查看和切换系统运行级别（target）：</p>
+<ul>
+<li>查看当前运行级别：<code>sudo systemctl get-default</code></li>
+<li>切换运行级别到图形界面：<code>sudo systemctl set-default graphical.target</code></li>
+<li>切换运行级别到多用户文本界面：<code>sudo systemctl set-default multi-user.target</code></li>
+</ul>
+</li>
+<li><p>重新加载 Systemd 配置：</p>
+<ul>
+<li>重新加载 Systemd 配置：<code>sudo systemctl daemon-reload</code></li>
+</ul>
+</li>
+</ol>
+<p>这些是一些常见的 <code>systemctl</code> 命令及其功能。<code>systemctl</code> 命令还有其他一些选项和功能，你可以使用 <code>man systemctl</code> 命令来查看完整的 <code>systemctl</code> 命令手册。</p>
+<p>Systemd 提供了强大的服务管理功能，可以帮助你启动、停止、管理和监控系统服务。使用 <code>systemctl</code> 命令可以方便地执行这些操作，并管理系统的运行级别和自启动行为。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_51_lspci/" rel="prev" title="linux_2_51_lspci">
+      <i class="fa fa-chevron-left"></i> linux_2_51_lspci
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_52_lsmod/" rel="next" title="linux_2_52_lsmod">
+      linux_2_52_lsmod <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-systemctl%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux systemctl命令 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-systemctl%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux systemctl命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-systemctl%E5%91%BD%E4%BB%A4-%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7"><span class="nav-number">4.</span> <span class="nav-text">linux systemctl命令 高级技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#systemctl"><span class="nav-number">5.</span> <span class="nav-text">systemctl</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

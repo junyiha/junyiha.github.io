@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 eval命令  linux eval命令 详解eval是一个用于执行由参数构成的Shell命令的Bash内置命令。它接受参数并将它们作为Shell命令解析和执行。使用eval时要非常小心，因为它可以执行任意命令，包括潜在的危险命令。 基本语法：1eval command_string  其中，command_string是需要执行的Shell命令。 示例： 简单的eval命令： 1eval">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_32_eval">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_32_eval/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 eval命令  linux eval命令 详解eval是一个用于执行由参数构成的Shell命令的Bash内置命令。它接受参数并将它们作为Shell命令解析和执行。使用eval时要非常小心，因为它可以执行任意命令，包括潜在的危险命令。 基本语法：1eval command_string  其中，command_string是需要执行的Shell命令。 示例： 简单的eval命令： 1eval">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.344Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_32_eval/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_32_eval | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_32_eval/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_32_eval
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>eval命令</li>
+</ul>
+<h2 id="linux-eval命令-详解"><a href="#linux-eval命令-详解" class="headerlink" title="linux eval命令 详解"></a>linux eval命令 详解</h2><p><code>eval</code>是一个用于执行由参数构成的Shell命令的Bash内置命令。它接受参数并将它们作为Shell命令解析和执行。使用<code>eval</code>时要非常小心，因为它可以执行任意命令，包括潜在的危险命令。</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> command_string</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>command_string</code>是需要执行的Shell命令。</p>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ol>
+<li><p><strong>简单的<code>eval</code>命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="built_in">echo</span> <span class="string">&quot;Hello, World!&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这将执行<code>echo &quot;Hello, World!&quot;</code>，并输出相应的结果。</p>
+</li>
+<li><p><strong>结合变量使用<code>eval</code>：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">variable=<span class="string">&quot;Hello&quot;</span></span><br><span class="line"><span class="built_in">eval</span> <span class="built_in">echo</span> <span class="string">&quot;\$variable&quot;</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>\$</code>来引用变量，<code>eval</code>将解析并执行命令，输出变量的值。</p>
+</li>
+<li><p><strong>动态生成命令字符串并执行：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">command_string=<span class="string">&quot;echo &#x27;Dynamic command&#x27;&quot;</span></span><br><span class="line"><span class="built_in">eval</span> <span class="variable">$command_string</span></span><br></pre></td></tr></table></figure>
+<p>将一个命令字符串赋值给变量，然后使用<code>eval</code>执行该命令。</p>
+</li>
+<li><p><strong>使用<code>eval</code>进行算术运算：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x=5</span><br><span class="line">y=3</span><br><span class="line"><span class="built_in">eval</span> <span class="string">&quot;result=\$((x + y))&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$result</span></span><br></pre></td></tr></table></figure>
+<p>在这个例子中，<code>eval</code>用于执行算术运算并将结果赋值给变量。</p>
+</li>
+<li><p><strong>执行包含特殊字符的命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;echo \$(ls)&quot;</span></span><br></pre></td></tr></table></figure>
+<p>在命令字符串中使用<code>\$()</code>执行子命令，并使用<code>eval</code>执行整个命令字符串。</p>
+</li>
+<li><p><strong>动态定义函数并调用：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;dynamic_function() &#123; echo &#x27;Dynamic function executed&#x27;; &#125;&quot;</span></span><br><span class="line">dynamic_function</span><br></pre></td></tr></table></figure>
+<p>使用<code>eval</code>动态定义函数，然后调用该函数。</p>
+</li>
+</ol>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><p><strong>潜在的安全风险：</strong> 使用<code>eval</code>时要格外小心，特别是当<code>eval</code>解析的内容来自外部用户或不受信任的源时，可能存在安全风险。</p>
+</li>
+<li><p><strong>谨慎使用：</strong> 在一般情况下，尽量避免使用<code>eval</code>，因为它使得代码更难以阅读和理解。在大多数情况下，有更安全、更清晰的替代方案。</p>
+</li>
+</ul>
+<p><code>eval</code>的使用需要慎重考虑，确保你理解其行为，并确保不会执行潜在的危险命令。在实际开发中，推荐寻找更安全和可读性更高的替代方案。</p>
+<h2 id="linux-eval命令更安全和可读性更高的代替方案"><a href="#linux-eval命令更安全和可读性更高的代替方案" class="headerlink" title="linux eval命令更安全和可读性更高的代替方案"></a>linux eval命令更安全和可读性更高的代替方案</h2><p>在很多情况下，可以通过其他更安全、可读性更高的方法替代<code>eval</code>命令。以下是一些替代方案：</p>
+<ol>
+<li><p><strong>使用函数：</strong><br>使用函数来封装一段需要执行的代码。函数提供了更清晰、可维护的代码结构，并且不需要使用<code>eval</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">my_function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;Hello, World!&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">my_function</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用命令替换：</strong><br>对于简单的命令，可以使用命令替换，而不是<code>eval</code>。命令替换使用<code>$()</code>或&#96;&#96;来执行命令并将结果赋值给变量。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">result=$(<span class="built_in">ls</span>)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$result</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用条件判断和循环：</strong><br>对于需要执行的复杂逻辑，可以使用条件判断和循环结构，而不是将一段代码作为字符串传递给<code>eval</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> [ <span class="string">&quot;<span class="variable">$condition</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;Condition is true.&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用数组：</strong><br>如果需要动态构建命令参数，可以使用数组来存储参数，而不是将它们作为字符串传递给<code>eval</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">command</span>=(<span class="string">&quot;echo&quot;</span> <span class="string">&quot;Hello, World!&quot;</span>)</span><br><span class="line"><span class="string">&quot;<span class="variable">$&#123;command[@]&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>使用代替工具或语言：</strong><br>对于一些复杂的任务，可能使用其他工具或编程语言（如Python、Perl）更为合适，避免使用<code>eval</code>。</p>
+</li>
+</ol>
+<p>总体来说，<code>eval</code>的使用要慎重考虑，特别是在处理外部输入时，避免潜在的安全风险。通过使用更清晰的替代方案，可以提高代码的可读性、可维护性，并减少潜在的安全隐患。</p>
+<h2 id="eval"><a href="#eval" class="headerlink" title="eval"></a>eval</h2><ul>
+<li>eval,命令用于重新运算求出参数的内容</li>
+<li>eval可读取一连串的参数,然后再依参数本身的特性来执行</li>
+<li>在shell脚本中,用eval加命令来执行linux命令</li>
+</ul>
+<p>在Linux中，<code>eval</code>命令用于将参数作为Shell命令执行，并将结果返回到当前Shell环境中。它将参数解析为Shell表达式并执行，可以用于动态地生成和执行命令。</p>
+<p>以下是<code>eval</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval [options] command</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>command</code>是要执行的命令或表达式。</p>
+<p><code>eval</code>命令在执行时会对<code>command</code>进行两次解析。首先，它会对<code>command</code>进行参数展开、命令替换和变量替换。然后，将解析后的结果作为Shell命令执行。</p>
+<p>以下是一些<code>eval</code>命令的常见用法：</p>
+<ol>
+<li><p>执行动态命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval &quot;$command&quot;</span><br></pre></td></tr></table></figure>
+
+<p>此命令将执行存储在<code>$command</code>变量中的动态命令。变量中的命令将被解析并执行。</p>
+</li>
+<li><p>执行包含变量的命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval &quot;echo $var&quot;</span><br></pre></td></tr></table></figure>
+
+<p>此命令将对变量<code>$var</code>进行变量替换，并将结果作为命令执行。换句话说，它将打印出变量<code>$var</code>的值。</p>
+</li>
+</ol>
+<p><code>eval</code>命令的主要用途是动态地构建和执行命令，可以在脚本中生成复杂的命令行操作。但需要注意，使用<code>eval</code>命令要谨慎，确保参数的来源可信，以避免安全风险。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_34_export/" rel="prev" title="linux_2_34_export">
+      <i class="fa fa-chevron-left"></i> linux_2_34_export
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_31_grep/" rel="next" title="linux_2_31_grep">
+      linux_2_31_grep <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-eval%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux eval命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-eval%E5%91%BD%E4%BB%A4%E6%9B%B4%E5%AE%89%E5%85%A8%E5%92%8C%E5%8F%AF%E8%AF%BB%E6%80%A7%E6%9B%B4%E9%AB%98%E7%9A%84%E4%BB%A3%E6%9B%BF%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">linux eval命令更安全和可读性更高的代替方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eval"><span class="nav-number">4.</span> <span class="nav-text">eval</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

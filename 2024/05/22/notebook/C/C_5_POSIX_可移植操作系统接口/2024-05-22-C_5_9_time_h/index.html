@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 Linux POSIX &lt;time.h&gt;  详解  Linux POSIX &lt;time.h&gt;  详解&lt;time.h&gt; 是 C 标准库中的一个头文件，用于处理日期和时间相关的操作。它同时也是 POSIX 操作系统接口的一部分，提供了在 POSIX 兼容环境下处理时间的函数和类型。 以下是 &lt;time.h&gt; 中一些关键组成部分的详解： 时间类型：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C_5_9_time_h">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_9_time_h/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 Linux POSIX &lt;time.h&gt;  详解  Linux POSIX &lt;time.h&gt;  详解&lt;time.h&gt; 是 C 标准库中的一个头文件，用于处理日期和时间相关的操作。它同时也是 POSIX 操作系统接口的一部分，提供了在 POSIX 兼容环境下处理时间的函数和类型。 以下是 &lt;time.h&gt; 中一些关键组成部分的详解： 时间类型：">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.239Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="CPOSIX">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_9_time_h/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>C_5_9_time_h | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_9_time_h/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C_5_9_time_h
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>Linux POSIX &lt;time.h&gt;  详解</li>
+</ul>
+<h2 id="Linux-POSIX-详解"><a href="#Linux-POSIX-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt;  详解"></a>Linux POSIX &lt;time.h&gt;  详解</h2><p><code>&lt;time.h&gt;</code> 是 C 标准库中的一个头文件，用于处理日期和时间相关的操作。它同时也是 POSIX 操作系统接口的一部分，提供了在 POSIX 兼容环境下处理时间的函数和类型。</p>
+<p>以下是 <code>&lt;time.h&gt;</code> 中一些关键组成部分的详解：</p>
+<h3 id="时间类型："><a href="#时间类型：" class="headerlink" title="时间类型："></a>时间类型：</h3><ol>
+<li><p>**<code>time_t</code>**：表示自 1970 年 1 月 1 日 00:00:00 UTC（称为 Epoch）以来经过的秒数。它通常用于存储和操作时间值。</p>
+</li>
+<li><p>**<code>struct tm</code>**：表示一个日期和时间，以其各个组成部分表示（例如年、月、日、小时、分钟、秒等）。</p>
+</li>
+</ol>
+<h3 id="函数："><a href="#函数：" class="headerlink" title="函数："></a>函数：</h3><ol>
+<li><p>**<code>time()</code>**：从系统时钟获取当前时间，并以 <code>time_t</code> 值的形式返回。</p>
+</li>
+<li><p>**<code>gmtime()</code>**：将 <code>time_t</code> 值转换为包含 UTC 时间的 <code>struct tm</code> 结构。</p>
+</li>
+<li><p>**<code>localtime()</code>**：将 <code>time_t</code> 值转换为包含本地时间的 <code>struct tm</code> 结构，已经根据当前时区进行了调整。</p>
+</li>
+<li><p>**<code>mktime()</code>**：将 <code>struct tm</code> 时间表示转换为 <code>time_t</code> 值。</p>
+</li>
+<li><p>**<code>strftime()</code>**：根据格式字符串，将 <code>struct tm</code> 时间值格式化为指定的字符串表示形式。</p>
+</li>
+<li><p>**<code>difftime()</code>**：计算两个 <code>time_t</code> 值之间的差异，以秒为单位返回差值。</p>
+</li>
+</ol>
+<h3 id="常量："><a href="#常量：" class="headerlink" title="常量："></a>常量：</h3><ol>
+<li><p><strong>Epoch</strong>：定义为时间的起始点，通常被表示为 1970 年 1 月 1 日（00:00:00 UTC）。</p>
+</li>
+<li><p><strong>与日期&#x2F;时间计算相关的常量</strong>：比如 <code>SECONDS_PER_MINUTE</code>（每分钟秒数）、<code>SECONDS_PER_HOUR</code>（每小时秒数）、<code>SECONDS_PER_DAY</code>（每天秒数）等，用于时间计算。</p>
+</li>
+</ol>
+<h3 id="时间操作："><a href="#时间操作：" class="headerlink" title="时间操作："></a>时间操作：</h3><p>通过 <code>&lt;time.h&gt;</code>，你可以进行各种时间相关的操作，比如：</p>
+<ul>
+<li>获取当前时间和日期。</li>
+<li>在不同的时间表示之间进行转换（比如 <code>time_t</code> 和 <code>struct tm</code>）。</li>
+<li>将时间值格式化为字符串。</li>
+<li>对时间值进行算术运算。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">time_t</span> currentTime;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> *<span class="title">localTime</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前时间</span></span><br><span class="line">    currentTime = time(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将当前时间转换为本地时间</span></span><br><span class="line">    localTime = localtime(&amp;currentTime);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示本地时间</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;当前本地时间和日期：%s&quot;</span>, asctime(localTime));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例演示了如何使用 <code>&lt;time.h&gt;</code> 中的函数获取当前本地时间和日期，并将其打印到控制台。</p>
+<p>请注意，虽然 <code>&lt;time.h&gt;</code> 提供了在 C 中进行基本日期和时间操作的功能，但是对于更高级的操作或在 C++ 中进行操作时，可能有更现代和功能更强大的库可用，比如 C++ 中的 <code>&lt;chrono&gt;</code>，或者其他库提供的更高级抽象。</p>
+<h2 id="Linux-POSIX-time-详解"><a href="#Linux-POSIX-time-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt; time()  详解"></a>Linux POSIX &lt;time.h&gt; time()  详解</h2><p><code>time()</code> 是 POSIX 操作系统中 <code>&lt;time.h&gt;</code> 头文件中所定义的一个函数，用于获取当前系统时间，并以 <code>time_t</code> 格式返回从 Epoch（1970 年 1 月 1 日 00:00:00 UTC）到当前时间经过的秒数。</p>
+<h3 id="函数签名："><a href="#函数签名：" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">time_t</span> <span class="title function_">time</span><span class="params">(<span class="type">time_t</span> *seconds)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：返回一个 <code>time_t</code> 类型的值，表示自 Epoch 起至当前时间经过的秒数。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>seconds</code>（可选）：一个指向 <code>time_t</code> 类型变量的指针。如果不为 <code>NULL</code>，函数会把获取到的当前时间也存储在这个指针所指向的位置，以便于进一步使用。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">time_t</span> currentTime;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前时间</span></span><br><span class="line">    currentTime = time(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;当前时间（自 Epoch 起的秒数）：%lld\n&quot;</span>, (<span class="type">long</span> <span class="type">long</span>)currentTime);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例："><a href="#解释示例：" class="headerlink" title="解释示例："></a>解释示例：</h3><ol>
+<li>引入 <code>&lt;stdio.h&gt;</code> 和 <code>&lt;time.h&gt;</code> 头文件。</li>
+<li>声明一个 <code>time_t</code> 类型的变量 <code>currentTime</code>。</li>
+<li>使用 <code>time(NULL)</code> 函数来获取当前时间，<code>NULL</code> 作为参数意味着函数只返回当前时间，不将其存储到其他地方。</li>
+<li>使用 <code>printf()</code> 将获取的当前时间值打印出来。</li>
+</ol>
+<h3 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h3><ul>
+<li><code>time()</code> 函数返回的时间值通常是自 Epoch（1970 年 1 月 1 日 00:00:00 UTC）起至当前时间的秒数。这个值的精度因系统而异，一般是秒级别的精度。</li>
+<li>如果 <code>seconds</code> 参数不为 <code>NULL</code>，则会将当前时间的值保存到这个参数所指向的位置，方便进一步处理。</li>
+</ul>
+<p><code>time()</code> 函数在 C 编程中常用于获取时间戳或者记录程序运行时间等任务。</p>
+<h2 id="Linux-POSIX-gmtime-详解"><a href="#Linux-POSIX-gmtime-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt; gmtime()  详解"></a>Linux POSIX &lt;time.h&gt; gmtime()  详解</h2><p><code>gmtime()</code> 是 POSIX 操作系统中 <code>&lt;time.h&gt;</code> 头文件中定义的一个函数，用于将 <code>time_t</code> 类型的时间值（从 Epoch 起的秒数）转换为一个 UTC（协调世界时）时间的结构体表示，即 <code>struct tm</code> 类型。</p>
+<h3 id="函数签名：-1"><a href="#函数签名：-1" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">gmtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：返回一个指向 <code>struct tm</code> 结构体的指针，其中包含了由 <code>time_t</code> 值表示的 UTC 时间的各个分量。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>timep</code>：一个指向 <code>time_t</code> 类型变量的指针，表示待转换的时间值。</li>
+</ul>
+</li>
+</ul>
+<h3 id="struct-tm-结构体定义："><a href="#struct-tm-结构体定义：" class="headerlink" title="struct tm 结构体定义："></a><code>struct tm</code> 结构体定义：</h3><p><code>struct tm</code> 结构体包含了表示时间的各个成员变量，例如年、月、日、小时、分钟、秒等，它的定义通常如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tm</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tm_sec;   <span class="comment">// 秒，范围 0-59</span></span><br><span class="line">    <span class="type">int</span> tm_min;   <span class="comment">// 分，范围 0-59</span></span><br><span class="line">    <span class="type">int</span> tm_hour;  <span class="comment">// 小时，范围 0-23</span></span><br><span class="line">    <span class="type">int</span> tm_mday;  <span class="comment">// 一个月中的日期，范围 1-31</span></span><br><span class="line">    <span class="type">int</span> tm_mon;   <span class="comment">// 月份，从一月开始计数，范围 0-11</span></span><br><span class="line">    <span class="type">int</span> tm_year;  <span class="comment">// 自 1900 年起至今的年数</span></span><br><span class="line">    <span class="type">int</span> tm_wday;  <span class="comment">// 一周中的天数，范围 0-6 (0 表示周日)</span></span><br><span class="line">    <span class="type">int</span> tm_yday;  <span class="comment">// 一年中的天数，范围 0-365</span></span><br><span class="line">    <span class="type">int</span> tm_isdst; <span class="comment">// 夏令时标志（0 表示不使用夏令时，正值表示夏令时，负值表示信息不可用）</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例：-2"><a href="#示例：-2" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">time_t</span> currentTime;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> *<span class="title">utcTime</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前时间</span></span><br><span class="line">    currentTime = time(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将当前时间转换为 UTC 时间</span></span><br><span class="line">    utcTime = gmtime(&amp;currentTime);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示 UTC 时间的各个成员</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;UTC 时间：%d-%02d-%02d %02d:%02d:%02d\n&quot;</span>,</span><br><span class="line">        utcTime-&gt;tm_year + <span class="number">1900</span>, utcTime-&gt;tm_mon + <span class="number">1</span>, utcTime-&gt;tm_mday,</span><br><span class="line">        utcTime-&gt;tm_hour, utcTime-&gt;tm_min, utcTime-&gt;tm_sec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例：-1"><a href="#解释示例：-1" class="headerlink" title="解释示例："></a>解释示例：</h3><ol>
+<li>引入 <code>&lt;stdio.h&gt;</code> 和 <code>&lt;time.h&gt;</code> 头文件。</li>
+<li>声明一个 <code>time_t</code> 类型的变量 <code>currentTime</code> 和一个指向 <code>struct tm</code> 的指针 <code>utcTime</code>。</li>
+<li>使用 <code>time(NULL)</code> 函数获取当前时间。</li>
+<li>使用 <code>gmtime(&amp;currentTime)</code> 函数将获取的时间转换为 UTC 时间，并将结果保存在 <code>utcTime</code> 指针指向的位置。</li>
+<li>使用 <code>printf()</code> 打印 UTC 时间的各个成员变量，需要注意月份应加一、年份需要加上 1900。</li>
+</ol>
+<p><code>gmtime()</code> 函数将 <code>time_t</code> 类型的时间值转换为 UTC 时间的结构体表示，方便对时间进行更详细的分析和处理。</p>
+<h2 id="Linux-POSIX-localtime-详解"><a href="#Linux-POSIX-localtime-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt; localtime()  详解"></a>Linux POSIX &lt;time.h&gt; localtime()  详解</h2><p><code>localtime()</code> 是 POSIX 操作系统中 <code>&lt;time.h&gt;</code> 头文件中定义的一个函数，用于将 <code>time_t</code> 类型的时间值（从 Epoch 起的秒数）转换为一个本地时间的结构体表示，即 <code>struct tm</code> 类型。</p>
+<h3 id="函数签名：-2"><a href="#函数签名：-2" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">localtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：返回一个指向 <code>struct tm</code> 结构体的指针，其中包含了由 <code>time_t</code> 值表示的本地时间的各个分量。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>timep</code>：一个指向 <code>time_t</code> 类型变量的指针，表示待转换的时间值。</li>
+</ul>
+</li>
+</ul>
+<h3 id="struct-tm-结构体定义：-1"><a href="#struct-tm-结构体定义：-1" class="headerlink" title="struct tm 结构体定义："></a><code>struct tm</code> 结构体定义：</h3><p><code>struct tm</code> 结构体包含了表示时间的各个成员变量，例如年、月、日、小时、分钟、秒等，它的定义通常如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tm</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tm_sec;   <span class="comment">// 秒，范围 0-59</span></span><br><span class="line">    <span class="type">int</span> tm_min;   <span class="comment">// 分，范围 0-59</span></span><br><span class="line">    <span class="type">int</span> tm_hour;  <span class="comment">// 小时，范围 0-23</span></span><br><span class="line">    <span class="type">int</span> tm_mday;  <span class="comment">// 一个月中的日期，范围 1-31</span></span><br><span class="line">    <span class="type">int</span> tm_mon;   <span class="comment">// 月份，从一月开始计数，范围 0-11</span></span><br><span class="line">    <span class="type">int</span> tm_year;  <span class="comment">// 自 1900 年起至今的年数</span></span><br><span class="line">    <span class="type">int</span> tm_wday;  <span class="comment">// 一周中的天数，范围 0-6 (0 表示周日)</span></span><br><span class="line">    <span class="type">int</span> tm_yday;  <span class="comment">// 一年中的天数，范围 0-365</span></span><br><span class="line">    <span class="type">int</span> tm_isdst; <span class="comment">// 夏令时标志（0 表示不使用夏令时，正值表示夏令时，负值表示信息不可用）</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例：-3"><a href="#示例：-3" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">time_t</span> currentTime;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> *<span class="title">localTime</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前时间</span></span><br><span class="line">    currentTime = time(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将当前时间转换为本地时间</span></span><br><span class="line">    localTime = localtime(&amp;currentTime);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示本地时间的各个成员</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;本地时间：%d-%02d-%02d %02d:%02d:%02d\n&quot;</span>,</span><br><span class="line">        localTime-&gt;tm_year + <span class="number">1900</span>, localTime-&gt;tm_mon + <span class="number">1</span>, localTime-&gt;tm_mday,</span><br><span class="line">        localTime-&gt;tm_hour, localTime-&gt;tm_min, localTime-&gt;tm_sec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例：-2"><a href="#解释示例：-2" class="headerlink" title="解释示例："></a>解释示例：</h3><ol>
+<li>引入 <code>&lt;stdio.h&gt;</code> 和 <code>&lt;time.h&gt;</code> 头文件。</li>
+<li>声明一个 <code>time_t</code> 类型的变量 <code>currentTime</code> 和一个指向 <code>struct tm</code> 的指针 <code>localTime</code>。</li>
+<li>使用 <code>time(NULL)</code> 函数获取当前时间。</li>
+<li>使用 <code>localtime(&amp;currentTime)</code> 函数将获取的时间转换为本地时间，并将结果保存在 <code>localTime</code> 指针指向的位置。</li>
+<li>使用 <code>printf()</code> 打印本地时间的各个成员变量，需要注意月份应加一、年份需要加上 1900。</li>
+</ol>
+<p><code>localtime()</code> 函数将 <code>time_t</code> 类型的时间值转换为本地时间的结构体表示，这样就可以方便地对时间进行更详细的分析和处理，并以易读的形式输出。</p>
+<h2 id="Linux-POSIX-mktime-详解"><a href="#Linux-POSIX-mktime-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt; mktime()  详解"></a>Linux POSIX &lt;time.h&gt; mktime()  详解</h2><p><code>mktime()</code> 是 POSIX 操作系统中 <code>&lt;time.h&gt;</code> 头文件中定义的一个函数，用于将一个表示日期和时间的 <code>struct tm</code> 结构体转换为 <code>time_t</code> 类型的时间值（从 Epoch 起的秒数）。</p>
+<h3 id="函数签名：-3"><a href="#函数签名：-3" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">time_t</span> <span class="title function_">mktime</span><span class="params">(<span class="keyword">struct</span> tm *timeptr)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：返回一个 <code>time_t</code> 类型的值，表示由 <code>struct tm</code> 结构体表示的时间值，即从 Epoch 起的秒数。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>timeptr</code>：一个指向 <code>struct tm</code> 结构体的指针，表示待转换为 <code>time_t</code> 类型的时间值。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例：-4"><a href="#示例：-4" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> <span class="title">dateTime</span>;</span></span><br><span class="line">    <span class="type">time_t</span> timeValue;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 填充日期和时间信息到 struct tm 结构体</span></span><br><span class="line">    dateTime.tm_year = <span class="number">2023</span> - <span class="number">1900</span>; <span class="comment">// 年份从 1900 开始计数</span></span><br><span class="line">    dateTime.tm_mon = <span class="number">11</span> - <span class="number">1</span>;       <span class="comment">// 月份从 0 开始计数</span></span><br><span class="line">    dateTime.tm_mday = <span class="number">23</span>;          <span class="comment">// 日期</span></span><br><span class="line">    dateTime.tm_hour = <span class="number">10</span>;          <span class="comment">// 小时</span></span><br><span class="line">    dateTime.tm_min = <span class="number">30</span>;           <span class="comment">// 分钟</span></span><br><span class="line">    dateTime.tm_sec = <span class="number">0</span>;            <span class="comment">// 秒</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将 struct tm 结构体转换为 time_t 类型的时间值</span></span><br><span class="line">    timeValue = mktime(&amp;dateTime);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示转换后的时间值（从 Epoch 起的秒数）</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;转换后的时间值：%lld\n&quot;</span>, (<span class="type">long</span> <span class="type">long</span>)timeValue);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例：-3"><a href="#解释示例：-3" class="headerlink" title="解释示例："></a>解释示例：</h3><ol>
+<li>引入 <code>&lt;stdio.h&gt;</code> 和 <code>&lt;time.h&gt;</code> 头文件。</li>
+<li>声明一个 <code>struct tm</code> 类型的变量 <code>dateTime</code> 和一个 <code>time_t</code> 类型的变量 <code>timeValue</code>。</li>
+<li>填充 <code>struct tm</code> 结构体 <code>dateTime</code> 中的年、月、日、小时、分钟、秒等成员变量。</li>
+<li>使用 <code>mktime(&amp;dateTime)</code> 函数将 <code>struct tm</code> 结构体转换为 <code>time_t</code> 类型的时间值，并将结果保存在 <code>timeValue</code> 变量中。</li>
+<li>使用 <code>printf()</code> 打印转换后的时间值（从 Epoch 起的秒数）。</li>
+</ol>
+<p><code>mktime()</code> 函数将日期和时间信息从 <code>struct tm</code> 结构体转换为 <code>time_t</code> 类型的时间值，方便在不同的时间表示之间进行转换。</p>
+<h2 id="Linux-POSIX-strftime-详解"><a href="#Linux-POSIX-strftime-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt; strftime()  详解"></a>Linux POSIX &lt;time.h&gt; strftime()  详解</h2><p><code>strftime()</code> 是 POSIX 操作系统中 <code>&lt;time.h&gt;</code> 头文件中定义的一个函数，用于将 <code>struct tm</code> 结构体表示的时间值格式化为指定格式的字符串。</p>
+<h3 id="函数签名：-4"><a href="#函数签名：-4" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">size_t</span> <span class="title function_">strftime</span><span class="params">(<span class="type">char</span> *s, <span class="type">size_t</span> maxsize, <span class="type">const</span> <span class="type">char</span> *format, <span class="type">const</span> <span class="keyword">struct</span> tm *timeptr)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：返回生成的字符串的字符数（不包括空字符 <code>\0</code>），如果格式化失败或者输出的字符串超出了 <code>maxsize</code> 的限制，则返回 0。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>s</code>：一个指向字符数组的指针，用于存储生成的格式化后的字符串。</li>
+<li><code>maxsize</code>：字符数组 <code>s</code> 的最大长度，以防止溢出。</li>
+<li><code>format</code>：一个表示输出格式的字符串。该格式字符串可以包含转换说明符以及普通字符。</li>
+<li><code>timeptr</code>：一个指向 <code>struct tm</code> 结构体的指针，表示待格式化的时间值。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例：-5"><a href="#示例：-5" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> <span class="title">dateTime</span>;</span></span><br><span class="line">    <span class="type">char</span> buffer[<span class="number">80</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 填充日期和时间信息到 struct tm 结构体</span></span><br><span class="line">    dateTime.tm_year = <span class="number">2023</span> - <span class="number">1900</span>; <span class="comment">// 年份从 1900 开始计数</span></span><br><span class="line">    dateTime.tm_mon = <span class="number">11</span> - <span class="number">1</span>;       <span class="comment">// 月份从 0 开始计数</span></span><br><span class="line">    dateTime.tm_mday = <span class="number">23</span>;          <span class="comment">// 日期</span></span><br><span class="line">    dateTime.tm_hour = <span class="number">10</span>;          <span class="comment">// 小时</span></span><br><span class="line">    dateTime.tm_min = <span class="number">30</span>;           <span class="comment">// 分钟</span></span><br><span class="line">    dateTime.tm_sec = <span class="number">0</span>;            <span class="comment">// 秒</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 格式化 struct tm 结构体中的时间信息为字符串</span></span><br><span class="line">    strftime(buffer, <span class="keyword">sizeof</span>(buffer), <span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>, &amp;dateTime);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示格式化后的字符串</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;格式化后的时间字符串：%s\n&quot;</span>, buffer);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例：-4"><a href="#解释示例：-4" class="headerlink" title="解释示例："></a>解释示例：</h3><ol>
+<li>引入 <code>&lt;stdio.h&gt;</code> 和 <code>&lt;time.h&gt;</code> 头文件。</li>
+<li>声明一个 <code>struct tm</code> 类型的变量 <code>dateTime</code> 和一个字符数组 <code>buffer</code>。</li>
+<li>填充 <code>struct tm</code> 结构体 <code>dateTime</code> 中的年、月、日、小时、分钟、秒等成员变量。</li>
+<li>使用 <code>strftime()</code> 函数将 <code>struct tm</code> 结构体中的时间信息格式化为字符串，按照给定的格式 <code>&quot;%Y-%m-%d %H:%M:%S&quot;</code>（表示年-月-日 时:分:秒）。</li>
+<li>生成的格式化后的字符串保存在 <code>buffer</code> 数组中，并使用 <code>printf()</code> 打印出来。</li>
+</ol>
+<p><code>strftime()</code> 函数可以根据指定的格式将 <code>struct tm</code> 结构体表示的时间值格式化为字符串，非常方便用于生成各种不同格式的日期时间字符串。</p>
+<h2 id="Linux-POSIX-difftime-详解"><a href="#Linux-POSIX-difftime-详解" class="headerlink" title="Linux POSIX &lt;time.h&gt; difftime()  详解"></a>Linux POSIX &lt;time.h&gt; difftime()  详解</h2><p><code>difftime()</code> 是 POSIX 操作系统中 <code>&lt;time.h&gt;</code> 头文件中定义的一个函数，用于计算两个 <code>time_t</code> 类型的时间值之间的差异，返回结果以秒为单位。</p>
+<h3 id="函数签名：-5"><a href="#函数签名：-5" class="headerlink" title="函数签名："></a>函数签名：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> <span class="title function_">difftime</span><span class="params">(<span class="type">time_t</span> time1, <span class="type">time_t</span> time0)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>返回值</strong>：返回一个 <code>double</code> 类型的值，表示两个时间值之间的差异（以秒为单位）。</li>
+<li><strong>参数</strong>：<ul>
+<li><code>time1</code>：第一个 <code>time_t</code> 类型的时间值。</li>
+<li><code>time0</code>：第二个 <code>time_t</code> 类型的时间值。</li>
+</ul>
+</li>
+</ul>
+<h3 id="示例：-6"><a href="#示例：-6" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">time_t</span> currentTime;</span><br><span class="line">    <span class="type">time_t</span> startTime;</span><br><span class="line">    <span class="type">double</span> difference;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前时间和起始时间</span></span><br><span class="line">    currentTime = time(<span class="literal">NULL</span>);</span><br><span class="line">    startTime = <span class="number">1638732000</span>; <span class="comment">// 2021-12-06 12:00:00 的时间戳</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算两个时间之间的差异</span></span><br><span class="line">    difference = difftime(currentTime, startTime);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示两个时间之间的差异（秒数）</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;时间差：%f 秒\n&quot;</span>, difference);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释示例：-5"><a href="#解释示例：-5" class="headerlink" title="解释示例："></a>解释示例：</h3><ol>
+<li>引入 <code>&lt;stdio.h&gt;</code> 和 <code>&lt;time.h&gt;</code> 头文件。</li>
+<li>声明 <code>time_t</code> 类型的变量 <code>currentTime</code>、<code>startTime</code> 和 <code>double</code> 类型的变量 <code>difference</code>。</li>
+<li>使用 <code>time(NULL)</code> 获取当前时间戳 <code>currentTime</code>，并将特定日期时间的时间戳（<code>2021-12-06 12:00:00</code>）存储在 <code>startTime</code> 变量中。</li>
+<li>使用 <code>difftime()</code> 函数计算当前时间 <code>currentTime</code> 和特定起始时间 <code>startTime</code> 之间的差异。</li>
+<li>将计算得到的时间差异（秒数）显示在控制台上。</li>
+</ol>
+<p><code>difftime()</code> 函数可用于计算两个 <code>time_t</code> 类型的时间值之间的差异，常用于测量时间间隔或计算程序执行时间等场景。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CPOSIX/" rel="tag"># CPOSIX</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_8_pthread_h/" rel="prev" title="C_5_8_pthread_h">
+      <i class="fa fa-chevron-left"></i> C_5_8_pthread_h
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/C/C_5_POSIX_%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3/2024-05-22-C_5_4_stdlib_h/" rel="next" title="C_5_4_stdlib_h">
+      C_5_4_stdlib_h <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt;  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">时间类型：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E9%87%8F%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">常量：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">时间操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-time-%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt; time()  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">3.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">解释示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="nav-number">3.4.</span> <span class="nav-text">注意事项：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-gmtime-%E8%AF%A6%E8%A7%A3"><span class="nav-number">4.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt; gmtime()  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-1"><span class="nav-number">4.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-tm-%E7%BB%93%E6%9E%84%E4%BD%93%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">struct tm 结构体定义：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">4.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%EF%BC%9A-1"><span class="nav-number">4.4.</span> <span class="nav-text">解释示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-localtime-%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt; localtime()  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-2"><span class="nav-number">5.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-tm-%E7%BB%93%E6%9E%84%E4%BD%93%E5%AE%9A%E4%B9%89%EF%BC%9A-1"><span class="nav-number">5.2.</span> <span class="nav-text">struct tm 结构体定义：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-3"><span class="nav-number">5.3.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%EF%BC%9A-2"><span class="nav-number">5.4.</span> <span class="nav-text">解释示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-mktime-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt; mktime()  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-3"><span class="nav-number">6.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-4"><span class="nav-number">6.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%EF%BC%9A-3"><span class="nav-number">6.3.</span> <span class="nav-text">解释示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-strftime-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt; strftime()  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-4"><span class="nav-number">7.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-5"><span class="nav-number">7.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%EF%BC%9A-4"><span class="nav-number">7.3.</span> <span class="nav-text">解释示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-POSIX-difftime-%E8%AF%A6%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">Linux POSIX &lt;time.h&gt; difftime()  详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%EF%BC%9A-5"><span class="nav-number">8.1.</span> <span class="nav-text">函数签名：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A-6"><span class="nav-number">8.2.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%A4%BA%E4%BE%8B%EF%BC%9A-5"><span class="nav-number">8.3.</span> <span class="nav-text">解释示例：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

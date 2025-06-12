@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="摘要 模型训练">
+<meta property="og:type" content="article">
+<meta property="og:title" content="模型训练">
+<meta property="og:url" content="https://junyiha.github.io/2025/05/12/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-05-12--YOLO%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="摘要 模型训练">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-05-12T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-03T02:14:45.785Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="AI部署">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/05/12/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-05-12--YOLO%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>模型训练 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/05/12/notebook/DeepLearning/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/2025-05-12--YOLO%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          模型训练
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-05-12 09:00:00" itemprop="dateCreated datePublished" datetime="2025-05-12T09:00:00+08:00">2025-05-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-06-03 10:14:45" itemprop="dateModified" datetime="2025-06-03T10:14:45+08:00">2025-06-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DeepLearning/" itemprop="url" rel="index"><span itemprop="name">DeepLearning</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
+<li>模型训练</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="模型训练流程"><a href="#模型训练流程" class="headerlink" title="模型训练流程"></a>模型训练流程</h2><ul>
+<li><p>安装python</p>
+<ul>
+<li>python3.10.0</li>
+</ul>
+</li>
+<li><p>安装OpenCV</p>
+<ul>
+<li>pip install opencv-python</li>
+</ul>
+</li>
+<li><p>安装 ultraytics</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Install the ultralytics package from PyPI</span><br><span class="line">pip install ultralytics -i https://mirrors.aliyun.com/pypi/simple/</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="免费标注工具推荐"><a href="#免费标注工具推荐" class="headerlink" title="免费标注工具推荐"></a>免费标注工具推荐</h2><ul>
+<li><p>LabelImg(本地标注)</p>
+</li>
+<li><p>LabelMe(本地标注)</p>
+</li>
+<li><p>安装标注工具</p>
+<ul>
+<li>pip install labelImg</li>
+<li>labelImg</li>
+</ul>
+</li>
+<li><p>标注规范：</p>
+<ul>
+<li>标注框紧贴目标边缘</li>
+<li>遮挡目标需标注可见部分</li>
+<li>小目标(&lt; 32x32)使用特殊标记</li>
+</ul>
+</li>
+</ul>
+<h2 id="选择预训练模型"><a href="#选择预训练模型" class="headerlink" title="选择预训练模型"></a>选择预训练模型</h2><ul>
+<li>官方提供的预训练权重<ul>
+<li>yolov12n.pt : 纳米级</li>
+<li>yolov12s.pt : 轻量级</li>
+<li>yolov12m.pt : 均衡版</li>
+<li>yolov12l.pt : 大型版</li>
+<li>yolov12x.pt : 超大型版</li>
+</ul>
+</li>
+</ul>
+<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ultralytics <span class="keyword">import</span> YOLO</span><br><span class="line"></span><br><span class="line">model = YOLO(<span class="string">&#x27;yolov12s.pt&#x27;</span>)</span><br><span class="line"></span><br><span class="line">results = model.train(</span><br><span class="line">    data=<span class="string">&#x27;dataset.yml&#x27;</span>,</span><br><span class="line">    epochs=<span class="number">300</span>,</span><br><span class="line">    imgsz=<span class="number">640</span>,</span><br><span class="line">    batch=<span class="number">16</span>,</span><br><span class="line">    device=<span class="number">0</span>,</span><br><span class="line">    optimizer=<span class="string">&#x27;SGD&#x27;</span>,</span><br><span class="line">    lr0=<span class="number">0.001</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>常用的模型训练参数和说明<ul>
+<li>model ： 指定用于训练的模型文件。接受指向.pt预训练模型或.yaml配置文件。对于定义模型结构或初始化权重至关重要</li>
+<li>data ： 数据集配置文件的路径，例如coco8.yaml。该文件包含特定于数据集的参数，包括训练数据和验证数据的路径，类名和类数</li>
+<li>epochs ：训练总轮数。每个epoch代表对整个数据集进行一次完整的训练。调整该值会影响训练时间和模型性能</li>
+<li>patience ：在验证指标没有改善的情况下，提前停止训练所需的epoch数。当性能趋于平稳时停止训练，有助于防止过度拟合</li>
+<li>batch ：批量大小，有三种模式：设置为整数，例如batch&#x3D;16，60%GPU内存利用率的自动模式(batch&#x3D;-1)，或指定利用率分数的自动模式(batch&#x3D;0.70)</li>
+<li>imgsz ：用于训练的目标图像尺寸。所有图像在输入模型前都会被调整到这一尺寸。影响模型精度和计算复杂度</li>
+<li>device ： 指定用于训练的计算设备：单个GPU(device &#x3D; 0)，多个GPU(device&#x3D;0,1)，CPU(device&#x3D;cpu)，或苹果芯片的MPS(device&#x3D;mps)</li>
+<li>workers ： 加载数据的工作线程数。影响数据预处理和输入模型的速度，尤其适用于多GPU设置</li>
+<li>name ： 训练运行的名称。用于在项目文件内创建一个子目录，用于存储训练日志和输出结果。</li>
+<li>pretrained ： 决定是否从预处理模型开始训练。可以是布尔值，也可以是加载权重的特定模型的字符串路径。提高训练效率和模型性能</li>
+<li>optimizer ： 为训练模型选择优化器。选项包括SGD，Adam，AdamW，NAdam，RAdam，RMSProp等，或auto用于根据模型配置进行自动选择。影响收敛速度和稳定性</li>
+<li>lr0 ： 初始学习率。调整这个值对优化过程至关重要，会影响模型权重的更新速度</li>
+<li>lrf ： 最终学习率占初始学习率的百分比，与调度程序结合使用，随着时间的推移调整学习率。</li>
+</ul>
+</li>
+</ul>
+<h2 id="模型训练中，每个损失函数的意义是什么？"><a href="#模型训练中，每个损失函数的意义是什么？" class="headerlink" title="模型训练中，每个损失函数的意义是什么？"></a>模型训练中，每个损失函数的意义是什么？</h2><h3 id="边界框回归损失"><a href="#边界框回归损失" class="headerlink" title="边界框回归损失"></a>边界框回归损失</h3><ul>
+<li><p>box_loss(边界框回归损失)，是用于优化预测边界框与真实边界框之间的差异的部分。</p>
+</li>
+<li><p>box_loss 主要包括两个部分</p>
+<ul>
+<li>中心点坐标损失<ul>
+<li>这一部分衡量了预测边界框中心点与真实边界框中心点之间的欧几里得距离平方。目的是使预测的边界框中心尽可能接近真实边界框的中心</li>
+</ul>
+</li>
+<li>宽度损失<ul>
+<li>这一部分衡量了预测边界框的宽度和高度与真实边界框的宽度和高度之间的差异。对宽度和高度取平方根是为了减小大尺寸边界框的影响，使得小尺寸边界框的误差不会被大尺寸边界框的误差所掩盖。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>为什么需要box_loss</p>
+<ul>
+<li>精确定位：通过最小化中心点坐标损失和宽度损失，模型能够更准确的预测目标的位置和大小</li>
+<li>平衡不同类型的目标：使用平方根来处理宽度损失，可以更好的平衡不同大小的目标，确保小目标也能得到足够的关注</li>
+<li>稳定训练：适当的损失函数设计有助于模型的稳定训练，避免梯度爆炸或消失等问题</li>
+</ul>
+</li>
+</ul>
+<h3 id="分类损失"><a href="#分类损失" class="headerlink" title="分类损失"></a>分类损失</h3><ul>
+<li><p>cls_loss(分类损失)，通常使用交叉熵损失(Cross-Entropy Loss)来计算。交叉熵损失衡量得是模型预测的概率分布与真实标签之间的差异。</p>
+</li>
+<li><p>为什么需要cls_loss</p>
+<ul>
+<li>类别识别： cls_loss 确保模型能够正确识别出图像中的目标属于哪个类别。这对于目标检测任务至关重要，因为不仅需要知道目标的位置，还需要知道目标的类型。</li>
+<li>多类别支持：通过最小化分类损失，模型可以处理多个类别的目标检测任务。例如，在道路缺陷检测中，可能需要识别裂缝，坑洞，路面破损等多种类型的缺陷。</li>
+<li>提高准确性：分类损失有助于提高模型的分类准确性，从而提升整体检测性能。通过优化分类损失，模型可以更好的学习不同类别之间的特征差异。</li>
+</ul>
+</li>
+</ul>
+<h3 id="分布损失详解"><a href="#分布损失详解" class="headerlink" title="分布损失详解"></a>分布损失详解</h3><ul>
+<li><p>dfl_loss(Distribution Focal Loss)，是YOLO系列中的一种损失函数，特别是在一些改进版本，例如YOLOv5和YOLOv7中被引用。它的主要目的是解决目标检测中的类别不平衡问题，并提高模型在处理小目标和困难样本时的性能。</p>
+</li>
+<li><p>在目标检测任务中，类别不平衡是一个常见的问题。某些类别的样本数量可能远远多于其他类别，这会导致模型在训练过程中对常见类别的学习效果较好，而对汉奸类别的学习效果交叉。此外，小目标和困难样本的检测也是一个挑战，因为这些目标通常具有较少的特征信息，容易被忽略或误分类。</p>
+</li>
+<li><p>为了应对这些问题，研究者们提出了多种改进方法，其中之一就是dfl_loss。dfl_loss通过引入分布焦点损失来增强模型对困难样本的关注，并改善类别不平衡问题。</p>
+</li>
+<li><p>DFL Loss通常与传统的交叉熵损失结合使用，以增强模型对困难样本的学习能力。其核心思想是通过对每个类别的预测概率进行加权，使得模型更加关注那些难以正确分类的样本。</p>
+</li>
+<li><p>DFL Loss的具体意义</p>
+<ul>
+<li>类别不平衡：通过引入平衡因子，DFL Loss可以更好的处理类别不平衡问题。对于少数类别的样本，可以通过增加其权重来提升其重要性，从而提高模型对这些类别的检测性能</li>
+<li>困难样本：通过聚焦参数，DFL Loss可以让模型更加关注那些难以正确分类的样本。当聚焦参数较大时，模型会对那些预测概率较低的样本给与更多的关注，从而提高这些样本的分类准确性。</li>
+<li>提高整体性能：DFL Loss结合了传统交叉熵损失的优势，并通过加权机制增强了模型对困难样本的学习能力，从而提高了整体的检测性能。</li>
+</ul>
+</li>
+</ul>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
+<li>YOLO的三大损失函数分别针对不同的任务进行优化：<ul>
+<li>边界框回归损失(Box Loss)：确保模型能够准确的定位目标</li>
+<li>置信度损失(Objectness Loss)：优化预测边界框的置信度，提高模型对目标存在与否的判断能力</li>
+<li>分类损失(Classification Loss): 确保模型能够正确识别出图像中的对象属于那个类别。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI%E9%83%A8%E7%BD%B2/" rel="tag"># AI部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/09/notebook/DeepLearning/2025-05-09--%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%B7%A5%E7%A8%8B%E5%8C%96%E5%BA%94%E7%94%A8/" rel="prev" title="深度学习工程化应用">
+      <i class="fa fa-chevron-left"></i> 深度学习工程化应用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/05/12/notebook/Windows/2025-05-12-DEF%E6%A8%A1%E5%9D%97%E5%AE%9A%E4%B9%89%E6%96%87%E4%BB%B6/" rel="next" title="DEF 模块定义文件">
+      DEF 模块定义文件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">模型训练流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%8D%E8%B4%B9%E6%A0%87%E6%B3%A8%E5%B7%A5%E5%85%B7%E6%8E%A8%E8%8D%90"><span class="nav-number">3.</span> <span class="nav-text">免费标注工具推荐</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">选择预训练模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">5.</span> <span class="nav-text">模型训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E4%B8%AD%EF%BC%8C%E6%AF%8F%E4%B8%AA%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%E7%9A%84%E6%84%8F%E4%B9%89%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">6.</span> <span class="nav-text">模型训练中，每个损失函数的意义是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%B9%E7%95%8C%E6%A1%86%E5%9B%9E%E5%BD%92%E6%8D%9F%E5%A4%B1"><span class="nav-number">6.1.</span> <span class="nav-text">边界框回归损失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E6%8D%9F%E5%A4%B1"><span class="nav-number">6.2.</span> <span class="nav-text">分类损失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E6%8D%9F%E5%A4%B1%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.3.</span> <span class="nav-text">分布损失详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">6.4.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

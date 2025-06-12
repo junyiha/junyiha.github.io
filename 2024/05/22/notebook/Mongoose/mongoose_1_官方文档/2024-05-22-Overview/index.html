@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 使用方式  添加mongoose.h和mongoose.c文件   两个基本数据结构  struct mg_mgr  –  持有所有运行连接的事件管理 struct mg_connection  –  单个连接描述符。换言之，每个连接都通过结构mg_connection结构来描述   事件处理，每一个连接有两个事件处理函数：c-&gt;fn和c-&gt;pfn  c-&gt;fn，是由用户自">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Overview">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-Overview/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 使用方式  添加mongoose.h和mongoose.c文件   两个基本数据结构  struct mg_mgr  –  持有所有运行连接的事件管理 struct mg_connection  –  单个连接描述符。换言之，每个连接都通过结构mg_connection结构来描述   事件处理，每一个连接有两个事件处理函数：c-&gt;fn和c-&gt;pfn  c-&gt;fn，是由用户自">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.407Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="Mongoose">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-Overview/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Overview | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-Overview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Overview
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mongoose/" itemprop="url" rel="index"><span itemprop="name">Mongoose</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><p>使用方式</p>
+<ul>
+<li>添加<code>mongoose.h</code>和<code>mongoose.c</code>文件</li>
+</ul>
+</li>
+<li><p>两个基本数据结构</p>
+<ul>
+<li><code>struct mg_mgr</code>  –  持有所有运行连接的事件管理</li>
+<li><code>struct mg_connection</code>  –  单个连接描述符。换言之，每个连接都通过结构mg_connection结构来描述</li>
+</ul>
+</li>
+<li><p>事件处理，每一个连接有两个事件处理函数：<code>c-&gt;fn</code>和<code>c-&gt;pfn</code></p>
+<ul>
+<li><code>c-&gt;fn</code>，是由用户自定义的事件处理函数</li>
+<li><code>c-&gt;pfn</code>，是一个特定于协议的处理程序函数，被隐式设置。例如，<code>mg_http_listen()</code>将<code>c-&gt;pfn</code>设置为mongoose的HTTP事件处理程序。</li>
+</ul>
+</li>
+<li><p>在特定于用户的处理程序之前调用特定于协议的处理程序。它解析传入数据，并可能调用特定于协议的事件，例如<code>MG_EV_HTTP_MSG</code></p>
+</li>
+<li><p>注意：</p>
+<ul>
+<li>由于Mongoose的核心不受并发访问的保护，因此请确保从同一线程或RTOS任务调用所有<code>mg_*</code> API函数</li>
+</ul>
+</li>
+<li><p>发送和接收缓冲区，每一个连接有一个发送和接收缓冲区：<code>struct mg_connection::send</code>, <code>struct mg_connection::recv</code></p>
+<ul>
+<li><code>struct mg_connection::send</code> : 将发送到对端的数据</li>
+<li><code>struct mg_connection::recv</code> : 从对端接收的数据</li>
+</ul>
+</li>
+<li><p>当数据到达时，mongoose将接收到的数据追加到<code>recv</code>并触发一个<code>MG_EV_READ</code>事件。</p>
+</li>
+<li><p>用户可以通过调用输出函数之一来发送数据，例如<code>mg_send()</code>，<code>mg_printf()</code>或类似于<code>mg_ws_send()</code>的协议特定函数。</p>
+</li>
+<li><p>输出函数将数据追加到<code>send</code>缓冲区。当mongoose成功将数据写入套接字中时，它会将数据从结构体<code>mg_connection::send</code>中丢掉并且发送一个<code>MG_EV_WRITE</code>事件</p>
+</li>
+<li><p>每个连接都有与之关联的事件处理函数，该功能必须由用户实现。事件处理函数是mongoose的关键要素，因为它定义了连接的行为</p>
+</li>
+<li><p>事件处理函数示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Event handler function defines connection&#x27;s behavior</span><br><span class="line">static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_READ) &#123;</span><br><span class="line">    mg_send(c, c-&gt;recv.buf, c-&gt;recv.len);   // Implement echo server</span><br><span class="line">    c-&gt;recv.len = 0;                        // Delete received data</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>参数：</p>
+<ul>
+<li><code>struct mg_connection *c</code>  –  接收事件的连接</li>
+<li><code>int ev</code>                   –  在<code>mongoose.h</code>中定义的事件编号。例如，当数据到达入站连接时，<code>ev</code>将是<code>MG_EV_READ</code></li>
+<li><code>void *ev_data</code>            –  指向特定于事件的数据，并且对不同事件具有不同的含义。<ul>
+<li>例如，对于<code>MG_EV_READ</code>事件，<code>ev_data</code>是一个<code>int *</code>指向从远程对等方接收的字节数，并保存到<code>c-&gt;recv</code> IO缓冲区中。</li>
+<li><code>ev_data</code>的确切含义是<strong>用来描述每一个事件</strong>。</li>
+<li>特定于协议的事件通常将<code>ev_data</code>指向具有特定协议信息的结构</li>
+</ul>
+</li>
+<li><code>void *fn_data</code>            –  连接的用户定义指针，这是用于应用程序特定数据的占位符。<ul>
+<li>这个<code>fn_data</code>指针是在<code>*_listen()</code>或者<code>*_connect()</code>调用期间设置的，并将其存储在<code>c-&gt;fn_data</code>。</li>
+<li>监听连接将<code>c-&gt;fn_data</code>的值复制到新接受的连接，因此所有接受的连接最初共享相同的<code>fn_data</code>指针。</li>
+<li>通过设置<code>c-&gt;fn_data = new_value</code>，可以随时更新或替换任何连接的<code>fn_data</code>指针</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>struct mg_connection</code>具有带有连接标志的设置。标志是二进制的：它们是0或者1。一些标志是由mongoose设置的，应用代码不能修改。例如，<code>is_udp</code>标志告诉应用连接是不是UDP。</p>
+</li>
+<li><p>一些标志是应用代码可以修改的，它们是：<code>is_hexdumping</code>, <code>id_draining</code>, <code>is_closing</code>。</p>
+<ul>
+<li><code>id_draining</code>标志，如果用户设置了这个标志，就是告诉mongoose向对端发送剩余数据，当都发送完毕时，关掉这个连接</li>
+<li><code>is_closing</code>标志，如果用户设置了这个标志，就是立即关闭并释放连接，而不需要发送剩余数据</li>
+<li><code>is_hexdumping</code>标志，</li>
+</ul>
+</li>
+<li><p>调试日志。要增加调试的详细性，调用<code>mg_log_set()</code> ： <code>mg_log_set(MG_LL_DEBUG); mg_mgr_init(&amp;mgr);</code></p>
+<ul>
+<li><code>MG_INFO()</code>, <code>MG_DEBUG()</code>日志宏默认情况下使用<code>putchar()</code>，即它们使用标准的C stdout流。这种方式在传统的操作系统环境正常工作。在嵌入式环境中，为了查看调试日志，可以使用两种方式：IO重定位和日志重定向<ul>
+<li>IO重定位可以通过嵌入式SDK实现</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>如果您需要执行连接的任何初始化，请通过捕获<code>MG_EV_OPEN</code>事件进行操作。</p>
+</li>
+<li><p>该事件是在连接被分配并添加到事件管理之后立即发送的，并在其他任何内容之前。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">if (ev == MG_EV_OPEN) &#123;</span><br><span class="line">  ... // Do your initialisation</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果您需要保留一些特定连接的数据，则有两个选择</p>
+<ul>
+<li>第一，使用<code>c-&gt;fn_data</code>指针。该指针作为最后一个参数传递给事件处理程序<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_OPEN) &#123;</span><br><span class="line">    c-&gt;fn_data = malloc(123);       // Change our fn_data</span><br><span class="line">  &#125; else if (ev == MG_EV_CLOSE) &#123;</span><br><span class="line">    free(fn_data);  // Don&#x27;t forget to free!</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Every accepted connection inherit NULL pointer as c-&gt;fn_data, but we change</span><br><span class="line">// it per-connection to something else</span><br><span class="line">mg_http_listen(&amp;mgr, &quot;http://localhost:1234&quot;, fn, NULL);</span><br></pre></td></tr></table></figure></li>
+<li>第二，使用<code>c-&gt;label</code>缓冲区。该缓冲区可以容纳一些特定于连接的数据，而无需额外的内存分配<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_WS_OPEN) &#123;</span><br><span class="line">    c-&gt;label[0] = &#x27;W&#x27;; // Established websocket connection, store something</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>如果需要关闭连接，请在自己的事件处理函数中设置<code>c-&gt;is_draining = 1;</code>。它将告诉mongoose向对端发送剩余数据，当都发送完毕时，关掉这个连接</p>
+</li>
+<li><p>如果需要立即关闭而不需要发送剩余数据，则设置<code>c-&gt;is_closing = 1;</code></p>
+</li>
+<li><p>使用<code>mg_http_reply()</code>函数创建HTTP响应报文。重要的是，这个函数能够正确设置<code>Content-Length</code>头。</p>
+</li>
+<li><p>当然，也可以手动创建HTTP响应报文。例如，使用<code>mg_printf()</code>函数，但是请确定设置了<code>Content-Length</code>头</p>
+<ul>
+<li><code>mg_printf(c, &quot;HTTP/1.1 200 OK\r\Content-Length: %d\r\n\r\n%s&quot;, 2, &quot;hi&quot;);</code></li>
+</ul>
+</li>
+<li><p>或者，使用块的传输编码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mg_printf(c, &quot;HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n&quot;);</span><br><span class="line">mg_http_printf_chunk(c, &quot;%s&quot;, &quot;foo&quot;);</span><br><span class="line">mg_http_printf_chunk(c, &quot;%s&quot;, &quot;bar&quot;);</span><br><span class="line">mg_http_printf_chunk(c, &quot;&quot;);  // Don&#x27;t forget the last empty chunk</span><br></pre></td></tr></table></figure></li>
+<li><p>需要注意的是：如果不适用<code>mg_http_reply()</code>或者<code>mg_http_*_chunk()</code>，请确保在自己的活动处理程序完成写入响应报文时，确保设置<code>c-&gt;is_reply = 0;</code></p>
+</li>
+<li><p>默认情况下，IO缓冲区分配的大小<code>MG_IO_SIZE</code>是2048.将其更改为512可以减少每个连接的内存消耗</p>
+</li>
+<li><p>Mongoose有三种影响构建的构建常数（预处理器定义）：目标体系结构&#x2F;操作系统，目标网络堆栈，可调参数。</p>
+</li>
+<li><p>为了在构建时间设置选项，请使用-D选项编译器标志</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ cc app.c mongoose.c                           # Use defaults!</span><br><span class="line">$ cc app.c mongoose.c -D MG_ENABLE_IPV6=1       # Build with IPv6 enabled</span><br><span class="line">$ cc app.c mongoose.c -D MG_ARCH=MG_ARCH_RTX    # Set architecture</span><br><span class="line">$ cc app.c mongoose.c -D MG_ENABLE_SSI=0 -D MG_IO_SIZE=8192  # Multiple options</span><br></pre></td></tr></table></figure></li>
+<li><p>支持架构的列表在<code>Arch.H</code>标题文件中定义。通常，无需明确指定体系结构。在构建过程中猜到了架构，因此通常不需要设置 </p>
+</li>
+<li><p>网络堆栈常数在下面列出。请注意，如果未指定网络堆栈，则假定目标体系结构支持标准BSD套接字API</p>
+</li>
+<li><p>另一类的构建常量是在<code>src/config.h</code>中定义的，以及它们的默认值。这些是包含&#x2F;排除某个功能或更改相关参数的调谐物。</p>
+</li>
+<li><p><code>MG_IO_SIZE</code>常数还设置了最大的UDP消息大小，请参见<code>#/907</code>有关详细信息。如果应用程序使用大型UDP消息，请相应地增加<code>MG_IO_SIZE</code>限制。</p>
+</li>
+<li><p>此步骤是可选的，仅当您打算使用自定义TCP&#x2F;IP堆栈时才需要。为此，您应该：</p>
+<ul>
+<li>禁用BSD插座API：在Mongoose_custom.h中，添加<code>#define MG_ENABLE_SOCKET 0</code></li>
+</ul>
+</li>
+<li><p>添加几个内部API函数的实现，例如<code>mg_send()</code>, <code>mg_mgr_poll()</code>等等。要参考，请查看<code>test/mongoose_custom.c</code>和实验性的<code>src/mip.c</code></p>
+</li>
+</ul>
+<h2 id="重要API"><a href="#重要API" class="headerlink" title="重要API"></a>重要API</h2><h3 id="1-1-数据结构"><a href="#1-1-数据结构" class="headerlink" title="1.1 数据结构"></a>1.1 数据结构</h3><h4 id="struct-mg-addr"><a href="#struct-mg-addr" class="headerlink" title="struct mg_addr"></a><code>struct mg_addr</code></h4>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">struct mg_addr &#123;</span><br><span class="line">  uint16_t port;    // TCP or UDP port in network byte order</span><br><span class="line">  uint32_t ip;      // IP address in network byte order</span><br><span class="line">  uint8_t ip6[16];  // IPv6 address</span><br><span class="line">  bool is_ip6;      // True when address is IPv6 address</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该结构包含网络地址。它可以被认为<code>sockaddr</code>结构在Mongoose中的等价结构体</li>
+</ul>
+<h4 id="struct-mg-mgr"><a href="#struct-mg-mgr" class="headerlink" title="struct mg_mgr"></a><code>struct mg_mgr</code></h4>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct mg_mgr &#123;</span><br><span class="line">  struct mg_connection *conns;  // List of active connections  结构体数组</span><br><span class="line">  struct mg_dns dns4;           // DNS for IPv4</span><br><span class="line">  struct mg_dns dns6;           // DNS for IPv6</span><br><span class="line">  int dnstimeout;               // DNS resolve timeout in milliseconds</span><br><span class="line">  unsigned long nextid;         // Next connection ID</span><br><span class="line">  void *userdata;               // Arbitrary user data pointer</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>它是一个事件管理结构体，能够保存一个正在活动的连接列表，以及一些维持管理的信息</li>
+</ul>
+<h4 id="struct-mg-connection"><a href="#struct-mg-connection" class="headerlink" title="struct mg_connection"></a><code>struct mg_connection</code></h4>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">struct mg_connection &#123;</span><br><span class="line">  struct mg_connection *next;  // Linkage in struct mg_mgr :: connections</span><br><span class="line">  struct mg_mgr *mgr;          // Our container</span><br><span class="line">  struct mg_addr loc;          // Local address</span><br><span class="line">  struct mg_addr rem;          // Remote address</span><br><span class="line">  void *fd;                    // Connected socket, or LWIP data</span><br><span class="line">  unsigned long id;            // Auto-incrementing unique connection ID</span><br><span class="line">  struct mg_iobuf recv;        // Incoming data</span><br><span class="line">  struct mg_iobuf send;        // Outgoing data</span><br><span class="line">  mg_event_handler_t fn;       // User-specified event handler function</span><br><span class="line">  void *fn_data;               // User-specified function parameter</span><br><span class="line">  mg_event_handler_t pfn;      // Protocol-specific handler function</span><br><span class="line">  void *pfn_data;              // Protocol-specific function parameter</span><br><span class="line">  char label[50];              // Arbitrary label</span><br><span class="line">  void *tls;                   // TLS specific data</span><br><span class="line">  unsigned is_listening : 1;   // Listening connection</span><br><span class="line">  unsigned is_client : 1;      // Outbound (client) connection</span><br><span class="line">  unsigned is_accepted : 1;    // Accepted (server) connection</span><br><span class="line">  unsigned is_resolving : 1;   // Non-blocking DNS resolve is in progress</span><br><span class="line">  unsigned is_connecting : 1;  // Non-blocking connect is in progress</span><br><span class="line">  unsigned is_tls : 1;         // TLS-enabled connection</span><br><span class="line">  unsigned is_tls_hs : 1;      // TLS handshake is in progress</span><br><span class="line">  unsigned is_udp : 1;         // UDP connection</span><br><span class="line">  unsigned is_websocket : 1;   // WebSocket connection</span><br><span class="line">  unsigned is_hexdumping : 1;  // Hexdump in/out traffic</span><br><span class="line">  unsigned is_draining : 1;    // Send remaining data, then close and free</span><br><span class="line">  unsigned is_closing : 1;     // Close and free the connection immediately</span><br><span class="line">  unsigned is_full : 1;        // Stop reads, until cleared</span><br><span class="line">  unsigned is_resp : 1;        // Response is still being generated</span><br><span class="line">  unsigned is_readable : 1;    // Connection is ready to read</span><br><span class="line">  unsigned is_writable : 1;    // Connection is ready to write</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>它是一个连接：可能是一个监听连接，或者是一个已接收连接，或者是一个出站连接</li>
+</ul>
+<h3 id="1-2-核心API调用"><a href="#1-2-核心API调用" class="headerlink" title="1.2 核心API调用"></a>1.2 核心API调用</h3><h4 id="mg-mgr-init"><a href="#mg-mgr-init" class="headerlink" title="mg_mgr_init()"></a><code>mg_mgr_init()</code></h4><ul>
+<li><code>void mg_mgr_init(struct mg_mgr *mgr);</code></li>
+<li>初始化事件管理器结构体变量，它所做的工作：<ul>
+<li>将活动连接的列表设置为null</li>
+<li>设置IPv4和IPv6的默认DNS服务器</li>
+<li>设置默认DNS查找超时</li>
+</ul>
+</li>
+<li>参数<ul>
+<li><code>mgr</code>  –  需要初始化的<code>mg_mgr</code>结构体指针</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct mg_mgr mgr;</span><br><span class="line">mg_mgr_init(&amp;mgr);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-mgr-poll"><a href="#mg-mgr-poll" class="headerlink" title="mg_mgr_poll()"></a><code>mg_mgr_poll()</code></h4><ul>
+<li><code>void mg_mgr_poll(struct mg_mgr *mgr, int ms);</code></li>
+<li>在所有连接中迭代，接受新的连接，发送和接收数据，关闭连接并调用事件处理程序的功能，以适用于各自事件。</li>
+<li>执行一次池迭代(poll iteration)。对在<code>mgr-&gt;conns</code>列表中的每一个连接进行如下操作<ul>
+<li>查看是否有传入数据。如果有，将数据读入到<code>c-&gt;recv</code>缓冲区，并发出一个<code>MG_EV_READ</code>事件</li>
+<li>查看<code>c-&gt;send</code>缓冲区是否有数据。如果有，写入数据，并发送<code>MG_EV_WRITE</code>事件</li>
+<li>如果一个连接处于监听状态，或已接收一个进入的连接状态，发送一个<code>MG_EV_ACCEPT</code>事件</li>
+<li>发送<code>MG_EV_POLL</code>事件</li>
+</ul>
+</li>
+<li>参数<ul>
+<li><code>mgr</code>  –  使用的事件管理结构体</li>
+<li><code>ms</code>   –  超时时间，单位为毫秒</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例<ul>
+<li><code>while (running == true) mg_mgr_poll(&amp;mgr, 1000 /*1 second*/);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-mgr-free"><a href="#mg-mgr-free" class="headerlink" title="mg_mgr_free()"></a><code>mg_mgr_free()</code></h4><ul>
+<li><code>void mg_mgr_free(struct mg_mgr *mgr);</code></li>
+<li>关闭所有连接，释放所有资源</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  需要被清除的事件管理结构体</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_mgr mgr;</span><br><span class="line">mg_mgr_init(&amp;mgr);</span><br><span class="line">while (running == true) mg_mgr_poll(&amp;mgr, 1000);   // Event loop</span><br><span class="line">mg_mgr_free(&amp;mgr);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-listen"><a href="#mg-listen" class="headerlink" title="mg_listen()"></a><code>mg_listen()</code></h4><ul>
+<li><code>struct mg_connection *mg_listen(struct mg_mgr *mgr, const char *url, mg_event_handler_t fn, void *fn_data);</code></li>
+<li>创建一个监听连接，并将这个连接追加到<code>mgr-&gt;conns</code>连接列表中</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  使用的事件管理结构体</li>
+<li><code>url</code>  –  URL。指定监听的本地IP地址和端口，例如：<code>tcp://127.0.0.1:1234</code>或<code>udp://0.0.0.0:9000</code></li>
+<li><code>fn</code>   –  事件处理函数</li>
+<li><code>fn_data</code>  –  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li>返回值：返回创建的连接 或 NULL作为错误</li>
+<li>示例<ul>
+<li><code>struct mg_connection *c = mg_listen(&amp;mgr, &quot;tcp://127.0.0.1:8080&quot;, fn, NULL);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-connect"><a href="#mg-connect" class="headerlink" title="mg_connect()"></a><code>mg_connect()</code></h4><ul>
+<li><code>struct mg_connection *mg_connect(struct mg_mgr *mgr, const char *url, mg_event_handler_t fn, void *fn_data);</code></li>
+<li>创建一个出站连接，并将这个连接追加到<code>mgr-&gt;conns</code>队列中</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  使用的事件管理结构体</li>
+<li><code>url</code>  –  URL，指定需要连接的远程IP地址和端口。例如：<code>http://a.com</code></li>
+<li><code>fn</code>   –  一个事件处理函数</li>
+<li><code>fn_data</code>  –  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li>返回值：返回创建的连接 或 NULL作为错误</li>
+<li>注意：<ul>
+<li>这个函数不会连接对端，它只会分配需要的资源和启动连接进程。</li>
+<li>一旦对端真正连接了，会将<code>MG_EV_CONNECT</code>事件发送到连接事件处理</li>
+</ul>
+</li>
+<li>示例<ul>
+<li><code>struct mg_connection *c = mg_connect(&amp;mgr, &quot;http://example.org&quot;, fn, NULL);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-send"><a href="#mg-send" class="headerlink" title="mg_send()"></a><code>mg_send()</code></h4><ul>
+<li><code>int mg_send(struct mg_connection *c, const void *data, size_t size);</code></li>
+<li>将大小为<code>size</code>的数据追加到<code>c-&gt;send</code>缓冲区。返回追加的字节数</li>
+<li>注意：<ul>
+<li>这个函数不会将数据推送到网络。它仅仅是将数据追加到输出缓冲区。</li>
+<li>只有当<code>mg_mgr_poll()</code>被调用时，才会将数据发送出去。</li>
+<li>如果<code>mg_send()</code>被多次调用，则输出缓冲区会增长</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>c</code>  –  一个连接指针</li>
+<li><code>data</code>  –  一个指向需要增加到输出缓冲区的数据指针</li>
+<li><code>size</code>  –  数据大小</li>
+</ul>
+</li>
+<li>返回值：如果数据成功追加，则返回true；否则返回false</li>
+<li>示例<ul>
+<li><code>mg_send(c, &quot;hi&quot;, 2);  // Append string &quot;hi&quot; to the output buffer</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-printf-mg-vprintf"><a href="#mg-printf-mg-vprintf" class="headerlink" title="mg_printf(), mg_vprintf()"></a><code>mg_printf(), mg_vprintf()</code></h4><ul>
+<li><code>int mg_printf(struct mg_connection *, const char *fmt, ...);</code></li>
+<li><code>int mg_vprintf(struct mg_connection *, const char *fmt, va_list *ap);</code></li>
+<li>与<code>mg_send()</code>相同，但是使用<code>printf()</code>语义格式化数据。返回追加到输出缓冲区的字节数。有关支持格式规范列表，参见<code>mg_snprintf</code></li>
+<li>参数：<ul>
+<li><code>c</code>  –  一个连接指针</li>
+<li><code>fmt</code>  –  <code>printf()</code>语义中的格式字符串</li>
+</ul>
+</li>
+<li>返回值：返回追加到输出缓冲区的字节数</li>
+<li>示例<ul>
+<li><code>mg_printf(c, &quot;Hello, %s!&quot;, &quot;world&quot;); // Add &quot;Hello, world!&quot; to output buffer</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-wrapfd"><a href="#mg-wrapfd" class="headerlink" title="mg_wrapfd()"></a><code>mg_wrapfd()</code></h4><ul>
+<li><code>struct mg_connection *mg_wrapfd(struct mg_mgr *mgr, int fd, mg_event_handler_t fn, void *fn_data);</code></li>
+<li>将给定的文件描述符<code>fd</code>包装到连接中，然后将该连接添加到事件管理器中。这个<code>fd</code>文件描述符必须支持<code>send(), recv(), select()</code>系统调用，而且是非阻塞的。Mongoose将把它当做TCP套接字使用。<code>c-&gt;rem</code>和<code>c-&gt;loc</code>地址将会变为空的</li>
+<li>参数：<ul>
+<li><code>fd</code>  –  需要包装的文件描述符</li>
+<li><code>mgr</code> –  一个事件管理结构体</li>
+<li><code>fn</code>  –  一个指向事件处理函数的指针</li>
+<li><code>ud</code>  –  一个用户数据指针。它将被当做<code>fn_data</code>参数传递给<code>fn</code></li>
+</ul>
+</li>
+<li>返回值：返回创建的连接 或者 NULL作为错误</li>
+</ul>
+<h4 id="mg-mkpipe"><a href="#mg-mkpipe" class="headerlink" title="mg_mkpipe()"></a><code>mg_mkpipe()</code></h4><ul>
+<li><code>int mg_mkpipe(struct mg_mgr *mgr, mg_event_handler_t fn, void *fn_data, bool udp);</code></li>
+<li>创建两个互相连接的套接字，用于线程间通信。其中一个套接字被包装到一个Mongoose连接，并被添加到事件管理结构体中。另一个套接字将会被返回，且它应该被传递给工作线程。当一个工作线程使用<code>send()</code>发送任何数据到这个套接字，都将唤醒<code>mgr</code>和<code>fn</code>事件处理函数接收一个<code>MG_EV_READ</code>事件。另外，<code>fn</code>向工作线程发送的任何数据，都被由工作线程使用<code>recv()</code>接收。</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  一个事件管理结构体</li>
+<li><code>fn</code>   –  一个指向事件处理函数的指针</li>
+<li><code>fn_data</code>  –  一个指向用户数据的指针。它将会被当做<code>fn_data</code>参数传递给<code>fn</code></li>
+<li><code>udp</code>  –  告知创建一个UDP，还是创建一个TCP socketpair</li>
+</ul>
+</li>
+<li>返回值：成功，返回创建的套接字；失败，返回-1</li>
+<li>使用案例参见<code>examples/multi-threaded</code></li>
+</ul>
+<h4 id="mg-hello"><a href="#mg-hello" class="headerlink" title="mg_hello()"></a><code>mg_hello()</code></h4><ul>
+<li><code>void mg_hello(const char *url);</code></li>
+<li>便利功能，在给定的监听URL上启动一个简单的Web服务器。这个函数只有在接收到一个<code>/quit</code>请求才会返回。服务器处理以下URI<ul>
+<li><code>/quit</code>  –  退出服务，且退出函数</li>
+<li><code>/debug</code> –  设置调试级别，作为POST负载，<code>&#123;&quot;level&quot; : 3&#125;</code>是有效的</li>
+<li>对其他所有的URI，都将返回一个<code>hi</code>作为响应</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>url</code>  –  一个监听的URL，例如：<code>http://0.0.0.0:8000</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-3-HTTP-API"><a href="#1-3-HTTP-API" class="headerlink" title="1.3 HTTP API"></a>1.3 HTTP API</h3><h4 id="struct-mg-http-header"><a href="#struct-mg-http-header" class="headerlink" title="struct mg_http_header"></a><code>struct mg_http_header</code></h4><ul>
+<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_http_header &#123;</span><br><span class="line">  struct mg_str name;   // Header name</span><br><span class="line">  struct mg_str value;  // Header value</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>结构代表HTTP标头，像<code>Content-Type: text/html</code>。<code>Content-Type</code> 是一个 Header name，<code>text/html/</code>是一个 Header value</li>
+</ul>
+<h4 id="struct-mg-http-message"><a href="#struct-mg-http-message" class="headerlink" title="struct mg_http_message"></a><code>struct mg_http_message</code></h4><ul>
+<li>声明<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">struct mg_http_message &#123;</span><br><span class="line">  struct mg_str method, uri, query, proto;             // Request/response line</span><br><span class="line">  struct mg_http_header headers[MG_MAX_HTTP_HEADERS];  // Headers</span><br><span class="line">  struct mg_str body;                                  // Body</span><br><span class="line">  struct mg_str message;                               // Request line + headers + body</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>结构代表HTTP消息。</li>
+</ul>
+<h4 id="mg-http-listen"><a href="#mg-http-listen" class="headerlink" title="mg_http_listen()"></a><code>mg_http_listen()</code></h4><ul>
+<li><code>struct mg_connection *mg_http_listen(struct mg_mgr *mgr, const char *url, mg_event_handler_t fn, void *fn_data);</code></li>
+<li>创建HTTP侦听器。</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  一个事件管理结构体</li>
+<li><code>url</code>  –  一个URL，指定监听的本地IP地址和端口。例如：<code>http://0.0.0.0:8000</code></li>
+<li><code>fn</code>   –  一个事件处理函数</li>
+<li><code>fn_data</code>  –  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li>返回值：返回一个指向创建的连接指针 或者 返回NULL表示错误</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct mg_connection *c = mg_http_listen(&amp;mgr, &quot;0.0.0.0:8000&quot;, fn, arg);</span><br><span class="line">if (c == NULL) fatal_error(&quot;Cannot create listener&quot;);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-connect"><a href="#mg-http-connect" class="headerlink" title="mg_http_connect()"></a><code>mg_http_connect()</code></h4><ul>
+<li><code>struct mg_connection *mg_http_connect(struct mg_mgr *, const char *url, mg_event_handler_t fn, void *fn_data);</code></li>
+<li>创建HTTP客户端连接。这个函数不能连接到对端，它仅仅分配需要的资源和启动连接进程。当对端真正连接好了，会向连接事件处理函数发送一个<code>MG_EV_CONNECT</code>事件</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  事件管理结构体</li>
+<li><code>url</code>  –  URL，指定远程URL。例如:<code>http://google.com</code></li>
+<li><code>fn</code>   –  事件处理函数</li>
+<li><code>fn_data</code>  –  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li>返回值： 返回一个指向创建的连接的指针 或者 返回NULL表示错误</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct mg_connection *c = mg_http_connect(&amp;mgr, &quot;http://google.com&quot;, fn, NULL);</span><br><span class="line">if (c == NULL) fatal_error(&quot;Cannot create connection&quot;);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-status"><a href="#mg-http-status" class="headerlink" title="mg_http_status()"></a><code>mg_http_status()</code></h4><ul>
+<li><code>int mg_http_status(const struct mg_http_message *hm);</code></li>
+<li>获取HTTP响应的状态代码。</li>
+<li>参数：<ul>
+<li><code>hm</code>  –  需要解析的HTTP响应</li>
+</ul>
+</li>
+<li>返回值：返回状态码。例如：200表示成功</li>
+</ul>
+<h4 id="mg-http-get-request-len"><a href="#mg-http-get-request-len" class="headerlink" title="mg_http_get_request_len()"></a><code>mg_http_get_request_len()</code></h4><ul>
+<li><code>int mg_http_get_request_len(const unsigned char *buf, size_t buf_len);</code></li>
+<li>获取请求的长度。请求的长度是直到HTTP头结束的字节数。它不包括HTTP请求体的长度</li>
+<li>参数：<ul>
+<li><code>buf</code>  –  指向存放请求数据的缓冲区的指针</li>
+<li><code>buf_len</code>  –  缓冲区大小</li>
+</ul>
+</li>
+<li>返回值： <ul>
+<li>-1  –  错误</li>
+<li>0   –  消息不完整</li>
+<li>请求的长度</li>
+</ul>
+</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const char *buf = &quot;GET /test \n\nGET /foo\n\n&quot;;</span><br><span class="line">int req_len = mg_http_get_request_len(buf, strlen(buf));  // req_len == 12</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-parse"><a href="#mg-http-parse" class="headerlink" title="mg_http_parse()"></a><code>mg_http_parse()</code></h4><ul>
+<li><code>int mg_http_parse(const char *s, size_t len, struct mg_http_message *hm);</code></li>
+<li>解析请求报文字符串，并存入到<code>mg_http_message</code>结构体中</li>
+<li>参数：<ul>
+<li><code>s</code>    –  一个请求字符串</li>
+<li><code>len</code>  –  请求字符串的长度</li>
+<li><code>hm</code>   –  存储解析请求报文结果的结构体指针</li>
+</ul>
+</li>
+<li>返回值：返回请求报文的长度</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct mg_http_message hm;</span><br><span class="line">const char *buf = &quot;GET / HTTP/1.0\n\n&quot;;</span><br><span class="line">if (mg_http_parse(buf, strlen(buf), &amp;hm) &gt; 0) &#123; /* success */ &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-printf-chunk"><a href="#mg-http-printf-chunk" class="headerlink" title="mg_http_printf_chunk()"></a><code>mg_http_printf_chunk()</code></h4><ul>
+<li><code>void mg_http_printf_chunk(struct mg_connection *c, const char *fmt, ...);</code></li>
+<li>使用<code>printf()</code>语义，写一个块编码的块数据。(Write a chunk of data in chunked encoding format, using printf() semantic)</li>
+<li>参数：<ul>
+<li><code>c</code>    –  一个连接指针</li>
+<li><code>fmt</code>  –  以<code>printf()</code>语义的字符串</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例<ul>
+<li><code>mg_http_printf_chunk(c, &quot;Hello, %s!&quot;, &quot;world&quot;);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-http-write-chunk"><a href="#mg-http-write-chunk" class="headerlink" title="mg_http_write_chunk()"></a><code>mg_http_write_chunk()</code></h4><ul>
+<li><code>void mg_http_write_chunk(struct mg_connection *c, const char *buf, size_t len);</code></li>
+<li>写入一个块编码格式的块数据(Write a chunk of data in chunked encoding format.)</li>
+<li>参数：<ul>
+<li><code>c</code>   –  一个连接指针</li>
+<li><code>buf</code> –  需要写入的数据</li>
+<li><code>len</code> –  写入数据的长度</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<ul>
+<li><code>mg_http_write_chunk(c, &quot;hi&quot;, 2);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-http-delete-chunk"><a href="#mg-http-delete-chunk" class="headerlink" title="mg_http_delete_chunk()"></a><code>mg_http_delete_chunk()</code></h4><ul>
+<li><code>void mg_http_delete_chunk(struct mg_connection *c, struct mg_http_message *hm);</code></li>
+<li>从输入缓冲区中删除指定的块(chunk)</li>
+<li>参数：<ul>
+<li><code>c</code>  –  连接指针</li>
+<li><code>hm</code> –  需要删除的块(chunk)</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_CHUNK) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    mg_http_delete_chunk(c, hm); // Remove received chunk</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="struct-mg-http-serve-opts"><a href="#struct-mg-http-serve-opts" class="headerlink" title="struct mg_http_serve_opts"></a><code>struct mg_http_serve_opts</code></h4><ul>
+<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct mg_http_serve_opts &#123;</span><br><span class="line">  const char *root_dir;       // Web root directory, must be non-NULL</span><br><span class="line">  const char *ssi_pattern;    // SSI file name pattern, e.g. #.shtml</span><br><span class="line">  const char *extra_headers;  // Extra HTTP headers to add in responses</span><br><span class="line">  const char *mime_types;     // Extra mime types, ext1=type1,ext2=type2,..</span><br><span class="line">  const char *page404;        // Path to the 404 page, or NULL by default</span><br><span class="line">  struct mg_fs *fs;           // Filesystem implementation. Use NULL for POSIX</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>传递给<code>mg_http_serve_dir()</code>和<code>mg_http_serve_file()</code>的结构，该结构驱动了这两个函数的行为</li>
+</ul>
+<h4 id="mg-http-serve-dir"><a href="#mg-http-serve-dir" class="headerlink" title="mg_http_serve_dir()"></a><code>mg_http_serve_dir()</code></h4><ul>
+<li><code>void mg_http_serve_dir(struct mg_connection *c, struct mg_http_message *hm, const struct mg_http_serve_opts *opts);</code></li>
+<li>根据给定选项服务多个静态文件。文件也可以被压缩,包括目录索引。所有压缩文件都必须以.gz结尾，并且不得在没有扩展名的情况下存在具有相同名称的文件，否则将优先考虑</li>
+<li>注意：<ul>
+<li>为了启动SSI，需要设置<code>-DMSG_ENABLE_SSI=1</code>构件标志</li>
+<li>在<code>root_dir</code>中为了避免双点<code>..</code>，如果需要引用高级目录，则需要使用绝对路径</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>c</code>     –  使用的连接</li>
+<li><code>hm</code>    –  应该被服务的HTTP消息</li>
+<li><code>opts</code>  –  服务选项。请注意，<code>opts.root_dir</code>可以选择接受额外的逗号分隔<code>uri=path</code></li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    struct mg_http_serve_opts opts;</span><br><span class="line">    memset(&amp;opts, 0, sizeof(opts));</span><br><span class="line">    opts.root_dir = &quot;/var/www,/conf=/etc&quot;;  // Serve /var/www. URIs starting with /conf are served from /etc</span><br><span class="line">    mg_http_serve_dir(c, hm, &amp;opts);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-serve-file"><a href="#mg-http-serve-file" class="headerlink" title="mg_http_serve_file()"></a><code>mg_http_serve_file()</code></h4><ul>
+<li><code>void mg_http_serve_file(struct mg_connection *c, struct mg_http_message *hm, const char *path, struct mg_http_serve_opts *opts);</code></li>
+<li>服务一个静态文件。如果不存在带有路径中指定的文件名的文件，则Mongoose尝试附加<code>.gz</code>；如果存在这样的文件，它将使用<code>Content-Encoding: gzip</code> header 去服务</li>
+<li>注意：<ul>
+<li><code>opts-&gt;root_dir</code>设置被这个函数忽略</li>
+<li><code>opts-&gt;extra_headers</code> 必须以<code>\r\n</code>结束</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>c</code>     –  使用的连接</li>
+<li><code>hm</code>    –  需要服务的HTTP消息</li>
+<li><code>path</code>  –  需要服务的文件路径</li>
+<li><code>opts</code>  –  服务选项</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    struct mg_http_serve_opts opts = &#123;</span><br><span class="line">      .mime_types = &quot;png=image/png&quot;,</span><br><span class="line">      .extra_headers = &quot;AA: bb\r\nCC: dd\r\n&quot;</span><br><span class="line">    &#125;;</span><br><span class="line">    mg_http_serve_file(c, hm, &quot;a.png&quot;, &amp;opts);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-reply"><a href="#mg-http-reply" class="headerlink" title="mg_http_reply()"></a><code>mg_http_reply()</code></h4><ul>
+<li><code>void mg_http_reply(struct mg_connection *c, int status_code, const char *headers, const char *body_fmt, ...);</code></li>
+<li>通过使用<code>printf()</code>语义发送简单的HTTP响应。这个函数根据<code>body_fmt</code>格式化响应体(response body)，然后自动追加到一个正确的<code>Content-Length</code>头(header)。额外的<code>headers</code>需要通过<code>headers</code>参数传递</li>
+<li>参数：<ul>
+<li><code>c</code>     –  使用的连接</li>
+<li><code>status_code</code>  –  一个HTTP响应状态码</li>
+<li><code>headers</code>      –  额外的headers，默认为NULL，如果不是空，则必须以<code>\r\n</code>结尾</li>
+<li><code>fmt</code>    –  使用<code>printf</code>语义，需要格式化成HTTP body的字符串</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<ul>
+<li>发送一个简单的JSON响应：<ul>
+<li><code>mg_http_reply(c, 200, &quot;Content-Type: application/json\r\n&quot;, &quot;&#123;\&quot;result\&quot;: %d&#125;&quot;, 123);</code></li>
+</ul>
+</li>
+<li>发送一个302重定向：<ul>
+<li><code>mg_http_reply(c, 302, &quot;Location: /\r\n&quot;, &quot;&quot;);</code></li>
+</ul>
+</li>
+<li>发送一个错误<ul>
+<li><code>mg_http_reply(c, 403, &quot;&quot;, &quot;%s&quot;, &quot;Not Authorized\n&quot;);</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-http-get-header"><a href="#mg-http-get-header" class="headerlink" title="mg_http_get_header()"></a><code>mg_http_get_header()</code></h4><ul>
+<li><code>struct mg_str *mg_http_get_header(struct mg_http_message *hm, const char *name);</code></li>
+<li>获取HTTP header值</li>
+<li>参数：<ul>
+<li><code>hm</code>    –  需要寻找 header 的HTTP消息</li>
+<li><code>name</code>  –  Header name</li>
+</ul>
+</li>
+<li>返回值：HTTP header 值 或 NULL表示没有找到</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose event handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    struct mg_str *s = mg_http_get_header(hm, &quot;X-Extra-Header&quot;);</span><br><span class="line">    if (s != NULL) &#123;</span><br><span class="line">      mg_http_reply(c, 200, &quot;&quot;, &quot;Holly molly! Header value: %.*s&quot;, (int) s-&gt;len, s-&gt;ptr);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      mg_http_reply(c, 200, &quot;&quot;, &quot;Oh no, header is not set...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-get-header-var"><a href="#mg-http-get-header-var" class="headerlink" title="mg_http_get_header_var()"></a><code>mg_http_get_header_var()</code></h4><ul>
+<li><code>struct mg_str mg_http_get_header_var(struct mg_str s, struct mg_str v);</code></li>
+<li>解析具有表格<code>name1=value1; name=value2;...</code>的HTTP header，并获取一个给定的变量</li>
+<li>参数：<ul>
+<li><code>s</code>  –  HTTP header</li>
+<li><code>name</code>  –  变量名字的名字</li>
+</ul>
+</li>
+<li>返回值：一个请求的变量 或 一个空的字符串</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str *cookie = mg_http_get_header(hm, &quot;Cookie&quot;);</span><br><span class="line">struct mg_str token = mg_str(&quot;&quot;);</span><br><span class="line"></span><br><span class="line">if (cookie != NULL) &#123;</span><br><span class="line">  token = mg_http_get_header_var(*cookie, mg_str(&quot;access_token&quot;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-var"><a href="#mg-http-var" class="headerlink" title="mg_http_var()"></a><code>mg_http_var()</code></h4><ul>
+<li><code>struct mg_str mg_http_var(struct mg_str buf, struct mg_str name);</code></li>
+<li>获取未编码的HTTP变量</li>
+<li>参数：<ul>
+<li><code>buf</code>  –  一个url编码的字符串：HTTP请求体或查询字符串(HTTP request body or query string)</li>
+<li><code>name</code> –  获取的变量名字</li>
+</ul>
+</li>
+<li>返回值：返回变量的值 或 返回一个空的字符串，表示没有找到</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// We have received a request to /my/uri?a=b&amp;c=d%20</span><br><span class="line">// The hm-&gt;query points to &quot;a=b&amp;c=d%20&quot;</span><br><span class="line">struct mg_str v = mg_http_var(hm-&gt;query, mg_str(&quot;c&quot;));  // v = &quot;d%20&quot;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-get-var"><a href="#mg-http-get-var" class="headerlink" title="mg_http_get_var()"></a><code>mg_http_get_var()</code></h4><ul>
+<li><code>int mg_http_get_var(const struct mg_str *var, const char *name, char *buf, int len);</code></li>
+<li>获取并解码HTTP 变量</li>
+<li>参数：<ul>
+<li><code>var</code>    –  HTTP请求体(HTTP request body)</li>
+<li><code>name</code>   –  变量名</li>
+<li><code>buf</code>    –  写入解码变量的缓冲区(Buffer to write decoded variable)</li>
+<li><code>len</code>    –  缓冲区大小</li>
+</ul>
+</li>
+<li>返回值：解码变量的长度 或 0，负数表示错误</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">char buf[100] = &quot;&quot;;</span><br><span class="line">mg_http_get_var(&amp;hm-&gt;body, &quot;key1&quot;, buf, sizeof(buf)) &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-creds"><a href="#mg-http-creds" class="headerlink" title="mg_http_creds()"></a><code>mg_http_creds()</code></h4><ul>
+<li><code>void mg_http_creds(struct mg_http_message *hm, char *user, size_t userlen, char *pass, size_t passlen);</code></li>
+<li>从请求获取身份验证证书，然后将它存储到<code>user</code>, <code>userlen</code>, <code>pass</code>, <code>passlen</code>缓冲区中。</li>
+<li>证书按以下顺序查找<ul>
+<li>从HTTP header中的<code>Authorization</code>中：<ul>
+<li>基本身份(Basic auth) ，填充到<code>user</code> 和 <code>pass</code></li>
+<li>持票人身份(Bearer auth)，仅填充到<code>pass</code></li>
+</ul>
+</li>
+<li>从 cookie 的<code>access_token</code>中，填充<code>pass</code></li>
+<li>从搜索字符串参数的<code>?access_token=...</code>，填充<code>pass</code></li>
+</ul>
+</li>
+<li>如果都没有，<code>user</code>和<code>pass</code>都被设置为以NULL结尾的字符串</li>
+<li>参数：<ul>
+<li><code>hm</code>    –  需要查找证书的HTTP 消息</li>
+<li><code>user</code>  –  接收用户名字的缓冲区</li>
+<li><code>userlen</code>  –  user缓冲区的大小</li>
+<li><code>pass</code>  –  接收密码的缓冲区</li>
+<li><code>passlen</code>  –  pass缓冲区的大小</li>
+</ul>
+</li>
+<li>返回值：空</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    char user[100], pass[100];</span><br><span class="line">    mg_http_creds(hm, user, sizeof(user), pass, sizeof(pass)); // &quot;user&quot; is now user name and &quot;pass&quot; is now password from request</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-match-uri"><a href="#mg-http-match-uri" class="headerlink" title="mg_http_match_uri()"></a><code>mg_http_match_uri()</code></h4><ul>
+<li><code>bool mg_http_match_uri(const struct mg_http_message *hm, const char *glob);</code></li>
+<li>检查在HTTP请求报文中，是否有和给定的<code>glob</code>字符串相匹配的字符串</li>
+<li>参数：<ul>
+<li><code>hm</code>    –  需要匹配检索的HTTP消息</li>
+<li><code>glob</code>  –  匹配的字符串</li>
+</ul>
+</li>
+<li>返回值：如果在HTTP请求报文中找到了匹配的字符串，返回 True 或者 返回 False表示未匹配到</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    if (mg_http_match_uri(hm, &quot;/secret&quot;)) &#123;</span><br><span class="line">      mg_http_reply(c, 200, NULL, &quot;Very big secret!&quot;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      mg_http_reply(c, 200, NULL, &quot;hello world..&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-bauth"><a href="#mg-http-bauth" class="headerlink" title="mg_http_bauth()"></a><code>mg_http_bauth()</code></h4><ul>
+<li><code>void mg_http_bauth(struct mg_connection *c, const char *user, const char *pass);</code></li>
+<li>将一个基本的<code>Authorization</code> header写入到输出缓冲区</li>
+<li>参数：<ul>
+<li><code>c</code>    –  使用的连接</li>
+<li><code>user</code> –  用户名</li>
+<li><code>pass</code> –  密码</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：使用基本验证来创建Stripe订阅的用法示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mg_printf(c, &quot;POST /v1/subscriptions HTTP/1.1\r\n&quot;</span><br><span class="line">             &quot;Host: api.stripe.com\r\n&quot;</span><br><span class="line">             &quot;Transfer-Encoding: chunked\r\n&quot;);</span><br><span class="line">mg_http_bauth(c, stripe_private_key, NULL);     // Add Basic auth header</span><br><span class="line">mg_printf(c, &quot;%s&quot;, &quot;\r\n&quot;);                     // End HTTP headers</span><br><span class="line"></span><br><span class="line">mg_http_printf_chunk(c, &quot;&amp;customer=%s&quot;, customer_id);   // Set customer</span><br><span class="line">mg_http_printf_chunk(c, &quot;&amp;items[0][price]=%s&quot;, price);  // And price</span><br><span class="line">mg_http_printf_chunk(c, &quot;&quot;);                            // End request</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="struct-mg-http-part"><a href="#struct-mg-http-part" class="headerlink" title="struct mg_http_part"></a><code>struct mg_http_part</code></h4><ul>
+<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// Parameter for mg_http_next_multipart</span><br><span class="line">struct mg_http_part &#123;</span><br><span class="line">  struct mg_str name;      // Form field name</span><br><span class="line">  struct mg_str filename;  // Filename for file uploads</span><br><span class="line">  struct mg_str body;      // Part contents</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>描述HTTP 多个消息(multipart message)中单个部分的结构体</li>
+</ul>
+<h4 id="mg-http-next-multipart"><a href="#mg-http-next-multipart" class="headerlink" title="mg_http_next_multipart()"></a><code>mg_http_next_multipart()</code></h4><ul>
+<li><code>size_t mg_http_next_multipart(struct mg_str body, size_t offset, struct mg_http_part *part);</code></li>
+<li>根据给定的<code>offset</code>，在<code>body</code>中解析multipart chunk。一个初始的<code>offset</code>应该为0.在提供的<code>part</code>中填充参数，可能为空。返回下一块的offsete，或者返回0表示没有其他块(chunks)</li>
+<li>参数：<ul>
+<li><code>body</code>  –  消息体(message body)</li>
+<li><code>offset</code>  –  开始偏移量(start offset)</li>
+<li><code>part</code>  –  指向需要填充的<code>struct mg_http_part</code>结构体</li>
+</ul>
+</li>
+<li>返回值：返回下一块的offsete，或者返回0表示没有其他块(chunks)</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">struct mg_http_part part;</span><br><span class="line">size_t pos = 0;</span><br><span class="line"></span><br><span class="line">while ((pos = mg_http_next_multipart(body, pos, &amp;part)) != 0) &#123;</span><br><span class="line">  // Use part</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-http-upload"><a href="#mg-http-upload" class="headerlink" title="mg_http_upload()"></a><code>mg_http_upload()</code></h4><ul>
+<li><code>int mg_http_upload(struct mg_connection *c, struct mg_http_message *hm, struct mg_fs *fs, const char *path, size_t max_size);</code></li>
+<li>这是一个助手实用程序功能，用于通过小块上传大型文件。将HTTP POST 数据追加到指定目录的文件中。文件名和文件偏移由查询字符串参数指定:<code>POST /upload?name=firmware.bin&amp;offset=2048 HTTP/1.1</code>。如果偏移量为0，则将文件截断。客户的责任是将文件分为较小的块，并发送一系列由此功能处理的POST请求</li>
+<li>参数：<ul>
+<li><code>c</code>    –  一个连接</li>
+<li><code>hm</code>   –  一个需要被解析的HTTP message</li>
+<li><code>fs</code>   –  需要写文件的文件系统，例如：<code>&amp;mg_fs_posix</code></li>
+<li><code>path</code> –  一个文件名</li>
+<li><code>max_size</code>  –  允许的文件大小的最大值</li>
+</ul>
+</li>
+<li>返回值：写完后，返回文件的大小  或者 返回一个负数表示错误</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    if (mg_http_match_uri(hm, &quot;/upload&quot;)) &#123;</span><br><span class="line">      mg_http_upload(c, hm, &amp;mg_fs_posix, &quot;/tmp/myfile.bin&quot;, 99999);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      struct mg_http_serve_opts opts = &#123;.root_dir = &quot;.&quot;&#125;;   // Serve</span><br><span class="line">      mg_http_serve_dir(c, ev_data, &amp;opts);                 // static content</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="1-4-WebSocket-API"><a href="#1-4-WebSocket-API" class="headerlink" title="1.4 WebSocket API"></a>1.4 WebSocket API</h3><h4 id="struct-mg-ws-message"><a href="#struct-mg-ws-message" class="headerlink" title="struct mg_ws_message"></a><code>struct mg_ws_message</code></h4><ul>
+<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_ws_message &#123;</span><br><span class="line">  struct mg_str data; // WebSocket message data</span><br><span class="line">  uint8_t flags;      // WebSocket message flags</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>该结构代表Websocket消息。这个<code>flag</code>元素对应于<code>RFC 6455</code>第5.2节中所述的第一个字节。(<code>https://www.rfc-editor.org/rfc/rfc6455#section-5.2</code>)</li>
+</ul>
+<h4 id="WebSockete-message-type"><a href="#WebSockete-message-type" class="headerlink" title="WebSockete message type:"></a>WebSockete message type:</h4><ul>
+<li>要从传入消息中提取消息类型，在结构体<code>mg_ws_message</code>的<code>flag</code>元素中检查四个<code>LSBs</code></li>
+<li>可能存在的WebSocket消息类型：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#define WEBSOCKET_OP_CONTINUE 0</span><br><span class="line">#define WEBSOCKET_OP_TEXT 1</span><br><span class="line">#define WEBSOCKET_OP_BINARY 2</span><br><span class="line">#define WEBSOCKET_OP_CLOSE 8</span><br><span class="line">#define WEBSOCKET_OP_PING 9</span><br><span class="line">#define WEBSOCKET_OP_PONG 10</span><br></pre></td></tr></table></figure></li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_WS_MSG) &#123;</span><br><span class="line">    struct mg_ws_message *wm = (struct mg_ws_message *) ev_data;</span><br><span class="line">    msgtype = wm-&gt;flags &amp; 0x0F;</span><br><span class="line">    if (msgtype == WEBSOCKET_OP_BINARY) &#123;</span><br><span class="line">      // This is a binary data message</span><br><span class="line">    &#125; else if (msgtype == WEBSOCKET_OP_TEXT) &#123;</span><br><span class="line">      // This is a text data message</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>当调用<code>mg_ws_send()</code>或<code>ms_ws_printf()</code>发送消息时，请使用<code>RFC 6455</code>第5.6节中所述的正确消息类型进行数据帧(<code>https://www.rfc-editor.org/rfc/rfc6455#section-5.6</code>)</li>
+</ul>
+<h4 id="mg-ws-connect"><a href="#mg-ws-connect" class="headerlink" title="mg_ws_connect()"></a><code>mg_ws_connect()</code></h4><ul>
+<li><code>struct mg_connection *mg_ws_connect(struct mg_mgr *mgr, const char *url, mg_event_handler_t fn, void *fn_data, const char *fmt, ...);</code></li>
+<li>创建客户端Websocket连接。这个函数不能连接到对端，它仅仅分配需要的资源和启动连接进程。当对端真正连接好了，会向连接事件处理函数发送一个<code>MG_EV_CONNECT</code>事件</li>
+<li>参数：<ul>
+<li><code>mgr</code>  –  使用的事件管理结构体</li>
+<li><code>url</code>  –  指定的远程URL。例如：<code>http://google.com</code></li>
+<li><code>fn</code>   –  一个事件处理函数</li>
+<li><code>fn_data</code>  –  一个任意指针，当事件处理函数被调用时，它会被作为<code>fn_data</code>传递。这个指针作为<code>c-&gt;fn_data</code>存储在连接结构体中</li>
+</ul>
+</li>
+<li>返回值：返回一个指向创建的连接； 返回NULL表示错误</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct mg_connection *c = mg_ws_connect(&amp;mgr, &quot;ws://test_ws_server.com:1000&quot;,</span><br><span class="line">                                        handler, NULL, &quot;%s&quot;, &quot;Sec-WebSocket-Protocol: echo\r\n&quot;);</span><br><span class="line">if(c == NULL) fatal(&quot;Cannot create connection&quot;);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-ws-upgrade"><a href="#mg-ws-upgrade" class="headerlink" title="mg_ws_upgrade()"></a><code>mg_ws_upgrade()</code></h4><ul>
+<li><code>void mg_ws_upgrade(struct mg_connection *c, struct mg_http_message *, const char *fmt, ...);</code></li>
+<li>升级给定HTTP连接到Websocket。<code>fmt</code>是一个类似于<code>printf()</code>格式的字符串，用于额外的HTTP标头，返回给Websocket握手的客户端。如果不需要额外的标头，将<code>fmt</code>设置为空。</li>
+<li>参数：<ul>
+<li><code>c</code>    –  使用的连接</li>
+<li><code>hm</code>   –  HTTP消息</li>
+<li><code>fmt</code>  –  类似于<code>printf</code>的格式字符串，用于附加<code>HTTP</code>标头或为null</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_HTTP_MSG) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    mg_ws_upgrade(c, hm, NULL);  // Upgrade HTTP to WS</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-ws-send"><a href="#mg-ws-send" class="headerlink" title="mg_ws_send()"></a><code>mg_ws_send()</code></h4><ul>
+<li><code>size_t mg_ws_send(struct mg_connection *c, const void *buf, size_t len, int op);</code></li>
+<li>向WebSocket对端发送数据</li>
+<li>参数：<ul>
+<li><code>c</code>  –  使用的连接</li>
+<li><code>buf</code>  –  需要发送的数据</li>
+<li><code>len</code>  –  需要发送的数据大小</li>
+<li><code>op</code>   –  WebSocket消息类型，参见WebSocket message type</li>
+</ul>
+</li>
+<li>返回值：返回发送的字节数</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Mongoose events handler</span><br><span class="line">void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) &#123;</span><br><span class="line">  if (ev == MG_EV_WS_OPEN) &#123;</span><br><span class="line">    struct mg_http_message *hm = (struct mg_http_message *) ev_data;</span><br><span class="line">    mg_ws_send(c, &quot;opened&quot;, 6, WEBSOCKET_OP_BINARY);  // Send &quot;opened&quot; to web socket connection</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-ws-printf-mg-ws-vprintf"><a href="#mg-ws-printf-mg-ws-vprintf" class="headerlink" title="mg_ws_printf(), mg_ws_vprintf()"></a><code>mg_ws_printf(), mg_ws_vprintf()</code></h4><ul>
+<li><code>size_t mg_ws_printf(struct mg_connection *, int op, const char *fmt, ...);</code></li>
+<li><code>size_t mg_ws_vprintf(struct mg_connection *, int op, const char *fmt, va_list *);</code></li>
+<li>和<code>ms_ws_send()</code>相同，但是使用<code>printf()</code>语义格式化数据</li>
+<li>参数：<ul>
+<li><code>c</code>   –  使用的连接</li>
+<li><code>op</code>  –  WebSocket消息类型，参见WebSocket message type</li>
+<li><code>fmt</code> –  使用<code>printf()</code>语义格式化的字符串</li>
+</ul>
+</li>
+<li>返回值：返回发送的字节数</li>
+<li>示例<ul>
+<li><code>mg_ws_printf(c, WEBSOCKET_OP_TEXT, &quot;Hello, %s!&quot;, &quot;world&quot;);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-ws-wrap"><a href="#mg-ws-wrap" class="headerlink" title="mg_ws_wrap()"></a><code>mg_ws_wrap()</code></h4><ul>
+<li><code>size_t mg_ws_wrap(struct mg_connection *c, size_t len, int op)</code></li>
+<li>将输出缓冲区中的数据转换为Websocket格式。有用然后通过WebSocket实施协议。具体示例参见<code>examples/mqtt-over-ws-client</code></li>
+<li>参数：<ul>
+<li><code>c</code>  –  使用的连接</li>
+<li><code>len</code>  –  转换的字节数</li>
+<li><code>op</code>   –  WebSocket消息类型</li>
+</ul>
+</li>
+<li>返回值：返回连接结构体中输出缓冲区新的大小</li>
+<li>示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">size_t len = c-&gt;send.len;         // Store output buffer len</span><br><span class="line">mg_mqtt_login(c, s_url, &amp;opts);   // Write MQTT login message</span><br><span class="line">mg_ws_wrap(c, c-&gt;send.len - len, WEBSOCKET_OP_BINARY); // Wrap it into WS</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="1-5-Timer-API"><a href="#1-5-Timer-API" class="headerlink" title="1.5 Timer API"></a>1.5 Timer API</h3><h4 id="mg-timer-add"><a href="#mg-timer-add" class="headerlink" title="mg_timer_add()"></a><code>mg_timer_add()</code></h4><ul>
+<li><code>struct mg_timer *mg_timer_add(struct mg_mgr *mgr, uint64_t period_ms, unsigned flags, void (*fn)(void *), void *fn_data);</code></li>
+<li>设置一个计时器。这是一个高级计时器API，允许将软件计时器添加到活动管理器。这个函数使用<code>calloc()</code>一个新的计时器，并将它添加到<code>mgr-&gt;timers</code>列表中。当调用<code>mg_mgr_poll()</code>时，所有添加的计时器均进行轮询，并在计时器到期时调用计时器设定的函数</li>
+<li>注意：<ul>
+<li>确保计时器的间隔等于或大于<code>mg_mgr_poll()</code>的超时时间</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>mgr</code>   –  指向事件管理器的结构体指针</li>
+<li><code>ms</code>    –  一个时间间隔，以毫秒为单位</li>
+<li><code>flags</code> –  计时器标志掩码：<code>MG_TIMER_REPEAT</code>和<code>MG_TIMER_RUN_NOW</code></li>
+<li><code>fn</code>    –  函数调用</li>
+<li><code>fn_data</code>  –  调用的函数参数</li>
+</ul>
+</li>
+<li>返回值：返回一个指向创建的计时器的指针</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void timer_fn(void *data) &#123;</span><br><span class="line">  // ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mg_timer_add(mgr, 1000, MG_TIMER_REPEAT, timer_fn, NULL);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="struct-mg-timer"><a href="#struct-mg-timer" class="headerlink" title="struct mg_timer"></a><code>struct mg_timer</code></h4><ul>
+<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct mg_timer &#123;</span><br><span class="line">  uint64_t period_ms;       // Timer period in milliseconds</span><br><span class="line">  uint64_t expire;          // Expiration timestamp in milliseconds</span><br><span class="line">  unsigned flags;           // Possible flags values below</span><br><span class="line">#define MG_TIMER_ONCE 0     // Call function once</span><br><span class="line">#define MG_TIMER_REPEAT 1   // Call function periodically</span><br><span class="line">#define MG_TIMER_RUN_NOW 2  // Call immediately when timer is set</span><br><span class="line">  void (*fn)(void *);       // Function to call</span><br><span class="line">  void *arg;                // Function argument</span><br><span class="line">  struct mg_timer *next;    // Linkage</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>计时器结构体。描述一个软件计时器。计时器粒度与主事件循环中的<code>mg_mgr_poll()</code>的超时参数相同</li>
+</ul>
+<h4 id="mg-timer-init"><a href="#mg-timer-init" class="headerlink" title="mg_timer_init()"></a><code>mg_timer_init()</code></h4><ul>
+<li><code>void mg_timer_init(struct mg_timer **head, struct mg_timer *t, uint64_t period_ms, unsigned flags, void (*fn)(void *), void *fn_data);</code></li>
+<li>设置一个计时器</li>
+<li>参数：<ul>
+<li><code>head</code>    –  指向<code>mg_timer</code>队列头部的指针</li>
+<li><code>t</code>       –  指向一个需要被初始化的<code>mg_timer</code></li>
+<li><code>ms</code>      –  时间间隔，以毫秒为单位</li>
+<li><code>flags</code>   –  计时器标志掩码：<code>MG_TIMER_REPEAT</code>和<code>MG_TIMER_RUN_NOW</code></li>
+<li><code>fn</code>    –  函数调用</li>
+<li><code>fn_data</code>  –  调用的函数参数</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void timer_fn(void *data) &#123;</span><br><span class="line">  // ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct mg_timer timer, *head = NULL;</span><br><span class="line">mg_timer_init(&amp;head, &amp;timer, 1000, MG_TIMER_REPEAT, timer_fn, NULL);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-timer-free"><a href="#mg-timer-free" class="headerlink" title="mg_timer_free()"></a><code>mg_timer_free()</code></h4><ul>
+<li><code>void mg_timer_free(struct mg_timer **head, struct mg_timer *t);</code></li>
+<li>释放计时器，将其从内部计时器列表中删除。</li>
+<li>参数：<ul>
+<li><code>head</code>  –  指向<code>mg_timer</code>队列头部的指针</li>
+<li><code>t</code>     –  需要释放的计时器</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct mg_timer timer;</span><br><span class="line">// ...</span><br><span class="line">mg_timer_free(&amp;timer);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-timer-poll"><a href="#mg-timer-poll" class="headerlink" title="mg_timer_poll()"></a><code>mg_timer_poll()</code></h4><ul>
+<li><code>void mg_timer_poll(struct mg_timer **head, uint64_t uptime_ms);</code></li>
+<li>如果当前的时间戳<code>uptime_ms</code>超过了计时器的到期时间，则计时器遍历列表，并调用它们</li>
+<li>参数：<ul>
+<li><code>head</code>   –  指向<code>mg_timer</code>列表头部的指针</li>
+<li><code>uptime_ms</code>  –  当前时间戳</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例<ul>
+<li><code>mg_timer_poll(mg_millis());</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-6-Time"><a href="#1-6-Time" class="headerlink" title="1.6 Time"></a>1.6 Time</h3><h4 id="mg-millis"><a href="#mg-millis" class="headerlink" title="mg_millis()"></a><code>mg_millis()</code></h4><ul>
+<li><code>int64_t mg_millis(void);</code></li>
+<li>以毫秒返回当前的正常运行时间。</li>
+<li>参数：无</li>
+<li>返回值：当前时间戳</li>
+<li>示例：<ul>
+<li><code>int64_t uptime = mg_millis();</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-7-String"><a href="#1-7-String" class="headerlink" title="1.7 String"></a>1.7 String</h3><h4 id="struct-mg-str"><a href="#struct-mg-str" class="headerlink" title="struct mg_str"></a><code>struct mg_str</code></h4><ul>
+<li>声明：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str &#123;</span><br><span class="line">  const char *ptr;  // Pointer to string data</span><br><span class="line">  size_t len;       // String len</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>该结构代表了任意内存的一部分，并不一定是<code>zero-terminated</code>。这是一个<code>mongoose string</code>，它在代码库中广泛使用，而不是C zero-terminated strings</li>
+<li>例如<ul>
+<li>当一个HTTP request到达时，Mongoose创建了一个<code>mg_http_message</code>结构体，该结构体包含一个指向请求方法，URI，头部等<code>struct mg_str</code>结构体集合。这样，Mongoose避免了任何堆申请，并且不会修改接收的缓冲区。相反，它使用<code>struct mg_str</code>来描述HTTP请求的各个部分</li>
+<li>许多其他情况也是如此。</li>
+</ul>
+</li>
+<li>注意：<ul>
+<li>由于<code>ptr</code>不一定是<code>zero-terminated</code>，因此请勿使用libc字符串函数，例如：<code>strlen()</code>或<code>sscanf()</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-str"><a href="#mg-str" class="headerlink" title="mg_str()"></a><code>mg_str()</code></h4><ul>
+<li><code>struct mg_str mg_str(const char *s)</code></li>
+<li>从<code>NULL-terminated C-string</code>创建一个Mongoose字符串。这个函数不重复提供字符串，并且将指针存储在创建的<code>mg_str</code>结构中</li>
+<li>注意：<ul>
+<li>在C++(构造函数)中存在此问题，这个功能有同义词<code>mg_str_s</code></li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>s</code>  –  一个指向需要存储到<code>mg_str</code>结构中的<code>NULL-terminated string</code></li>
+</ul>
+</li>
+<li>返回值：创建的Mongoose string</li>
+<li>示例：  <ul>
+<li><code>struct mg_str str = mg_str(&quot;Hello, world!);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-str-n"><a href="#mg-str-n" class="headerlink" title="mg_str_n()"></a><code>mg_str_n()</code></h4><ul>
+<li><code>struct mg_str mg_str_n(const char *s, size_t n);</code></li>
+<li>从C-string（可以是<code>non-NULL terminated</code>，长度由<code>n</code>指定）创建Mongoose string。这个函数不重复提供字符串，并且将指针存储在创建的<code>mg_str</code>结构中</li>
+<li>参数：<ul>
+<li><code>s</code>  –  指向需要存储到创建的<code>mg_str</code>的字符串</li>
+<li><code>n</code>  –  字符串长度</li>
+</ul>
+</li>
+<li>返回值：创建的Mongoose string</li>
+<li>示例：<ul>
+<li><code>struct mg_str str = mg_str_n(&quot;hi&quot;, 2);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-casecmp"><a href="#mg-casecmp" class="headerlink" title="mg_casecmp()"></a><code>mg_casecmp()</code></h4><ul>
+<li><code>int mg_casecmp(const char *s1, const char *s2);</code></li>
+<li>不区分大小写的，比较两个 NULL-terminated strings</li>
+<li>参数：<ul>
+<li><code>s1</code>, <code>s2</code>  –  指向两个需要比较的字符串的指针</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>如果两个字符串相等，则返回0</li>
+<li>如果第一个参数比第二个参数长，则返回大于0的数</li>
+<li>如果第一个参数比第二个参数短，则返回小于0的数</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (mg_casecmp(&quot;hello&quot;, &quot;HELLO&quot;) == 0) &#123;</span><br><span class="line">  // Strings are equal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-ncasecmp"><a href="#mg-ncasecmp" class="headerlink" title="mg_ncasecmp()"></a><code>mg_ncasecmp()</code></h4><ul>
+<li><code>int mg_ncasecmp(const char *s1, const char *s2, size_t len);</code></li>
+<li>不区分大小写的比较两个C-strings的前<code>len</code>个字符，或者遇到<code>\0</code>字符</li>
+<li>参数：<ul>
+<li><code>s1</code>, <code>s2</code>  –  指向需要比较的两个字符串</li>
+<li><code>len</code>   –  比较的最大长度</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>如果两个字符串相等，则返回0</li>
+<li>如果第一个参数比第二个参数长，则返回大于0的数</li>
+<li>如果第一个参数比第二个参数短，则返回小于0的数</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (mg_ncasecmp(&quot;hello1&quot;, &quot;HELLO2&quot;, 5) == 0) &#123;</span><br><span class="line">  // Strings are equal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-vcmp"><a href="#mg-vcmp" class="headerlink" title="mg_vcmp()"></a><code>mg_vcmp()</code></h4><ul>
+<li><code>int mg_vcmp(const struct mg_str *s1, const char *s2);</code></li>
+<li>比较 mongoose string 和 C-string</li>
+<li>参数：<ul>
+<li><code>s1</code>  –  指向需要比较的 mongoose string</li>
+<li><code>s2</code>  –  指向需要比较的 C-string</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>如果两个字符串相等，则返回0</li>
+<li>如果第一个参数比第二个参数长，则返回大于0的数</li>
+<li>如果第一个参数比第二个参数短，则返回小于0的数</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str str = mg_str(&quot;hello&quot;);</span><br><span class="line">if (mg_vcmp(str, &quot;hello&quot;) == 0) &#123;</span><br><span class="line">  // Strings are equal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-vcasecmp"><a href="#mg-vcasecmp" class="headerlink" title="mg_vcasecmp()"></a><code>mg_vcasecmp()</code></h4><ul>
+<li><code>int mg_vcasecmp(const struct mg_str *str1, const char *str2);</code></li>
+<li>不区分大小的比较 mongoose string 和 C-string</li>
+<li>参数：<ul>
+<li><code>s1</code>  –  指向需要比较的 mongoose string</li>
+<li><code>s2</code>  –  指向需要比较的 C-string</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>如果两个字符串相等，则返回0</li>
+<li>如果第一个参数比第二个参数长，则返回大于0的数</li>
+<li>如果第一个参数比第二个参数短，则返回小于0的数</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str str = mg_str(&quot;hello&quot;);</span><br><span class="line">if (mg_vcasecmp(str, &quot;HELLO&quot;) == 0) &#123;</span><br><span class="line">  // Strings are equal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-strcmp"><a href="#mg-strcmp" class="headerlink" title="mg_strcmp()"></a><code>mg_strcmp()</code></h4><ul>
+<li><code>int mg_strcmp(const struct mg_str str1, const struct mg_str str2);</code></li>
+<li>比较两个 mongoose strings</li>
+<li>参数：<ul>
+<li><code>str1</code>, <code>str2</code>  –  指向两个需要比较的 mongoose strings</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>如果两个字符串相等，则返回0</li>
+<li>如果第一个参数比第二个参数长，则返回大于0的数</li>
+<li>如果第一个参数比第二个参数短，则返回小于0的数</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str str1 = mg_str(&quot;hello&quot;);</span><br><span class="line">struct mg_str str2 = mg_str(&quot;hello&quot;);</span><br><span class="line">if (mg_strcmp(str1, str2) == 0) &#123;</span><br><span class="line">  // Strings are equal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-strdup"><a href="#mg-strdup" class="headerlink" title="mg_strdup()"></a><code>mg_strdup()</code></h4><ul>
+<li><code>struct mg_str mg_strdup(const struct mg_str s);</code></li>
+<li>重复提供的字符串。返回一个新的字符串或者<code>MG_NULL_STR</code>表示错误。</li>
+<li>注意：<ul>
+<li>这个函数为返回的字符串分配内存。需要使用<code>free()</code>函数释放</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>s</code>  –  需要重复的 mongoose string</li>
+</ul>
+</li>
+<li>返回值：重复的字符串</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str str1 = mg_str(&quot;hello&quot;);</span><br><span class="line">struct mg_str str2 = mg_strdup(str1);</span><br><span class="line">//...</span><br><span class="line">free((void *)str2.ptr);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-strstr"><a href="#mg-strstr" class="headerlink" title="mg_strstr()"></a><code>mg_strstr()</code></h4><ul>
+<li><code>const char *mg_strstr(const struct mg_str haystack, const struct mg_str needle)</code></li>
+<li>在<code>haystack</code>字符串中查找<code>needle</code>子字符串</li>
+<li>参数：<ul>
+<li><code>haystack</code>  –  需要查找子字符串的 mongoose string</li>
+<li><code>needle</code>    –  需要查找的 mongoose string</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>返回一个指向<code>neddle</code>在<code>haystack</code>中发生的位置的指针</li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str str = mg_str(&quot;Hello, world&quot;);</span><br><span class="line">struct mg_str sub_str = mg_str(&quot;world&quot;);</span><br><span class="line"></span><br><span class="line">if (mg_strstr(str, sub_str) != NULL) &#123;</span><br><span class="line">  // Found</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-strstrip"><a href="#mg-strstrip" class="headerlink" title="mg_strstrip()"></a><code>mg_strstrip()</code></h4><ul>
+<li><code>struct mg_str mg_strstrip(struct mg_str s)</code></li>
+<li>删除 mongoose string <code>s</code>的头部和尾部的空格</li>
+<li>参数：<ul>
+<li><code>s</code>  –  需要修剪的 mongoose string</li>
+</ul>
+</li>
+<li>返回值：输入的字符串</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str str = mg_strstrip(mg_str(&quot;   Hello, world   &quot;));</span><br><span class="line">if (mg_vcmp(str, &quot;Hello, world&quot;) == 0) &#123;</span><br><span class="line">  // Strings are equal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-match"><a href="#mg-match" class="headerlink" title="mg_match()"></a><code>mg_match()</code></h4><ul>
+<li><code>bool mg_match(struct mg_str str, struct mg_str pattern, struct mg_str *caps);</code></li>
+<li>检查字符串<code>str</code>是否匹配<code>pattern</code>，可选地将通配符捕获到提供的数组<code>caps</code>中</li>
+<li>注意：<ul>
+<li>如果<code>caps</code>是非空的，那么<code>caps</code>数组的大小最小为<code>pattern</code>的长度加1.</li>
+<li>最后的 cap 将会被初始化成一个空的字符串</li>
+</ul>
+</li>
+<li>全局匹配规则：<ul>
+<li><code>?</code>  –  匹配任何单个字符</li>
+<li><code>*</code>  –  匹配0个或多个字符，除了<code>/</code></li>
+<li><code>#</code>  –  匹配0个或多个字符</li>
+<li>任何其他字符只匹配它自身</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>str</code>    –  需要匹配的字符串</li>
+<li><code>patter</code> –  与之匹配的规则（模式）</li>
+<li><code>caps</code>   –  通配符符号的可选捕获数组<code>?</code>, <code>*</code>, <code>#</code></li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>匹配成功，返回true</li>
+<li>其他情况，返回false</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// Assume that hm-&gt;uri holds /foo/bar. Then we can match the requested URI:</span><br><span class="line">struct mg_str caps[3];  // Two wildcard symbols &#x27;*&#x27; plus 1</span><br><span class="line">if (mg_match(hm-&gt;uri, mg_str(&quot;/*/*&quot;), caps)) &#123;</span><br><span class="line">  // caps[0] holds `foo`, caps[1] holds `bar`.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-commalist"><a href="#mg-commalist" class="headerlink" title="mg_commalist()"></a><code>mg_commalist()</code></h4><ul>
+<li><code>bool mg_commalist(struct mg_str *s, struct mg_str *k, struct mg_str *v);</code></li>
+<li>解析字符串S，这是一个分隔的条目列表。条目可以是任意字符串，该字符串存储在<code>v</code>中，或者分别存储在<code>k</code>和<code>v</code>中的<code>KEY=VALUE</code></li>
+<li>重要：<ul>
+<li>此函数通过指向下一个条目来修改<code>s</code>。</li>
+</ul>
+</li>
+<li>参数：<ul>
+<li><code>s</code>  –  需要搜索条目的字符串</li>
+<li><code>k</code>  –  一个指向<code>mg_str</code>的指针，接收条目键</li>
+<li><code>v</code>  –  一个指向<code>mg_str</code>的指针，接收条目值</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>如果条目被找到，返回true</li>
+<li>其他情况，返回false</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str k, v, s = mg_str(&quot;a=333,b=777&quot;);</span><br><span class="line">while (mg_commalist(&amp;s, &amp;k, &amp;v))                      // This loop output:</span><br><span class="line">  printf(&quot;[%.*s] set to [%.*s]\n&quot;,                    // [a] set to [333]</span><br><span class="line">         (int) k.len, k.ptr, (int) v.len, v.ptr);     // [b] set to [777]</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-hex"><a href="#mg-hex" class="headerlink" title="mg_hex()"></a><code>mg_hex()</code></h4><ul>
+<li><code>char *mg_hex(const void *buf, size_t len, char *dst);</code></li>
+<li>十六进制编码的二进制数据<code>buf</code>，<code>len</code>输入到一个缓冲区<code>dst</code>，并将其终止。这个输出缓冲区至少比<code>2 x len + 1</code>大</li>
+<li>参数：<ul>
+<li><code>buf</code>  –  十六进制编码的数据</li>
+<li><code>len</code>  –  数据长度</li>
+<li><code>dst</code>  –  指向输出缓冲区的指针</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>返回<code>dst</code>指针。这个编码的字符是小写的</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">char data[] = &quot;\x1\x2\x3&quot;;</span><br><span class="line">char buf[sizeof(data)*2];</span><br><span class="line">char *hex = mg_hex(data, sizeof(data) - 1, buf);</span><br><span class="line">LOG(LL_INFO, (&quot;%s&quot;, hex)); // Output &quot;010203&quot;;</span><br><span class="line">free(hex);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-unhex"><a href="#mg-unhex" class="headerlink" title="mg_unhex()"></a><code>mg_unhex()</code></h4><ul>
+<li><code>void mg_unhex(const char *buf, size_t len, unsigned char *to);</code></li>
+<li>十六进制字符串<code>buf</code>，<code>len</code>输入到缓冲区<code>to</code>。这个缓冲区<code>to</code>必须大于<code>lsn / 2</code></li>
+<li>参数：<ul>
+<li><code>buf</code>  –  需要十六进制解码的数据</li>
+<li><code>len</code>  –  数据大小</li>
+<li><code>to</code>   –  指向输出缓冲区的指针</li>
+</ul>
+</li>
+<li>返回值：无</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">char data[] = &quot;010203&quot;;</span><br><span class="line">char *buf[sizeof(data)/2];</span><br><span class="line">char *hex = mg_unhex(data, sizeof(data) - 1, buf); // buf is now [1,2,3]</span><br><span class="line">free(hex);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-unhexn"><a href="#mg-unhexn" class="headerlink" title="mg_unhexn()"></a><code>mg_unhexn()</code></h4><ul>
+<li><code>unsigned long mg_unhexn(const char *s, size_t len);</code></li>
+<li>解析十六进制编码的字符串<code>s</code>的<code>len</code>个字节。这个<code>len</code>最大值为<code>long x 2</code>的宽度，例如：32-bit platform it is 8</li>
+<li>参数：<ul>
+<li><code>s</code>   –  需要解析的字符串</li>
+<li><code>len</code> –  字符串长度</li>
+</ul>
+</li>
+<li>返回值：返回解析的值</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">char data[] = &quot;010203&quot;;</span><br><span class="line">char *buf[sizeof(data)/2];</span><br><span class="line">unsigned long val = mg_unhex(data, sizeof(data) - 1); // val is now 123</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-remove-double-dots"><a href="#mg-remove-double-dots" class="headerlink" title="mg_remove_double_dots()"></a><code>mg_remove_double_dots()</code></h4><ul>
+<li><code>char *mg_remove_double_dots(char *s);</code></li>
+<li>通过从中删除双点，修改字符串<code>s</code>。用于修改从网络收到的文件名或URI</li>
+<li>参数：<ul>
+<li><code>s</code>  –  需要修改的字符串</li>
+</ul>
+</li>
+<li>返回值：返回<code>s</code>指针</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">char data[] = &quot;../../a.txt&quot;;</span><br><span class="line">mg_remove_double_dots(data);  // data is /a.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-snprintf-mg-vsnprintf"><a href="#mg-snprintf-mg-vsnprintf" class="headerlink" title="mg_snprintf(), mg_vsnprintf()"></a><code>mg_snprintf(), mg_vsnprintf()</code></h4><ul>
+<li><code>size_t mg_snprintf(char *buf, size_t len, const char *fmt, ...);</code></li>
+<li><code>size_t mg_vsnprintf(char *buf, size_t len, const char *fmt, va_list ap);</code></li>
+<li>像<code>snprintf()</code>标准函数一样，打印格式的字符串到字符串缓冲区中,但是以一种可预测的方式，不取决于C库或构建环境。返回值可以大于缓冲区长度<code>len</code>，在这种情况下，溢出字节未打印。Mongoose库通常用于以JSON格式交换数据因此，还支持非标准<code>％q</code>，<code>％v</code>，<code>％h</code>指定符用于格式化JSON字符串</li>
+<li>参数：<ul>
+<li><code>buf</code>  –  指向输出缓冲区的指针</li>
+<li><code>len</code>  –  缓冲区大小</li>
+<li><code>fmt</code>  –  类似于printf的格式字符串</li>
+</ul>
+</li>
+<li>支持格式指定符<ul>
+<li><code>hhd</code>, <code>hd</code>, <code>d</code>, <code>ld</code>, <code>lld</code>  –  用于 <code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>int64_t</code></li>
+<li><code>hhu</code>, <code>hu</code>, <code>u</code>, <code>lu</code>, <code>llu</code>  –  相同，但是用于无符号</li>
+<li><code>hhx</code>, <code>hx</code>, <code>x</code>, <code>lx</code>, <code>llx</code>  –  相同，无符号并且以十六进制输出</li>
+<li><code>s</code>  –  对应<code>char *</code></li>
+<li><code>q</code>  –  对应<code>char *</code>，输出JSON格式字符串(extension)</li>
+<li><code>Q</code>  –  对应<code>char *</code>，输出双引号的JSON格式字符串(extension)</li>
+<li><code>H</code>  –  对应<code>int</code>, <code>void *</code>, 输出双引号的十六进制字符串(extension)</li>
+<li><code>I</code>  –  对应<code>int</code>（4 或 6）， <code>void *</code>, 输出IP地址(extension)</li>
+<li><code>A</code>  –  对应<code>void *</code>， 输出硬件地址(extension)</li>
+<li><code>V</code>  –  对应<code>int</code>, <code>void *</code>， 输出双引号的base64 字符串(extension)</li>
+<li><code>M</code>  –  对应<code>mg_pfn_t</code>，调用另一个输出函数(extension)</li>
+<li><code>g</code>, <code>f</code>  –  对应<code>double</code></li>
+<li><code>c</code>  –  对应<code>char</code></li>
+<li><code>%</code>  –  对应<code>%</code>字符自己</li>
+<li><code>p</code>  –  对应任何指针，输出<code>0x....</code>十六进制值</li>
+<li><code>%X.Y</code>  –  可选宽度和精度修饰符</li>
+<li><code>%.*</code>   –  可选的精度修饰符指定为<code>int</code>参数</li>
+</ul>
+</li>
+<li>返回值：返回打印的字节数</li>
+<li>发送一个JSON HTTP response： <ul>
+<li><code>mg_http_reply(c, 200, &quot;Content-Type: application/json\r\n&quot;, &quot;&#123; %Q: %g&#125;&quot;, &quot;value&quot;, 1.2345);</code></li>
+</ul>
+</li>
+<li>使用更复杂格式字符串的示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%lld&quot;, (int64_t) 123);   // 123</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%.2s&quot;, &quot;abcdef&quot;);        // ab</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%.*s&quot;, 2, &quot;abcdef&quot;);     // ab</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%05x&quot;, 123);             // 00123</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%%-%3s&quot;, &quot;a&quot;);           // %-  a</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;hi, %Q&quot;, &quot;a&quot;);           // hi, &quot;a&quot;</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;r: %M, %d&quot;, f,1,2,7);    // r: 3, 7</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%I&quot;, 4, &quot;abcd&quot;);         // 97.98.99.100</span><br><span class="line">mg_snprintf(buf, sizeof(buf), &quot;%A&quot;, &quot;abcdef&quot;);          // 61:62:63:64:65:66</span><br><span class="line"></span><br><span class="line">// Printing sub-function for %M specifier. Grabs two int parameters</span><br><span class="line">size_t f(void (*out)(char, void *), void *ptr, va_list *ap) &#123;</span><br><span class="line">  int a = va_arg(*ap, int);</span><br><span class="line">  int b = va_arg(*ap, int);</span><br><span class="line">  return mg_xprintf(out, ptr, &quot;%d&quot;, a + b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-mprintf-mg-vmprintf"><a href="#mg-mprintf-mg-vmprintf" class="headerlink" title="mg_mprintf(), mg_vmprintf()"></a><code>mg_mprintf(), mg_vmprintf()</code></h4><ul>
+<li><code>char *mg_mprintf(const char *fmt, ...);</code></li>
+<li><code>char *mg_vmprintf(const char *fmt, va_list *ap);</code></li>
+<li>将消息打印输出到分配的缓冲区中。调用者必须手动释放缓冲区</li>
+<li>参数：<ul>
+<li><code>fmt</code>  –  类似于printf的格式字符串</li>
+</ul>
+</li>
+<li>返回值：分配的内存缓冲区</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">char *msg = mg_mprintf(&quot;Double quoted string: %Q!&quot;, &quot;hi&quot;);</span><br><span class="line">free(msg);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-xprintf-mg-vxprintf"><a href="#mg-xprintf-mg-vxprintf" class="headerlink" title="mg_xprintf(), mg_vxprintf()"></a><code>mg_xprintf(), mg_vxprintf()</code></h4><ul>
+<li><code>size_t mg_xprintf(void (*out)(char, void *), void *param, const char *fmt, ...);</code></li>
+<li><code>size_t mg_vxprintf(void (*out)(char, void *), void *param, const char *fmt, va_list *ap);</code></li>
+<li>使用指定字符输出函数打印消息</li>
+<li>参数：<ul>
+<li><code>out</code>   –  被用于打印字符的函数</li>
+<li><code>param</code> –  被传给<code>out</code>的参数</li>
+<li><code>fmt</code>   –  类似于printf的格式字符串</li>
+</ul>
+</li>
+<li>返回值：返回打印的字节数</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void myfn(char c, void *p);</span><br><span class="line"></span><br><span class="line">size_t len = mg_xprintf(myfn, myfn_p, &quot;Double quoted string: %Q!&quot;, &quot;hi&quot;);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-pfn-iobuf"><a href="#mg-pfn-iobuf" class="headerlink" title="mg_pfn_iobuf()"></a><code>mg_pfn_iobuf()</code></h4><ul>
+<li><code>void mg_pfn_iobuf(char ch, void *param);</code></li>
+<li>将一个字符打印到通用IO缓冲区 <code>Generic IO buffer</code></li>
+<li>参数：<ul>
+<li><code>ch</code>    –  被打印的字节</li>
+<li><code>param</code> –  必须是<code>struct mg_iobuf *</code></li>
+</ul>
+</li>
+<li>示例：<ul>
+<li><code>mg_xprintf(mg_pfn_iobuf, &amp;c-&gt;send, &quot;hi!&quot;);  // Append to the output buffer</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-to64"><a href="#mg-to64" class="headerlink" title="mg_to64()"></a><code>mg_to64()</code></h4><ul>
+<li><code>int64_t mg_to64(struct mg_str str);</code></li>
+<li><code>uint64_t mg_tou64(struct mg_str str);</code></li>
+<li>解析字符串持有的64位整数的值。</li>
+<li>参数：<ul>
+<li><code>str</code>  –  需要解析的字符串</li>
+</ul>
+</li>
+<li>返回值：解析的值</li>
+<li>示例：<ul>
+<li><code>int64_t val = mg_to64(mg_str(&quot;123&quot;)); // Val is now 123</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="mg-aton"><a href="#mg-aton" class="headerlink" title="mg_aton()"></a><code>mg_aton()</code></h4><ul>
+<li><code>bool mg_aton(struct mg_str str, struct mg_addr *addr);</code></li>
+<li>解析存储在<code>str</code>的IP地址，并将结果存储在<code>addr</code></li>
+<li>参数：<ul>
+<li><code>str</code>   –  需要解析的字符串，例如：<code>1.2.3.4</code>, <code>[::1]</code>, <code>01:02::03</code></li>
+<li><code>addr</code>  –  指向接收解析结果的<code>mg_addr</code>字符串的指针</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功，返回true</li>
+<li>其他情况，返回false</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct mg_addr addr;</span><br><span class="line">if (mg_aton(mg_str(&quot;127.0.0.1&quot;), &amp;addr)) &#123;</span><br><span class="line">  // addr is now binary representation of 127.0.0.1 IP address</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="1-8-JSON-API"><a href="#1-8-JSON-API" class="headerlink" title="1.8 JSON API"></a>1.8 JSON API</h3><ul>
+<li>请注意，Mongoose的打印功能支持非标准格式指定Q和％m，它们可以轻松打印JSON字符串：<ul>
+<li><code>char *json = mg_mprintf(&quot;&#123; %Q:%d&#125;&quot;, &quot;value&quot;, 123);  // &#123;&quot;value&quot;:123&#125;</code></li>
+<li><code>free(json);</code></li>
+</ul>
+</li>
+<li>因此，对于完整的JSON支持，需要一组解析功能 - 如下所述。</li>
+</ul>
+<h4 id="mg-json-get"><a href="#mg-json-get" class="headerlink" title="mg_json_get()"></a><code>mg_json_get()</code></h4><ul>
+<li><code>enum &#123; MG_JSON_TOO_DEEP = -1, MG_JSON_INVALID = -2, MG_JSON_NOT_FOUND = -3 &#125;;</code></li>
+<li><code>int mg_json_get(struct mg_str json, const char *path, int *toklen);</code></li>
+<li>解析JSON字符串<code>json</code>，并且返回JSON <code>path</code> 指定的元素的偏移。这个元素的长度被存储在<code>toklen</code></li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有一个有效JSON的字符串</li>
+<li><code>path</code>  –  一个JSON 路径，必须由<code>$</code>开始，例如：<code>$.user</code></li>
+<li><code>toklen</code> –  指向接收元素的长度的指针，可以为NULL</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>返回元素的偏移量</li>
+<li>返回负数 <code>MG_JSON_*</code>表示错误</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// Create a json string: &#123; &quot;a&quot;: 1, &quot;b&quot;: [2, 3] &#125;</span><br><span class="line">char *buf = mg_mprintf(&quot;&#123; %Q: %d, %Q: [%d, %d] &#125;&quot;, &quot;a&quot;, 1, &quot;b&quot;, 2, 3);</span><br><span class="line">struct mg_str json = mg_str(buf);</span><br><span class="line">int offset, length;</span><br><span class="line"></span><br><span class="line">// Lookup &quot;$&quot;, which is the whole JSON. Can be used for validation</span><br><span class="line">offset = mg_json_get(json, &quot;$&quot;, &amp;length);    // offset = 0, length = 23</span><br><span class="line"></span><br><span class="line">// Lookup attribute &quot;a&quot;. Point to value &quot;1&quot;</span><br><span class="line">offset = mg_json_get(json, &quot;$.a&quot;, &amp;length);  // offset = 7, length = 1</span><br><span class="line"></span><br><span class="line">// Lookup attribute &quot;b&quot;. Point to array [2, 3]</span><br><span class="line">offset = mg_json_get(json, &quot;$.b&quot;, &amp;length);  // offset = 15, length = 6</span><br><span class="line"></span><br><span class="line">// Lookup attribute &quot;b[1]&quot;. Point to value &quot;3&quot;</span><br><span class="line">offset = mg_json_get(json, &quot;$.b[1]&quot;, &amp;length); // offset = 19, length = 1</span><br><span class="line"></span><br><span class="line">free(buf);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-json-get-num"><a href="#mg-json-get-num" class="headerlink" title="mg_json_get_num()"></a><code>mg_json_get_num()</code></h4><ul>
+<li><code>bool mg_json_get_num(struct mg_str json, const char *path, double *v);</code></li>
+<li>在JSON路径<code>path</code>，从<code>json</code>字符串获取数字值(double)。如果成功，返回true</li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有效JSON字符串</li>
+<li><code>path</code>  –  一个JSON路径。必须以<code>$</code>开始</li>
+<li><code>v</code>     –  一个对应于值的占位符</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功，返回true</li>
+<li>失败，返回false</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">double d = 0.0;</span><br><span class="line">mg_json_get_num(mg_str(&quot;[1,2,3]&quot;, &quot;$[1]&quot;, &amp;d));     // d contains 2</span><br><span class="line">mg_json_get_num(mg_str(&quot;&#123;\&quot;a\&quot;:1.23&#125;&quot;, &quot;$.a&quot;, &amp;d)); // d contains 1.23</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-json-get-bool"><a href="#mg-json-get-bool" class="headerlink" title="mg_json_get_bool()"></a><code>mg_json_get_bool()</code></h4><ul>
+<li><code>bool mg_json_get_bool(struct mg_str json, const char *path, bool *v);</code></li>
+<li>在JSON路径<code>path</code>，从<code>json</code>字符串获取布尔值(bool)。如果成功，返回true</li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有效JSON字符串</li>
+<li><code>path</code>  –  一个JSON路径。必须以<code>$</code>开始</li>
+<li><code>v</code>     –  一个对应于值的占位符</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功，返回true</li>
+<li>失败，返回false</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bool b = false;</span><br><span class="line">mg_json_get_bool(mg_str(&quot;[123]&quot;, &quot;$[0]&quot;, &amp;b));   // Error. b remains to be false</span><br><span class="line">mg_json_get_bool(mg_str(&quot;[true]&quot;, &quot;$[0]&quot;, &amp;b));  // b is true</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-json-get-long"><a href="#mg-json-get-long" class="headerlink" title="mg_json_get_long()"></a><code>mg_json_get_long()</code></h4><ul>
+<li><code>long mg_json_get_long(struct mg_str json, const char *path, long default_val);</code></li>
+<li>在JSON路径<code>path</code>，从<code>json</code>字符串获取数字值(long)。</li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有效JSON字符串</li>
+<li><code>path</code>  –  一个JSON路径。必须以<code>$</code>开始</li>
+<li><code>v</code>     –  一个对应于值的占位符</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>返回找到的值</li>
+<li>返回<code>default_val</code>值</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">long a = mg_json_get_long(mg_str(&quot;[123]&quot;, &quot;$a&quot;, -1));   // a = -1</span><br><span class="line">long b = mg_json_get_long(mg_str(&quot;[123]&quot;, &quot;$[0]&quot;, -1)); // b = 123</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-json-get-str"><a href="#mg-json-get-str" class="headerlink" title="mg_json_get_str()"></a><code>mg_json_get_str()</code></h4><ul>
+<li><code>char *mg_json_get_str(struct mg_str json, const char *path);</code></li>
+<li>在JSON路径<code>path</code>，从<code>json</code>字符串获取字符串值。如果找到，使用<code>calloc()</code>分配内存的字符串，没有转义的返回给调用者。调用者需要手动使用<code>free()</code>释放返回的字符串</li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有效JSON字符串</li>
+<li><code>path</code>  –  一个JSON路径。必须以<code>$</code>开始</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功，返回non-NULL</li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str json = mg_str(&quot;&#123;\&quot;a\&quot;: \&quot;hi\&quot;&#125;&quot;);  // json = &#123;&quot;a&quot;: &quot;hi&quot;&#125;</span><br><span class="line">char *str = mg_json_get_str(json, &quot;$.a&quot;);        // str = &quot;hi&quot;</span><br><span class="line">free(str);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-json-get-hex"><a href="#mg-json-get-hex" class="headerlink" title="mg_json_get_hex()"></a><code>mg_json_get_hex()</code></h4><ul>
+<li><code>char *mg_json_get_hex(struct mg_str json, const char *path, int *len);</code></li>
+<li>在JSON路径<code>path</code>，从<code>json</code>字符串获取十六进制编码的缓冲区。如果找到，使用<code>calloc()</code>分配内存的缓冲区，解码，并且返回给调用者。调用者需要手动调用<code>free()</code>释放返回的字符串。返回的缓冲区是 0-terminated</li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有效JSON字符串</li>
+<li><code>path</code>  –  一个JSON路径。必须以<code>$</code>开始</li>
+<li><code>len</code>   –  一个指向接收解码长度的指针。可以为NULL</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功，返回non-NULL</li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str json = mg_str(&quot;&#123;\&quot;a\&quot;: \&quot;6869\&quot;&#125;&quot;); // json = &#123;&quot;a&quot;: &quot;6869&quot;&#125;</span><br><span class="line">char *str = mg_json_get_hex(json, &quot;$.a&quot;, NULL);   // str = &quot;hi&quot;</span><br><span class="line">free(str);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="mg-json-get-b64"><a href="#mg-json-get-b64" class="headerlink" title="mg_json_get_b64()"></a><code>mg_json_get_b64()</code></h4><ul>
+<li><code>char *mg_json_get_b4(struct mg_str json, const char *path, int *len);</code></li>
+<li>在JSON路径<code>path</code>，从<code>json</code>字符串获取base64 编码的缓冲区。如果找到，使用<code>calloc()</code>申请内存的缓冲区，解码，并返回给调用者。调用者需要手动调用<code>free()</code>释放返回的字符串。返回的缓冲区是 0-terminated</li>
+<li>参数：<ul>
+<li><code>json</code>  –  保存有效JSON字符串</li>
+<li><code>path</code>  –  一个JSON路径。必须以<code>$</code>开始</li>
+<li><code>len</code>   –  一个指向接收解码长度的指针。可以为NULL</li>
+</ul>
+</li>
+<li>返回值：<ul>
+<li>成功，返回non-NULL</li>
+<li>失败，返回NULL</li>
+</ul>
+</li>
+<li>示例：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct mg_str json = mg_str(&quot;&#123;\&quot;a\&quot;: \&quot;YWJj\&quot;&#125;&quot;); // json = &#123;&quot;a&quot;: &quot;YWJj&quot;&#125;</span><br><span class="line">char *str = mg_json_get_b64(json, &quot;$.a&quot;, NULL);   // str = &quot;abc&quot;</span><br><span class="line">free(str);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="1-9-Utility-API"><a href="#1-9-Utility-API" class="headerlink" title="1.9 Utility API"></a>1.9 Utility API</h3><h3 id="2-0-URL-API"><a href="#2-0-URL-API" class="headerlink" title="2.0 URL API"></a>2.0 URL API</h3><h3 id="2-1-Logging-API"><a href="#2-1-Logging-API" class="headerlink" title="2.1 Logging API"></a>2.1 Logging API</h3>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mongoose/" rel="tag"># Mongoose</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_utility/" rel="prev" title="mongoose_utility">
+      <i class="fa fa-chevron-left"></i> mongoose_utility
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Mongoose/mongoose_1_%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/2024-05-22-mongoose_logging/" rel="next" title="mongoose_logging">
+      mongoose_logging <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E8%A6%81API"><span class="nav-number">2.</span> <span class="nav-text">重要API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-addr"><span class="nav-number">2.1.1.</span> <span class="nav-text">struct mg_addr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-mgr"><span class="nav-number">2.1.2.</span> <span class="nav-text">struct mg_mgr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-connection"><span class="nav-number">2.1.3.</span> <span class="nav-text">struct mg_connection</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%A0%B8%E5%BF%83API%E8%B0%83%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 核心API调用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-mgr-init"><span class="nav-number">2.2.1.</span> <span class="nav-text">mg_mgr_init()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-mgr-poll"><span class="nav-number">2.2.2.</span> <span class="nav-text">mg_mgr_poll()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-mgr-free"><span class="nav-number">2.2.3.</span> <span class="nav-text">mg_mgr_free()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-listen"><span class="nav-number">2.2.4.</span> <span class="nav-text">mg_listen()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-connect"><span class="nav-number">2.2.5.</span> <span class="nav-text">mg_connect()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-send"><span class="nav-number">2.2.6.</span> <span class="nav-text">mg_send()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-printf-mg-vprintf"><span class="nav-number">2.2.7.</span> <span class="nav-text">mg_printf(), mg_vprintf()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-wrapfd"><span class="nav-number">2.2.8.</span> <span class="nav-text">mg_wrapfd()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-mkpipe"><span class="nav-number">2.2.9.</span> <span class="nav-text">mg_mkpipe()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-hello"><span class="nav-number">2.2.10.</span> <span class="nav-text">mg_hello()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-HTTP-API"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 HTTP API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-http-header"><span class="nav-number">2.3.1.</span> <span class="nav-text">struct mg_http_header</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-http-message"><span class="nav-number">2.3.2.</span> <span class="nav-text">struct mg_http_message</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-listen"><span class="nav-number">2.3.3.</span> <span class="nav-text">mg_http_listen()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-connect"><span class="nav-number">2.3.4.</span> <span class="nav-text">mg_http_connect()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-status"><span class="nav-number">2.3.5.</span> <span class="nav-text">mg_http_status()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-get-request-len"><span class="nav-number">2.3.6.</span> <span class="nav-text">mg_http_get_request_len()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-parse"><span class="nav-number">2.3.7.</span> <span class="nav-text">mg_http_parse()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-printf-chunk"><span class="nav-number">2.3.8.</span> <span class="nav-text">mg_http_printf_chunk()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-write-chunk"><span class="nav-number">2.3.9.</span> <span class="nav-text">mg_http_write_chunk()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-delete-chunk"><span class="nav-number">2.3.10.</span> <span class="nav-text">mg_http_delete_chunk()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-http-serve-opts"><span class="nav-number">2.3.11.</span> <span class="nav-text">struct mg_http_serve_opts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-serve-dir"><span class="nav-number">2.3.12.</span> <span class="nav-text">mg_http_serve_dir()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-serve-file"><span class="nav-number">2.3.13.</span> <span class="nav-text">mg_http_serve_file()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-reply"><span class="nav-number">2.3.14.</span> <span class="nav-text">mg_http_reply()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-get-header"><span class="nav-number">2.3.15.</span> <span class="nav-text">mg_http_get_header()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-get-header-var"><span class="nav-number">2.3.16.</span> <span class="nav-text">mg_http_get_header_var()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-var"><span class="nav-number">2.3.17.</span> <span class="nav-text">mg_http_var()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-get-var"><span class="nav-number">2.3.18.</span> <span class="nav-text">mg_http_get_var()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-creds"><span class="nav-number">2.3.19.</span> <span class="nav-text">mg_http_creds()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-match-uri"><span class="nav-number">2.3.20.</span> <span class="nav-text">mg_http_match_uri()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-bauth"><span class="nav-number">2.3.21.</span> <span class="nav-text">mg_http_bauth()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-http-part"><span class="nav-number">2.3.22.</span> <span class="nav-text">struct mg_http_part</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-next-multipart"><span class="nav-number">2.3.23.</span> <span class="nav-text">mg_http_next_multipart()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-http-upload"><span class="nav-number">2.3.24.</span> <span class="nav-text">mg_http_upload()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-WebSocket-API"><span class="nav-number">2.4.</span> <span class="nav-text">1.4 WebSocket API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-ws-message"><span class="nav-number">2.4.1.</span> <span class="nav-text">struct mg_ws_message</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#WebSockete-message-type"><span class="nav-number">2.4.2.</span> <span class="nav-text">WebSockete message type:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-ws-connect"><span class="nav-number">2.4.3.</span> <span class="nav-text">mg_ws_connect()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-ws-upgrade"><span class="nav-number">2.4.4.</span> <span class="nav-text">mg_ws_upgrade()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-ws-send"><span class="nav-number">2.4.5.</span> <span class="nav-text">mg_ws_send()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-ws-printf-mg-ws-vprintf"><span class="nav-number">2.4.6.</span> <span class="nav-text">mg_ws_printf(), mg_ws_vprintf()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-ws-wrap"><span class="nav-number">2.4.7.</span> <span class="nav-text">mg_ws_wrap()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Timer-API"><span class="nav-number">2.5.</span> <span class="nav-text">1.5 Timer API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-timer-add"><span class="nav-number">2.5.1.</span> <span class="nav-text">mg_timer_add()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-timer"><span class="nav-number">2.5.2.</span> <span class="nav-text">struct mg_timer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-timer-init"><span class="nav-number">2.5.3.</span> <span class="nav-text">mg_timer_init()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-timer-free"><span class="nav-number">2.5.4.</span> <span class="nav-text">mg_timer_free()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-timer-poll"><span class="nav-number">2.5.5.</span> <span class="nav-text">mg_timer_poll()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-Time"><span class="nav-number">2.6.</span> <span class="nav-text">1.6 Time</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-millis"><span class="nav-number">2.6.1.</span> <span class="nav-text">mg_millis()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-String"><span class="nav-number">2.7.</span> <span class="nav-text">1.7 String</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-mg-str"><span class="nav-number">2.7.1.</span> <span class="nav-text">struct mg_str</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-str"><span class="nav-number">2.7.2.</span> <span class="nav-text">mg_str()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-str-n"><span class="nav-number">2.7.3.</span> <span class="nav-text">mg_str_n()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-casecmp"><span class="nav-number">2.7.4.</span> <span class="nav-text">mg_casecmp()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-ncasecmp"><span class="nav-number">2.7.5.</span> <span class="nav-text">mg_ncasecmp()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-vcmp"><span class="nav-number">2.7.6.</span> <span class="nav-text">mg_vcmp()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-vcasecmp"><span class="nav-number">2.7.7.</span> <span class="nav-text">mg_vcasecmp()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-strcmp"><span class="nav-number">2.7.8.</span> <span class="nav-text">mg_strcmp()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-strdup"><span class="nav-number">2.7.9.</span> <span class="nav-text">mg_strdup()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-strstr"><span class="nav-number">2.7.10.</span> <span class="nav-text">mg_strstr()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-strstrip"><span class="nav-number">2.7.11.</span> <span class="nav-text">mg_strstrip()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-match"><span class="nav-number">2.7.12.</span> <span class="nav-text">mg_match()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-commalist"><span class="nav-number">2.7.13.</span> <span class="nav-text">mg_commalist()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-hex"><span class="nav-number">2.7.14.</span> <span class="nav-text">mg_hex()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-unhex"><span class="nav-number">2.7.15.</span> <span class="nav-text">mg_unhex()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-unhexn"><span class="nav-number">2.7.16.</span> <span class="nav-text">mg_unhexn()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-remove-double-dots"><span class="nav-number">2.7.17.</span> <span class="nav-text">mg_remove_double_dots()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-snprintf-mg-vsnprintf"><span class="nav-number">2.7.18.</span> <span class="nav-text">mg_snprintf(), mg_vsnprintf()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-mprintf-mg-vmprintf"><span class="nav-number">2.7.19.</span> <span class="nav-text">mg_mprintf(), mg_vmprintf()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-xprintf-mg-vxprintf"><span class="nav-number">2.7.20.</span> <span class="nav-text">mg_xprintf(), mg_vxprintf()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-pfn-iobuf"><span class="nav-number">2.7.21.</span> <span class="nav-text">mg_pfn_iobuf()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-to64"><span class="nav-number">2.7.22.</span> <span class="nav-text">mg_to64()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-aton"><span class="nav-number">2.7.23.</span> <span class="nav-text">mg_aton()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-JSON-API"><span class="nav-number">2.8.</span> <span class="nav-text">1.8 JSON API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get"><span class="nav-number">2.8.1.</span> <span class="nav-text">mg_json_get()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get-num"><span class="nav-number">2.8.2.</span> <span class="nav-text">mg_json_get_num()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get-bool"><span class="nav-number">2.8.3.</span> <span class="nav-text">mg_json_get_bool()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get-long"><span class="nav-number">2.8.4.</span> <span class="nav-text">mg_json_get_long()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get-str"><span class="nav-number">2.8.5.</span> <span class="nav-text">mg_json_get_str()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get-hex"><span class="nav-number">2.8.6.</span> <span class="nav-text">mg_json_get_hex()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mg-json-get-b64"><span class="nav-number">2.8.7.</span> <span class="nav-text">mg_json_get_b64()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-9-Utility-API"><span class="nav-number">2.9.</span> <span class="nav-text">1.9 Utility API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-0-URL-API"><span class="nav-number">2.10.</span> <span class="nav-text">2.0 URL API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Logging-API"><span class="nav-number">2.11.</span> <span class="nav-text">2.1 Logging API</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

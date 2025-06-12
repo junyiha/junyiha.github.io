@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 userdata命令  linux useradd命令 详解useradd命令用于在Linux系统中创建新用户。它可以通过命令行提供一系列选项和参数来配置新用户的属性。以下是useradd命令的基本语法和一些常见选项： 基本语法：1useradd [选项] 用户名  常见选项： 指定用户家目录： 1useradd -m -d &#x2F;home&#x2F;newuser newuser  -m: 创建用户的家">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_2_28_useradd">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_28_useradd/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 userdata命令  linux useradd命令 详解useradd命令用于在Linux系统中创建新用户。它可以通过命令行提供一系列选项和参数来配置新用户的属性。以下是useradd命令的基本语法和一些常见选项： 基本语法：1useradd [选项] 用户名  常见选项： 指定用户家目录： 1useradd -m -d &#x2F;home&#x2F;newuser newuser  -m: 创建用户的家">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.341Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="LinuxCommand">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_28_useradd/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>linux_2_28_useradd | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_28_useradd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux_2_28_useradd
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>userdata命令</li>
+</ul>
+<h2 id="linux-useradd命令-详解"><a href="#linux-useradd命令-详解" class="headerlink" title="linux useradd命令 详解"></a>linux useradd命令 详解</h2><p><code>useradd</code>命令用于在Linux系统中创建新用户。它可以通过命令行提供一系列选项和参数来配置新用户的属性。以下是<code>useradd</code>命令的基本语法和一些常见选项：</p>
+<h3 id="基本语法："><a href="#基本语法：" class="headerlink" title="基本语法："></a>基本语法：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd [选项] 用户名</span><br></pre></td></tr></table></figure>
+
+<h3 id="常见选项："><a href="#常见选项：" class="headerlink" title="常见选项："></a>常见选项：</h3><ol>
+<li><p><strong>指定用户家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -m -d /home/newuser newuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-m</code>: 创建用户的家目录。</li>
+<li><code>-d</code>: 指定用户的家目录路径。</li>
+</ul>
+</li>
+<li><p><strong>指定用户ID（UID）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -u 1001 newuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-u</code>: 指定用户ID。</li>
+</ul>
+</li>
+<li><p><strong>指定初始登录Shell：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -s /bin/bash newuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-s</code>: 指定初始登录Shell。</li>
+</ul>
+</li>
+<li><p><strong>指定用户组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -g <span class="built_in">users</span> newuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-g</code>: 指定用户的主组。</li>
+</ul>
+</li>
+<li><p><strong>指定附加组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -G wheel,ftp newuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-G</code>: 指定用户的附加组。</li>
+</ul>
+</li>
+<li><p><strong>设置用户密码：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>passwd</code>命令为新用户设置密码。</p>
+</li>
+<li><p><strong>强制用户在首次登录时修改密码：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -e 2023-01-31 newuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-e</code>: 指定过期日期。</li>
+</ul>
+</li>
+<li><p><strong>创建系统用户：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -r sysuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-r</code>: 创建系统用户。</li>
+</ul>
+</li>
+</ol>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><ul>
+<li><p>创建一个新用户并设置密码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">useradd newuser</span><br><span class="line">passwd newuser</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建用户时指定用户ID、初始Shell和主组：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -u 1001 -s /bin/bash -g <span class="built_in">users</span> newuser</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建系统用户：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -r sysuser</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>请注意，使用<code>useradd</code>仅会创建用户，如果你需要为新用户分配文件访问权限，可能还需要使用<code>chown</code>和<code>chmod</code>等命令。要了解更多选项和详细信息，可以查看<code>man useradd</code>。</p>
+<h2 id="linux-useradd命令-常用技巧"><a href="#linux-useradd命令-常用技巧" class="headerlink" title="linux useradd命令 常用技巧"></a>linux useradd命令 常用技巧</h2><p>在使用<code>useradd</code>命令时，有一些常用的技巧和选项，可以帮助你更灵活地创建和管理用户。以下是一些常见的<code>useradd</code>命令技巧：</p>
+<ol>
+<li><p><strong>一次性设置多个用户：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd user1 user2 user3</span><br></pre></td></tr></table></figure>
+<p>可以在一条命令中一次性创建多个用户。</p>
+</li>
+<li><p><strong>使用<code>-m</code>选项创建用户的家目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -m newuser</span><br></pre></td></tr></table></figure>
+<p><code>-m</code>选项将会为新用户创建一个家目录。</p>
+</li>
+<li><p><strong>指定用户ID（UID）：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -u 1001 newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-u</code>选项可以为用户指定特定的用户ID。</p>
+</li>
+<li><p><strong>指定用户组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -g <span class="built_in">users</span> newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-g</code>选项可以指定新用户的主组。</p>
+</li>
+<li><p><strong>添加用户到多个附加组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -G wheel,ftp newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-G</code>选项可以为用户指定多个附加组。</p>
+</li>
+<li><p><strong>指定用户的登录Shell：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -s /bin/bash newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-s</code>选项可以为用户指定初始登录Shell。</p>
+</li>
+<li><p><strong>创建系统用户：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -r sysuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-r</code>选项可以创建系统用户，这样系统用户将没有家目录，通常用于运行服务的用户。</p>
+</li>
+<li><p><strong>创建用户并设置过期日期：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -e 2023-01-31 newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-e</code>选项可以设置用户的过期日期，用户在首次登录时需要修改密码。</p>
+</li>
+<li><p><strong>创建用户时强制指定密码：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -p $(openssl passwd -crypt mypassword) newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-p</code>选项可以指定经过加密的密码。上例中使用<code>openssl passwd -crypt</code>生成加密的密码。</p>
+</li>
+<li><p><strong>禁用新用户的登录权限：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> useradd -M newuser</span><br></pre></td></tr></table></figure>
+<p>使用<code>-M</code>选项可以创建用户，但不会为其创建家目录，也不会设置登录Shell，从而禁用其登录权限。</p>
+</li>
+</ol>
+<p>这些技巧可以帮助你更好地使用<code>useradd</code>命令，根据具体需求创建和管理用户。确保仔细查看<code>man useradd</code>以了解更多详细信息。</p>
+<h2 id="useradd"><a href="#useradd" class="headerlink" title="useradd"></a>useradd</h2><ul>
+<li>useradd, 用于建立用户账号</li>
+<li>useradd可用来建立用户账号,账号建好之后,再用passwd设定账号的密码,用userdel删除账号,</li>
+<li>示例:<ul>
+<li><code>useradd tt # 添加一般用户</code></li>
+<li><code>useradd -g root tt  # 为添加的用户指定相应的用户组</code></li>
+<li><code>useradd -r tt  # 创建一个系统用户</code></li>
+<li><code>useradd -d /home/myd tt  # 为新添加的用户指定home目录</code></li>
+<li><code>useradd caojh -u 544  # 建立用户并制定id</code></li>
+</ul>
+</li>
+</ul>
+<p>在Linux中，<code>useradd</code>命令用于创建新用户账号。它是用于管理用户的基本命令之一。</p>
+<p>以下是<code>useradd</code>命令的一般语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd [options] username</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>options</code>是可选的一些选项，<code>username</code>是要创建的新用户的用户名。</p>
+<p>以下是一些常见的<code>useradd</code>命令选项和用法：</p>
+<ol>
+<li><p>创建新用户：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将创建一个新用户账号，并使用指定的用户名。</p>
+</li>
+<li><p>指定用户ID（UID）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -u uid username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将为新用户指定一个特定的用户ID（UID）。如果未指定，系统会自动分配一个唯一的UID。</p>
+</li>
+<li><p>指定用户所属的初始组：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -g groupname username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将指定新用户所属的初始组。如果未指定，将使用与用户名相同的组。</p>
+</li>
+<li><p>指定用户的主目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -d homedir username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将为新用户指定一个特定的主目录。如果未指定，系统将创建一个与用户名相同的目录。</p>
+</li>
+<li><p>创建用户并指定登录Shell：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -s shell username</span><br></pre></td></tr></table></figure>
+
+<p>此命令将为新用户指定一个特定的登录Shell。如果未指定，将使用系统默认的Shell。</p>
+</li>
+</ol>
+<p><code>useradd</code>命令还支持其他一些选项，如设置用户的密码、指定用户的备注信息等。您可以使用<code>man useradd</code>命令查看完整的选项和用法说明。</p>
+<p>请注意，使用<code>useradd</code>命令仅创建用户账号，不会自动创建密码或设置用户的权限和访问控制。您可能需要使用其他命令，如<code>passwd</code>和<code>usermod</code>，来设置密码和修改用户的属性。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LinuxCommand/" rel="tag"># LinuxCommand</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_29_userdel/" rel="prev" title="linux_2_29_userdel">
+      <i class="fa fa-chevron-left"></i> linux_2_29_userdel
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/Linux/linux_2_%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/2024-05-22-linux_2_25_source/" rel="next" title="linux_2_25_source">
+      linux_2_25_source <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-useradd%E5%91%BD%E4%BB%A4-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">linux useradd命令 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">基本语法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">常见选项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">示例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-useradd%E5%91%BD%E4%BB%A4-%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">linux useradd命令 常用技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#useradd"><span class="nav-number">4.</span> <span class="nav-text">useradd</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

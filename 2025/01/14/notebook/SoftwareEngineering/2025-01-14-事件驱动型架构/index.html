@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介 事件驱动型架构相关学习笔记 事件驱动型架构是一种以事件为核心进行系统设计和实现的方法。它通过事件的发布和订阅机制，使系统的各个组件之间能够松耦合的进行通信，从而提高系统的灵活性和可维护性。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="事件驱动型架构">
+<meta property="og:url" content="https://junyiha.github.io/2025/01/14/notebook/SoftwareEngineering/2025-01-14-%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介 事件驱动型架构相关学习笔记 事件驱动型架构是一种以事件为核心进行系统设计和实现的方法。它通过事件的发布和订阅机制，使系统的各个组件之间能够松耦合的进行通信，从而提高系统的灵活性和可维护性。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://junyiha.github.io/images/SoftwareEngineering/%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://junyiha.github.io/images/SoftwareEngineering/%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+<meta property="article:published_time" content="2025-01-14T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.522Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="软件工程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://junyiha.github.io/images/SoftwareEngineering/%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+
+<link rel="canonical" href="https://junyiha.github.io/2025/01/14/notebook/SoftwareEngineering/2025-01-14-%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>事件驱动型架构 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2025/01/14/notebook/SoftwareEngineering/2025-01-14-%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          事件驱动型架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-01-14 09:00:00" itemprop="dateCreated datePublished" datetime="2025-01-14T09:00:00+08:00">2025-01-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SoftwareEngineering/" itemprop="url" rel="index"><span itemprop="name">SoftwareEngineering</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>事件驱动型架构相关学习笔记</li>
+<li>事件驱动型架构是一种以事件为核心进行系统设计和实现的方法。它通过事件的发布和订阅机制，使系统的各个组件之间能够松耦合的进行通信，从而提高系统的灵活性和可维护性。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="事件驱动编程模型"><a href="#事件驱动编程模型" class="headerlink" title="事件驱动编程模型"></a>事件驱动编程模型</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ul>
+<li>在一些应用场景中，我们希望程序是被 事件 触发运行的，并且程序在感知到不同的事件后能够产生不同的响应动作，此时就需要应用程序能够实时感知其所关心的事件，并在事件发生后执行相应的操作。</li>
+<li>在解决上述问题时，应用程序是由 事件 驱动运行的，这类程序在编写时往往可以采用相同的模型实现，我们可以将这种编程模型称为 事件驱动模型。</li>
+<li>个人理解：事件驱动模型其实是一种抽象模型，用于对外部事件驱动系统业务逻辑这类应用程序进行建模。</li>
+</ul>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ul>
+<li>基于事件驱动的应用程序可以实时响应所关心的事件，实现实时检测，响应外部动作，这是事件驱动模型的基本功能和作用。在一些复杂的系统中，事件驱动模型还可很好的发挥以下作用：实现组件之间的松耦合，解耦，实现异步任务，跟踪状态变化。</li>
+<li>在复杂系统中，往往存在多个组件相互耦合的情况，如果将组件之间的耦合关系抽象成事件(event)，让事件担任组件之间的通信任务，就能减低组件之间的耦合关系。</li>
+</ul>
+<h3 id="实现异步任务"><a href="#实现异步任务" class="headerlink" title="实现异步任务"></a>实现异步任务</h3><ul>
+<li>在一些业务场景中，顺序，阻塞式的执行任务会遇到一些比较耗时的中间步骤，但是不希望整个流程都停下来等待这些中间步骤完成，而是触发一个异步操作，然后继续执行当前任务，在收到异步操作处理完成的消息之后再执行相关的处理。</li>
+<li>在一些事件驱动模型的设计结构中，会存在任务队列用以存储需要处理的事件(Event)，这种结构的事件驱动模型可以很好的实现上述业务场景。</li>
+<li>使用事件驱动模型实现异步任务的一般思路是：当遇到耗时较大，没有同步执行要求的操作时，针对这个操作触发一个事件，将这个事件加入到任务队列中，直到有一个进程(线程)能够获取并执行这个任务，才开始执行这个任务。</li>
+</ul>
+<h3 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h3><ul>
+<li><p>事件驱动模型有很多种体现形式，例如简单的事件触发机制，单线程异步任务，多线程异步任务等，但是各种技术中实现事件驱动模型的基本思路相同。</p>
+</li>
+<li><p>事件驱动模型的基本结构如下图所示<br><img src="/images/SoftwareEngineering/%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png" alt="事件驱动模型基本结构"></p>
+</li>
+<li><p>事件驱动模型包括三个基本要素：事件状态对象(Event), 事件源(EventSource), 事件监听器(EventListener)</p>
+</li>
+<li><p>事件状态对象(Event)</p>
+<ul>
+<li>Event 作为事件的抽象，对事件本身进行了描述，携带着事件的详细信息，例如在UI系统中，Event携带的信息有鼠标动作类型，鼠标坐标等信息。在事件驱动模式中Event起着传递事件信息的作用，负责把被触发事件的详细信息传递给EventListener，以便EventListerner做出正确的响应动作</li>
+</ul>
+</li>
+<li><p>事件源(EventSource)</p>
+<ul>
+<li>EventSource 主要用于感知外部事件，将事件打包成Event并分发给EventListener处理。</li>
+<li>这里的EventSource实际上担任了两个职责：生成事件和派发事件。依据职责单一原则的描述EventSource应该只担任 生成事件 的职责，而派发事件的职责应当重新设计一个EventDispatcher类来担任，但是由于单应用场景下派发事件的业务逻辑通常比较简单，所以这里将EventDispatcher的职责也交由EventSource负责</li>
+<li>到底应该设计成EventSource还是EventSource ＋ EventDispatcher，涉及到事件驱动模型的两种实现形式：以观察者模式实现，以发布订阅模式实现。</li>
+</ul>
+</li>
+<li><p>监听器(EventListener)</p>
+<ul>
+<li>EventListener封装了响应事件的能力，它职责就是在感知到EventSource触发Event后，处理Event对象以响应事件。一般需要在EventSource预留注册EventListener的接口，以便在运行时向EventSource添加处理事件的监听器。</li>
+</ul>
+</li>
+<li><p>三要素之间的关系:<br><img src="/images/SoftwareEngineering/%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png" alt="事件驱动模型基本结构"></p>
+</li>
+</ul>
+<h3 id="事件驱动编程模型-1"><a href="#事件驱动编程模型-1" class="headerlink" title="事件驱动编程模型"></a><strong>事件驱动编程模型</strong></h3><p>事件驱动编程（Event-Driven Programming, EDP）是一种以<strong>事件</strong>为核心的编程范式，系统中的主要逻辑通过<strong>事件的产生、分发、响应</strong>来组织和实现。它广泛应用于图形用户界面（GUI）、网络通信、游戏开发、物联网和分布式系统中。</p>
+<hr>
+<h3 id="事件驱动编程模型的核心概念"><a href="#事件驱动编程模型的核心概念" class="headerlink" title="事件驱动编程模型的核心概念"></a><strong>事件驱动编程模型的核心概念</strong></h3><ol>
+<li><p><strong>事件（Event）：</strong></p>
+<ul>
+<li>系统中发生的某种动作或状态变化，例如鼠标点击、键盘输入、网络请求到达等。</li>
+<li>事件可以携带数据，用于描述事件的详细信息。</li>
+</ul>
+</li>
+<li><p><strong>事件源（Event Source）：</strong></p>
+<ul>
+<li>事件的发生者或触发点，例如用户操作（点击、输入）或系统变化（定时器、网络）。</li>
+</ul>
+</li>
+<li><p><strong>事件处理器（Event Handler）：</strong></p>
+<ul>
+<li>负责响应和处理事件的函数或方法。通常通过回调函数的形式实现。</li>
+</ul>
+</li>
+<li><p><strong>事件循环（Event Loop）：</strong></p>
+<ul>
+<li>一个持续运行的循环，监听事件源并将事件分发给合适的事件处理器。</li>
+<li>常见于异步编程模型中，例如 Node.js 的事件循环机制。</li>
+</ul>
+</li>
+<li><p><strong>事件分发器（Event Dispatcher）：</strong></p>
+<ul>
+<li>管理事件的发布和分发，将事件发送到对应的处理器。</li>
+</ul>
+</li>
+<li><p><strong>事件监听器（Event Listener）：</strong></p>
+<ul>
+<li>绑定到事件源上，用于监听特定事件的发生，并触发相应的处理逻辑。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动编程模型的工作原理"><a href="#事件驱动编程模型的工作原理" class="headerlink" title="事件驱动编程模型的工作原理"></a><strong>事件驱动编程模型的工作原理</strong></h3><ol>
+<li><p><strong>事件的触发：</strong></p>
+<ul>
+<li>事件源产生事件，通常由用户动作或系统状态变化引发。</li>
+</ul>
+</li>
+<li><p><strong>事件的监听：</strong></p>
+<ul>
+<li>事件监听器捕获事件，并将其传递给事件分发器。</li>
+</ul>
+</li>
+<li><p><strong>事件的分发：</strong></p>
+<ul>
+<li>事件分发器根据预定义规则，将事件路由到适当的事件处理器。</li>
+</ul>
+</li>
+<li><p><strong>事件的处理：</strong></p>
+<ul>
+<li>事件处理器执行相应的逻辑（例如更新界面、发送响应等）。</li>
+</ul>
+</li>
+<li><p><strong>事件的结束：</strong></p>
+<ul>
+<li>处理完成后，系统继续监听下一次事件。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动编程的特点"><a href="#事件驱动编程的特点" class="headerlink" title="事件驱动编程的特点"></a><strong>事件驱动编程的特点</strong></h3><h4 id="优点："><a href="#优点：" class="headerlink" title="优点："></a><strong>优点：</strong></h4><ol>
+<li><p><strong>松耦合：</strong></p>
+<ul>
+<li>事件源与事件处理逻辑分离，便于模块化设计。</li>
+</ul>
+</li>
+<li><p><strong>高响应性：</strong></p>
+<ul>
+<li>系统能够实时响应用户输入或外部变化。</li>
+</ul>
+</li>
+<li><p><strong>灵活性和扩展性：</strong></p>
+<ul>
+<li>新增事件处理逻辑时无需修改事件源。</li>
+</ul>
+</li>
+<li><p><strong>异步处理：</strong></p>
+<ul>
+<li>事件驱动常与异步编程结合，提升系统性能。</li>
+</ul>
+</li>
+</ol>
+<h4 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a><strong>缺点：</strong></h4><ol>
+<li><p><strong>调试复杂：</strong></p>
+<ul>
+<li>事件流动的路径可能较复杂，难以追踪。</li>
+</ul>
+</li>
+<li><p><strong>状态管理困难：</strong></p>
+<ul>
+<li>在复杂系统中，维护事件的顺序和状态可能变得复杂。</li>
+</ul>
+</li>
+<li><p><strong>潜在的性能问题：</strong></p>
+<ul>
+<li>事件处理器过多可能导致事件队列阻塞或内存泄漏。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动编程模型的常见模式"><a href="#事件驱动编程模型的常见模式" class="headerlink" title="事件驱动编程模型的常见模式"></a><strong>事件驱动编程模型的常见模式</strong></h3><ol>
+<li><p><strong>观察者模式（Observer Pattern）：</strong></p>
+<ul>
+<li>对象间的一种一对多依赖关系，当一个对象状态发生变化时，其所有依赖者都会收到通知并自动更新。</li>
+</ul>
+</li>
+<li><p><strong>回调函数（Callback Function）：</strong></p>
+<ul>
+<li>注册一个函数，当事件触发时，调用该函数处理事件。</li>
+</ul>
+</li>
+<li><p><strong>发布-订阅模式（Publish-Subscribe Pattern）：</strong></p>
+<ul>
+<li>事件源将事件发布到中间层（如事件总线），订阅者订阅感兴趣的事件。</li>
+</ul>
+</li>
+<li><p><strong>Reactor 模式：</strong></p>
+<ul>
+<li>使用事件循环将 I&#x2F;O 事件分发给适当的处理器，常用于网络编程（如 libevent、libuv）。</li>
+</ul>
+</li>
+<li><p><strong>事件流（Event Stream）：</strong></p>
+<ul>
+<li>事件被表示为一个连续的数据流，可以进行过滤、转换和组合。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动编程的应用场景"><a href="#事件驱动编程的应用场景" class="headerlink" title="事件驱动编程的应用场景"></a><strong>事件驱动编程的应用场景</strong></h3><ol>
+<li><p><strong>用户界面开发：</strong></p>
+<ul>
+<li>GUI 系统如 Qt、Java Swing，React.js 等。</li>
+</ul>
+</li>
+<li><p><strong>网络通信：</strong></p>
+<ul>
+<li>处理高并发的异步网络请求，例如 Node.js、Nginx、libevent。</li>
+</ul>
+</li>
+<li><p><strong>物联网：</strong></p>
+<ul>
+<li>处理设备数据、传感器事件。</li>
+</ul>
+</li>
+<li><p><strong>游戏开发：</strong></p>
+<ul>
+<li>玩家操作、物理引擎等事件的实时响应。</li>
+</ul>
+</li>
+<li><p><strong>分布式系统：</strong></p>
+<ul>
+<li>使用事件驱动的架构设计微服务之间的通信。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动编程的技术实现"><a href="#事件驱动编程的技术实现" class="headerlink" title="事件驱动编程的技术实现"></a><strong>事件驱动编程的技术实现</strong></h3><h4 id="C-中的实现："><a href="#C-中的实现：" class="headerlink" title="C++ 中的实现："></a><strong>C++ 中的实现：</strong></h4><ol>
+<li><p><strong>事件循环：</strong></p>
+<ul>
+<li>使用 <code>select</code>、<code>poll</code> 或 <code>epoll</code> 实现事件循环。</li>
+</ul>
+</li>
+<li><p><strong>库支持：</strong></p>
+<ul>
+<li><strong>Qt：</strong> 提供信号与槽机制实现事件驱动。</li>
+<li><strong>Boost.Asio：</strong> 用于网络编程的异步事件处理。</li>
+<li><strong>libevent&#x2F;libuv：</strong> 用于高性能事件驱动网络编程。</li>
+</ul>
+</li>
+</ol>
+<h4 id="其他语言的实现："><a href="#其他语言的实现：" class="headerlink" title="其他语言的实现："></a><strong>其他语言的实现：</strong></h4><ol>
+<li><p><strong>JavaScript：</strong></p>
+<ul>
+<li>Node.js 提供了事件循环和异步 I&#x2F;O 的支持。</li>
+</ul>
+</li>
+<li><p><strong>Python：</strong></p>
+<ul>
+<li>使用 <code>asyncio</code> 模块或 Twisted 库。</li>
+</ul>
+</li>
+<li><p><strong>Java：</strong></p>
+<ul>
+<li>使用 <code>EventListener</code> 接口或 Akka 框架。</li>
+</ul>
+</li>
+<li><p><strong>C#:</strong></p>
+<ul>
+<li>使用 <code>Event</code> 和 <code>Delegate</code> 实现事件驱动模型。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动编程示例"><a href="#事件驱动编程示例" class="headerlink" title="事件驱动编程示例"></a><strong>事件驱动编程示例</strong></h3><h4 id="示例：C-简单事件驱动程序"><a href="#示例：C-简单事件驱动程序" class="headerlink" title="示例：C++ 简单事件驱动程序"></a>示例：C++ 简单事件驱动程序</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unordered_map&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">EventDispatcher</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> EventHandler = std::function&lt;<span class="built_in">void</span>(<span class="type">const</span> std::string&amp;)&gt;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addListener</span><span class="params">(<span class="type">const</span> std::string&amp; event, EventHandler handler)</span> </span>&#123;</span><br><span class="line">        handlers[event] = handler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">dispatch</span><span class="params">(<span class="type">const</span> std::string&amp; event, <span class="type">const</span> std::string&amp; message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (handlers.<span class="built_in">find</span>(event) != handlers.<span class="built_in">end</span>()) &#123;</span><br><span class="line">            handlers[event](message);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::unordered_map&lt;std::string, EventHandler&gt; handlers;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    EventDispatcher dispatcher;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册事件处理器</span></span><br><span class="line">    dispatcher.<span class="built_in">addListener</span>(<span class="string">&quot;onClick&quot;</span>, [](<span class="type">const</span> std::string&amp; msg) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Button clicked: &quot;</span> &lt;&lt; msg &lt;&lt; std::endl;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    dispatcher.<span class="built_in">addListener</span>(<span class="string">&quot;onHover&quot;</span>, [](<span class="type">const</span> std::string&amp; msg) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Mouse hover: &quot;</span> &lt;&lt; msg &lt;&lt; std::endl;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 触发事件</span></span><br><span class="line">    dispatcher.<span class="built_in">dispatch</span>(<span class="string">&quot;onClick&quot;</span>, <span class="string">&quot;Submit Button&quot;</span>);</span><br><span class="line">    dispatcher.<span class="built_in">dispatch</span>(<span class="string">&quot;onHover&quot;</span>, <span class="string">&quot;Menu Item&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>事件驱动编程模型通过松耦合的方式连接事件源和事件处理器，能够灵活、高效地处理异步任务和用户交互。但在实际开发中，需要注意调试复杂性和状态管理问题，合理设计事件流是实现高效事件驱动系统的关键。</p>
+<h2 id="什么是事件"><a href="#什么是事件" class="headerlink" title="什么是事件"></a>什么是事件</h2><ul>
+<li>在事件驱动型架构中，事件是一种状态的改变或特定动作的发生。例如，用户点击按钮，订单创建，文件上传成功等都可以被视为事件。事件具有唯一表示，并且通常包含时间戳和其他相关数据。</li>
+</ul>
+<h2 id="事件驱动型架构的核心概念"><a href="#事件驱动型架构的核心概念" class="headerlink" title="事件驱动型架构的核心概念"></a>事件驱动型架构的核心概念</h2><ul>
+<li>事件驱动型架构的核心概念包括事件源，事件监听器，事件处理器和事件总线</li>
+<li>事件源(Event Source): 负责生成和发布事件的组件。例如，一个用户操作界面可以作为事件源，当用户点击按钮时生成一个点击事件。</li>
+<li>事件监听器(Event Listener): 订阅并接收特定事件的组件。监听器会对接收到的事件进行处理</li>
+<li>事件处理器(Event Processor): 订阅事件的具体逻辑。处理器通常包含在监听器内部</li>
+<li>事件总线(Event Bus): 用于传递事件的通信通道。事件源通过事件总线发布事件，监听器通过事件总线订阅事件。</li>
+</ul>
+<h2 id="事件驱动型架构的实现"><a href="#事件驱动型架构的实现" class="headerlink" title="事件驱动型架构的实现"></a>事件驱动型架构的实现</h2><ul>
+<li>事件驱动型架构可以通过多种方式，常见的包括基于消息队列，基于发布–订阅模式以及基于流处理的实现方式。</li>
+</ul>
+<h2 id="事件驱动型架构-详解"><a href="#事件驱动型架构-详解" class="headerlink" title="事件驱动型架构 详解"></a>事件驱动型架构 详解</h2><h3 id="事件驱动型架构（Event-Driven-Architecture-EDA）"><a href="#事件驱动型架构（Event-Driven-Architecture-EDA）" class="headerlink" title="事件驱动型架构（Event-Driven Architecture, EDA）"></a><strong>事件驱动型架构（Event-Driven Architecture, EDA）</strong></h3><p>事件驱动型架构是一种以<strong>事件</strong>为核心进行系统设计的架构模式，系统中的组件通过<strong>事件的生成、传递、处理</strong>来完成交互。EDA 常用于构建具有高性能、松耦合、可扩展性和异步处理能力的系统。</p>
+<hr>
+<h3 id="事件驱动型架构的核心概念-1"><a href="#事件驱动型架构的核心概念-1" class="headerlink" title="事件驱动型架构的核心概念"></a><strong>事件驱动型架构的核心概念</strong></h3><ol>
+<li><p><strong>事件（Event）：</strong></p>
+<ul>
+<li>系统中发生的某种有意义的动作或状态变化，如“用户下单”、“订单支付成功”等。</li>
+<li>事件通常由事件生产者（Producer）生成，并传递给事件消费者（Consumer）处理。</li>
+</ul>
+</li>
+<li><p><strong>事件生产者（Event Producer）：</strong></p>
+<ul>
+<li>负责生成事件的组件。</li>
+<li>例如：用户界面生成的点击事件，业务逻辑生成的订单事件。</li>
+</ul>
+</li>
+<li><p><strong>事件消费者（Event Consumer）：</strong></p>
+<ul>
+<li>负责接收和处理事件的组件。</li>
+<li>例如：库存管理系统消费订单事件以更新库存。</li>
+</ul>
+</li>
+<li><p><strong>事件通道（Event Channel）：</strong></p>
+<ul>
+<li>事件从生产者传递到消费者的路径，通常由消息队列或事件总线实现（如 Kafka、RabbitMQ）。</li>
+</ul>
+</li>
+<li><p><strong>事件处理器（Event Handler）：</strong></p>
+<ul>
+<li>实现对事件的具体处理逻辑。</li>
+</ul>
+</li>
+<li><p><strong>事件总线（Event Bus）：</strong></p>
+<ul>
+<li>用于管理事件的发布和订阅，确保事件生产者和消费者之间的松耦合。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的工作原理"><a href="#事件驱动型架构的工作原理" class="headerlink" title="事件驱动型架构的工作原理"></a><strong>事件驱动型架构的工作原理</strong></h3><ol>
+<li><p><strong>事件的生成：</strong></p>
+<ul>
+<li>事件生产者在某个操作发生后生成事件（如用户提交订单）。</li>
+</ul>
+</li>
+<li><p><strong>事件的分发：</strong></p>
+<ul>
+<li>事件通过事件通道（或事件总线）被发布。</li>
+<li>事件总线可以将事件广播给多个订阅的消费者。</li>
+</ul>
+</li>
+<li><p><strong>事件的消费：</strong></p>
+<ul>
+<li>事件消费者监听并接收到事件后，执行相应的处理逻辑（如更新库存或通知物流系统）。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的模式"><a href="#事件驱动型架构的模式" class="headerlink" title="事件驱动型架构的模式"></a><strong>事件驱动型架构的模式</strong></h3><ol>
+<li><p><strong>简单事件流模式：</strong></p>
+<ul>
+<li>事件从生产者直接传递到消费者，通常用于简单的一对一场景。</li>
+<li><strong>优点：</strong> 简单易实现。</li>
+<li><strong>缺点：</strong> 不适合复杂系统，生产者与消费者耦合较高。</li>
+</ul>
+</li>
+<li><p><strong>发布-订阅模式（Pub&#x2F;Sub）：</strong></p>
+<ul>
+<li>事件生产者将事件发布到事件通道，多个消费者订阅并处理事件。</li>
+<li><strong>优点：</strong> 支持一对多、异步处理，松耦合。</li>
+<li><strong>缺点：</strong> 管理事件和订阅关系可能较复杂。</li>
+</ul>
+</li>
+<li><p><strong>事件溯源模式（Event Sourcing）：</strong></p>
+<ul>
+<li>系统的状态变化由一系列事件记录并重放，而不是直接存储最终状态。</li>
+<li><strong>优点：</strong> 提供完整的历史记录，可实现回溯。</li>
+<li><strong>缺点：</strong> 对存储和性能要求高。</li>
+</ul>
+</li>
+<li><p><strong>命令-查询职责分离（CQRS）：</strong></p>
+<ul>
+<li>结合事件溯源，通过将写操作（命令）和读操作（查询）分开处理。</li>
+<li><strong>优点：</strong> 提高读写性能。</li>
+<li><strong>缺点：</strong> 增加系统复杂度。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的优点"><a href="#事件驱动型架构的优点" class="headerlink" title="事件驱动型架构的优点"></a><strong>事件驱动型架构的优点</strong></h3><ol>
+<li><p><strong>松耦合：</strong></p>
+<ul>
+<li>生产者与消费者解耦，通过事件通道通信，系统模块独立性高。</li>
+</ul>
+</li>
+<li><p><strong>可扩展性：</strong></p>
+<ul>
+<li>新增或移除消费者不影响现有系统。</li>
+</ul>
+</li>
+<li><p><strong>实时性：</strong></p>
+<ul>
+<li>支持事件的异步处理和实时响应。</li>
+</ul>
+</li>
+<li><p><strong>灵活性：</strong></p>
+<ul>
+<li>事件流可以动态调整，适应业务需求的变化。</li>
+</ul>
+</li>
+<li><p><strong>容错性：</strong></p>
+<ul>
+<li>消费者失败时，事件可以保存在队列中，等待恢复后再处理。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的缺点"><a href="#事件驱动型架构的缺点" class="headerlink" title="事件驱动型架构的缺点"></a><strong>事件驱动型架构的缺点</strong></h3><ol>
+<li><p><strong>调试复杂：</strong></p>
+<ul>
+<li>系统的异步特性和松耦合使得调试和问题定位较难。</li>
+</ul>
+</li>
+<li><p><strong>数据一致性问题：</strong></p>
+<ul>
+<li>在分布式系统中，可能需要使用额外机制（如幂等性设计、事务消息）保证一致性。</li>
+</ul>
+</li>
+<li><p><strong>性能开销：</strong></p>
+<ul>
+<li>事件通道或消息队列可能成为性能瓶颈。</li>
+</ul>
+</li>
+<li><p><strong>事件管理复杂性：</strong></p>
+<ul>
+<li>需要设计和管理事件的格式、序列化和版本控制。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的应用场景"><a href="#事件驱动型架构的应用场景" class="headerlink" title="事件驱动型架构的应用场景"></a><strong>事件驱动型架构的应用场景</strong></h3><ol>
+<li><p><strong>实时数据处理：</strong></p>
+<ul>
+<li>如交易系统、物联网设备数据采集。</li>
+</ul>
+</li>
+<li><p><strong>分布式系统：</strong></p>
+<ul>
+<li>各模块需要独立开发和部署。</li>
+</ul>
+</li>
+<li><p><strong>消息驱动系统：</strong></p>
+<ul>
+<li>例如：订单处理、库存更新、通知系统。</li>
+</ul>
+</li>
+<li><p><strong>事件溯源：</strong></p>
+<ul>
+<li>金融、审计等需要记录和回放历史事件的场景。</li>
+</ul>
+</li>
+<li><p><strong>微服务架构：</strong></p>
+<ul>
+<li>各微服务通过事件通信，减少直接依赖。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的技术实现"><a href="#事件驱动型架构的技术实现" class="headerlink" title="事件驱动型架构的技术实现"></a><strong>事件驱动型架构的技术实现</strong></h3><ol>
+<li><p><strong>消息队列：</strong></p>
+<ul>
+<li><strong>Kafka：</strong> 高吞吐量分布式消息队列。</li>
+<li><strong>RabbitMQ：</strong> 功能丰富的 AMQP 消息队列。</li>
+<li><strong>ActiveMQ：</strong> 企业级消息中间件。</li>
+</ul>
+</li>
+<li><p><strong>事件总线：</strong></p>
+<ul>
+<li><strong>Azure Event Hub：</strong> 支持高吞吐量的事件流。</li>
+<li><strong>AWS EventBridge：</strong> 事件驱动的服务器less服务。</li>
+<li><strong>NATS：</strong> 高性能的事件总线系统。</li>
+</ul>
+</li>
+<li><p><strong>框架支持：</strong></p>
+<ul>
+<li>Spring Boot 的事件机制。</li>
+<li>Akka 的 Actor 模型。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的设计原则"><a href="#事件驱动型架构的设计原则" class="headerlink" title="事件驱动型架构的设计原则"></a><strong>事件驱动型架构的设计原则</strong></h3><ol>
+<li><p><strong>定义清晰的事件模型：</strong></p>
+<ul>
+<li>明确事件的格式、字段和语义。</li>
+</ul>
+</li>
+<li><p><strong>保证事件幂等性：</strong></p>
+<ul>
+<li>避免事件重复处理带来的问题。</li>
+</ul>
+</li>
+<li><p><strong>可靠性和容错机制：</strong></p>
+<ul>
+<li>使用持久化队列、事务消息，确保事件不会丢失。</li>
+</ul>
+</li>
+<li><p><strong>监控和可观察性：</strong></p>
+<ul>
+<li>为系统的事件流和消费者提供全面的监控。</li>
+</ul>
+</li>
+<li><p><strong>事件的顺序性：</strong></p>
+<ul>
+<li>在某些场景下，需要保证事件的消费顺序。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="事件驱动型架构的示例"><a href="#事件驱动型架构的示例" class="headerlink" title="事件驱动型架构的示例"></a><strong>事件驱动型架构的示例</strong></h3><h4 id="示例场景：电商系统"><a href="#示例场景：电商系统" class="headerlink" title="示例场景：电商系统"></a>示例场景：电商系统</h4><ul>
+<li><p><strong>事件生产者：</strong></p>
+<ul>
+<li>用户提交订单（生成“订单已提交”事件）。</li>
+</ul>
+</li>
+<li><p><strong>事件通道：</strong></p>
+<ul>
+<li>Kafka 队列。</li>
+</ul>
+</li>
+<li><p><strong>事件消费者：</strong></p>
+<ul>
+<li><strong>库存服务：</strong> 订阅“订单已提交”事件，更新库存。</li>
+<li><strong>支付服务：</strong> 订阅“订单已提交”事件，处理付款。</li>
+<li><strong>物流服务：</strong> 订阅“订单已支付”事件，安排发货。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>事件驱动型架构是一种强大的设计方法，适合现代分布式、高并发的系统。但其异步特性和分布式特性也带来了一定的挑战。合理地设计事件模型、选择合适的技术栈，并注重系统的监控与调试，是成功实施事件驱动型架构的关键。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" rel="tag"># 软件工程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/01/14/notebook/UML/2025-01-14-UML/" rel="prev" title="UML">
+      <i class="fa fa-chevron-left"></i> UML
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/01/15/notebook/C/C_7_%E5%B8%B8%E7%94%A8%E5%BA%93/2025-01-15-libevent/" rel="next" title="libevent库">
+      libevent库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">事件驱动编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.3.</span> <span class="nav-text">实现异步任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">2.4.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B-1"><span class="nav-number">2.5.</span> <span class="nav-text">事件驱动编程模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.6.</span> <span class="nav-text">事件驱动编程模型的核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.7.</span> <span class="nav-text">事件驱动编程模型的工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">2.8.</span> <span class="nav-text">事件驱动编程的特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%82%B9%EF%BC%9A"><span class="nav-number">2.8.1.</span> <span class="nav-text">优点：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9%EF%BC%9A"><span class="nav-number">2.8.2.</span> <span class="nav-text">缺点：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%B8%B8%E8%A7%81%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.9.</span> <span class="nav-text">事件驱动编程模型的常见模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.10.</span> <span class="nav-text">事件驱动编程的应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E7%9A%84%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.11.</span> <span class="nav-text">事件驱动编程的技术实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#C-%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%9A"><span class="nav-number">2.11.1.</span> <span class="nav-text">C++ 中的实现：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E8%AF%AD%E8%A8%80%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%9A"><span class="nav-number">2.11.2.</span> <span class="nav-text">其他语言的实现：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.12.</span> <span class="nav-text">事件驱动编程示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9AC-%E7%AE%80%E5%8D%95%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">2.12.1.</span> <span class="nav-text">示例：C++ 简单事件驱动程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.13.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%8B%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">什么是事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">4.</span> <span class="nav-text">事件驱动型架构的核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">事件驱动型架构的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84-%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">事件驱动型架构 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%EF%BC%88Event-Driven-Architecture-EDA%EF%BC%89"><span class="nav-number">6.1.</span> <span class="nav-text">事件驱动型架构（Event-Driven Architecture, EDA）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5-1"><span class="nav-number">6.2.</span> <span class="nav-text">事件驱动型架构的核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">6.3.</span> <span class="nav-text">事件驱动型架构的工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E6%A8%A1%E5%BC%8F"><span class="nav-number">6.4.</span> <span class="nav-text">事件驱动型架构的模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">6.5.</span> <span class="nav-text">事件驱动型架构的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">6.6.</span> <span class="nav-text">事件驱动型架构的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">6.7.</span> <span class="nav-text">事件驱动型架构的应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.8.</span> <span class="nav-text">事件驱动型架构的技术实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="nav-number">6.9.</span> <span class="nav-text">事件驱动型架构的设计原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E5%9E%8B%E6%9E%B6%E6%9E%84%E7%9A%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">6.10.</span> <span class="nav-text">事件驱动型架构的示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%9C%BA%E6%99%AF%EF%BC%9A%E7%94%B5%E5%95%86%E7%B3%BB%E7%BB%9F"><span class="nav-number">6.10.1.</span> <span class="nav-text">示例场景：电商系统</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">6.11.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

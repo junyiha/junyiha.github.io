@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"junyiha.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="简介一、RGB模型与YUV模型  RGB模型 物理三基色分别是红（Red）、绿（Green）、蓝（Blue）。现代的显示器技术就是通过组合不通强度的红绿蓝三原色，来达成几乎任何一种可见光的颜色。 在图像存储中，通过记录每个像素的红绿蓝强度，来记录图像的方法，称为RGB模型（RGB Model）。 常见的图片格式中，PNG和BMP这两种就是基于RGB模型的。 YUV模型 YUV模型，又被称为亮度-色">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV 图像理论基础">
+<meta property="og:url" content="https://junyiha.github.io/2024/05/22/notebook/OpenCV/opencv_0_%E9%A2%86%E5%9F%9F%E7%9F%A5%E8%AF%86/2024-05-22-opencv_5_%E5%9B%BE%E5%83%8F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="junyi&#39;s blog">
+<meta property="og:description" content="简介一、RGB模型与YUV模型  RGB模型 物理三基色分别是红（Red）、绿（Green）、蓝（Blue）。现代的显示器技术就是通过组合不通强度的红绿蓝三原色，来达成几乎任何一种可见光的颜色。 在图像存储中，通过记录每个像素的红绿蓝强度，来记录图像的方法，称为RGB模型（RGB Model）。 常见的图片格式中，PNG和BMP这两种就是基于RGB模型的。 YUV模型 YUV模型，又被称为亮度-色">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-22T01:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-28T08:08:39.427Z">
+<meta property="article:author" content="zhang junyi">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://junyiha.github.io/2024/05/22/notebook/OpenCV/opencv_0_%E9%A2%86%E5%9F%9F%E7%9F%A5%E8%AF%86/2024-05-22-opencv_5_%E5%9B%BE%E5%83%8F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>OpenCV 图像理论基础 | junyi's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">junyi's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">hahahahaha</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://junyiha.github.io/2024/05/22/notebook/OpenCV/opencv_0_%E9%A2%86%E5%9F%9F%E7%9F%A5%E8%AF%86/2024-05-22-opencv_5_%E5%9B%BE%E5%83%8F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zhang junyi">
+      <meta itemprop="description" content="工作学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junyi's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenCV 图像理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-22 09:00:00" itemprop="dateCreated datePublished" datetime="2024-05-22T09:00:00+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-04-28 16:08:39" itemprop="dateModified" datetime="2025-04-28T16:08:39+08:00">2025-04-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OpenCV/" itemprop="url" rel="index"><span itemprop="name">OpenCV</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>一、RGB模型与YUV模型</p>
+<ol>
+<li>RGB模型<br> 物理三基色分别是红（Red）、绿（Green）、蓝（Blue）。现代的显示器技术就是通过组合不通强度的红绿蓝三原色，来达成几乎任何一种可见光的颜色。<br> 在图像存储中，通过记录每个像素的红绿蓝强度，来记录图像的方法，称为RGB模型（RGB Model）。<br> 常见的图片格式中，PNG和BMP这两种就是基于RGB模型的。</li>
+<li>YUV模型<br> YUV模型，又被称为亮度-色度模型。它是通过数学转换，将RGB三通道转换为一个代表亮度的通道（Y），和两个代表色度的通道（UV）来记录图像的模型</li>
+</ol>
+<p>二、转换过程</p>
+<ol>
+<li><p>RGB2YUV<br> 在做RGB信号到YUV信号的转换时，一般是先转换到YUV444格式，然后再将UV信号的分辨率降低，变成所需要的格式</p>
+</li>
+<li><p>YUV2RGB<br> 在播放视频或显示图像的时候，需要将YUV信号转换成RGB信号。这个步骤称为渲染（Rendering）<br> 在做YUV到RGB的转换时，首先需要将缩水的UV信号的分辨率拉升到与Y信号相同的分辨率，然后再转换到RGB信号。</p>
+</li>
+<li><p>公式：<br> Y &#x3D; 0.299 * R + 0.587 * G + 0.114 * B<br> U &#x3D; -0.147 * R - 0.289 * G - 0.436 * B<br> V &#x3D; 0.615 * R - 0.515 * G - 0.100 * B </p>
+<p> R &#x3D; Y + 1.1140 * V<br> G &#x3D; Y - 0.395 * U - 0.581 * V<br> B &#x3D; Y + 2.032 * U</p>
+</li>
+</ol>
+<p>收集箱：</p>
+<ol>
+<li>Opencv没有提供BGR转NV12，但是提供了NV12转RGB：cvtColor(src,dst,CV_YUV2BGR_NV12);</li>
+<li>摄像机拍摄出来的视频很多都是用YUV格式保存，颜色空间的转换必须在RGB色彩模型上才能完成，所以第一步是将YUV颜色模型转换为RGB颜色模型</li>
+<li>split(image,yuvchannel);<br>merge(rgbchannel,3,img2);</li>
+</ol>
+<h1 id="二值化"><a href="#二值化" class="headerlink" title="二值化"></a>二值化</h1><ol>
+<li>二值化，指将256阶的灰度图通过合适的阈值，转换为黑白二值图，即像素值只有0和1两种（或者是0和255）。</li>
+<li>目的：通常为将图像的前后景进行分割，以便进行进一步的处理</li>
+<li>二值化的关键在于<strong>阈值的选择</strong>，合理的阈值应该尽可能的分离前景和后景</li>
+<li>图像二值化的算法的设计目的在于选择一个合理的阈值。在选择阈值的时候，应该是一种自适应的选择，不需要手动调节。</li>
+<li>图像二值化阈值选择算法：<ol>
+<li>P-tile算法（最古老）</li>
+<li>最小误判概率法</li>
+<li>大津法（OTSU）（最常用）</li>
+<li>局部自适应二值化（Chow and Kaneko algorithm）：有一些场合，单一的阈值不可能将前景和后景分开，颜色不呈现双峰性<ol>
+<li>将图像分成多个子区域，每个局部区域内的像素满足双峰性</li>
+<li>对每个区域求解阈值</li>
+<li>通过插值法计算每个像素的阈值</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h1 id="图像形态学"><a href="#图像形态学" class="headerlink" title="图像形态学"></a>图像形态学</h1><ol>
+<li>图像形态学的理论基础为<strong>集合论</strong></li>
+<li>图像中的集合代表二值图像或灰度图像的形状。如二值图像的前景像素集合</li>
+<li>图像形态学的作用是简化图像数据，保持基本形状特性，去除不相干的结构等</li>
+<li>基本运算包括：膨胀、腐蚀、开运算、闭运算、顶帽运算和底帽运算等。<ol>
+<li>腐蚀运算：去除一些粘连图像，去除噪声</li>
+<li>膨胀运算：由于无法实现理想的二值化，使得原本连通的像素集合被分成不通的连通域，从而影响目标物的提取。可通过膨胀运算使其恢复连通性   </li>
+<li>膨胀和腐蚀运算的问题：使图像形状发生改变，目标物体变形，对识别时的特征提取会造成影响</li>
+<li>开运算：先对图像进行腐蚀处理，再对结果进行膨胀处理。先腐蚀再膨胀的结果并不是恢复原状，而是会消除黏连部分，同时不影响其他部分的形状</li>
+<li>闭运算：先对图像进行膨胀处理，再对膨胀结果进行腐蚀处理。小的裂缝，小孔等被填充，并不影响原来的形状</li>
+<li>顶帽和底帽变换<ol>
+<li>顶帽变换：原图 - 灰度开运算结果（灰度腐蚀+灰度膨胀）<ol>
+<li>保留比结构元素小的部分</li>
+<li>保留比周围环境亮的像素</li>
+</ol>
+</li>
+<li>底帽变换：灰度闭运算（灰度膨胀+灰度腐蚀） - 原图<ol>
+<li>保留比结构元素小的部分</li>
+<li>保留比周围环境暗的像素</li>
+</ol>
+</li>
+<li>功能：消除背景光照不均匀的现象，从而改善在二值化时的效果，同样结构元素的尺寸大小要根据目标物体的大小进行选择</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h1 id="空间滤波"><a href="#空间滤波" class="headerlink" title="空间滤波"></a>空间滤波</h1><ol>
+<li>卷积的基本概念：<ol>
+<li>空间滤波是一种采用滤波处理的影响增强方法。其理论基础是空间卷积和空间相关。目的是改善影响质量，包括去除高频噪声与干扰，及影响边缘增强、线性增强以及去模糊等。分为低通滤波（平滑化）、高通滤波（锐化）和带通滤波。</li>
+<li>一维卷积实例：对数字图像做卷积操作其实就是利用卷积核在图像上滑动，将图像点上的像素灰度值与对应的卷积核上的数值相乘，然后将所有相乘后的值相加作为卷积核中间像素对应的图像上像素的灰度值，并最终滑动完成所有图像的过程。</li>
+<li>二维卷积实例：对数字图像做卷积操作其实就是利用卷积核在图像上滑动，将图像点上的像素灰度值与对应的卷积核上的数值相乘，然后将所有相乘后的值相加作为卷积核中间像素对应的图像上像素的灰度值，并最终滑动完成所有图像的过程。</li>
+</ol>
+</li>
+<li>卷积的应用<ol>
+<li>均值滤波<ol>
+<li>两种基本的平滑卷积：平滑卷积，通过高斯分布加权的高斯平滑卷积</li>
+<li>效果：与周围差距较大的值趋向于与周围相似，整体值趋向于平均化</li>
+</ol>
+</li>
+<li>中值滤波：中值是一种非线性滤波，不需要指定卷积核，只需要指定滤波器尺寸<ol>
+<li>效果：一些和周围像素值差异特别大的点被周围的像素值代替。表现在图像就是一些特别亮或者特别暗的点被周围的像素值代替。</li>
+</ol>
+</li>
+<li>均值滤波和中值滤波通常的作用是：降噪，而图像中两种常见的噪声：椒盐噪声和高斯噪声<ol>
+<li>椒盐噪声：它是一种随机出现的白点或者黑点，即亮的区域有黑色像素或者在暗的区域有白色像素（或者两者皆有）。椒盐噪声的成因是图像信号受到突如其来的强烈干扰而产生的。椒盐噪声通常使用<strong>中值滤波</strong>降噪</li>
+<li>高斯噪声：主要来源是在采集过程中产生的，例如由于照明不良或者高温引起的传感器噪声。其概率分布上符合正态分布。高斯噪声通常使用<strong>平滑滤波</strong>进行降噪。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h1 id="几何变换"><a href="#几何变换" class="headerlink" title="几何变换"></a>几何变换</h1><ol>
+<li>图像的几何变换，又称空间变换，是图形处理的一个方面，是各种图形处理算法的基础。<ol>
+<li>具体步骤：它将一幅图像中的坐标位置映射到另一幅图像中的新坐标位置，其实质是改变像素的空间位置，估算新空间位置上的像素值。</li>
+<li>几何变换算法一般包括：空间变换运算和插值算法</li>
+</ol>
+</li>
+<li>二维图像的几何运算矩阵：<ol>
+<li>齐次坐标：对一个在二维平面上的点（x，y），对任意非零实数Z，三元组（xZ, yZ, Z）即称之为该店的齐次坐标。使用n+1维，来表示n维的坐标<ol>
+<li>目的：统一坐标的加法运算和乘法运算，运算时提高效率，表示无穷远的点，可以控制尺度的缩放，当z&#x3D;0的时候，表示无穷远的点。</li>
+</ol>
+</li>
+<li>比例缩放：图像的比例缩放是指将给定的图像在x轴方向按比例缩放a倍，在y轴方向按比例缩放b倍，从而获得一幅新的图像。<ol>
+<li>如果a&#x3D;b，称这样的比例缩放为图像的权比例缩放</li>
+<li>如果a不等于b，图像的比例缩放会改变原始图像的像素间的相对位置，产生几何畸变</li>
+</ol>
+</li>
+<li>旋转和镜像</li>
+<li>错切和复合变换</li>
+<li>投影变换</li>
+</ol>
+</li>
+</ol>
+<h1 id="视频图像处理"><a href="#视频图像处理" class="headerlink" title="视频图像处理"></a>视频图像处理</h1><ol>
+<li>固定背景的视频图像处理<ol>
+<li>背景差分法：</li>
+<li>高斯背景建模：为每一个像素计算了一个单独的阈值</li>
+<li>阴影处理</li>
+<li>背景更新</li>
+</ol>
+</li>
+<li>移动背景的视频图像处理：光流法和特定物体目标检测<ol>
+<li>光流法：<ol>
+<li>光流是空间运动物体在观测成像面上的像素运动的瞬时速度。光流场是指图像中所有像素点构成的一种二维瞬时速度场。1981年，Horn&amp;Schunck创造性地将二维速度场和亮度变化相结合，引入基本光流约束方程及整体平滑约束条件，建立了光流计算的基本模型。</li>
+<li>光流法的标准测试数据集：<a target="_blank" rel="noopener" href="http://vision.middlebury.edu/flow/">http://vision.middlebury.edu/flow/</a></li>
+<li>光流法实际上是计算图像中的像素在两帧之间的运动向量</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h1 id="图像识别（涉及到识别，通常分为两大体系：SVM体系和神经网络体系）"><a href="#图像识别（涉及到识别，通常分为两大体系：SVM体系和神经网络体系）" class="headerlink" title="图像识别（涉及到识别，通常分为两大体系：SVM体系和神经网络体系）"></a>图像识别（涉及到识别，通常分为两大体系：SVM体系和神经网络体系）</h1><ol>
+<li>SVM体系：手动去设计特征，然后根据分类器进行分类</li>
+<li>神经网络体系：通过训练自动收敛特征进行识</li>
+</ol>
+<h1 id="琐碎基础概念"><a href="#琐碎基础概念" class="headerlink" title="琐碎基础概念"></a>琐碎基础概念</h1><h2 id="边缘识别（边缘检测）"><a href="#边缘识别（边缘检测）" class="headerlink" title="边缘识别（边缘检测）"></a>边缘识别（边缘检测）</h2><ol>
+<li>边缘识别又称边缘检测，是模仿人类视觉的一个过程。</li>
+<li>人类视觉系统认识目标的过程分两步：首先，把图像边缘与背景分裂出来；然后，才能知觉到图像的细节，辨认出图像的轮廓。在检测物体边缘时，先对其轮廓点进行粗略检测，然后通过链接规则把原来检测到的轮廓点链接来，同时也检测和连接遗漏的边界点及去除虚假的边界。</li>
+<li>边缘检测的目的是去发现图像中关于形状和反射或透射比的信息，是图像处理、图像分析、模式识别、计算机视觉以及人类视觉的基本步骤之一。</li>
+<li>边缘识别的实质是采用某种算法来提取出图像中的对象和背景间的交界线。图像灰度的变化情况可以用图像灰度分布的梯度来反应，因此我们可以利用局部图像微分技术获得边缘检测算子</li>
+<li>边缘识别步骤及要求：<ol>
+<li>图像滤波：边缘检测算法主要是基于图像亮度的一阶和二阶导数，但是导数的计算对噪声很敏感，因此必须使用滤波器来改善与噪声有关的边缘检测器的性能。（中值滤波、高斯滤波、均值滤波）</li>
+<li>图形增强：增强边缘的基础是确定图像各点邻域强度的变化值。增强算法可以将邻域强度值有显著变化的点突出显示。</li>
+<li>图像检测：在图像中有许多点的梯度幅值比较大，而这些点在特定的应用领域并不都是边缘，应该用某些方法来确定哪些是边缘点。最简单的边缘检测判据是梯度幅值阈值判据。</li>
+<li>图像定位：如果某一应用场合要求确定边缘位置，则边缘的位置可以在子像素分辨率上来估计，边缘的方位也可以被估计出来。</li>
+</ol>
+</li>
+<li>传统边缘识别方法：<ol>
+<li>基于灰度直方图</li>
+<li>基于梯度：梯度对应一阶导数，梯度算子就是一阶导数算子。在边缘灰度值过渡比较尖锐，且在图像噪声比较小时，梯度算子工作的效果较好，而且对施加的运算方向不予考虑，在实际中常用小区域模板进行卷积来近似计算。根据模板的大小和元素值的不用，已经提出许多不同的算子。常见的有：Roberts边缘检测算子、Sobel边缘检测算子、Prewitt边缘检测算子、Robinson边缘检测算子、Laplacan边缘检测算子、<strong>Canny边缘检测算子</strong>、LOG滤波器（Marr-Hildreth算子）等。<ol>
+<li>Canny边缘检测算子：基本思想是先将图像使用高斯函数Gauss进行平滑，再由一阶微分的极大值确定边缘点。二阶微分的零交叉点不仅对应着一阶导数的极大值，而且也对应着一阶导数的极小值。换句话说，图像中灰度变化剧烈的点与变化缓慢的点都对应着二阶导数零交叉点。因此，Canny算子可能会引入伪边缘点。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="OpenCV中的轮廓"><a href="#OpenCV中的轮廓" class="headerlink" title="OpenCV中的轮廓"></a>OpenCV中的轮廓</h2><ol>
+<li>什么是轮廓？<ol>
+<li>轮廓可以简单地解释为：连接具有相同颜色或强度的所有连续点（沿边界）的曲线。轮廓是用于形状分析以及对象检测和识别的有用工具。</li>
+<li>为了获得更高的准确性，请使用二进制图像。因此，在找到轮廓之前，请应用阈值或者Canny边缘检测</li>
+<li>在OpenCV中，找到轮廓就像从黑色背景中找到白色物体，因此请记住：要找到的对象应该是白色，背景应该是黑色。</li>
+</ol>
+</li>
+<li>轮廓特征<ol>
+<li>矩：图像矩可以帮助计算某些特征，例如物体的重心，物体的面积</li>
+<li>轮廓面积：轮廓区域由函数contourArea（）给出</li>
+<li>轮廓周长（弧长）：可以使用arcLength（）函数找到</li>
+<li>轮廓近似：根据指定的精度，它可以将轮廓形状近似为顶点数量较少的其他形状。它是Douglas-Peucker算法的实现</li>
+<li>凸包：凸包外观看起来与轮廓相似，甚至在某些情况下两者提供相同的结果。在这里，使用convexHull（）函数检查曲线是否存在凹凸缺陷并对其进行矫正。一般而言，凸曲线是始终凸出或至少平坦的曲线，如果在内部凸出，则称为凸度缺陷</li>
+<li>边界矩形：<ol>
+<li>直角矩形：它是一个直角矩形，不考虑对象的旋转。因此，边界矩形的面积将不会最小，可以通过boundingRect（）找到</li>
+<li>旋转矩形：在这里，边界矩形是用最小面积绘制的，因此它也考虑了旋转的因素。使用函数minAreaRect（）得到，它返回一个Box2D结构，其中包含：中心（x,y），（宽度，高度），旋转角度）。但是要绘制此矩形，需要矩形的四个角，通过函数boxPoints（）获得</li>
+</ol>
+</li>
+<li>最小外圆：使用函数minEnclosingCircle（）找到对象的外接圆，它是一个以最小面积完全覆盖对象的圆圈。</li>
+<li>拟合椭圆：使用函数fitEllipse（），ellipse（）函数</li>
+</ol>
+</li>
+<li>轮廓属性：<ol>
+<li>长宽比：它是对象边界矩形的宽度与高度的比率</li>
+<li>范围：它是轮廓区域与边界矩形区域的比率</li>
+<li>固实性：它是轮廓面积与其凸包面积的比率</li>
+<li>等效直径：它是面积与轮廓面积相同的圆的直径</li>
+<li>方向：它是物体指向的角度</li>
+<li>遮罩和像素点</li>
+<li>最大值、最小值及其位置：</li>
+<li>平均颜色或平均强度：</li>
+<li>极端点：它是指对象的最顶部,最底部,最右侧和最左侧的点</li>
+</ol>
+</li>
+<li>轮廓：更多功能：<ol>
+<li>凸包缺陷：物体与该船体的任何偏离都可以视为凸包缺陷，使用convexityDefect（）来查找</li>
+<li>点多边形测试：此功能查找图像中的点与轮廓之间的最短距离</li>
+<li>匹配形状：matchShapes（）函数能够比较两个形状或两个轮廓，并返回显示相似度的度量。结果月底，匹配越好。</li>
+</ol>
+</li>
+<li>轮廓层次：<ol>
+<li>什么是轮廓层次：<ol>
+<li>通常使用findContours（）函数来检测图像中的对象，有时对象位于不通的位置。但是在某些情况下，某些形状位于其他形状内，就像嵌套的数字一样。在这种情况下，我们将外部的一个称为父级，将内部的一个称为子级。这样，图像中的轮廓彼此之间就具有某种关系。并且我们可以指定一个轮廓如何相互连接，例如：是其他轮廓的子轮廓，还是父轮廓等。这种关系的表示称为层次结构。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>OpenCV中的函数： <ol>
+<li>void findContours(InputArray image, OutputArrayOfArrays contours, OutputArray hierarchy, int mode, int method, Point offset &#x3D; Point())<ol>
+<li>轮廓检测，从二进制图片中找到轮廓。</li>
+<li>参数<ol>
+<li>image：源图片</li>
+<li>contours：检测到的轮廓，每个轮廓都存储为点向量。</li>
+<li>hierarchy：可选的输出向量，包含有关图像拓扑的信息。指定子轮廓和父轮廓等。</li>
+<li>mode：轮廓检测模式<ol>
+<li>RETR_EXTERNAL ：仅检索极端外部轮廓</li>
+<li>RETR_LIST ：检索所有轮廓而不建立任何层次关系</li>
+<li>RETR_CCOMP ：检索所有轮廓并将他们组织成两级层次结构</li>
+<li>RETR_TREE ：检索所有轮廓并重建嵌套轮廓的完整层次</li>
+</ol>
+</li>
+<li>method：轮廓近似法<ol>
+<li>CHAIN_APPROX_NONE ：绝对存储所有轮廓点</li>
+<li>CHAIN_APPROX_SIMPLE ：压缩水平、垂直和对角线段，只留下它们的端点</li>
+<li>CHAIN_APPROX_TC89_L1 ：应用Teh-Chin 炼近似算法的一种风格</li>
+<li>CHAIN_APPROX_TC89_KCOS ：应用Teh-Chin 炼近似算法的一种风格</li>
+</ol>
+</li>
+<li>offset：每个轮廓点移动的可选偏移量。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>void approxPloyDP(InputArray curve, OutputArray approxCurve, double epsilon, bool closed);<ol>
+<li>用另一个具有较少顶点的曲线&#x2F;多边形来逼近一条曲线&#x2F;多边形，使它们之间的距离小于或等于指定的精度。</li>
+<li>参数<ol>
+<li>curve：存储在vector或Mat中的2D点的输入向量</li>
+<li>approxCurve：近似的结果。该类型与输入曲线的类型相匹配</li>
+<li>epsilon：指定近似精度的参数。这是原始曲线与其近似值之间的最大距离</li>
+<li>closed：如果为真，则近似曲线是闭合的，否则不是闭合的</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Rect boundingRect(InputArray array);<ol>
+<li>计算点集或灰度图像的非零像素的右上边界矩形。该函数计算并返回灰度图像的指定点集或非零像素的最小上边界矩形</li>
+<li>参数：array，输入灰度图像或二维点集，存储在vector或Mat中</li>
+</ol>
+</li>
+<li>void rectangle(InputOutputArray img, Point pt1, Point pt2, const Scalar&amp; color, int thickness &#x3D; 1, int lineType &#x3D; LINE_8, int shift &#x3D; 0);<ol>
+<li>绘制一个简单的、填充的直角矩形</li>
+<li>参数<ol>
+<li>img：图像</li>
+<li>pt1：矩形的顶点</li>
+<li>pt2：与pt1相对的矩形的顶点</li>
+<li>color：矩形颜色或亮度（灰度图像）</li>
+<li>thickness：构成矩形的线条粗细</li>
+<li>lineType：线的类型（线路连通性）<ol>
+<li>LINE_4：4连线</li>
+<li>LINE_8：8连线</li>
+<li>LINE_AA ：抗锯齿线</li>
+</ol>
+</li>
+<li>shift：坐标中的小数位数</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>void drawContours(InputOutputArray image, InputArrayOfArrays contours, int contourldx, const Scalar&amp; color, int thickness &#x3D; 1, int lineType &#x3D; LINE_8, InputArray &#x3D; hierarchy &#x3D; noArray(), int maxLevel &#x3D; INT_MAX, Point offset &#x3D; Point());<ol>
+<li>绘制轮廓或填充轮廓。如果thickness&gt;&#x3D;0，该函数在图像中绘制轮廓，如果thickness &lt; 0，则填充轮廓所包围的区域。</li>
+<li>参数：<ol start="3">
+<li>image：目标图像</li>
+<li>contours：所有输入轮廓。每个轮廓都存储为一个点向量</li>
+<li>contourldx：指定要绘制的轮廓的参数。如果为负数，则绘制所有轮廓。</li>
+<li>color：轮廓的颜色</li>
+<li>thickness：轮廓线的粗细</li>
+<li>lineType：线路连通性<ol>
+<li>LINE_4：4连线</li>
+<li>LINE_8：8连线</li>
+<li>LINE_AA ：抗锯齿线</li>
+</ol>
+</li>
+<li>hierarchy：有关层次结构的可选信息</li>
+<li>maxLevel：绘制轮廓的最大级别。<ol>
+<li>如果为0，则仅绘制指定的轮廓。</li>
+<li>如果为1，则函数绘制和所有嵌套轮廓</li>
+<li>如果为2，则函数绘制轮廓、所有嵌套轮廓、所有嵌套到嵌套的轮廓，以此类推。</li>
+<li>仅当存在可用层次结构的时候才考虑此参数</li>
+</ol>
+</li>
+<li>offset：可选的轮廓移动参数。将所有绘制的轮廓移动指定的offset &#x3D; (dx, dy)。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h1 id="运动目标检测：背景差分法（Background-subtraction）"><a href="#运动目标检测：背景差分法（Background-subtraction）" class="headerlink" title="运动目标检测：背景差分法（Background subtraction）"></a>运动目标检测：背景差分法（Background subtraction）</h1><ol>
+<li>背景差分法，又称背景减法，常用于检测视频图像中的运动目标，是目前目标检测的主流方法之一。这种方法是通过把当前帧（current frame）的每一个像素与背景模板（background model）的每一个像素做减法，来判断这个像素是属于前景还是背景。</li>
+<li>基本原理：将图像序列中的当前帧和已经确定好或实时获取的背景参考模型（背景图像）做减法，找不同，计算出与背景图像像素差异超过一定阈值的区域作为运动区域，从而来确定运动物体位置、轮廓、大小等特征，非常适用于摄像机静止的场景。</li>
+<li>背景：<ol>
+<li>背景差分法的性能好坏很大程度上取决于背景模型的建模、获取和更新方法，背景图像的建模和模拟的准确程度，将直接影响到检测的效果。</li>
+<li>什么是背景？<ol>
+<li>对于一个稳定的监控场景而言，在没有运动目标，光照没有变化的情况下，视频图像中各个像素点的灰度值是符合随机概率分布的。由于摄像机在采集图像的过程中，会不可避免地引入噪声，这些灰度值以某一个均值为基准线，在附近做一定范围内的随机震荡，这种场景就是所谓的背景。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>传统的背景建模方法有：中值法背景建模、均值法背景建模、单高斯分布模型、混合高斯分布模型、卡尔曼滤波器模型以及高级背景模型等，这些方法都是基于像素的亮度值进行数学计算处理，所以我们说运动目标检测是基于统计学原理。<ol>
+<li>中值法背景建模：在一段时间内，取连续N帧图像序列，把这N帧图像序列中对应位置的像素点灰度值按从小到大的顺序排列，然后取中间值作为背景图像中对应像素点的灰度值；</li>
+<li>均值法背景建模：在视频图像中取连续N帧，计算这N帧图像像素灰度值的平均值来作为背景图像的像素灰度值</li>
+<li>卡尔曼滤波器模型：该算法把背景认为是一种稳态的系统，把前景图像认为是一种噪声，用基于Kalman滤波理论的时域递归低通滤波来预测变化缓慢的背景图像，这样既可以不断地用前景图更新背景，又可以维持背景的稳定性消除噪声的干扰；</li>
+<li>单高斯分布模型：其基本思想是，将图像中每一个像素点的灰度值看成是一个随机过程X，并假设该点的某一像素灰度值出现的概率服从高斯分布，</li>
+<li>多高斯分布模型：将背景图像的每一个像素点按多个高斯分布的叠加来建模，每种高斯分布可以表示一种背景场景，这样的话，多个高斯模型混合使用就可以模拟出复杂场景中的多模态情形</li>
+<li>高级背景模型：得到每个像素或一组像素的时间序列模型。这种模型能很好的处理时间起伏，缺点是需要消耗大量的内存。</li>
+</ol>
+</li>
+<li>背景差分法计算十分简单，此外该方法还在一定程度上克服了环境光线的影响。其缺点是不能用于运动的摄像头，同时背景图像的实时更新也并非易事。</li>
+<li>背景差分法实现目标检测的四个环节：背景建模、背景更新、目标检测、后期处理。在其中，背景建模和背景更新是背景差分法中的核心问题。</li>
+</ol>
+<h1 id="高斯混合模型"><a href="#高斯混合模型" class="headerlink" title="高斯混合模型"></a>高斯混合模型</h1><ol>
+<li>GMM，高斯混合模型，也可以简写为MOG。高斯模型就是用高斯概率密度函数（正态分布曲线）精确地量化事物，将一个事物分解为若干的基于高斯概率密度函数（正态分布曲线）形成的模型。</li>
+<li>GMMs已经在数值逼近、语音识别、图像分类、图像去噪、图像重构、故障诊断、视频分析、邮件过滤、密度估计、目标识别与跟踪领域取得了良好的效果。</li>
+<li>对图像背景建立高斯模型的原理及过程：<ol>
+<li>图像灰度直方图反映的是图像中某个灰度值出现的频次，也可以认为是图像灰度概率密度的估计。如果图像所包含的目标区域和背景区域相比比较大，且背景区域和目标区域在灰度上有一定的差异，那么该图像的灰度直方图呈现双峰-谷形状，其中一个峰对应于目标，另一个峰对应于背景的中心灰度。对于复杂的图像，尤其是医学图像，一般是多峰的。通过将直方图的多峰特性看作是多个高斯分布的叠加，可以解决图像的分割问题。在智能监控系统中，对于运动目标的检测是中心内容，而在运动目标检测提取中，背景目标对于目标的识别和跟踪至关重要，而建模正是背景目标提取的一个重要环节。</li>
+<li>混合高斯模型使用K（基本为3到5个）个高斯模型来表征图像中各个像素的特征，在新一帧图像获得后更新混合高斯模型，用当前图像中的每个像素点与混合高斯模型匹配，如果成功则判定该点为背景点，否则为前景点。</li>
+<li>通观整个高斯模型，主要是由方差和均值两个参数决定，对均值和方差的学习，采用不同的学习机制，将直接影响到模型的稳定性、精确性和收敛性。</li>
+<li>由于是对运动目标的背景提取建模，因此需要对高斯模型中方差和均值两个参数实时更新。为提取模型的学习能力，改进方法对均值和方差的更新采用不同的学习率；为提高在繁忙的场景下，大而慢的运动目标的检测效果，引入权值均值的概念，建立背景图像并实时更新，然后结合权值、权值均值和背景图像对像素点进行前景和背景的分类</li>
+<li>主要步骤：<ol>
+<li>为图像的每个像素点指定一个初试的均值、标准差及权重。</li>
+<li>收集N（一般取200以上，否则很难得到像样的结果）帧图像利用在线EM算法得到每个像素点的均值、标准差以及权重</li>
+<li>从N+1帧开始检测，检测的方法，对每个像素点：<ol>
+<li>将所有的高斯核按照ω &#x2F; σ 降序排序</li>
+<li>选择满足公式的前M个高斯核：M &#x3D; arg min(ω &#x2F; σ &gt; T)</li>
+<li>如果当前像素点的像素值其中有一个满足：就可以认为其为背景点</li>
+<li>更新背景图像，用在线EM算法<ol>
+<li>EM算法（Expectation Maximization）算法是由Dsmpser、Laind和Rubin在1977年提出的一种求参数的极大似然估计方法，可以广泛地应用于处理缺损数据、截尾数据等带有噪声的不完整数据。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>背景与前景：<ol>
+<li>前景是指在假设背景为静止的情况下，任何有意义的运动物体即为前景。建模的基本思想是从当前帧中提取前景，其目的是使背景更加接近当前视频帧的背景。即利用当前帧和视频序列中的当前背景帧进行加权平均来更新背景，但是由于光照突变以及其他外界环境的影响，一般的建模后的背景并非十分干净清晰，而高斯混合模型是建模最为成功的方法之一。</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h1 id="计算机视觉领域：目标分割、目标识别、目标检测和目标跟踪"><a href="#计算机视觉领域：目标分割、目标识别、目标检测和目标跟踪" class="headerlink" title="计算机视觉领域：目标分割、目标识别、目标检测和目标跟踪"></a>计算机视觉领域：目标分割、目标识别、目标检测和目标跟踪</h1><h2 id="目标分割"><a href="#目标分割" class="headerlink" title="目标分割"></a>目标分割</h2><ol>
+<li>目标分割是要把目标对应的部分分割出来，分出前景和背景，并将背景去除。将图像输入模型以后，模型对图像进行逐帧预测，目标涉及的每个像素都标注出来。目标分割一般要求的精度较高。</li>
+<li>它本质上也是一个分类任务，但是与图像识别不同，它不是对整个图像进行分类，而是对图像中的逐像素进行分类，例如日常在辅助驾驶中看到的车道线标注，这就是其中之一的应用</li>
+</ol>
+<h2 id="目标识别"><a href="#目标识别" class="headerlink" title="目标识别"></a>目标识别</h2><ol>
+<li>目标识别就是将目标的类型进行分类，针对整个图像进行分类，一般基于深度学习方法。</li>
+<li>把图像输入到模型中，模型会识别出图像中的目标是什么。这本质上是一个分类任务，即把图像中的目标进行分类，最终输出它是属于哪个类别的目标。</li>
+<li>当我们想知道图像中具体在哪里时，仅能完成分类任务的图像识别就不能胜任了；同时，如果我们想知道图像中具体包括多少数量的同类目标时，分类任务也无法给出合理的答案</li>
+</ol>
+<h2 id="目标检测"><a href="#目标检测" class="headerlink" title="目标检测"></a>目标检测</h2><ol>
+<li>目标检测就是检测图片中目标的具体位置和尺寸，也就是目标定位在图像分类的基础上，进一步判断目标具体在图像中的位置，一般是以bounding box的形式出现的。</li>
+<li>把图像输入到模型中，模型需要给出回归的位置标注，除此之外，还需要给出标注位置内的目标是什么。它同事兼顾了目标的位置标注任务，以及目标的识别任务</li>
+</ol>
+<h2 id="目标跟踪"><a href="#目标跟踪" class="headerlink" title="目标跟踪"></a>目标跟踪</h2><ol>
+<li>目标追踪，也成为目标跟踪，基于目标定位实时追踪目标所在的位置，主要用于视频中，利用图像帧之间的时序关系。</li>
+<li>目标被识别以后，算法需要在接下来的时序数据中快速高效的对目标进行再定位。区别类似的目标可以避免不必要的重复计算，利用时序相关性，对一些简单的旋转、遮盖、缩小、放大等线性或非线性变化具有鲁棒性。也就是对视频中的ROI连续检测，输出每一帧图像的bounding box</li>
+<li>目标跟踪一般建立在目标检测和目标分割之上，在连续采样的视频或图像中，当我们需要知道同一个目标在相邻视频帧数或图像中的位置识别时，目标跟踪可以很好的完成这个任务。</li>
+</ol>
+<h2 id="综上所述，目标识别（图像识别）、目标检测、目标分割以及目标跟踪，它们有着一定的联系，大部分的任务都是建立在目标识别的基础上，而目标跟踪又是在目标检测和目标分割的扩展应用。"><a href="#综上所述，目标识别（图像识别）、目标检测、目标分割以及目标跟踪，它们有着一定的联系，大部分的任务都是建立在目标识别的基础上，而目标跟踪又是在目标检测和目标分割的扩展应用。" class="headerlink" title="综上所述，目标识别（图像识别）、目标检测、目标分割以及目标跟踪，它们有着一定的联系，大部分的任务都是建立在目标识别的基础上，而目标跟踪又是在目标检测和目标分割的扩展应用。"></a>综上所述，目标识别（图像识别）、目标检测、目标分割以及目标跟踪，它们有着一定的联系，大部分的任务都是建立在目标识别的基础上，而目标跟踪又是在目标检测和目标分割的扩展应用。</h2><h1 id="计算机视觉（大黑书）"><a href="#计算机视觉（大黑书）" class="headerlink" title="计算机视觉（大黑书）"></a>计算机视觉（大黑书）</h1><h2 id="第一章"><a href="#第一章" class="headerlink" title="第一章"></a>第一章</h2><ol>
+<li>计算机视觉的研究目标是，根据感测到的图像对实际物体和场景做出有意义的判定。为了对实际物体做出判定，总是需要根据图像来构造它的某个描述或模型，因此专家们会说计算机视觉的目标是根据图像来构造出对场景的描述。</li>
+<li>数字图像包含固定的像素（pixel）行数与列数，像素是图像元素（picture element）的缩写。</li>
+<li>多幅图像运算：<ol>
+<li>两幅图像相加或者相减可以得到一副新图像。一般用图像减法检测图像随时间的变化。</li>
+</ol>
+</li>
+<li>图像类型：<ol>
+<li>在图像计算中，要了解模拟图像（analog image）和数字图像（digital image）两个概念。<ol>
+<li>模拟图像是指二维图像F（x, y），其空间参数x和y具有无限精度，在每个空间点（x，y）的光强也具有无限精度</li>
+<li>数字图像是指二维图像I（r，c），用离散的二维光强阵列表示，光强的精度是有限的。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h1 id="mooc"><a href="#mooc" class="headerlink" title="mooc"></a>mooc</h1><p>数字图像处理：<br>    数字图像，是由模拟图像数字化得到的，以像素为基本元素的图像<br>    数字图像处理（Digital Image Processing）又称为计算机图像处理，它是指用数字计算机或数字电路对数字图像进行处理的。</p>
+<p>几个相关领域：<br>    数字图像处理：图像增强、图像复原、图像压缩、图像变换、图像描述等。<br>    计算机视觉：工业检测、图像识别、图像检索、图像理解等<br>    计算机图形学：仿真、工业设计、游戏、电影特效<br>    人工智能：对信息分析、控制、决策</p>
+<p>学习内容和学习建议：<br>    设计的专业知识<br>        高等数学、概率论、线性代数、矩阵理论、数字信号处理、最优化理论、运筹学、图论、几何学、机器学习<br>    数字图像处理设计的编程知识：<br>        C++  Python  matlab<br>    常用数字图像处理开发库：<br>        Opencv </p>
+<p>参考书目：<br>    《数字图像处理》 Rafael,C,Gonzalez<br>    《OpenCV3编程入门》毛星云</p>
+<hr>
+<p>Opencv简介：<br>    OpenCV,1999年由Intel建立，开源的跨平台计算机视觉库，<br>    主页：<a target="_blank" rel="noopener" href="https://opencv.org/">https://opencv.org/</a></p>
+<p>编译原理简介：<br>    C&#x2F;C++代码编译过程：<br>        C语言的编译链接过程要把编写的C程序（源代码）转换成可以在硬件上运行的程序（可执行代码）<br>    分为两个部分：编译和链接<br>        编译，就是把文本形式源代码翻译为机器语言形式的目标文件的过程<br>            编译过程又分为两个阶段：编译和汇编<br>                在编译阶段，编译器会首先进行预处理，预处理主要对下面的内容进行处理：1）宏定义指令，2）条件编译指令，3）头文件包含指令，4）特殊符号。编译阶段，编译器还会进行一些优化，检查语法规则，然后会把代码生成为汇编码。<br>                汇编阶段会把汇编码生成为目标机器所能够读取的机器码。<br>        链接，就是把目标文件、操作系统的启动代码和用到的库文件进行组织，形成最终生成可执行代码的流程<br>            编译阶段生成的机器码实际上还不能马上运行。因为opencv头文件中只有函数的定义，没有函数的内容。函数的内容通常是封装在dll动态库（Linux下为.so后缀文件）或者lib静态库（Linux下为.a后缀文件）文件中，那么在链接阶段，就需要告诉编译器，去哪里找这些库文件，以及库文件的名称。 </p>
+<p>编译安装Opencv：</p>
+<ul>
+<li>安装配置环境<ul>
+<li>安装<code>cmake</code></li>
+<li>安装环境依赖<code>build-essential libgtk2.0-dev libavcodec-dev libavformat-dev libjpeg-dev libswscale-dev libtiff5-dev	libgtk2.0-dev pkg-config</code></li>
+</ul>
+</li>
+<li>安装Opencv：<ul>
+<li>下载压缩文件</li>
+<li>在opencv目录下： <code>mkdir build &amp;&amp; cd build</code></li>
+<li>编译Opencv： <code>cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local/ ..  &amp;&amp; make -j8 &amp;&amp; make install </code></li>
+</ul>
+</li>
+<li>配置环境：<ul>
+<li><code>/etc/ld.so.conf</code> 文件添加 <code>/usr/local/lib</code></li>
+<li><code>/etc/bash.bashrc</code> 文件添加 <code>PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig</code>  &amp;&amp; <code>export PKG_CONFIG_PATH</code></li>
+<li><code>source /etc/bash.bashrc</code></li>
+</ul>
+</li>
+<li>检验：<ul>
+<li><code>pkg-config opencv --modversion</code></li>
+</ul>
+</li>
+</ul>
+<p>Opencv的基本数据格式：<br>    OpenCV早期版本中，采用IplImage格式来保存图像，到2.0以后的版本，引入面向对象的思想，采用C++重写了大量代码，并引入Mat类作为图像容器。Mat（matrix）类本身是一个矩阵格式，也可以用来保存图像</p>
+<p>Mat的基本操作：<br>1.)创建：opencv提供了很多方法创建mat<br>1.1)使用Mat()构造函数<br>    cv::Mat M1(2,2,CV_8UC3,Scalar(0,0,255))<br>    这个函数的意思是，创建了一个名为M1的Mat，改Mat的尺寸为2,2，类型为CV_8UC3，即8位uchar类型，C3是指该Mat通道数为3.这个Mat的每一个元素包含了3个通道或者说3个数值，然后用0,0,255为每一个元素赋值。<br>    这里8位uchar类型的取值为0~255，实际上如果一个Mat是用来表示RGB图像的时候应该声明为CV_8UC3型。<br>    Mat型可以定义各种类型，定义的方式：CV_(位数)+(数据类型)+(通道数)<br>1.2)使用create()函数<br>    cv::Mat M3;<br>    M3.create(3,4,CV_8UC3);<br>    表示首先声明一个mat型，名为M3，其尺寸为3行，4列。</p>
+<p>2.)复制<br>2.1)浅复制<br>    cv::Mat srcM(2,2,CV8UC3,Scalar(0,0,255));<br>    cv::Mat dstM;<br>    dstM &#x3D; srcM;<br>    表示首先声明一个mat名为srcM，并初始化，然后声明一个mat名为dstM，通过 &#x3D; 把srcM复制给dstM<br>    这样生成的矩阵，只是新生成一个矩阵头，dstM的data依然指向矩阵srcM的data，类似C++中的浅拷贝<br>2.2)深复制<br>    cv::Mat srcM(2,2,CV_8UC3,Scalar(0,0,255));<br>    cv::Mat dstM;<br>    srcM.copyTo(dstM);<br>    通过copyTo函数，可以实现深复制，也就是dstM是一个全新的矩阵，他在内存中的地址和srcM是不一样的，另外copyTo函数还可以加上掩模参数。</p>
+<p>3.)遍历Mat：当我们想读取或者修改Mat的任意内容的时候，可以用以下方式访问Mat<br>3.1)利用指针.ptr</p>
+<hr>
+<p>数字图像的基本概念<br>1.)数字图像的硬件介绍<br>1.1)图像输入设备：输入，采样量化，专用处理。（相机、摄像机、扫描仪等）<br>1.1.1)线阵相机和面阵相机<br>    面阵相机：一次拍摄一个区域，视觉检测中绝大部分应用面阵相机<br>    线阵相机：一次拍摄一行像素，通过移动以及拼接来获取图像，分辨率更高，成像质量更高，价格更贵<br>1.2)电脑：数字图像处理（PC机，服务器集群，硬件电路等）<br>1.3)图像输出设备：专用处理，D&#x2F;A转换，输出。（打印机、显示器等）</p>
+<p>2.)数字图像的几个基本概念<br>2.1)图像的采样和量化<br>    数字化坐标值称为采样<br>    数字化幅度值称为量化<br>2.2)图像的分辨率<br>    采样的程度通常用采样率来表示，也就是通常所说的分辨率。分辨率160 × 128 的意思是水平像素数为160个，垂直像素数128个。分辨率越高，像素的数目越多，感受的图像越精密<br>2.3)图像的灰度级<br>    最常见的图像为8位图像，灰度级为256级，即2的8次方。<br>    灰度级越多，可以展现的图像细节就越多，有时候也把灰度级称为灰度分辨率。<br>2.4)图像的坐标系<br>    在图像中，如果要表示图像中的某一个像素，可以用它的坐标来表示<br>    图像原点为图像的左上角，坐标记做[0,0]<br>    一副M × N的图像可以用一个矩阵来表示<br>2.5)像素的空间关系：8-邻接和4-邻接<br>3.)数字图像的种类和色彩模型<br>3.1)图像的种类<br>3.1.1)二值图像：<br>    像素取值仅为0和1，“0“代表黑色，”1“代表白色。通常用来表示状态，如区分图像中的前景和背景<br>3.1.2)灰度图像：<br>    像素取值范围为[0,255]，”0”表示纯黑，“255”表示纯白色，一些图像算法中需要使用灰度图进行运算<br>3.1.3)彩色图像：<br>    显示设备通常使用RGB格式的彩色图像，即红（red）绿（green）蓝（blue）三种颜色的组合叠加起来获得各种颜色。<br>    如果把RGB值看做是3个维度的坐标，构建的空间称为RGB色彩空间<br>    除了RGB外，常见的色彩模型还有HSV&#x2F;HSI（数字图像算法常用），CMYK（主要用于印刷），YUV（用于图像传输）<br>3.2)色彩模型：通过数学模型表示颜色，所用的数学模型即颜色模型。<br>3.2.1)CMYK色彩模型<br>    印刷业通过青（C）、品（M）、黄（Y）三原色油墨的不同网点面积率的叠印来表现颜色，一般采用青（C）、品（M）、黄（Y）、黑（BK）四色印刷。<br>    CMYK可以看做是从黑色中减少颜色得到新的颜色，故可以称之为减色模型。而RGB是在白色上叠加颜色得到新的颜色，故称为加色模型。<br>3.2.2)HSV色彩模型<br>    HSV即色相（Hue）、饱和度（Saturation）、明度（Value），又称HSI（I即intensity）。常用于图像算法中的色彩分析，对光照具有较强的鲁棒性。<br>    H：用角度表示，从红色开始按逆时针方向计算，红色为0度，绿色为120度，蓝色为240度，该值表示颜色接近于哪种纯色值<br>    S：通常取值范围为0%~100%。圆锥的中心为0，该值越大表示颜色越饱满，直观的说即颜色深而艳<br>    V：亮度，表示颜色的明亮程度<br>4.)图像直方图<br>4.1)图像的直方图<br>    直方图（histogram）是图像处理中的一个非常重要工具，被广泛应用。直方图本质是概率分布的图形化，同时直方图也可以用来表示向量。<br>4.1.1)直方图的作用<br>    图像匹配：比较两幅图像的直方图，可以得到两幅图像的相似程度，其本质是对比灰度出现的概率是否相似<br>    判断成像质量<br>    二值化阈值：所谓二值化即通过设置一个门限值，把灰度图像转换为二值化图像，通常的目的是分离前景和背景。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢老板支持！敬礼(^^ゞ</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="zhang junyi WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="zhang junyi Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/OpenCV/opencv_3_%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/2024-05-22--%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B002/" rel="prev" title="常用函数">
+      <i class="fa fa-chevron-left"></i> 常用函数
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/22/notebook/OpenCV/opencv_0_%E9%A2%86%E5%9F%9F%E7%9F%A5%E8%AF%86/2024-05-22-opencv_6_%E8%A7%86%E9%A2%91%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="next" title="OpenCV 视频理论基础">
+      OpenCV 视频理论基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E5%80%BC%E5%8C%96"><span class="nav-number"></span> <span class="nav-text">二值化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E5%BD%A2%E6%80%81%E5%AD%A6"><span class="nav-number"></span> <span class="nav-text">图像形态学</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E6%BB%A4%E6%B3%A2"><span class="nav-number"></span> <span class="nav-text">空间滤波</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E5%8F%98%E6%8D%A2"><span class="nav-number"></span> <span class="nav-text">几何变换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86"><span class="nav-number"></span> <span class="nav-text">视频图像处理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB%EF%BC%88%E6%B6%89%E5%8F%8A%E5%88%B0%E8%AF%86%E5%88%AB%EF%BC%8C%E9%80%9A%E5%B8%B8%E5%88%86%E4%B8%BA%E4%B8%A4%E5%A4%A7%E4%BD%93%E7%B3%BB%EF%BC%9ASVM%E4%BD%93%E7%B3%BB%E5%92%8C%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%BD%93%E7%B3%BB%EF%BC%89"><span class="nav-number"></span> <span class="nav-text">图像识别（涉及到识别，通常分为两大体系：SVM体系和神经网络体系）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%90%90%E7%A2%8E%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number"></span> <span class="nav-text">琐碎基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%B9%E7%BC%98%E8%AF%86%E5%88%AB%EF%BC%88%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">边缘识别（边缘检测）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenCV%E4%B8%AD%E7%9A%84%E8%BD%AE%E5%BB%93"><span class="nav-number">2.</span> <span class="nav-text">OpenCV中的轮廓</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E5%8A%A8%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%EF%BC%9A%E8%83%8C%E6%99%AF%E5%B7%AE%E5%88%86%E6%B3%95%EF%BC%88Background-subtraction%EF%BC%89"><span class="nav-number"></span> <span class="nav-text">运动目标检测：背景差分法（Background subtraction）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B"><span class="nav-number"></span> <span class="nav-text">高斯混合模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E9%A2%86%E5%9F%9F%EF%BC%9A%E7%9B%AE%E6%A0%87%E5%88%86%E5%89%B2%E3%80%81%E7%9B%AE%E6%A0%87%E8%AF%86%E5%88%AB%E3%80%81%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E5%92%8C%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA"><span class="nav-number"></span> <span class="nav-text">计算机视觉领域：目标分割、目标识别、目标检测和目标跟踪</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E5%88%86%E5%89%B2"><span class="nav-number">1.</span> <span class="nav-text">目标分割</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E8%AF%86%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">目标识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B"><span class="nav-number">3.</span> <span class="nav-text">目标检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA"><span class="nav-number">4.</span> <span class="nav-text">目标跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%BC%E4%B8%8A%E6%89%80%E8%BF%B0%EF%BC%8C%E7%9B%AE%E6%A0%87%E8%AF%86%E5%88%AB%EF%BC%88%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB%EF%BC%89%E3%80%81%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E3%80%81%E7%9B%AE%E6%A0%87%E5%88%86%E5%89%B2%E4%BB%A5%E5%8F%8A%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%EF%BC%8C%E5%AE%83%E4%BB%AC%E6%9C%89%E7%9D%80%E4%B8%80%E5%AE%9A%E7%9A%84%E8%81%94%E7%B3%BB%EF%BC%8C%E5%A4%A7%E9%83%A8%E5%88%86%E7%9A%84%E4%BB%BB%E5%8A%A1%E9%83%BD%E6%98%AF%E5%BB%BA%E7%AB%8B%E5%9C%A8%E7%9B%AE%E6%A0%87%E8%AF%86%E5%88%AB%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8A%EF%BC%8C%E8%80%8C%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E5%8F%88%E6%98%AF%E5%9C%A8%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E5%92%8C%E7%9B%AE%E6%A0%87%E5%88%86%E5%89%B2%E7%9A%84%E6%89%A9%E5%B1%95%E5%BA%94%E7%94%A8%E3%80%82"><span class="nav-number">5.</span> <span class="nav-text">综上所述，目标识别（图像识别）、目标检测、目标分割以及目标跟踪，它们有着一定的联系，大部分的任务都是建立在目标识别的基础上，而目标跟踪又是在目标检测和目标分割的扩展应用。</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%EF%BC%88%E5%A4%A7%E9%BB%91%E4%B9%A6%EF%BC%89"><span class="nav-number"></span> <span class="nav-text">计算机视觉（大黑书）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0"><span class="nav-number">1.</span> <span class="nav-text">第一章</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mooc"><span class="nav-number"></span> <span class="nav-text">mooc</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">zhang junyi</p>
+  <div class="site-description" itemprop="description">工作学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/junyiha" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;junyiha" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/zhangjunyiha" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;zhangjunyiha" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhang junyi</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
