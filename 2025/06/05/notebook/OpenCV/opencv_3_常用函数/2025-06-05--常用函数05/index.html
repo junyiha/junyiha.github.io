@@ -28,7 +28,7 @@
 <meta property="og:description" content="简介 OpenCV 常用的函数">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2025-06-05T01:00:00.000Z">
-<meta property="article:modified_time" content="2025-06-05T05:31:25.339Z">
+<meta property="article:modified_time" content="2025-06-15T06:34:50.652Z">
 <meta property="article:author" content="zhang junyi">
 <meta property="article:tag" content="OpenCV">
 <meta name="twitter:card" content="summary">
@@ -217,10 +217,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2025-06-05 09:00:00 / Modified: 13:31:25" itemprop="dateCreated datePublished" datetime="2025-06-05T09:00:00+08:00">2025-06-05</time>
+              <time title="Created: 2025-06-05 09:00:00" itemprop="dateCreated datePublished" datetime="2025-06-05T09:00:00+08:00">2025-06-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-06-15 14:34:50" itemprop="dateModified" datetime="2025-06-15T14:34:50+08:00">2025-06-15</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -247,6 +253,178 @@
 </ul>
 <span id="more"></span>
 
+<h2 id="cv-dnn-Net-setPreferableTarget-函数-详解"><a href="#cv-dnn-Net-setPreferableTarget-函数-详解" class="headerlink" title="cv::dnn::Net::setPreferableTarget() 函数 详解"></a>cv::dnn::Net::setPreferableTarget() 函数 详解</h2><p><code>cv::dnn::Net::setPreferableTarget(targetId)</code> 用来指定在所选后端（backend）中，将网络推理调度到哪个设备或硬件加速路径。它的原型为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> cv::dnn::Net::<span class="built_in">setPreferableTarget</span>(<span class="type">int</span> targetId);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="一、常见-targetId-枚举"><a href="#一、常见-targetId-枚举" class="headerlink" title="一、常见 targetId 枚举"></a>一、常见 targetId 枚举</h2><table>
+<thead>
+<tr>
+<th>枚举值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cv::dnn::DNN_TARGET_CPU</code></td>
+<td>在 CPU 上执行（默认）</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_OPENCL</code></td>
+<td>使用 OpenCL 加速，设备由 OpenCL 后端选择（GPU&#x2F;加速器）</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_OPENCL_FP16</code></td>
+<td>OpenCL 半精度（FP16）加速，仅当设备与驱动支持时有效</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_MYRIAD</code></td>
+<td>Intel Movidius NCS（VPU）设备</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_CUDA</code></td>
+<td>NVIDIA GPU（CUDA）</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_CUDA_FP16</code></td>
+<td>NVIDIA GPU 半精度（FP16）</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_CUDA_FP16_TENSORRT</code></td>
+<td>NVIDIA TensorRT（FP16）加速</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_HDDL</code></td>
+<td>Intel Vision Accelerator Design (HDDL)</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_VULKAN</code></td>
+<td>Vulkan Compute 加速</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_TARGET_FPGA</code></td>
+<td>FPGA（需专门编译并支持）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>提示</strong>：并非所有编译版本都支持上述所有 target；可用的 target 取决于你的 OpenCV 编译时配置和运行时环境。</p>
+</blockquote>
+<hr>
+<h2 id="二、与-setPreferableBackend-的配合"><a href="#二、与-setPreferableBackend-的配合" class="headerlink" title="二、与 setPreferableBackend() 的配合"></a>二、与 setPreferableBackend() 的配合</h2><ul>
+<li><strong>Backend</strong> 决定用哪套“引擎”来驱动推理（OpenCV、CUDA、Vulkan、Inference Engine…）。</li>
+<li><strong>Target</strong> 决定在该引擎内跑在哪个具体设备上（CPU、GPU、VPU、半精度、TensorRT…）。</li>
+</ul>
+<p>示例组合：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net.<span class="built_in">setPreferableBackend</span>(cv::dnn::DNN_BACKEND_CUDA);</span><br><span class="line">net.<span class="built_in">setPreferableTarget</span> (cv::dnn::DNN_TARGET_CUDA_FP16);</span><br></pre></td></tr></table></figure>
+
+<p>如果只设置 target 而不设置 backend，OpenCV 会先用默认 backend（通常是 OPENCV），再用给定 target。但最佳实践是两者都指定。</p>
+<hr>
+<h2 id="三、使用示例"><a href="#三、使用示例" class="headerlink" title="三、使用示例"></a>三、使用示例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/dnn.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/imgcodecs.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 加载 ONNX 模型</span></span><br><span class="line">    cv::dnn::Net net = cv::dnn::<span class="built_in">readNetFromONNX</span>(<span class="string">&quot;model.onnx&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 优先尝试 TensorRT（需 OpenCV 编译时开启 WITH_TENSORRT）</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        net.<span class="built_in">setPreferableBackend</span>(cv::dnn::DNN_BACKEND_CUDA);</span><br><span class="line">        net.<span class="built_in">setPreferableTarget</span>(cv::dnn::DNN_TARGET_CUDA_FP16_TENSORRT);</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Using CUDA+TensorRT FP16\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">catch</span> (...) &#123;</span><br><span class="line">        <span class="comment">// 回退到 OpenCL 半精度</span></span><br><span class="line">        net.<span class="built_in">setPreferableBackend</span>(cv::dnn::DNN_BACKEND_OPENCV);</span><br><span class="line">        net.<span class="built_in">setPreferableTarget</span>(cv::dnn::DNN_TARGET_OPENCL_FP16);</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Fallback to OpenCL FP16\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输入准备</span></span><br><span class="line">    cv::Mat img = cv::<span class="built_in">imread</span>(<span class="string">&quot;test.jpg&quot;</span>);</span><br><span class="line">    cv::Mat blob = cv::dnn::<span class="built_in">blobFromImage</span>(img, <span class="number">1</span>/<span class="number">255.0</span>, &#123;<span class="number">640</span>,<span class="number">640</span>&#125;, &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>&#125;, <span class="literal">true</span>, <span class="literal">false</span>);</span><br><span class="line">    net.<span class="built_in">setInput</span>(blob);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 推理</span></span><br><span class="line">    cv::Mat out = net.forward();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Output size: &quot;</span> &lt;&lt; out.size &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、注意事项"><a href="#四、注意事项" class="headerlink" title="四、注意事项"></a>四、注意事项</h2><ol>
+<li><p><strong>编译依赖</strong></p>
+<ul>
+<li>要使用 CUDA 或 TensorRT target，需在 OpenCV 编译时开启对应模块（如 <code>-DWITH_CUDA=ON</code>、<code>-DWITH_TENSORRT=ON</code>）。</li>
+<li>OpenCL target 需正确安装 ICD 驱动，并在 CMake 中启用 <code>-DWITH_OPENCL=ON</code>（大多数预编译包已开启）。</li>
+</ul>
+</li>
+<li><p><strong>性能对比</strong></p>
+<ul>
+<li>不同 target 在启动延迟、吞吐量、精度（FP32&#x2F;FP16&#x2F;INT8）上差异显著，建议在目标平台做基准测试选最优组合。</li>
+</ul>
+</li>
+<li><p><strong>模型兼容</strong></p>
+<ul>
+<li>某些后端&#x2F;target 对模型层支持不全，可能出现“不支持的 layer”或行为差异；可通过 OpenCV 日志级别或 try-catch 捕获并回退。</li>
+</ul>
+</li>
+<li><p><strong>多设备场景</strong></p>
+<ul>
+<li>如果系统中有多张 GPU 或多种加速设备，可通过 OpenCL API（先枚举）或 CUDA API 显式选择设备，然后再让 OpenCV DNN 走对应 target。</li>
+</ul>
+</li>
+<li><p><strong>半精度与数值稳定</strong></p>
+<ul>
+<li>FP16 虽能提升吞吐，但可能引入精度波动；对关键场景应验证输出准确性。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>通过合理地设置 <code>setPreferableTarget</code>，你可以在多种硬件与精度选项间灵活切换，从而在性能和资源约束间找到最佳平衡。</p>
+<h2 id="cv-dnn-Net-setPreferableBackend-函数-详解"><a href="#cv-dnn-Net-setPreferableBackend-函数-详解" class="headerlink" title="cv::dnn::Net::setPreferableBackend() 函数 详解"></a>cv::dnn::Net::setPreferableBackend() 函数 详解</h2><p><code>cv::dnn::Net::setPreferableBackend(backendId)</code> 用于指定 DNN 模块在执行前向推理时所使用的“后端”（backend），即选用哪一套硬件加速或纯 CPU 实现来计算网络。它的原型及常用参数如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> cv::dnn::Net::<span class="built_in">setPreferableBackend</span>(<span class="type">int</span> backendId);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="一、常见-backendId-枚举"><a href="#一、常见-backendId-枚举" class="headerlink" title="一、常见 backendId 枚举"></a>一、常见 backendId 枚举</h2><table>
+<thead>
+<tr>
+<th>枚举值</th>
+<th>含义</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cv::dnn::DNN_BACKEND_DEFAULT</code></td>
+<td>默认后端</td>
+<td>由 OpenCV 决定（通常等同于 OPENCV+CPU）</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_BACKEND_OPENCV</code></td>
+<td>OpenCV 自带实现（CPU）</td>
+<td>纯 CPU、无额外依赖</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_BACKEND_CUDA</code></td>
+<td>NVIDIA CUDA 后端</td>
+<td>需要编译时启用 <code>WITH_CUDA</code>，并有 CUDA 驱动</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_BACKEND_HALIDE</code></td>
+<td>Halide 框架加速</td>
+<td>需要 OpenCV 编译时启用了 Halide 支持</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_BACKEND_INFERENCE_ENGINE</code></td>
+<td>Intel OpenVINO™（IE）后端</td>
+<td>需要编译时启用了 Inference Engine</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_BACKEND_VKCOM</code></td>
+<td>Vulkan Compute 后端</td>
+<td>需要 Vulkan SDK 支持</td>
+</tr>
+<tr>
+<td><code>cv::dnn::DNN_BACKEND_TIMVX</code></td>
+<td>Arm® NN 的 TIM-VX 后端</td>
+<td>用于嵌入式平台</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>注意</strong>：部分后端（CUDA&#x2F;IE&#x2F;Halide&#x2F;VKCOM&#x2F;TIMVX）并不是在所有预编译 OpenCV 包中都可用，需自行编译并启用对应选项。</p>
+</blockquote>
+<hr>
+<h2 id="二、与-setPreferableTarget-的配合"><a href="#二、与-setPreferableTarget-的配合" class="headerlink" title="二、与 setPreferableTarget() 的配合"></a>二、与 setPreferableTarget() 的配合</h2><p>后端决定了“<em>使用哪种计算引擎</em>”，而 target 决定了“<em>在该后端中跑在哪个设备</em>”。常见 target 枚举：</p>
+<ul>
+<li><code>DNN_TARGET_CPU</code></li>
+<li><code>DNN_TARGET_OPENCL</code> &#x2F; <code>DNN_TARGET_OPENCL_FP16</code></li>
+<li><code>DNN_TARGET_CUDA</code> &#x2F; <code>DNN_TARGET_CUDA_FP16</code></li>
+<li><code>DNN_TARGET_MYRIAD</code>（Movidius NCS）</li>
+<li><code>DNN_TARGET_FPGA</code> 等</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net.<span class="built_in">setPreferableBackend</span>(cv::dnn::DNN_BACKEND_CUDA);</span><br><span class="line">net.<span class="built_in">setPreferableTarget</span>(cv::dnn::DNN_TARGET_CUDA_FP16);</span><br></pre></td></tr></table></figure>
+
+<p>若只调用 <code>setPreferableBackend</code> 而不设 target，OpenCV 会为你选择默认 target（通常是 CPU）。</p>
+<hr>
+<h2 id="三、使用示例-1"><a href="#三、使用示例-1" class="headerlink" title="三、使用示例"></a>三、使用示例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">cv::dnn::Net net = cv::dnn::<span class="built_in">readNetFromONNX</span>(<span class="string">&quot;model.onnx&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 优先使用 CUDA 后端和半精度推理</span></span><br><span class="line"><span class="keyword">if</span> (cv::cuda::<span class="built_in">getCudaEnabledDeviceCount</span>() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    net.<span class="built_in">setPreferableBackend</span>(cv::dnn::DNN_BACKEND_CUDA);</span><br><span class="line">    net.<span class="built_in">setPreferableTarget</span> (cv::dnn::DNN_TARGET_CUDA_FP16);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 在没 CUDA 时回退到 OpenCL（若可用）</span></span><br><span class="line">    net.<span class="built_in">setPreferableBackend</span>(cv::dnn::DNN_BACKEND_OPENCV);</span><br><span class="line">    net.<span class="built_in">setPreferableTarget</span> (cv::dnn::DNN_TARGET_OPENCL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 前向推理</span></span><br><span class="line">cv::Mat blob = cv::dnn::<span class="built_in">blobFromImage</span>(src);</span><br><span class="line">net.<span class="built_in">setInput</span>(blob);</span><br><span class="line">cv::Mat out = net.forward();</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、注意事项-1"><a href="#四、注意事项-1" class="headerlink" title="四、注意事项"></a>四、注意事项</h2><ol>
+<li><strong>编译需求</strong>：要使用非 OPENCV 后端，需在编译 OpenCV 时开启相应模块（例如 <code>-DWITH_CUDA=ON</code>）。</li>
+<li><strong>性能对比</strong>：不同后端在加载时间、内存占用和吞吐量上表现各异，建议在目标平台上做基准测试。</li>
+<li><strong>模型兼容</strong>：部分后端（如 Inference Engine、Vulkan）对 Layer 支持有差异，可能出现“不支持层”错误，需要通过 plugin 或手动实现。</li>
+</ol>
+<hr>
+<p>通过合理地选用 <code>setPreferableBackend</code> 与 <code>setPreferableTarget</code>，即可在 OpenCV DNN 流水线上灵活切换到最优的硬件加速路径，大幅提升推理性能。</p>
 <h2 id="C-OpenCV-cv-addWeighted-详解"><a href="#C-OpenCV-cv-addWeighted-详解" class="headerlink" title="C++ OpenCV cv::addWeighted() 详解"></a>C++ OpenCV cv::addWeighted() 详解</h2><p><code>cv::addWeighted()</code> 是 OpenCV 中一个非常常用的函数，主要用于<strong>图像加权融合（图像叠加）</strong>，可以将两张图像按照一定的比例融合在一起，非常适合实现图像透明叠加、水印、特效处理等功能。</p>
 <hr>
 <h2 id="🧠-函数原型"><a href="#🧠-函数原型" class="headerlink" title="🧠 函数原型"></a>🧠 函数原型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">cv::addWeighted</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    InputArray src1,  <span class="comment">// 第一张输入图像</span></span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">double</span> alpha,     <span class="comment">// 第一张图像的权重</span></span></span></span><br><span class="line"><span class="params"><span class="function">    InputArray src2,  <span class="comment">// 第二张输入图像</span></span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">double</span> beta,      <span class="comment">// 第二张图像的权重</span></span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">double</span> gamma,     <span class="comment">// 加到最终结果上的标量偏移量</span></span></span></span><br><span class="line"><span class="params"><span class="function">    OutputArray dst,  <span class="comment">// 输出图像</span></span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">int</span> dtype = <span class="number">-1</span>    <span class="comment">// 输出图像的数据类型（可选）</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
@@ -439,7 +617,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-OpenCV-cv-addWeighted-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">C++ OpenCV cv::addWeighted() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%A0-%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">🧠 函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%98-%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">📘 数学公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number">5.</span> <span class="nav-text">✅ 参数详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8E%AF-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%9B%BE%E5%83%8F%E8%9E%8D%E5%90%88"><span class="nav-number">6.</span> <span class="nav-text">🎯 使用示例：图像融合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%AA-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">7.</span> <span class="nav-text">🧪 应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%A9-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">8.</span> <span class="nav-text">🧩 注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%8C-%E6%8B%93%E5%B1%95%EF%BC%9A%E5%8A%A8%E6%80%81%E8%9E%8D%E5%90%88%E5%8A%A8%E7%94%BB%EF%BC%88%E6%B8%90%E5%8F%98%EF%BC%89"><span class="nav-number">9.</span> <span class="nav-text">📌 拓展：动态融合动画（渐变）</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cv-dnn-Net-setPreferableTarget-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">cv::dnn::Net::setPreferableTarget() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%B8%B8%E8%A7%81-targetId-%E6%9E%9A%E4%B8%BE"><span class="nav-number">3.</span> <span class="nav-text">一、常见 targetId 枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%B8%8E-setPreferableBackend-%E7%9A%84%E9%85%8D%E5%90%88"><span class="nav-number">4.</span> <span class="nav-text">二、与 setPreferableBackend() 的配合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text">三、使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">6.</span> <span class="nav-text">四、注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cv-dnn-Net-setPreferableBackend-%E5%87%BD%E6%95%B0-%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">cv::dnn::Net::setPreferableBackend() 函数 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%B8%B8%E8%A7%81-backendId-%E6%9E%9A%E4%B8%BE"><span class="nav-number">8.</span> <span class="nav-text">一、常见 backendId 枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%B8%8E-setPreferableTarget-%E7%9A%84%E9%85%8D%E5%90%88"><span class="nav-number">9.</span> <span class="nav-text">二、与 setPreferableTarget() 的配合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">10.</span> <span class="nav-text">三、使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-1"><span class="nav-number">11.</span> <span class="nav-text">四、注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-OpenCV-cv-addWeighted-%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">C++ OpenCV cv::addWeighted() 详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%A0-%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B"><span class="nav-number">13.</span> <span class="nav-text">🧠 函数原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%98-%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F"><span class="nav-number">14.</span> <span class="nav-text">📘 数学公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="nav-number">15.</span> <span class="nav-text">✅ 参数详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8E%AF-%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%9B%BE%E5%83%8F%E8%9E%8D%E5%90%88"><span class="nav-number">16.</span> <span class="nav-text">🎯 使用示例：图像融合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%AA-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">17.</span> <span class="nav-text">🧪 应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%A9-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">18.</span> <span class="nav-text">🧩 注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%8C-%E6%8B%93%E5%B1%95%EF%BC%9A%E5%8A%A8%E6%80%81%E8%9E%8D%E5%90%88%E5%8A%A8%E7%94%BB%EF%BC%88%E6%B8%90%E5%8F%98%EF%BC%89"><span class="nav-number">19.</span> <span class="nav-text">📌 拓展：动态融合动画（渐变）</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -453,7 +631,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">672</span>
+          <span class="site-state-item-count">686</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -466,7 +644,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">98</span>
+        <span class="site-state-item-count">99</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
